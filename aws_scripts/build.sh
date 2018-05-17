@@ -42,7 +42,7 @@ echo "https://img.shields.io/badge/Build-$badge_status-$badge_colour.svg"
 curl -s "https://img.shields.io/badge/Build-$badge_status-$badge_colour.svg" > badges/build.svg
 
 # Unit tests
-failures=$( xmllint --xpath 'string(//testsuite/@failures) + string(//testsuite/@errors)' API/target/surefire-reports/TEST-*.xml )
+failures=$( xmllint --xpath 'string(//testsuite/@failures) + string(//testsuite/@errors)' api/target/surefire-reports/TEST-*.xml )
 
 if [ "$failures" -gt "0" ] ; then
         badge_status=failing
