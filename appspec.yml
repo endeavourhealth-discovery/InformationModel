@@ -1,9 +1,9 @@
 version: 0.0
 os: linux
 files:
-  - source: /FrontEnd/dist
+  - source: /frontend/dist
     destination: //opt/tomcat/webapps/information-model
-  - source: /API/target/api-1.0-SNAPSHOT
+  - source: /api/target/api-1.0-SNAPSHOT
     destination: //opt/tomcat/webapps/information-model
 hooks:
   BeforeInstall:
