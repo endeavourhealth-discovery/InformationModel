@@ -26,7 +26,7 @@ public class SwaggerBootstrap extends HttpServlet {
                 "/realms/" + ConfigService.instance().getAuthConfig().getRealm() + "/protocol/openid-connect";
 
         Swagger swagger = new Swagger().info(info);
-        swagger.basePath("/information-model/api");
+        swagger.basePath("../api");
         swagger.securityDefinition("oauth",
                 new OAuth2Definition()
                         .accessCode(baseAuthUrl + "/auth", baseAuthUrl + "/token")
