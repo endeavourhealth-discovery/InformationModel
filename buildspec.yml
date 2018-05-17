@@ -10,8 +10,6 @@ phases:
       - echo Build started on `date`
       - chmod +x aws_scripts/build.sh
       - aws_scripts/build.sh mvn -B package
-      - mvn -f common/pom.xml -B deploy
-      - mvn -f client/pom.xml -B deploy
   post_build:
     commands:
       - IP=$(curl http://checkip.amazonaws.com)/32
