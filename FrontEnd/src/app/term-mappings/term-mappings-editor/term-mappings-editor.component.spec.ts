@@ -2,7 +2,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { TermMappingsEditorComponent } from './term-mappings-editor.component';
 
-describe('AttributeModelEditorComponent', () => {
+describe('TermMappingsEditorComponent', () => {
   let component: TermMappingsEditorComponent;
   let fixture: ComponentFixture<TermMappingsEditorComponent>;
 

@@ -11,7 +11,7 @@ import {TermMappingsService} from '../term-mappings.service';
 import {TermMapping} from '../../models/TermMapping';
 
 @Component({
-  selector: 'app-attribute-model-editor',
+  selector: 'app-term-mappings-editor',
   templateUrl: './term-mappings-editor.component.html',
   styleUrls: [
     './term-mappings-editor.component.css',
