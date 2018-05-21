@@ -3,7 +3,6 @@ import {LoggerService} from 'eds-angular4';
 import {ConceptSummary} from '../models/ConceptSummary';
 import {Router} from '@angular/router';
 import {TermMappingsService} from './term-mappings.service';
-import {AttributeModelSummary} from '../models/AttributeModelSummary';
 
 @Component({
   selector: 'app-term-mappings',
