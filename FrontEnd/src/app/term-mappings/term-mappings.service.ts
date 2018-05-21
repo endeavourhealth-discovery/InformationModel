@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import {Http, URLSearchParams} from '@angular/http';
 import {Observable} from 'rxjs/Observable';
 import {ConceptSummary} from '../models/ConceptSummary';
+import {TermMapping} from '../models/TermMapping';
 
 @Injectable()
 export class TermMappingsService {
@@ -16,6 +17,13 @@ export class TermMappingsService {
     }
 
     return this.http.get('api/Concept/Summaries', {search: params})
+      .map((result) => result.json());
+  }
+
+  getMappings(conceptId: number): Observable<TermMapping[]> {
+    const params = new URLSearchParams();
+    params.append("concept_id", conceptId.toString());
+    return this.http.get('api/Term/Mappings', {search: params})
       .map((result) => result.json());
   }
 }

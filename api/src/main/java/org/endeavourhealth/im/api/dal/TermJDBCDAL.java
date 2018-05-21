@@ -8,6 +8,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TermJDBCDAL implements TermDAL {
     private final IMFilerDAL filer;
@@ -77,5 +79,30 @@ public class TermJDBCDAL implements TermDAL {
     @Override
     public String getOpcsTerm(String code) {
         return null;
+    }
+
+    @Override
+    public List<TermMapping> getMappings(Long conceptId) throws Exception {
+        List<TermMapping> result = new ArrayList<>();
+
+        String sql = "SELECT organisation, context, system, code FROM term_mapping WHERE concept_id = ?";
+        Connection conn = ConnectionPool.InformationModel.pop();
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, conceptId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                result.add(new TermMapping()
+                .setOrganisation(rs.getString("organisation"))
+                    .setContext(rs.getString("context"))
+                    .setSystem(rs.getString("system"))
+                    .setCode(rs.getString("code"))
+                    .setConceptId(conceptId)
+                );
+            }
+        } finally {
+            ConnectionPool.InformationModel.push(conn);
+        }
+
+        return result;
     }
 }

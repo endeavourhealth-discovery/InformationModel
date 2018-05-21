@@ -7,6 +7,8 @@ import {ConceptPickerComponent} from '../../concept/concept-picker/concept-picke
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConceptService} from '../../concept/concept.service';
 import {Location} from '@angular/common';
+import {TermMappingsService} from '../term-mappings.service';
+import {TermMapping} from '../../models/TermMapping';
 
 @Component({
   selector: 'app-attribute-model-editor',
@@ -17,6 +19,7 @@ import {Location} from '@angular/common';
 })
 export class TermMappingsEditorComponent implements AfterViewInit {
   model: Concept;
+  maps: TermMapping[];
   data: any;
   selectedRelation: any;
 
@@ -27,7 +30,8 @@ export class TermMappingsEditorComponent implements AfterViewInit {
               private location: Location,
               private logger: LoggerService,
               private modal: NgbModal,
-              private conceptService: ConceptService) { }
+              private conceptService: ConceptService,
+              private termService: TermMappingsService) { }
 
   ngAfterViewInit() {
     this.route.params.subscribe(
@@ -40,6 +44,11 @@ export class TermMappingsEditorComponent implements AfterViewInit {
     this.conceptService.getConcept(id)
       .subscribe(
         (result) => { this.model = result; this.getRelated() },
+        (error) => this.logger.error(error)
+      );
+    this.termService.getMappings(id)
+      .subscribe(
+        (result) => this.maps = result,
         (error) => this.logger.error(error)
       );
   }

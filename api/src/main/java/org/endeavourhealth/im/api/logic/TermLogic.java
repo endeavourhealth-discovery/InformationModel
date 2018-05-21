@@ -2,12 +2,14 @@ package org.endeavourhealth.im.api.logic;
 
 import org.endeavourhealth.im.api.dal.TermDAL;
 import org.endeavourhealth.im.api.dal.TermJDBCDAL;
+import org.endeavourhealth.im.api.models.TermMapping;
 import org.endeavourhealth.im.common.models.Concept;
 import org.endeavourhealth.im.common.models.ConceptStatus;
 import org.endeavourhealth.im.common.models.TaskType;
 import org.endeavourhealth.im.common.models.Term;
 
 import java.sql.SQLException;
+import java.util.List;
 
 public class TermLogic {
     private TermDAL dal;
@@ -66,6 +68,9 @@ public class TermLogic {
                 .setText(concept.getFullName());
     }
 
+    public List<TermMapping> getMappings(Long conceptId) throws Exception {
+        return this.dal.getMappings(conceptId);
+    }
 
     private String getOfficialTermForCode(String system, String code) throws Exception {
         String officialTerm = null;
@@ -77,4 +82,5 @@ public class TermLogic {
             officialTerm = this.dal.getOpcsTerm(code);      // Switch to official OPCS term text
         return officialTerm;
     }
+
 }
