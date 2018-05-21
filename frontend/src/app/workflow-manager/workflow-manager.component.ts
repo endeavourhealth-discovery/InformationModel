@@ -42,6 +42,10 @@ export class WorkflowManagerComponent implements OnInit {
         this.router.navigate(['attributeModel', task.identifier]);
         break;
       }
+      case TaskType.TERM_MAPPINGS: {
+        this.router.navigate(['termMappings', task.identifier]);
+        break;
+      }
       default: {
         this.logger.error('Unknown task type');
       }
