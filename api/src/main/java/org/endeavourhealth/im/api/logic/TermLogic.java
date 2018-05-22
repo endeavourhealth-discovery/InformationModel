@@ -3,10 +3,7 @@ package org.endeavourhealth.im.api.logic;
 import org.endeavourhealth.im.api.dal.TermDAL;
 import org.endeavourhealth.im.api.dal.TermJDBCDAL;
 import org.endeavourhealth.im.api.models.TermMapping;
-import org.endeavourhealth.im.common.models.Concept;
-import org.endeavourhealth.im.common.models.ConceptStatus;
-import org.endeavourhealth.im.common.models.TaskType;
-import org.endeavourhealth.im.common.models.Term;
+import org.endeavourhealth.im.common.models.*;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -37,30 +34,35 @@ public class TermLogic {
         if (conceptId != null) {
             concept = this.conceptLogic.get(conceptId);
         } else {
-
-            // Try to find an official term based on code/system
-            String officialTerm = getOfficialTermForCode(system, code);
+            // Try to find based on context
             String termConceptContext = "Term." + system + "." + code;
-            concept = new Concept()
+            concept = this.conceptLogic.get(termConceptContext);
+
+            if (concept != null) {
+                conceptId = concept.getId();
+            } else {
+                // Try to find an official term based on code/system
+                String officialTerm = getOfficialTermForCode(system, code);
+                concept = new Concept()
                     .setContext(termConceptContext);
 
-            if (officialTerm != null) {
-                // If one was found, just use it
-                concept.setStatus(ConceptStatus.ACTIVE)
+                if (officialTerm != null) {
+                    // If one was found, just use it
+                    concept.setStatus(ConceptStatus.ACTIVE)
                         .setFullName(officialTerm);
-                conceptId = this.conceptLogic.save(concept);
-            } else {
-                // otherwise create a draft/temporary one and associated task
-                concept.setStatus(ConceptStatus.DRAFT)
+                    conceptId = this.conceptLogic.save(concept);
+                    importParentHierarchy(conceptId, system, code);
+                } else {
+                    // otherwise create a draft/temporary one and associated task
+                    concept.setStatus(ConceptStatus.DRAFT)
                         .setFullName(termText);
-                conceptId = this.conceptLogic.save(concept);
-                this.taskLogic.createTask("New draft term", termConceptContext + " => " + termText, TaskType.TERM_MAPPINGS, conceptId);
+                    conceptId = this.conceptLogic.save(concept);
+                    this.taskLogic.createTask("New draft term", termConceptContext + " => " + termText, TaskType.TERM_MAPPINGS, conceptId);
+                }
             }
 
             // Add the mapping
             this.dal.createTermMap(organisation, context, system, code, conceptId);
-
-            // Return the new id
         }
 
         return new Term()
@@ -81,6 +83,38 @@ public class TermLogic {
         else if (system.toLowerCase().equals("opcs"))
             officialTerm = this.dal.getOpcsTerm(code);      // Switch to official OPCS term text
         return officialTerm;
+    }
+
+    private void importParentHierarchy(Long conceptId, String system, String code) throws Exception {
+        if (system.toLowerCase().equals("snomed"))
+            importSnomedParentHierarchy(conceptId, code);
+    }
+
+    private void importSnomedParentHierarchy(Long conceptId, String code) throws Exception {
+        Term parent = this.dal.getSnomedParent(code);
+        if (parent != null) {
+            String context = "Term.Snomed." + parent.getId().toString();
+
+            Concept concept = this.conceptLogic.get(context);
+
+            if (concept == null) {
+                concept = new Concept()
+                    .setContext(context)
+                    .setStatus(ConceptStatus.ACTIVE)
+                    .setFullName(parent.getText());
+
+                Long parentConceptId = this.conceptLogic.save(concept);
+
+                Relationship relationship = new Relationship()
+                    .setSource(parentConceptId)
+                    .setRelationship(ConceptRelationship.HAS_CHILD)
+                    .setTarget(conceptId);
+
+                this.conceptLogic.save(relationship);
+
+                importSnomedParentHierarchy(parentConceptId, parent.getId().toString());
+            }
+        }
     }
 
 }

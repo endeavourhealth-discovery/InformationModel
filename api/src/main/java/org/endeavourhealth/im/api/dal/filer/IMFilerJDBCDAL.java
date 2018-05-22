@@ -8,10 +8,7 @@ import org.endeavourhealth.im.api.models.TransactionTable;
 import org.endeavourhealth.im.common.models.DbEntity;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -131,7 +128,6 @@ public class IMFilerJDBCDAL implements IMFilerDAL {
         }
     }
 
-
     private Long applyTransactionComponent(Transaction transaction, TransactionComponent transactionComponent) throws Exception {
         switch (transactionComponent.getTable()) {
             case CONCEPT:
@@ -144,6 +140,8 @@ public class IMFilerJDBCDAL implements IMFilerDAL {
                 return applyTransactionComponent(transaction, transactionComponent, new ComponentFilerForAttributeModels());
             case TERM_MAPPING:
                 return applyTransactionComponent(transaction, transactionComponent, new ComponentFilerForTermMappings());
+            case RELATIONSHIP:
+                return applyTransactionComponent(transaction, transactionComponent, new ComponentFilerForRelationships());
             default:
                 throw new IllegalArgumentException("No component filer defined for the given type");
         }

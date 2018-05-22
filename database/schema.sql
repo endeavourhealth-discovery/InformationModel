@@ -2,11 +2,17 @@ DROP DATABASE IF EXISTS im;
 CREATE DATABASE im;
 USE im;
 
+DROP TABLE IF EXISTS table_id;
+CREATE TABLE table_id (
+  table_name VARCHAR(25) PRIMARY KEY            COMMENT 'Name of the table for this id counter',
+  id BIGINT NOT NULL                            COMMENT 'The next id available on that table'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 -- ********** CORE INFORMATION MODEL TABLE **********
 
 DROP TABLE IF EXISTS concept;
 CREATE TABLE concept(
-  id BIGINT AUTO_INCREMENT PRIMARY KEY          COMMENT 'Main concept id, common across all tables',
+  id BIGINT PRIMARY KEY                         COMMENT 'Main concept id, common across all tables',
   url VARCHAR(250)                              COMMENT 'URL for where documentation for this concept is published',
   full_name VARCHAR(4096)                       COMMENT 'Full, clear, unambiguous name for the concept',
   context VARCHAR(250) NOT NULL                 COMMENT 'Unique, computable (immutable) name for the concept',
@@ -15,6 +21,25 @@ CREATE TABLE concept(
   description VARCHAR(4096)                     COMMENT 'Full textual description of the concept',
   expression VARCHAR(1024)                      COMMENT 'Definition of this concept, based on other concepts, using ECL',
   criteria VARCHAR(1024)                        COMMENT 'Definition of this concept, using a criteria in D/IMQL'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS concept_relationship;
+CREATE TABLE concept_relationship (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY          COMMENT '',
+  source BIGINT NOT NULL                        COMMENT '',
+  relationship BIGINT NOT NULL                  COMMENT '',
+  target BIGINT NOT NULL                        COMMENT '',
+  `order` INTEGER DEFAULT 0                     COMMENT '',
+  mandatory BOOLEAN DEFAULT 0                   COMMENT 'Is this relationship optional (0:??) or mandatory (1:??)',
+  unlimited BOOLEAN DEFAULT 0                   COMMENT 'Is this relationship limited (??:1) or unlimited (??:*)',
+  weighting INTEGER DEFAULT 0                   COMMENT '',
+
+  KEY concept_relationship_source_idx (source),
+  KEY concept_relationship_target_idx (target),
+
+  CONSTRAINT concept_relationship_source_fk FOREIGN KEY (source) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT concept_relationship_relationship_fk FOREIGN KEY (relationship) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT concept_relationship_target_fk FOREIGN KEY (target) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS record_type;

@@ -80,6 +80,15 @@ public class ConceptJDBCDAL implements ConceptDAL {
     }
 
     @Override
+    public Long save(Relationship relationship) throws Exception {
+        return this.filer.storeAndApply(
+            "Endeavour Health",
+            relationship.getId() == null ? TransactionAction.CREATE : TransactionAction.UPDATE,
+            TransactionTable.RELATIONSHIP,
+            relationship);
+    }
+
+    @Override
     public List<ConceptSummary> search(String criteria) throws Exception{
         List<ConceptSummary> results = new ArrayList<>();
 

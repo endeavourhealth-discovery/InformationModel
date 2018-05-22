@@ -1,6 +1,7 @@
 package org.endeavourhealth.im.api.dal;
 
 import org.endeavourhealth.im.api.models.TermMapping;
+import org.endeavourhealth.im.common.models.Term;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -16,4 +17,6 @@ public interface TermDAL {
     String getOpcsTerm(String code);
 
     List<TermMapping> getMappings(Long conceptId) throws Exception;
+
+    Term getSnomedParent(String code) throws SQLException;
 }

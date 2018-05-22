@@ -2,10 +2,7 @@ package org.endeavourhealth.im.api.logic;
 
 import org.endeavourhealth.im.api.dal.ConceptDAL;
 import org.endeavourhealth.im.api.dal.ConceptJDBCDAL;
-import org.endeavourhealth.im.common.models.Concept;
-import org.endeavourhealth.im.common.models.ConceptReference;
-import org.endeavourhealth.im.common.models.ConceptSummary;
-import org.endeavourhealth.im.common.models.TaskType;
+import org.endeavourhealth.im.common.models.*;
 
 import java.util.List;
 
@@ -35,6 +32,10 @@ public class ConceptLogic {
         return this.dal.get(id);
     }
 
+    public Concept get(String context) throws Exception {
+        return this.dal.getConceptByContext(context);
+    }
+
     private boolean validateAndCreateDraft(ConceptReference ref, boolean createTaskIfInvalid) throws Exception {
         if (ref == null || ref.getId() != null || ref.getContext() == null || ref.getContext().isEmpty())
             return true;
@@ -54,6 +55,10 @@ public class ConceptLogic {
 
     public Long save(Concept concept) throws Exception {
         return this.dal.save(concept);
+    }
+
+    public Long save(Relationship relationship) throws Exception {
+        return this.dal.save(relationship);
     }
 
     public List<ConceptSummary> search(String criteria) throws Exception {

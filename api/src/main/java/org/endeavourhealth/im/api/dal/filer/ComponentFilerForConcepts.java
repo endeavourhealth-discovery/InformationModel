@@ -2,6 +2,7 @@ package org.endeavourhealth.im.api.dal.filer;
 
 import org.endeavourhealth.common.cache.ObjectMapperPool;
 import org.endeavourhealth.im.api.dal.ConnectionPool;
+import org.endeavourhealth.im.api.dal.TableIdHelper;
 import org.endeavourhealth.im.common.models.Concept;
 import org.endeavourhealth.im.api.models.TransactionComponent;
 
@@ -18,6 +19,8 @@ public class ComponentFilerForConcepts extends ComponentFiler {
     }
 
     protected Long createConcept(Concept concept) throws SQLException {
+        concept.setId(TableIdHelper.getNextId("concept"));
+
         List<String> fieldList = getPopulatedFieldList(concept);
         String paramList = getParamList(fieldList);
 
@@ -25,12 +28,10 @@ public class ComponentFilerForConcepts extends ComponentFiler {
                 "VALUES (" + paramList + ")";
 
         Connection conn = ConnectionPool.InformationModel.pop();
-        try (PreparedStatement statement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement statement = conn.prepareStatement(sql)) {
             setParameters(statement, concept);
             statement.executeUpdate();
-            ResultSet rs = statement.getGeneratedKeys();
-            rs.next();
-            return rs.getLong(1);
+            return concept.getId();
         } finally {
             ConnectionPool.InformationModel.push(conn);
         }
@@ -66,6 +67,7 @@ public class ComponentFilerForConcepts extends ComponentFiler {
     private List<String> getPopulatedFieldList(Concept concept) {
         List<String> fields = new ArrayList<>();
 
+        if (concept.getId() != null) fields.add("id");
         if (concept.getUrl() != null) fields.add("url");
         if (concept.getFullName() != null) fields.add("full_name");
         if (concept.getContext() != null) fields.add("context");
@@ -80,6 +82,10 @@ public class ComponentFilerForConcepts extends ComponentFiler {
 
     private Integer setParameters(PreparedStatement statement, Concept concept) throws SQLException {
         int i = 1;
+
+        if (concept.getId() != null)
+            statement.setLong(i++, concept.getId());
+
         if (concept.getUrl() != null)
             statement.setString(i++, concept.getUrl());
 

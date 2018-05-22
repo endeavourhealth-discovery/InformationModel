@@ -3,6 +3,7 @@ package org.endeavourhealth.im.api.dal;
 import org.endeavourhealth.im.api.dal.filer.IMFilerDAL;
 import org.endeavourhealth.im.api.dal.filer.IMFilerJDBCDAL;
 import org.endeavourhealth.im.api.models.*;
+import org.endeavourhealth.im.common.models.Term;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -104,5 +105,30 @@ public class TermJDBCDAL implements TermDAL {
         }
 
         return result;
+    }
+
+    @Override
+    public Term getSnomedParent(String code) throws SQLException {
+        String sql = "SELECT p.code, p.display " +
+            "FROM trm_concept p " +
+            "JOIN trm_concept_pc_link l ON l.parent_pid = p.pid " +
+            "JOIN trm_concept c ON c.pid = l.child_pid " +
+            "WHERE c.code = ? " +
+            "AND l.rel_type = 0";
+
+        Connection conn = ConnectionPool.Snomed.pop();
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, code);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next())
+                return new Term()
+                .setId(rs.getLong("code"))
+                .setText(rs.getString("display"));
+        } finally {
+            ConnectionPool.Snomed.push(conn);
+        }
+
+        return null;
     }
 }
