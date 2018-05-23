@@ -18,4 +18,7 @@ public interface ConceptDAL {
     Long save(Relationship relationship) throws Exception;
 
     List<ConceptSummary> search(String criteria) throws Exception;
+
+    List<ConceptSummary> getRelatedTargets(Long id) throws SQLException;
+    List<ConceptSummary> getRelatedSources(Long id) throws SQLException;
 }

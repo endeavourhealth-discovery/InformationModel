@@ -64,4 +64,12 @@ public class ConceptLogic {
     public List<ConceptSummary> search(String criteria) throws Exception {
         return this.dal.search(criteria);
     }
+
+    public List<ConceptSummary> getRelatedTargets(Long id) throws Exception {
+        return this.dal.getRelatedTargets(id);
+    }
+
+    public List<ConceptSummary> getRelatedSources(Long id) throws Exception {
+        return this.dal.getRelatedSources(id);
+    }
 }

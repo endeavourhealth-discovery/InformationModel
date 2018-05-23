@@ -9,6 +9,8 @@ import {ConceptService} from '../../concept/concept.service';
 import {Location} from '@angular/common';
 import {TermMappingsService} from '../term-mappings.service';
 import {TermMapping} from '../../models/TermMapping';
+import {ConceptSummary} from '../../models/ConceptSummary';
+import {forkJoin} from 'rxjs/observable/forkJoin';
 
 @Component({
   selector: 'app-term-mappings-editor',
@@ -36,44 +38,52 @@ export class TermMappingsEditorComponent implements AfterViewInit {
   ngAfterViewInit() {
     this.route.params.subscribe(
       params => {
-        this.loadAttributeModel(params['id']);
+        this.loadConcept(params['id']);
       });
   }
 
-  loadAttributeModel(id: number) {
+  loadConcept(id: number) {
+    // this.model = null;
+    // this.maps = null;
+    // this.data = null;
     this.conceptService.getConcept(id)
       .subscribe(
-        (result) => { this.model = result; this.getRelated() },
+        (result) => this.loadDetails(result),
         (error) => this.logger.error(error)
       );
-    this.termService.getMappings(id)
+  }
+
+  loadDetails(concept: Concept) {
+    this.model = concept;
+    this.termService.getMappings(this.model.id)
       .subscribe(
         (result) => this.maps = result,
         (error) => this.logger.error(error)
       );
+
+    forkJoin([this.termService.getRelatedTargets(this.model.id), this.termService.getRelatedSources(this.model.id)])
+      .subscribe(
+        (results) => this.buildRelated(results),
+        (error) => this.logger.error(error)
+      );
   }
 
-  getRelated() {
-    this.data = {
+  buildRelated(results:any[]) {
+    const targets = results[0];
+    const sources = results[1];
 
-      'nodes': [
-        {'name': 'Term', 'group': 1},
+    let tempData = {nodes: [{name: this.model.context, group: 1}], edges: []};
 
-        {'name': 'Child Term 1', 'group': 2},
-        {'name': 'Child Term 2', 'group': 2},
-        {'name': 'Child Term 3', 'group': 2},
-        {'name': 'Child Term 4', 'group': 2},
+    for(let target of targets) {
+      let i = tempData.nodes.push({name: target.context, group: 2});
+      tempData.edges.push({source: 0, target: i-1, label: 'Has target'});
+    }
+    for(let source of sources) {
+      let i = tempData.nodes.push({name: source.context, group: 3});
+      tempData.edges.push({source: i-1, target: 0, label: 'Has source'});
+    }
 
-        {'name': 'Term Parent', 'group': 3}
-      ],
-      'edges': [
-        {'source': 0, 'target': 1, 'label': 'Has child'},
-        {'source': 0, 'target': 2, 'label': 'Has child'},
-        {'source': 0, 'target': 3, 'label': 'Has child'},
-        {'source': 0, 'target': 4, 'label': 'Has child'},
-        {'source': 0, 'target': 5, 'label': 'Has parent'}
-      ]
-    };
+    this.data = tempData;
   }
 
   getConceptStatusName(status: ConceptStatus): string {

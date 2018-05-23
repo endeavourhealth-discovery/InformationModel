@@ -11,8 +11,8 @@
     <div class="module-body">
       <form>
         <div class="row">
-          <div class="col-md-12">
-            <div class="card" id="detailCard" *ngIf="model">
+          <div class="col-md-8">
+            <div class="card h-100" id="detailCard" *ngIf="model">
               <div class="card-header card-success"><h4>Details</h4></div>
               <div class="card-block">
                 <div class="row">
@@ -53,11 +53,19 @@
               </div>
             </div>
           </div>
+          <div class="col-md-4">
+            <div class="card h-100" id="relatedGraph">
+              <div class="card-header card-success"><h4>Related</h4></div>
+              <div class="card-block">
+                    <nodeGraph [graphData]="data"></nodeGraph>
+              </div>
+            </div>
+          </div>
         </div>
         <br>
         <div class="row">
           <div class="col-md-8">
-            <div class="card" id="mapsCard" [hidden]="!maps">
+            <div class="card h-100" id="mapsCard" [hidden]="!maps">
               <div class="card-header card-success"><h4>Mappings</h4></div>
               <div class="card-block">
                 <table class="table table-sm table-striped table-hover" *ngIf="maps">
@@ -89,13 +97,13 @@
             </div>
           </div>
           <div class="col-md-4">
-            <div class="card" id="relatedCard" [hidden]="!model">
+            <div class="card h-100" id="relatedCard" [hidden]="!data">
               <div class="card-header card-success"><h4>Attributes</h4></div>
               <div class="card-block">
                 <button class="btn btn-sm btn-success" (click)="addRelationship()">Add</button>
                 <br>
                 <br>
-                <table class="table table-sm table-striped table-hover" *ngIf="model">
+                <table class="table table-sm table-striped table-hover" *ngIf="data">
                   <thead>
                     <tr class="d-flex">
                       <th class="col-6">Concept</th>

@@ -98,4 +98,42 @@ public class ConceptEndpoint {
                 .entity(concepts)
                 .build();
     }
+
+    @GET
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/RelatedTargets")
+    @Timed(absolute = true, name = "InformationModel.ConceptEndpoint.RelatedTargets")
+    @ApiOperation(value = "Returns related target concepts by id")
+    public Response getRelatedTargets(@Context SecurityContext sc,
+                                 @ApiParam(value = "Concept Id") @QueryParam("id") Long id
+    ) throws Exception {
+        LOG.debug("Get related target concepts");
+
+        List<ConceptSummary> concepts = new ConceptLogic().getRelatedTargets(id);
+
+        return Response
+            .ok()
+            .entity(concepts)
+            .build();
+    }
+
+    @GET
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/RelatedSources")
+    @Timed(absolute = true, name = "InformationModel.ConceptEndpoint.RelatedSources")
+    @ApiOperation(value = "Returns related source concepts by id")
+    public Response getRelatedSources(@Context SecurityContext sc,
+                               @ApiParam(value = "Concept Id") @QueryParam("id") Long id
+    ) throws Exception {
+        LOG.debug("Get related source concepts");
+
+        List<ConceptSummary> concepts = new ConceptLogic().getRelatedSources(id);
+
+        return Response
+            .ok()
+            .entity(concepts)
+            .build();
+    }
 }

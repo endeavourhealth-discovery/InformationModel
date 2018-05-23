@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 
 @Component({
   selector: 'nodeGraph',
@@ -8,10 +8,11 @@ import {Component, Input, OnInit} from '@angular/core';
 export class NodeGraphComponent implements OnInit {
   data: any;
 
+  @ViewChild('graphSvg') graphSvg: ElementRef;
   @Input('graphData')
   set setData(value) {
     this.data = value;
-    if (this.data) {
+    if (this.data && this.data.nodes && this.data.edges) {
       this.refresh();
     }
   }
@@ -148,7 +149,11 @@ export class NodeGraphComponent implements OnInit {
   }
 
   onResize(svg: any, force: any) {
-    const width = window.innerWidth * 0.6, height = window.innerHeight * 0.4;
+    const computedStyle = window.getComputedStyle(this.graphSvg.nativeElement.parentElement.parentElement);
+    const hPadding = parseFloat(computedStyle.paddingLeft) + parseFloat(computedStyle.paddingRight) + 5;
+    const width = parseFloat(computedStyle.width) - hPadding;
+    const vPadding = parseFloat(computedStyle.paddingTop) + parseFloat(computedStyle.paddingBottom) + 5;
+    const height = parseFloat(computedStyle.height) - vPadding;
     svg.attr('width', width).attr('height', height);
     force.size([width, height]).resume();
   }

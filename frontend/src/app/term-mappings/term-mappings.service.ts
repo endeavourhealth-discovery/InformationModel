@@ -26,4 +26,19 @@ export class TermMappingsService {
     return this.http.get('api/Term/Mappings', {search: params})
       .map((result) => result.json());
   }
+
+  getRelatedTargets(conceptId: number): Observable<ConceptSummary[]> {
+    const params = new URLSearchParams();
+    params.append('id', conceptId.toString());
+    return this.http.get('api/Concept/RelatedTargets', {search: params})
+      .map((result) => result.json());
+  }
+
+  getRelatedSources(conceptId: number): Observable<ConceptSummary[]> {
+    const params = new URLSearchParams();
+    params.append('id', conceptId.toString());
+    return this.http.get('api/Concept/RelatedSources', {search: params})
+      .map((result) => result.json());
+  }
+
 }

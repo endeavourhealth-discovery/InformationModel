@@ -27,29 +27,17 @@ public class ConceptJDBCDAL implements ConceptDAL {
 
     @Override
     public List<ConceptSummary> getSummaries(Integer page) throws SQLException {
-        List<ConceptSummary> result = new ArrayList<>();
         Connection conn = ConnectionPool.InformationModel.pop();
 
-        int offset = (page -1) * PAGE_SIZE;
+        int offset = (page - 1) * PAGE_SIZE;
 
-        try(PreparedStatement stmt = conn.prepareStatement("SELECT id, context, status, version FROM concept LIMIT ?, ?")) {
+        try (PreparedStatement stmt = conn.prepareStatement("SELECT id, context, status, version FROM concept LIMIT ?, ?")) {
             stmt.setInt(1, offset);
             stmt.setInt(2, PAGE_SIZE);
-            ResultSet rs = stmt.executeQuery();
-
-            while(rs.next()) {
-                result.add(new ConceptSummary()
-                        .setId(rs.getLong("id"))
-                        .setContext(rs.getString("context"))
-                        .setStatus(ConceptStatus.byValue(rs.getByte("status")).getName())
-                        .setVersion(rs.getString("version"))
-                );
-            }
+            return getSummaryResultSet(stmt);
         } finally {
             ConnectionPool.InformationModel.push(conn);
         }
-
-        return result;
     }
 
     @Override
@@ -89,33 +77,73 @@ public class ConceptJDBCDAL implements ConceptDAL {
     }
 
     @Override
-    public List<ConceptSummary> search(String criteria) throws Exception{
-        List<ConceptSummary> results = new ArrayList<>();
-
+    public List<ConceptSummary> search(String criteria) throws Exception {
         criteria = "%" + criteria + "%";
 
         String sql = "SELECT id, context, status, version " +
-                "FROM concept " +
-                "WHERE context like ? OR full_name like ? " +
-                "LIMIT 50";
+            "FROM concept " +
+            "WHERE context like ? OR full_name like ? " +
+            "LIMIT 50";
 
         Connection conn = ConnectionPool.InformationModel.pop();
         try (PreparedStatement statement = conn.prepareStatement(sql)) {
             statement.setString(1, criteria);
             statement.setString(2, criteria);
-            ResultSet res = statement.executeQuery();
-            while (res.next()) {
-                results.add(new ConceptSummary()
-                        .setId(res.getLong("id"))
-                        .setContext(res.getString("context"))
-                        .setStatus(ConceptStatus.byValue(res.getByte("status")).getName())
-                        .setVersion(res.getString("version")));
-            }
+            return getSummaryResultSet(statement);
         } finally {
             ConnectionPool.InformationModel.push(conn);
         }
+    }
 
-        return results;
+    @Override
+    public List<ConceptSummary> getRelatedTargets(Long id) throws SQLException {
+        String sql = "SELECT c.id, c.context, c.status, c.version " +
+            "FROM concept c " +
+            "JOIN concept_relationship r ON r.target = c.id " +
+            "WHERE r.source = ?";
+
+        Connection conn = ConnectionPool.InformationModel.pop();
+
+        try(PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, id);
+            return getSummaryResultSet(stmt);
+        } finally {
+            ConnectionPool.InformationModel.push(conn);
+        }
+    }
+
+    @Override
+    public List<ConceptSummary> getRelatedSources(Long id) throws SQLException {
+        String sql = "SELECT c.id, c.context, c.status, c.version " +
+            "FROM concept c " +
+            "JOIN concept_relationship r ON r.source = c.id " +
+            "WHERE r.target = ?";
+
+        Connection conn = ConnectionPool.InformationModel.pop();
+
+        try(PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, id);
+            return getSummaryResultSet(stmt);
+        } finally {
+            ConnectionPool.InformationModel.push(conn);
+        }
+    }
+
+    private List<ConceptSummary> getSummaryResultSet(PreparedStatement stmt) throws SQLException {
+        List<ConceptSummary> result = new ArrayList<>();
+
+        ResultSet rs = stmt.executeQuery();
+
+        while(rs.next()) {
+            result.add(new ConceptSummary()
+                .setId(rs.getLong("id"))
+                .setContext(rs.getString("context"))
+                .setStatus(ConceptStatus.byValue(rs.getByte("status")).getName())
+                .setVersion(rs.getString("version"))
+            );
+        }
+
+        return result;
     }
 
     @Override
