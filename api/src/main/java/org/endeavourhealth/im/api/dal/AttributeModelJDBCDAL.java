@@ -107,4 +107,34 @@ public class AttributeModelJDBCDAL implements AttributeModelDAL {
 
         return this.filer.storeAndApply("Endeavour health", TransactionAction.CREATE, TransactionTable.ATTRIBUTE_MODEL, attributeModel);
     }
+
+    @Override
+    public List<ConceptSummary> getAttributes(Long conceptId) throws SQLException {
+        List<ConceptSummary> result = new ArrayList<>();
+
+        Connection conn = ConnectionPool.InformationModel.pop();
+
+        String sql = "SELECT c.id, c.context, c.status, c.version " +
+            "FROM record_type_attribute r " +
+            "JOIN concept c ON c.id = r.data_type " +
+            "WHERE r.record_type = ?";
+
+        try(PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, conceptId);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                result.add( new ConceptSummary()
+                    .setId(rs.getLong("id"))
+                    .setContext(rs.getString("context"))
+                    .setStatus(rs.getString("status"))
+                    .setVersion(rs.getString("version"))
+                );
+            }
+        } finally {
+            ConnectionPool.InformationModel.push(conn);
+        }
+
+        return result;
+    }
 }

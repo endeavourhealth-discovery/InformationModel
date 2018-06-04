@@ -4,6 +4,7 @@ import org.endeavourhealth.im.api.dal.AttributeModelDAL;
 import org.endeavourhealth.im.api.dal.AttributeModelJDBCDAL;
 import org.endeavourhealth.im.common.models.*;
 
+import java.sql.SQLException;
 import java.util.List;
 
 public class AttributeModelLogic {
@@ -39,5 +40,9 @@ public class AttributeModelLogic {
             ref.setId(id);
             return false;
         }
+    }
+
+    public List<ConceptSummary> getAttributes(Long conceptId) throws SQLException {
+        return this.dal.getAttributes(conceptId);
     }
 }

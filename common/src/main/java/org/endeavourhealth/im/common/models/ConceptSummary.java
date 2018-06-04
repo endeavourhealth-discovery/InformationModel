@@ -4,6 +4,7 @@ public class ConceptSummary extends DbEntity<ConceptSummary> {
     private String context;
     private String status;
     private String version;
+    private ConceptRelationship relationship;
 
     public String getContext() {
         return context;
@@ -29,6 +30,15 @@ public class ConceptSummary extends DbEntity<ConceptSummary> {
 
     public ConceptSummary setVersion(String version) {
         this.version = version;
+        return this;
+    }
+
+    public ConceptRelationship getRelationship() {
+        return relationship;
+    }
+
+    public ConceptSummary setRelationship(ConceptRelationship relationship) {
+        this.relationship = relationship;
         return this;
     }
 }

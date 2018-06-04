@@ -5,4 +5,5 @@ export class ConceptSummary extends DbEntity {
   context: string;
   status: ConceptStatus;
   version: string;
+  relationship: number;
 }

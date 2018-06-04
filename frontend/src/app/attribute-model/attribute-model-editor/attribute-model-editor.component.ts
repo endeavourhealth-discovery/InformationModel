@@ -7,6 +7,8 @@ import {ConceptPickerComponent} from '../../concept/concept-picker/concept-picke
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConceptService} from '../../concept/concept.service';
 import {Location} from '@angular/common';
+import {forkJoin} from 'rxjs/observable/forkJoin';
+import {AttributeModelService} from '../attribute-model.service';
 
 @Component({
   selector: 'app-attribute-model-editor',
@@ -27,7 +29,8 @@ export class AttributeModelEditorComponent implements AfterViewInit {
               private location: Location,
               private logger: LoggerService,
               private modal: NgbModal,
-              private conceptService: ConceptService) { }
+              private conceptService: ConceptService,
+              private attributeService: AttributeModelService) { }
 
   ngAfterViewInit() {
     this.route.params.subscribe(
@@ -39,32 +42,46 @@ export class AttributeModelEditorComponent implements AfterViewInit {
   loadAttributeModel(id: number) {
     this.conceptService.getConcept(id)
       .subscribe(
-        (result) => { this.model = result; this.getRelated() },
+        (result) => this.loadDetails(result),
         (error) => this.logger.error(error)
       );
   }
 
-  getRelated() {
-    this.data = {
+  loadDetails(concept: Concept) {
+    this.model = concept;
 
-      'nodes': [
-        {'name': 'Patient Demographics', 'group': 1},
+    forkJoin([
+        this.conceptService.getRelatedTargets(this.model.id),
+        this.conceptService.getRelatedSources(this.model.id),
+        this.attributeService.getAttributes(this.model.id)
+    ])
+      .subscribe(
+        (results) => this.buildRelated(results),
+        (error) => this.logger.error(error)
+      );
+  }
 
-        {'name': 'Forename', 'group': 2},
-        {'name': 'Surname', 'group': 2},
-        {'name': 'Birth Date', 'group': 2},
-        {'name': 'Address', 'group': 2},
+  buildRelated(results:any[]) {
+    const targets = results[0];
+    const sources = results[1];
+    const attributes = results[2];
 
-        {'name': 'Record type', 'group': 3}
-      ],
-      'edges': [
-        {'source': 0, 'target': 1, 'label': 'Has a'},
-        {'source': 0, 'target': 2, 'label': 'Has a'},
-        {'source': 0, 'target': 3, 'label': 'Has a'},
-        {'source': 0, 'target': 4, 'label': 'Has a'},
-        {'source': 0, 'target': 5, 'label': 'Is a'}
-      ]
-    };
+    let tempData = {nodes: [{name: this.model.context, group: 1}], edges: []};
+
+    for(let target of targets) {
+      let i = tempData.nodes.push({name: target.context, group: 2});
+      tempData.edges.push({source: 0, target: i-1, label: 'Has target'});
+    }
+    for(let source of sources) {
+      let i = tempData.nodes.push({name: source.context, group: 3});
+      tempData.edges.push({source: i-1, target: 0, label: 'Has source'});
+    }
+    for(let attribute of attributes) {
+      let i = tempData.nodes.push({name: attribute.context, group: 4});
+      tempData.edges.push({source: 0, target: i-1, label: 'Has attribute'});
+    }
+
+    this.data = tempData;
   }
 
   getConceptStatusName(status: ConceptStatus): string {

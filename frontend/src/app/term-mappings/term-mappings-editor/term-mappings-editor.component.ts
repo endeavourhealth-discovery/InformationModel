@@ -61,7 +61,7 @@ export class TermMappingsEditorComponent implements AfterViewInit {
         (error) => this.logger.error(error)
       );
 
-    forkJoin([this.termService.getRelatedTargets(this.model.id), this.termService.getRelatedSources(this.model.id)])
+    forkJoin([this.conceptService.getRelatedTargets(this.model.id), this.conceptService.getRelatedSources(this.model.id)])
       .subscribe(
         (results) => this.buildRelated(results),
         (error) => this.logger.error(error)

@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.endeavourhealth.im.api.logic.AttributeModelLogic;
 import org.endeavourhealth.im.common.models.AttributeModelSummary;
+import org.endeavourhealth.im.common.models.ConceptSummary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,5 +41,24 @@ public class AttributeModelEndpoint {
                 .ok()
                 .entity(models)
                 .build();
+    }
+
+    @GET
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/Attributes")
+    @Timed(absolute = true, name = "InformationModel.AttributeModelEndpoint.GetAttributes")
+    @ApiOperation(value = "Retrieves a list of attributes assocated with the given attribute model id")
+    public Response getAttributes(@Context SecurityContext sc,
+                                  @ApiParam(value = "Attribute Model id") @QueryParam("conceptId") Long conceptId
+    ) throws Exception {
+        LOG.debug("Get attribute model attributes");
+
+        List<ConceptSummary> attributes = new AttributeModelLogic().getAttributes(conceptId);
+
+        return Response
+            .ok()
+            .entity(attributes)
+            .build();
     }
 }
