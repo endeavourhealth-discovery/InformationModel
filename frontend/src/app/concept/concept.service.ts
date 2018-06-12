@@ -3,6 +3,7 @@ import {Http, URLSearchParams} from '@angular/http';
 import {Observable} from 'rxjs/Observable';
 import {Concept} from '../models/Concept';
 import {ConceptSummary} from '../models/ConceptSummary';
+import {RelatedConcept} from '../models/RelatedConcept';
 
 @Injectable()
 export class ConceptService {
@@ -47,17 +48,24 @@ export class ConceptService {
       .map((result) => result.json());
   }
 
-  getRelatedTargets(conceptId: number): Observable<ConceptSummary[]> {
+  getRelatedTargets(conceptId: number): Observable<RelatedConcept[]> {
     const params = new URLSearchParams();
     params.append('id', conceptId.toString());
     return this.http.get('api/Concept/RelatedTargets', {search: params})
       .map((result) => result.json());
   }
 
-  getRelatedSources(conceptId: number): Observable<ConceptSummary[]> {
+  getRelatedSources(conceptId: number): Observable<RelatedConcept[]> {
     const params = new URLSearchParams();
     params.append('id', conceptId.toString());
     return this.http.get('api/Concept/RelatedSources', {search: params})
+      .map((result) => result.json());
+  }
+
+  getAttributes(conceptId: number): Observable<ConceptSummary[]> {
+    const params = new URLSearchParams();
+    params.append('id', conceptId.toString());
+    return this.http.get('api/Concept/Attribute', {search: params})
       .map((result) => result.json());
   }
 }

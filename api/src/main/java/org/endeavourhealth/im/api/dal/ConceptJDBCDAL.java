@@ -96,34 +96,81 @@ public class ConceptJDBCDAL implements ConceptDAL {
     }
 
     @Override
-    public List<ConceptSummary> getRelatedTargets(Long id) throws SQLException {
-        String sql = "SELECT c.id, c.context, c.status, c.version, r.relationship " +
+    public List<RelatedConcept> getRelatedTargets(Long id) throws SQLException {
+        String sql = "SELECT c.id, c.context, rc.full_name as relationship " +
             "FROM concept c " +
             "JOIN concept_relationship r ON r.target = c.id " +
+            "JOIN concept rc ON rc.id = r.relationship " +
             "WHERE r.source = ?";
 
         Connection conn = ConnectionPool.InformationModel.pop();
 
+        List<RelatedConcept> result = new ArrayList<>();
         try(PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setLong(1, id);
-            return getSummaryResultSet(stmt, true);
+            ResultSet rs = stmt.executeQuery();
+
+            while(rs.next()) {
+                RelatedConcept summary = new RelatedConcept()
+                    .setId(rs.getLong("id"))
+                    .setContext(rs.getString("context"))
+                    .setRelationship(rs.getString("relationship"));
+
+                result.add(summary);
+            }
+
+
         } finally {
             ConnectionPool.InformationModel.push(conn);
         }
+
+        return result;
     }
 
     @Override
-    public List<ConceptSummary> getRelatedSources(Long id) throws SQLException {
-        String sql = "SELECT c.id, c.context, c.status, c.version, r.relationship " +
+    public List<RelatedConcept> getRelatedSources(Long id) throws SQLException {
+        String sql = "SELECT c.id, c.context, rc.full_name as relationship " +
             "FROM concept c " +
             "JOIN concept_relationship r ON r.source = c.id " +
+            "JOIN concept rc ON rc.id = r.relationship " +
             "WHERE r.target = ?";
+
+        Connection conn = ConnectionPool.InformationModel.pop();
+
+        List<RelatedConcept> result = new ArrayList<>();
+        try(PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, id);
+            ResultSet rs = stmt.executeQuery();
+
+            while(rs.next()) {
+                RelatedConcept summary = new RelatedConcept()
+                    .setId(rs.getLong("id"))
+                    .setContext(rs.getString("context"))
+                    .setRelationship(rs.getString("relationship"));
+
+                result.add(summary);
+            }
+
+
+        } finally {
+            ConnectionPool.InformationModel.push(conn);
+        }
+
+        return result;
+    }
+
+    @Override
+    public List<ConceptSummary> getAttributes(Long id) throws SQLException {
+        String sql = "SELECT c.id, c.context, c.status, c.version " +
+            "FROM concept c " +
+            "JOIN concept_attribute a ON a.attribute_id = c.id " +
+            "WHERE a.concept_id = ?";
 
         Connection conn = ConnectionPool.InformationModel.pop();
 
         try(PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setLong(1, id);
-            return getSummaryResultSet(stmt, true);
+            return getSummaryResultSet(stmt, false);
         } finally {
             ConnectionPool.InformationModel.push(conn);
         }

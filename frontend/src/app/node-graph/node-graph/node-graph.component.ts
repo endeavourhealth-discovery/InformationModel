@@ -1,4 +1,4 @@
-import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
 
 @Component({
   selector: 'nodeGraph',
@@ -9,10 +9,20 @@ export class NodeGraphComponent implements OnInit {
   data: any;
 
   @ViewChild('graphSvg') graphSvg: ElementRef;
+
+  @Output()
+  nodeClick = new EventEmitter();
+
+  @Output()
+  nodeDblClick = new EventEmitter();
+
   @Input('graphData')
   set setData(value) {
-    this.data = value;
-    if (this.data && this.data.nodes && this.data.edges) {
+    if (value && value.nodes && value.edges) {
+      this.data = {
+        nodes: Object.assign([], value.nodes),
+        edges: Object.assign([], value.edges)
+      };
       this.refresh();
     }
   }
@@ -29,6 +39,7 @@ export class NodeGraphComponent implements OnInit {
     const colors = d3.scale.category10();
 
     const svg = d3.select('svg');
+    svg.selectAll("*").remove();
 
     const force = d3.layout.force()
       .nodes(this.data.nodes)
@@ -55,6 +66,8 @@ export class NodeGraphComponent implements OnInit {
       .attr({'r': nodeSize})
       .style('fill', (d: any) => colors(d.group))
       .call(force.drag)
+      .on("click", (node) => this.nodeClick.emit(node))
+      .on("dblclick", (node) => this.nodeDblClick.emit(node));
 
 
     const nodelabels = svg.selectAll('.nodelabel')

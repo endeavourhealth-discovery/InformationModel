@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiParam;
 import org.endeavourhealth.im.api.logic.ConceptLogic;
 import org.endeavourhealth.im.common.models.Concept;
 import org.endeavourhealth.im.common.models.ConceptSummary;
+import org.endeavourhealth.im.common.models.RelatedConcept;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -110,7 +111,7 @@ public class ConceptEndpoint {
     ) throws Exception {
         LOG.debug("Get related target concepts");
 
-        List<ConceptSummary> concepts = new ConceptLogic().getRelatedTargets(id);
+        List<RelatedConcept> concepts = new ConceptLogic().getRelatedTargets(id);
 
         return Response
             .ok()
@@ -129,11 +130,31 @@ public class ConceptEndpoint {
     ) throws Exception {
         LOG.debug("Get related source concepts");
 
-        List<ConceptSummary> concepts = new ConceptLogic().getRelatedSources(id);
+        List<RelatedConcept> concepts = new ConceptLogic().getRelatedSources(id);
 
         return Response
             .ok()
             .entity(concepts)
+            .build();
+    }
+
+
+    @GET
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/Attribute")
+    @Timed(absolute = true, name = "InformationModel.ConceptEndpoint.Attribute")
+    @ApiOperation(value = "Returns a list of attributes of a concept")
+    public Response getAttributes(@Context SecurityContext sc,
+                                      @ApiParam(value = "Concept Id") @QueryParam("id") Long id
+    ) throws Exception {
+        LOG.debug("Get concept attributes");
+
+        List<ConceptSummary> attributes = new ConceptLogic().getAttributes(id);
+
+        return Response
+            .ok()
+            .entity(attributes)
             .build();
     }
 }

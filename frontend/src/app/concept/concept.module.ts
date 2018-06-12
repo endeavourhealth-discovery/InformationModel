@@ -6,14 +6,21 @@ import {FormsModule} from '@angular/forms';
 import {ControlsModule} from 'eds-angular4/dist/controls';
 import { RelationshipPickerComponent } from './relationship-picker/relationship-picker.component';
 import {ConceptLibraryComponent} from './concept-library.component';
+import {ConceptEditorComponent} from './concept-editor/concept-editor.component';
+import {NodeGraphModule} from '../node-graph/node-graph.module';
+import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {NvD3Module} from 'ng2-nvd3';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
-    ControlsModule
+    ControlsModule,
+    NvD3Module,
+    NgbModule,
+    NodeGraphModule
   ],
-  declarations: [ConceptPickerComponent, RelationshipPickerComponent, ConceptLibraryComponent],
+  declarations: [ConceptPickerComponent, RelationshipPickerComponent, ConceptLibraryComponent, ConceptEditorComponent],
   entryComponents: [ConceptPickerComponent],
   providers: [ConceptService]
 })

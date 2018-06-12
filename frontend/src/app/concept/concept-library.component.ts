@@ -30,4 +30,8 @@ export class ConceptLibraryComponent implements OnInit {
         (error) => this.log.error(error)
       );
   }
+
+  editConcept(concept: ConceptSummary) {
+    this.router.navigate(['concept', concept.id]);
+  }
 }

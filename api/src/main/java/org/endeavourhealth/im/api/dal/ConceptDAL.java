@@ -2,6 +2,7 @@ package org.endeavourhealth.im.api.dal;
 
 import org.endeavourhealth.im.common.models.Concept;
 import org.endeavourhealth.im.common.models.ConceptSummary;
+import org.endeavourhealth.im.common.models.RelatedConcept;
 import org.endeavourhealth.im.common.models.Relationship;
 
 import java.sql.SQLException;
@@ -19,6 +20,8 @@ public interface ConceptDAL {
 
     List<ConceptSummary> search(String criteria) throws Exception;
 
-    List<ConceptSummary> getRelatedTargets(Long id) throws SQLException;
-    List<ConceptSummary> getRelatedSources(Long id) throws SQLException;
+    List<RelatedConcept> getRelatedTargets(Long id) throws SQLException;
+    List<RelatedConcept> getRelatedSources(Long id) throws SQLException;
+
+    List<ConceptSummary> getAttributes(Long id) throws SQLException;
 }
