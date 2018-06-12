@@ -52,40 +52,11 @@
               </div>
             </div>
           </div>
-        <!--</div>-->
-        <!--<br>-->
-        <!--<div class="row">-->
-          <!--<div class="col-md-8">-->
-            <!--<div class="card" id="relatedCard" [hidden]="!data">-->
-              <!--<div class="card-header card-success"><h4>Attributes</h4></div>-->
-              <!--<div class="card-block">-->
-                <!--<button class="btn btn-sm btn-success" (click)="addRelationship()">Add</button>-->
-                <!--<br>-->
-                <!--<br>-->
-                <!--<table class="table table-sm table-striped table-hover" *ngIf="data">-->
-                  <!--<thead>-->
-                  <!--<tr class="d-flex">-->
-                    <!--<th class="col-6">Concept</th>-->
-                    <!--<th class="col-5">Relationship</th>-->
-                    <!--<th class="col-1"></th>-->
-                  <!--</tr>-->
-                  <!--</thead>-->
-                  <!--<tbody>-->
-                  <!--<tr *ngFor="let item of data.nodes" class="d-flex show-child-on-hover" ngClass="" (click)="selectRelated(item)" [class.selection]="item == selectedRelation">-->
-                    <!--<td class="col-6">{{item.name}}</td>-->
-                    <!--<td class="col-5">{{item.group}}</td>-->
-                    <!--<td class="col-1"><button class="btn btn-sm btn-danger pull-right child-to-show"><i class="fa fa-trash"></i></button> </td>-->
-                  <!--</tr>-->
-                  <!--</tbody>-->
-                <!--</table>-->
-              <!--</div>-->
-            <!--</div>-->
-          <!--</div>-->
           <div class="col-md-8">
             <div class="card h-100" id="relatedGraph">
-              <div class="card-header card-success"><h4>Diagram <small> (double-click to expand)</small> <button class="btn pull-right" (click)="buildDiagram()">Refresh</button></h4></div>
+              <div class="card-header card-success"><h4>Diagram <small> (double-click to expand)</small></h4></div>
               <div class="card-block">
-                <nodeGraph [graphData]="data" (nodeClick)="nodeClick($event)" (nodeDblClick)="nodeDblClick($event)"></nodeGraph>
+                <nodeGraph #nodeGraph (nodeClick)="nodeClick($event)" (nodeDblClick)="nodeDblClick($event)"></nodeGraph>
               </div>
             </div>
           </div>

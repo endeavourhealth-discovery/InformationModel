@@ -157,4 +157,23 @@ public class ConceptEndpoint {
             .entity(attributes)
             .build();
     }
+
+    @GET
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/AttributeOf")
+    @Timed(absolute = true, name = "InformationModel.ConceptEndpoint.AttributeOf")
+    @ApiOperation(value = "Returns a list of concepts that this is an attribute of")
+    public Response getAttributeOf(@Context SecurityContext sc,
+                                  @ApiParam(value = "Concept Id") @QueryParam("id") Long id
+    ) throws Exception {
+        LOG.debug("Get attribute of concepts");
+
+        List<ConceptSummary> attributes = new ConceptLogic().getAttributeOf(id);
+
+        return Response
+            .ok()
+            .entity(attributes)
+            .build();
+    }
 }

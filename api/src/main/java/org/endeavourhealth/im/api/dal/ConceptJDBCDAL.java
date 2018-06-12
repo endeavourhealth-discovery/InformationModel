@@ -176,6 +176,23 @@ public class ConceptJDBCDAL implements ConceptDAL {
         }
     }
 
+    @Override
+    public List<ConceptSummary> getAttributeOf(Long id) throws SQLException {
+        String sql = "SELECT c.id, c.context, c.status, c.version " +
+            "FROM concept c " +
+            "JOIN concept_attribute a ON a.concept_id = c.id " +
+            "WHERE a.attribute_id = ?";
+
+        Connection conn = ConnectionPool.InformationModel.pop();
+
+        try(PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, id);
+            return getSummaryResultSet(stmt, false);
+        } finally {
+            ConnectionPool.InformationModel.push(conn);
+        }
+    }
+
     private List<ConceptSummary> getSummaryResultSet(PreparedStatement stmt, Boolean includeRelationship) throws SQLException {
         List<ConceptSummary> result = new ArrayList<>();
 

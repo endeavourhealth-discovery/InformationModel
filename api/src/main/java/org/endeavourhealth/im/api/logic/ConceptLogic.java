@@ -76,4 +76,7 @@ public class ConceptLogic {
     public List<ConceptSummary> getAttributes(Long id) throws Exception {
         return this.dal.getAttributes(id);
     }
-}
+
+    public List<ConceptSummary> getAttributeOf(Long id) throws Exception {
+        return this.dal.getAttributeOf(id);
+    }}

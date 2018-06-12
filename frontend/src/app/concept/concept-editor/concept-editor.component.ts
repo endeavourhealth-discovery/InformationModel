@@ -1,4 +1,4 @@
-import {AfterViewInit, Component} from '@angular/core';
+import {AfterViewInit, Component, ViewChild} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {InputBoxDialog, LoggerService} from 'eds-angular4';
 import {Concept} from '../../models/Concept';
@@ -10,6 +10,7 @@ import {Location} from '@angular/common';
 import {forkJoin} from 'rxjs/observable/forkJoin';
 import {RelatedConcept} from '../../models/RelatedConcept';
 import {ConceptSummary} from '../../models/ConceptSummary';
+import {NodeGraphComponent} from '../../node-graph/node-graph/node-graph.component';
 
 @Component({
   selector: 'app-concept-editor',
@@ -24,7 +25,8 @@ export class ConceptEditorComponent implements AfterViewInit {
   selectedRelation: any;
   nodes: any[];
   edges: any[];
-  nodemap: any = {};
+
+  @ViewChild('nodeGraph') graph: NodeGraphComponent;
 
   // Local enum instance
   ConceptStatus = ConceptStatus;
@@ -55,63 +57,42 @@ export class ConceptEditorComponent implements AfterViewInit {
     this.data = null;
     this.nodes = [{name: this.model.context, group: 1}];
     this.edges = [];
-    this.loadDetails(concept.id, 0);
+    this.graph.addNodeData(concept.id, concept.context, 1, concept);
+    this.loadDetails(concept.id);
   }
 
-  loadDetails(conceptId: number, nodeIndex: number) {
+  loadDetails(conceptId: number) {
 
     forkJoin(
         this.conceptService.getRelatedTargets(conceptId),
         this.conceptService.getRelatedSources(conceptId),
-        this.conceptService.getAttributes(conceptId)
+        this.conceptService.getAttributes(conceptId),
+        this.conceptService.getAttributeOf(conceptId)
     )
       .subscribe(
-        ([targets, sources, attributes]) => this.extendData(nodeIndex, targets, sources, attributes),
+        ([targets, sources, attributes, attributeOf]) => this.extendData(conceptId, targets, sources, attributes, attributeOf),
         (error) => this.logger.error(error)
       );
   }
 
-  extendData(nodeIndex: number, targets: RelatedConcept[], sources: RelatedConcept[], attributes: ConceptSummary[]) {
+  extendData(conceptId: number, targets: RelatedConcept[], sources: RelatedConcept[], attributes: ConceptSummary[], attributeOf: ConceptSummary[]) {
     for (let target of targets) {
-      let i = this.nodemap[target.id];
-      if (!i) {
-        i = this.nodes.push({name: target.context, group: 2, data: target});
-        this.nodemap[target.id] = i;
-      }
-      this.edges.push({source: nodeIndex, target: i - 1, label: target.relationship});
+      this.graph.addNodeData(target.id, target.context, 2, target);
+      this.graph.addEdgeData(conceptId, target.id, target.relationship);
     }
     for (let source of sources) {
-      let i = this.nodemap[source.id];
-      if (!i) {
-        i = this.nodes.push({name: source.context, group: 3, data: source});
-        this.nodemap[source.id] = i;
-      }
-      this.edges.push({source: i - 1, target: nodeIndex, label: source.relationship});
+      this.graph.addNodeData(source.id, source.context, 2, source);
+      this.graph.addEdgeData(source.id, conceptId, source.relationship);
     }
     for (let attribute of attributes) {
-      let i = this.nodemap[attribute.id];
-      if (!i) {
-        i = this.nodes.push({name: attribute.context, group: 4, data: attribute});
-        this.nodemap[attribute.id] = i;
-      }
-      this.edges.push({source: nodeIndex, target: i - 1, label: 'Attribute'});
+      this.graph.addNodeData(attribute.id, attribute.context, 3, attribute);
+      this.graph.addEdgeData(conceptId, attribute.id, 'Has attribute');
     }
-
-    this.buildDiagram();
-  }
-
-  buildDiagram() {
-    let tempData = {nodes: [], edges: []};
-
-    for (let node of this.nodes) {
-      tempData.nodes.push(Object.assign({}, node));
+    for (let concept of attributeOf) {
+      this.graph.addNodeData(concept.id, concept.context, 2, concept);
+      this.graph.addEdgeData(concept.id, conceptId, 'Has attribute');
     }
-
-    for (let edge of this.edges) {
-      tempData.edges.push(Object.assign({}, edge));
-    }
-
-    this.data = tempData;
+    this.graph.start();
   }
 
   getConceptStatusName(status: ConceptStatus): string {
@@ -120,10 +101,6 @@ export class ConceptEditorComponent implements AfterViewInit {
 
   setStatus(status: ConceptStatus) {
     this.model.status = status;
-  }
-
-  selectRelated(node: any) {
-    this.selectedRelation = node;
   }
 
   addRelationship() {
@@ -170,7 +147,6 @@ export class ConceptEditorComponent implements AfterViewInit {
   nodeClick(node) {
     console.log("Click");
     console.log(node);
-
   }
 
   nodeDblClick(node) {
@@ -178,7 +154,7 @@ export class ConceptEditorComponent implements AfterViewInit {
     console.log(node);
     if (!node.data.loaded) {
       node.data.loaded = true;
-      this.loadDetails(node.data.id, node.index);
+      this.loadDetails(node.data.id);
     }
   }
 

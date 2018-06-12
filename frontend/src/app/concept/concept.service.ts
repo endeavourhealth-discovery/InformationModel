@@ -68,4 +68,10 @@ export class ConceptService {
     return this.http.get('api/Concept/Attribute', {search: params})
       .map((result) => result.json());
   }
+  getAttributeOf(conceptId: number): Observable<ConceptSummary[]> {
+    const params = new URLSearchParams();
+    params.append('id', conceptId.toString());
+    return this.http.get('api/Concept/AttributeOf', {search: params})
+      .map((result) => result.json());
+  }
 }
