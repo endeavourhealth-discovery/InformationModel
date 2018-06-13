@@ -20,6 +20,7 @@ export class EditRelatedComponent implements OnInit {
 
   sourceConcept: Concept;
   targetConcept: Concept;
+  readonly: boolean;
 
   constructor(public activeModal: NgbActiveModal, private logger: LoggerService, private conceptService: ConceptService) { }
 
