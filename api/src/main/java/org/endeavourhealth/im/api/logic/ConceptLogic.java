@@ -4,6 +4,7 @@ import org.endeavourhealth.im.api.dal.ConceptDAL;
 import org.endeavourhealth.im.api.dal.ConceptJDBCDAL;
 import org.endeavourhealth.im.common.models.*;
 
+import java.sql.SQLException;
 import java.util.List;
 
 public class ConceptLogic {
@@ -24,18 +25,6 @@ public class ConceptLogic {
         return validateAndCreateDraft(ref, true);
     }
 
-    public List<ConceptSummary> getSummaries(Integer page) throws Exception {
-        return this.dal.getSummaries(page);
-    }
-
-    public Concept get(Long id) throws Exception {
-        return this.dal.get(id);
-    }
-
-    public Concept get(String context) throws Exception {
-        return this.dal.getConceptByContext(context);
-    }
-
     private boolean validateAndCreateDraft(ConceptReference ref, boolean createTaskIfInvalid) throws Exception {
         if (ref == null || ref.getId() != null || ref.getContext() == null || ref.getContext().isEmpty())
             return true;
@@ -51,6 +40,18 @@ public class ConceptLogic {
             ref.setId(id);
             return false;
         }
+    }
+
+    public List<ConceptSummary> getSummaries(Integer page) throws Exception {
+        return this.dal.getSummaries(page);
+    }
+
+    public Concept get(Long id) throws Exception {
+        return this.dal.get(id);
+    }
+
+    public Concept get(String context) throws Exception {
+        return this.dal.getConceptByContext(context);
     }
 
     public Long save(Concept concept) throws Exception {
@@ -79,4 +80,9 @@ public class ConceptLogic {
 
     public List<ConceptSummary> getAttributeOf(Long id) throws Exception {
         return this.dal.getAttributeOf(id);
-    }}
+    }
+
+    public List<ConceptSummary> getRelationships() throws Exception {
+        return this.dal.getRelationships();
+    }
+}

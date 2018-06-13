@@ -12,14 +12,13 @@
       <div class="col-md-4 form-group">
         <label for="relationship">&nbsp;</label>
         <div ngbDropdown id="relationship">
-          <button class="btn dropdown-toggle btn-block text-left" id="relationshipDropdown" ngbDropdownToggle [disabled]="readonly">Has attribute<i class="fa fa-caret-down pull-right"></i> </button>
+          <button class="btn dropdown-toggle btn-block text-left" id="relationshipDropdown" ngbDropdownToggle [disabled]="readonly">{{getLinkageText()}}<i class="fa fa-caret-down pull-right"></i> </button>
           <div class="dropdown-menu"  aria-labelledby="relationshipDropdown">
-            <button class="dropdown-item">Is a</button>
-            <button class="dropdown-item">Is parent of</button>
-            <button class="dropdown-item">Is child of</button>
-            <button class="dropdown-item">Is type of</button>
+            <button class="dropdown-item" (click)="setLinkage({id: 0, name: 'Has attribute'})">Has attribute</button>
+            <button *ngFor="let rel of relationships" class="dropdown-item" (click)="setLinkage(rel)">{{rel.name}}</button>
           </div>
-        </div>      </div>
+        </div>
+      </div>
       <div class="col-md-4 form-group">
         <label for="targetConcept">&nbsp;</label>
         <input class="form-control" id="targetConcept" type="text" [(ngModel)]="targetConcept.context" name="targetConcept" [readonly]="targetConcept?.id">

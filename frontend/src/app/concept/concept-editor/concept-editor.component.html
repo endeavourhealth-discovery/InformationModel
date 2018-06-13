@@ -20,7 +20,7 @@
           </div>
           <div class="col-md-8">
             <div class="card h-100" id="relatedGraph">
-              <div class="card-header card-success"><h4>Diagram <small> (double-click to expand)</small><button class="btn btn-info pull-right" (click)="addConcept()">Add...</button></h4> </div>
+              <div class="card-header card-success"><h4>Concept links <small> (double-click to expand)</small><button class="btn btn-info pull-right" (click)="addConcept()">Add...</button></h4> </div>
               <div class="card-block">
                 <nodeGraph #nodeGraph (nodeClick)="nodeClick($event)" (nodeDblClick)="nodeDblClick($event)"></nodeGraph>
               </div>

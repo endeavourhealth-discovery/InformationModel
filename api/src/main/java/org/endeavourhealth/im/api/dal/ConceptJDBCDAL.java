@@ -31,10 +31,10 @@ public class ConceptJDBCDAL implements ConceptDAL {
 
         int offset = (page - 1) * PAGE_SIZE;
 
-        try (PreparedStatement stmt = conn.prepareStatement("SELECT id, context, status, version FROM concept LIMIT ?, ?")) {
+        try (PreparedStatement stmt = conn.prepareStatement("SELECT id, context, full_name, status, version FROM concept LIMIT ?, ?")) {
             stmt.setInt(1, offset);
             stmt.setInt(2, PAGE_SIZE);
-            return getSummaryResultSet(stmt, false);
+            return getSummaryResultSet(stmt);
         } finally {
             ConnectionPool.InformationModel.push(conn);
         }
@@ -80,7 +80,7 @@ public class ConceptJDBCDAL implements ConceptDAL {
     public List<ConceptSummary> search(String criteria) throws Exception {
         criteria = "%" + criteria + "%";
 
-        String sql = "SELECT id, context, status, version " +
+        String sql = "SELECT id, context, full_name, status, version " +
             "FROM concept " +
             "WHERE context like ? OR full_name like ? " +
             "LIMIT 50";
@@ -89,7 +89,7 @@ public class ConceptJDBCDAL implements ConceptDAL {
         try (PreparedStatement statement = conn.prepareStatement(sql)) {
             statement.setString(1, criteria);
             statement.setString(2, criteria);
-            return getSummaryResultSet(statement, false);
+            return getSummaryResultSet(statement);
         } finally {
             ConnectionPool.InformationModel.push(conn);
         }
@@ -161,7 +161,7 @@ public class ConceptJDBCDAL implements ConceptDAL {
 
     @Override
     public List<ConceptSummary> getAttributes(Long id) throws SQLException {
-        String sql = "SELECT c.id, c.context, c.status, c.version " +
+        String sql = "SELECT c.id, c.context, c.full_name, c.status, c.version " +
             "FROM concept c " +
             "JOIN concept_attribute a ON a.attribute_id = c.id " +
             "WHERE a.concept_id = ?";
@@ -170,7 +170,7 @@ public class ConceptJDBCDAL implements ConceptDAL {
 
         try(PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setLong(1, id);
-            return getSummaryResultSet(stmt, false);
+            return getSummaryResultSet(stmt);
         } finally {
             ConnectionPool.InformationModel.push(conn);
         }
@@ -178,7 +178,7 @@ public class ConceptJDBCDAL implements ConceptDAL {
 
     @Override
     public List<ConceptSummary> getAttributeOf(Long id) throws SQLException {
-        String sql = "SELECT c.id, c.context, c.status, c.version " +
+        String sql = "SELECT c.id, c.context, c.full_name, c.status, c.version " +
             "FROM concept c " +
             "JOIN concept_attribute a ON a.concept_id = c.id " +
             "WHERE a.attribute_id = ?";
@@ -187,13 +187,28 @@ public class ConceptJDBCDAL implements ConceptDAL {
 
         try(PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setLong(1, id);
-            return getSummaryResultSet(stmt, false);
+            return getSummaryResultSet(stmt);
         } finally {
             ConnectionPool.InformationModel.push(conn);
         }
     }
 
-    private List<ConceptSummary> getSummaryResultSet(PreparedStatement stmt, Boolean includeRelationship) throws SQLException {
+    @Override
+    public List<ConceptSummary> getRelationships() throws SQLException {
+        String sql = "SELECT c.id, c.context, c.full_name, c.status, c.version " +
+            "FROM concept c " +
+            "WHERE c.type = 8"; // 8 == Relationship
+
+        Connection conn = ConnectionPool.InformationModel.pop();
+
+        try(PreparedStatement stmt = conn.prepareStatement(sql)) {
+            return getSummaryResultSet(stmt);
+        } finally {
+            ConnectionPool.InformationModel.push(conn);
+        }
+    }
+
+    private List<ConceptSummary> getSummaryResultSet(PreparedStatement stmt) throws SQLException {
         List<ConceptSummary> result = new ArrayList<>();
 
         ResultSet rs = stmt.executeQuery();
@@ -202,11 +217,9 @@ public class ConceptJDBCDAL implements ConceptDAL {
             ConceptSummary summary = new ConceptSummary()
                 .setId(rs.getLong("id"))
                 .setContext(rs.getString("context"))
+                .setName(rs.getString("full_name"))
                 .setStatus(ConceptStatus.byValue(rs.getByte("status")).getName())
                 .setVersion(rs.getString("version"));
-
-            if (includeRelationship)
-                summary.setRelationship(ConceptRelationship.forValue(rs.getInt("relationship")));
 
             result.add(summary);
         }

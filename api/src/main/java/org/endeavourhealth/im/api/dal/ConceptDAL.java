@@ -25,4 +25,7 @@ public interface ConceptDAL {
 
     List<ConceptSummary> getAttributes(Long id) throws SQLException;
     List<ConceptSummary> getAttributeOf(Long id) throws SQLException;
+
+    List<ConceptSummary> getRelationships() throws SQLException;
+
 }

@@ -30,13 +30,14 @@ INSERT INTO concept
   (id, type, url, full_name, context, status, version, description, expression, criteria)
 VALUES
   -- BASE TYPES
-  (1, 1, '', 'Concept',          'Class.Concept',           0, '1.0', 'Base type for data model concepts (patient, observation, organisation, etc (aka "Record type")', null, null),
+  (1, 1, '', 'Concept',           'Class.Concept',          0, '1.0', 'Base type for data model concepts (patient, observation, organisation, etc (aka "Record type")', null, null),
   (2, 1, '', 'Numeric',           'Class.Numeric',          0, '1.0', 'A type of field that holds a number (integer or float)', null, null),
   (3, 1, '', 'DateTime',          'Class.DateTime',         0, '1.0', 'A type of field that holds a date and time', null, null),
   (4, 1, '', 'Code',              'Class.Code',             0, '1.0', 'A field that holds a simple code', null, null),
   (5, 1, '', 'Text',              'Class.Text',             0, '1.0', 'contains a simple text value', null, null),
   (6, 1, '', 'Boolean',           'Class.Boolean',          0, '1.0', 'Ony a 1 or a zero (Y or N)', null, null),
   (7, 1, '', 'Codeable concept',  'Class.CodeableConcept',  0, '1.0', 'A field that holds a code that is a concept in the information model', null, null),
+  (8, 1, '', 'Relationship',      'Class.Relationship',     0, '1.0', 'A type of relationship between two concepts', null, null),
 
   -- RELATIONSHIPS
   (100, 8, '', 'Is a',                     'Relationship.IsA',               0, '1.0', 'Points to target concepts that are parent types of the source concept. Equivalent t', null, null),

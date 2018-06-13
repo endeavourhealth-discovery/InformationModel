@@ -3,6 +3,7 @@ import {ConceptService} from '../concept.service';
 import {NgbActiveModal, NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {LoggerService} from 'eds-angular4';
 import {Concept} from '../../models/Concept';
+import {ConceptSummary} from '../../models/ConceptSummary';
 
 @Component({
   selector: 'app-edit-related',
@@ -21,14 +22,29 @@ export class EditRelatedComponent implements OnInit {
   sourceConcept: Concept;
   targetConcept: Concept;
   readonly: boolean;
+  relationships: ConceptSummary[] = [];
+  linkage: ConceptSummary;
 
   constructor(public activeModal: NgbActiveModal, private logger: LoggerService, private conceptService: ConceptService) { }
 
   ngOnInit() {
+    this.conceptService.getRelationships()
+      .subscribe(
+        (result) => this.relationships = result,
+        (error) => this.logger.error(error)
+      );
+  }
+
+  setLinkage(linkage: ConceptSummary) {
+    this.linkage = linkage;
+  }
+
+  getLinkageText() {
+    return this.linkage?this.linkage.name:null;
   }
 
   ok() {
-    this.activeModal.close();
+    this.activeModal.close({concept: this.targetConcept, link: this.linkage});
   }
 
   cancel() {

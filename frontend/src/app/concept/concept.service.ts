@@ -74,4 +74,9 @@ export class ConceptService {
     return this.http.get('api/Concept/AttributeOf', {search: params})
       .map((result) => result.json());
   }
+
+  getRelationships(): Observable<ConceptSummary[]> {
+    return this.http.get('api/Concept/Relationships')
+      .map((result) => result.json());
+  }
 }

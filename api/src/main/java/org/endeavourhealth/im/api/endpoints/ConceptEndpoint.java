@@ -176,4 +176,21 @@ public class ConceptEndpoint {
             .entity(attributes)
             .build();
     }
+
+    @GET
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/Relationships")
+    @Timed(absolute = true, name = "InformationModel.ConceptEndpoint.Relationships")
+    @ApiOperation(value = "Returns a list of relationship concepts")
+    public Response getRelationships(@Context SecurityContext sc) throws Exception {
+        LOG.debug("Get relationship concepts");
+
+        List<ConceptSummary> relationships = new ConceptLogic().getRelationships();
+
+        return Response
+            .ok()
+            .entity(relationships)
+            .build();
+    }
 }

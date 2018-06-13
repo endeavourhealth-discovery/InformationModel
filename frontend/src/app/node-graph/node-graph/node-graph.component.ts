@@ -100,7 +100,6 @@ export class NodeGraphComponent implements AfterViewInit {
   }
 
   start() {
-    // this.edges = this.edges.data(this.force.links(), function(d) { return d.source.id + "-" + d.target.id; });
     this.edges = this.edges.data(this.force.links());
     this.edges.enter()
       .append('line')
@@ -111,7 +110,6 @@ export class NodeGraphComponent implements AfterViewInit {
       .style('pointer-events', 'none');
     this.edges.exit().remove();
 
-    // this.nodes = this.nodes.data(this.force.nodes(), function(d) { return d.id;}).call(this.force.drag);
     this.nodes = this.nodes.data(this.force.nodes());
     this.nodes.enter()
       .append('circle')
@@ -151,14 +149,14 @@ export class NodeGraphComponent implements AfterViewInit {
       .style('pointer-events', 'none')
       .attr({'class': 'edgelabel',
         'id': (d, i) => 'edgelabel' + i,
-        'dx': this.linkDistance * 0.4,
+        'dx': (d,i) => (this.linkDistance * 0.5) - (d.label.length * 2.5),
         'dy': 0,
         'font-size': 10,
         'fill': '#aaa'})
       .append('textPath')
       .attr('xlink:href', (d, i) => '#edgepath' + i)
       .style('pointer-events', 'none')
-      .text((d: any, i) => d.label);;
+      .text((d: any, i) => d.label);
     this.edgelabels.exit().remove();
 
     this.force.start();

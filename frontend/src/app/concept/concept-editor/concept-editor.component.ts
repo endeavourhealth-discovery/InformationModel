@@ -1,6 +1,6 @@
 import {AfterViewInit, Component, ViewChild} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
-import {InputBoxDialog, LoggerService} from 'eds-angular4';
+import {LoggerService} from 'eds-angular4';
 import {Concept} from '../../models/Concept';
 import {ConceptStatus, ConceptStatusHelper} from '../../models/ConceptStatus';
 import {ConceptPickerComponent} from '../concept-picker/concept-picker.component';
@@ -106,17 +106,31 @@ export class ConceptEditorComponent implements AfterViewInit {
   addConcept() {
     ConceptPickerComponent.open(this.modal).result
       .then(
-        (result) => this.addRelatedConcept(result),
+        (result) => this.editLinkedConcept(result),
         (error) => this.logger.error(error)
       );
   }
 
-  addRelatedConcept(concept: Concept) {
+  editLinkedConcept(concept: Concept) {
     EditRelatedComponent.open(this.modal, this.model, concept)
       .result.then(
-      (result) => this.logger.info(result),
+      (result) => this.saveLinkedConcept(result.concept, result.link),
       (error) => this.logger.error(error)
     )
+  }
+
+  saveLinkedConcept(concept: Concept, relationship: Concept) {
+    console.log(concept);
+    console.log(relationship)
+
+    if (relationship.id === 0) {
+      this.graph.addNodeData(concept.id, concept.context, 3, concept);
+    } else {
+      this.graph.addNodeData(concept.id, concept.context, 2, concept);
+    }
+
+    this.graph.addEdgeData(this.model.id, concept.id, relationship.name);
+    this.graph.start();
   }
 
   nodeClick(node) {
