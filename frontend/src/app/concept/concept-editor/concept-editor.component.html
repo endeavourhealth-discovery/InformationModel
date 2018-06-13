@@ -14,47 +14,13 @@
             <div class="card h-100" id="detailCard" *ngIf="model">
               <div class="card-header card-success"><h4>Details</h4></div>
               <div class="card-block">
-                <div class="row">
-                  <div class="col-md-12 form-group">
-                    <label for="conceptContext">Context</label>
-                    <input class="form-control" id="conceptContext" type="text" value="{{model.context}}" name="conceptContext" readonly>
-                  </div>
-                  <div class="col-md-6 form-group">
-                    <label for="conceptVersion">Version</label>
-                    <input class="form-control" id="conceptVersion" type="text" value="{{model.version}}" name="conceptVersion" readonly>
-                  </div>
-                  <div class="col-md-6 form-group">
-                    <label for="conceptStatus">Status</label>
-                    <div ngbDropdown id="conceptStatus">
-                      <button class="btn dropdown-toggle btn-block text-left" id="statusDropdown" ngbDropdownToggle>{{getConceptStatusName(model.status)}}<i class="fa fa-caret-down pull-right"></i> </button>
-                      <div class="dropdown-menu"  aria-labelledby="statusDropdown">
-                        <button class="dropdown-item" (click)="setStatus(ConceptStatus.DRAFT)">Draft</button>
-                        <button class="dropdown-item" (click)="setStatus(ConceptStatus.ACTIVE)">Active</button>
-                        <button class="dropdown-item" (click)="setStatus(ConceptStatus.DEPRECATED)">Deprecated</button>
-                        <button class="dropdown-item" (click)="setStatus(ConceptStatus.TEMPORARY)">Temporary</button>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-md-12 form-group">
-                    <label for="conceptUrl">URL</label>
-                    <input class="form-control" id="conceptUrl" type="text" [(ngModel)]="model.url" name="conceptUrl">
-                  </div>
-                  <div class="col-md-12 form-group">
-                    <label for="conceptName">Full name</label>
-                    <input class="form-control" id="conceptName" type="text" [(ngModel)]="model.fullName" name="conceptName">
-                  </div>
-
-                  <div class="col-md-12 form-group">
-                    <label for="conceptDescription">Description</label>
-                    <input class="form-control" id="conceptDescription" type="text" [(ngModel)]="model.description" name="conceptDescription">
-                  </div>
-                </div>
+                <app-concept-details [(ngModel)]="model" name="details"></app-concept-details>
               </div>
             </div>
           </div>
           <div class="col-md-8">
             <div class="card h-100" id="relatedGraph">
-              <div class="card-header card-success"><h4>Diagram <small> (double-click to expand)</small></h4></div>
+              <div class="card-header card-success"><h4>Diagram <small> (double-click to expand)</small><button class="btn btn-info pull-right" (click)="addConcept()">Add...</button></h4> </div>
               <div class="card-block">
                 <nodeGraph #nodeGraph (nodeClick)="nodeClick($event)" (nodeDblClick)="nodeDblClick($event)"></nodeGraph>
               </div>

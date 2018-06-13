@@ -81,64 +81,64 @@ CREATE TABLE concept_relationship (
 # ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 #
 # -- ********** TRANSACTION TABLES **********
-#
-# DROP TABLE IF EXISTS transaction_action;
-# CREATE TABLE transaction_action (
-#   id TINYINT NOT NULL PRIMARY KEY               COMMENT 'Transaction action unique identifier',
-#   action VARCHAR(25) NOT NULL                   COMMENT 'Name of the action'
-# ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-#
-# DROP TABLE IF EXISTS transaction_table;
-# CREATE TABLE transaction_table (
-#   id TINYINT NOT NULL PRIMARY KEY               COMMENT 'Transaction table identifier',
-#   `table` VARCHAR(25) NOT NULL                  COMMENT 'Name of the transaction table'
-# ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-#
-# DROP TABLE IF EXISTS transaction;
-# CREATE TABLE transaction (
-#   id BIGINT AUTO_INCREMENT PRIMARY KEY          COMMENT 'Unique transaction identifier',
-#   date_time DATETIME NOT NULL DEFAULT NOW()     COMMENT 'Date/time the transaction was created',
-#   owner VARCHAR(250) NOT NULL                   COMMENT 'Owner of the transaction',
-#   action TINYINT NOT NULL                       COMMENT 'The transaction action - 0=Create, 1=Update, 2=Delete',
-#
-#   CONSTRAINT transaction_action_fk FOREIGN KEY (action) REFERENCES transaction_action(id) ON DELETE NO ACTION ON UPDATE NO ACTION -- Move to component table!?
-# ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-#
-# DROP TABLE IF EXISTS transaction_component;
-# CREATE TABLE transaction_component (
-#   id BIGINT AUTO_INCREMENT PRIMARY KEY          COMMENT 'Unique transaction component identifier',
-#   transaction_id BIGINT NOT NULL                COMMENT 'The transaction that this is a component of',
-#   `order` INTEGER NOT NULL                      COMMENT 'The order of this component in relation to the others within the same transaction',
-#   table_id TINYINT NOT NULL                     COMMENT 'The table this transaction component effects',
-#   data LONGTEXT                                 COMMENT 'The data for the transaction component',
-#
-#   KEY transaction_component_transaction_id (transaction_id),
-#   CONSTRAINT transaction_component_transaction_id_fk FOREIGN KEY (transaction_id) REFERENCES transaction(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
-#   CONSTRAINT transaction_component_table_id_fk FOREIGN KEY (table_id) REFERENCES transaction_table(id) ON DELETE NO ACTION ON UPDATE NO ACTION
-# ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-#
-# -- ********** WORKFLOW MANAGER TASK TABLES **********
-#
-# DROP TABLE IF EXISTS task_type;
-# CREATE TABLE task_type (
-#   id TINYINT NOT NULL PRIMARY KEY               COMMENT 'Unique task type identifier',
-#   name VARCHAR(50)                              COMMENT 'Name for the type of task'
-# ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-#
-# DROP TABLE IF EXISTS task;
-# CREATE TABLE task (
-#   id INT AUTO_INCREMENT PRIMARY KEY             COMMENT 'Unique task identifier',
-#   type TINYINT NOT NULL                         COMMENT 'The type of this task - 0=Attribute model, 1=Value model, 2=Unmapped message',
-#   title VARCHAR(250) NOT NULL                   COMMENT 'Title/subject for the task',
-#   description VARCHAR(4096)                     COMMENT 'Full textual description of the task',
-#   identifier BIGINT                             COMMENT 'Reference to the item this task relates to',
-#   created DATETIME NOT NULL                     COMMENT 'Date/time the task was created',
-#
-#   KEY task_type_idx (type),
-#   CONSTRAINT task_type_fk FOREIGN KEY (type) REFERENCES task_type(id) ON DELETE NO ACTION ON UPDATE NO ACTION
-# ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-#
-# -- ********** INBOUND MESSAGE TABLES **********
+
+DROP TABLE IF EXISTS transaction_action;
+CREATE TABLE transaction_action (
+  id TINYINT NOT NULL PRIMARY KEY               COMMENT 'Transaction action unique identifier',
+  action VARCHAR(25) NOT NULL                   COMMENT 'Name of the action'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS transaction_table;
+CREATE TABLE transaction_table (
+  id TINYINT NOT NULL PRIMARY KEY               COMMENT 'Transaction table identifier',
+  `table` VARCHAR(25) NOT NULL                  COMMENT 'Name of the transaction table'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS transaction;
+CREATE TABLE transaction (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY          COMMENT 'Unique transaction identifier',
+  date_time DATETIME NOT NULL DEFAULT NOW()     COMMENT 'Date/time the transaction was created',
+  owner VARCHAR(250) NOT NULL                   COMMENT 'Owner of the transaction',
+  action TINYINT NOT NULL                       COMMENT 'The transaction action - 0=Create, 1=Update, 2=Delete',
+
+  CONSTRAINT transaction_action_fk FOREIGN KEY (action) REFERENCES transaction_action(id) ON DELETE NO ACTION ON UPDATE NO ACTION -- Move to component table!?
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS transaction_component;
+CREATE TABLE transaction_component (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY          COMMENT 'Unique transaction component identifier',
+  transaction_id BIGINT NOT NULL                COMMENT 'The transaction that this is a component of',
+  `order` INTEGER NOT NULL                      COMMENT 'The order of this component in relation to the others within the same transaction',
+  table_id TINYINT NOT NULL                     COMMENT 'The table this transaction component effects',
+  data LONGTEXT                                 COMMENT 'The data for the transaction component',
+
+  KEY transaction_component_transaction_id (transaction_id),
+  CONSTRAINT transaction_component_transaction_id_fk FOREIGN KEY (transaction_id) REFERENCES transaction(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT transaction_component_table_id_fk FOREIGN KEY (table_id) REFERENCES transaction_table(id) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ********** WORKFLOW MANAGER TASK TABLES **********
+
+DROP TABLE IF EXISTS task_type;
+CREATE TABLE task_type (
+  id TINYINT NOT NULL PRIMARY KEY               COMMENT 'Unique task type identifier',
+  name VARCHAR(50)                              COMMENT 'Name for the type of task'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS task;
+CREATE TABLE task (
+  id INT AUTO_INCREMENT PRIMARY KEY             COMMENT 'Unique task identifier',
+  type TINYINT NOT NULL                         COMMENT 'The type of this task - 0=Attribute model, 1=Value model, 2=Unmapped message',
+  title VARCHAR(250) NOT NULL                   COMMENT 'Title/subject for the task',
+  description VARCHAR(4096)                     COMMENT 'Full textual description of the task',
+  identifier BIGINT                             COMMENT 'Reference to the item this task relates to',
+  created DATETIME NOT NULL                     COMMENT 'Date/time the task was created',
+
+  KEY task_type_idx (type),
+  CONSTRAINT task_type_fk FOREIGN KEY (type) REFERENCES task_type(id) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ********** INBOUND MESSAGE TABLES **********
 #
 # DROP TABLE IF EXISTS message;
 # CREATE TABLE message (

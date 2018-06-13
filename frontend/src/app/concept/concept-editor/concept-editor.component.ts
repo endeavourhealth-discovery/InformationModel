@@ -11,6 +11,7 @@ import {forkJoin} from 'rxjs/observable/forkJoin';
 import {RelatedConcept} from '../../models/RelatedConcept';
 import {ConceptSummary} from '../../models/ConceptSummary';
 import {NodeGraphComponent} from '../../node-graph/node-graph/node-graph.component';
+import {EditRelatedComponent} from '../edit-related/edit-related.component';
 
 @Component({
   selector: 'app-concept-editor',
@@ -22,7 +23,6 @@ import {NodeGraphComponent} from '../../node-graph/node-graph/node-graph.compone
 export class ConceptEditorComponent implements AfterViewInit {
   model: Concept;
   data: any;
-  selectedRelation: any;
   nodes: any[];
   edges: any[];
 
@@ -103,45 +103,20 @@ export class ConceptEditorComponent implements AfterViewInit {
     this.model.status = status;
   }
 
-  addRelationship() {
+  addConcept() {
     ConceptPickerComponent.open(this.modal).result
       .then(
-        (result) => this.processRelationship(result),
-        (error) => this.logger.error(error)
-      );
-  }
-
-  processRelationship(concept: Concept) {
-    if (concept.id == null) {
-      this.promptNewConceptContext(concept);
-    } else {
-      this.addRelatedConcept(concept);
-    }
-  }
-
-  promptNewConceptContext(concept: Concept) {
-    let contextName = concept.context;
-    if (contextName.substring(0, this.model.context.length) !== this.model.context) {
-      contextName = this.model.context + '.' + contextName;
-    }
-
-    InputBoxDialog.open(this.modal, 'Create new concept', 'Create a new concept with the context name', contextName)
-      .result.then(
-      (result) => { concept.context = result; this.createAndAddRelatedConcept(concept); },
-      (error) => this.logger.error(error )
-    );
-  }
-
-  createAndAddRelatedConcept(concept: Concept) {
-    this.conceptService.save(concept)
-      .subscribe(
-        (result) => { concept.id = result; this.addRelatedConcept(concept); },
+        (result) => this.addRelatedConcept(result),
         (error) => this.logger.error(error)
       );
   }
 
   addRelatedConcept(concept: Concept) {
-    this.logger.info('Add related', concept, 'Add related');
+    EditRelatedComponent.open(this.modal, this.model, concept)
+      .result.then(
+      (result) => this.logger.info(result),
+      (error) => this.logger.error(error)
+    )
   }
 
   nodeClick(node) {

@@ -1,6 +1,7 @@
 package org.endeavourhealth.im.common.models;
 
 public class Concept extends DbEntity<Concept> {
+    private Long type;
     private String url;
     private String fullName;
     private String context;
@@ -9,6 +10,16 @@ public class Concept extends DbEntity<Concept> {
     private String description;
     private String expression;
     private String criteria;
+    private Long useCount;
+
+    public Long getType() {
+        return type;
+    }
+
+    public Concept setType(Long type) {
+        this.type = type;
+        return this;
+    }
 
     public String getUrl() {
         return url;
@@ -79,6 +90,15 @@ public class Concept extends DbEntity<Concept> {
 
     public Concept setCriteria(String criteria) {
         this.criteria = criteria;
+        return this;
+    }
+
+    public Long getUseCount() {
+        return useCount;
+    }
+
+    public Concept setUseCount(Long useCount) {
+        this.useCount = useCount;
         return this;
     }
 }

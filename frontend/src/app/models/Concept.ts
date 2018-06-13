@@ -1,6 +1,7 @@
 import {ConceptSummary} from './ConceptSummary';
 
 export class Concept extends ConceptSummary {
+  public type: number = 1;    // Basic class
   public url: string;
   public fullName: string;
   public description: string;

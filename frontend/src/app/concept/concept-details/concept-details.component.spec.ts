@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { RelationshipPickerComponent } from './relationship-picker.component';
+import { ConceptDetailsComponent } from './concept-details.component';
 
-describe('RelationshipPickerComponent', () => {
-  let component: RelationshipPickerComponent;
-  let fixture: ComponentFixture<RelationshipPickerComponent>;
+describe('ConceptDetailsComponent', () => {
+  let component: ConceptDetailsComponent;
+  let fixture: ComponentFixture<ConceptDetailsComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ RelationshipPickerComponent ]
+      declarations: [ ConceptDetailsComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(RelationshipPickerComponent);
+    fixture = TestBed.createComponent(ConceptDetailsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

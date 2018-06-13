@@ -1,29 +1,29 @@
 USE im;
-#
-# INSERT INTO transaction_action
-#   (id, action)
-# VALUES
-#   (0, 'Create'),
-#   (1, 'Update'),
-#   (2, 'Delete');
-#
-# INSERT INTO transaction_table
-#   (id, `table`)
-# VALUES
-#   (0, 'Concept'),
-#   (1, 'Message'),
-#   (2, 'Task'),
-#   (3, 'Record Type'),
-#   (4, 'Term Mapping'),
-#   (5, 'Relationship');
-#
-# INSERT INTO task_type
-#   (id, name)
-# VALUES
-#   (0, 'Attribute Model'),
-#   (1, 'Value Model'),
-#   (2, 'Unmapped message'),
-#   (3, 'Unmapped terms');
+
+INSERT INTO transaction_action
+  (id, action)
+VALUES
+  (0, 'Create'),
+  (1, 'Update'),
+  (2, 'Delete');
+
+INSERT INTO transaction_table
+  (id, `table`)
+VALUES
+  (0, 'Concept'),
+  (1, 'Message'),
+  (2, 'Task'),
+  (3, 'Record Type'),
+  (4, 'Term Mapping'),
+  (5, 'Relationship');
+
+INSERT INTO task_type
+  (id, name)
+VALUES
+  (0, 'Attribute Model'),
+  (1, 'Value Model'),
+  (2, 'Unmapped message'),
+  (3, 'Unmapped terms');
 
 -- TODO: Need to review as many of these no longer relevant in new Information Model db schema. Commented out (until used) for clarity
 INSERT INTO concept
@@ -91,6 +91,6 @@ VALUES
 #   (1000, 1002, 10, 0, 0),
 #   (1000, 1008, 10, 0, 0);
 #
-# INSERT INTO table_id (table_name, id)
-#   SELECT 'concept', MAX(id) + 1 as id
-#   FROM concept;
+INSERT INTO table_id (table_name, id)
+  SELECT 'concept', MAX(id) + 1 as id
+  FROM concept;
