@@ -114,23 +114,25 @@ export class ConceptEditorComponent implements AfterViewInit {
   editLinkedConcept(concept: Concept) {
     EditRelatedComponent.open(this.modal, this.model, concept)
       .result.then(
-      (result) => this.saveLinkedConcept(result.concept, result.link),
+      (result) => this.saveLinkedConcept(result),
       (error) => this.logger.error(error)
     )
   }
 
-  saveLinkedConcept(concept: Concept, relationship: Concept) {
-    console.log(concept);
-    console.log(relationship)
+  saveLinkedConcept(link: any) {
+    if (link) {
+      console.log(link.concept);
+      console.log(link.relationship)
 
-    if (relationship.id === 0) {
-      this.graph.addNodeData(concept.id, concept.context, 3, concept);
-    } else {
-      this.graph.addNodeData(concept.id, concept.context, 2, concept);
+      if (link.relationship.id === 0) {
+        this.graph.addNodeData(link.concept.id, link.concept.context, 3, link.concept);
+      } else {
+        this.graph.addNodeData(link.concept.id, link.concept.context, 2, link.concept);
+      }
+
+      this.graph.addEdgeData(this.model.id, link.concept.id, link.relationship.name);
+      this.graph.start();
     }
-
-    this.graph.addEdgeData(this.model.id, concept.id, relationship.name);
-    this.graph.start();
   }
 
   nodeClick(node) {
