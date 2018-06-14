@@ -111,28 +111,58 @@ export class ConceptEditorComponent implements AfterViewInit {
       );
   }
 
-  editLinkedConcept(concept: Concept) {
-    EditRelatedComponent.open(this.modal, this.model, concept)
+  editLinkedConcept(target: Concept) {
+    EditRelatedComponent.open(this.modal, this.model, target)
       .result.then(
-      (result) => this.saveLinkedConcept(result),
+      (result) => this.saveLinkedConcept(result, target),
       (error) => this.logger.error(error)
     )
   }
 
-  saveLinkedConcept(link: any) {
-    if (link) {
-      console.log(link.concept);
-      console.log(link.relationship)
+  saveLinkedConcept(relationship: ConceptSummary, target) {
+    if (relationship) {
 
-      if (link.relationship.id === 0) {
-        this.graph.addNodeData(link.concept.id, link.concept.context, 3, link.concept);
+      console.log(target);
+      console.log(relationship);
+
+      if (!target.id) {
+        this.conceptService.save(target)
+          .subscribe(
+            (result) => {target.id = result; this.saveLink(target, relationship)},
+            (error) => this.logger.error(error)
+          );
       } else {
-        this.graph.addNodeData(link.concept.id, link.concept.context, 2, link.concept);
+        this.saveLink(target, relationship)
       }
-
-      this.graph.addEdgeData(this.model.id, link.concept.id, link.relationship.name);
-      this.graph.start();
     }
+  }
+
+  saveLink(target: Concept, relationship: any) {
+
+    if (relationship.id === 0) {
+      this.conceptService.saveAttribute(this.model.id, target.id)
+        .subscribe(
+          (result) => this.addLinkToGraph(target, relationship),
+          (error) => this.logger.error(error)
+        );
+    } else {
+      this.conceptService.saveRelationship(this.model.id, target.id, relationship.id)
+        .subscribe(
+          (result) => this.addLinkToGraph(target, relationship),
+          (error) => this.logger.error(error)
+        );
+    }
+  }
+
+  addLinkToGraph(target: Concept, relationship: any) {
+    if (relationship.id === 0) {
+      this.graph.addNodeData(target.id, target.context, 3, target);
+    } else {
+      this.graph.addNodeData(target.id, target.context, 2, target);
+    }
+
+    this.graph.addEdgeData(this.model.id, target.id, relationship.name);
+    this.graph.start();
   }
 
   nodeClick(node) {

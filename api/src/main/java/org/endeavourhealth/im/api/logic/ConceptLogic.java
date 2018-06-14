@@ -85,4 +85,12 @@ public class ConceptLogic {
     public List<ConceptSummary> getRelationships() throws Exception {
         return this.dal.getRelationships();
     }
+
+    public Long addAttribute(Long conceptId, Long attributeId) throws Exception {
+        return this.dal.saveAttribute(conceptId, attributeId);
+    }
+
+    public Long addRelationship(Long sourceId, Long targetId, Long relationshipId) throws Exception {
+        return this.dal.saveRelationship(sourceId, targetId, relationshipId);
+    }
 }

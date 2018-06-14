@@ -45,12 +45,11 @@ public class IMClient {
         String address = ConfigManager.getConfiguration("information-model-address");
 
         Client client = ClientBuilder.newClient();
-        Response response = client.target(address)
+        return client
+            .target(address)
             .path(path)
             .request()
             .post(Entity.entity(entity, MediaType.APPLICATION_JSON));
-
-        return response;
     }
 
     private static Response get(String path) throws IOException {
@@ -71,12 +70,10 @@ public class IMClient {
 
         Header keycloakAuth = getKeycloakAuthorization();
 
-        Response response = target
+        return target
             .request()
             .header(keycloakAuth.getName(), keycloakAuth.getValue())
             .get();
-
-        return response;
     }
 
     private static Header getKeycloakAuthorization() throws IOException {

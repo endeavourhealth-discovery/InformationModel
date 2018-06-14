@@ -208,6 +208,33 @@ public class ConceptJDBCDAL implements ConceptDAL {
         }
     }
 
+    @Override
+    public Long saveAttribute(Long conceptId, Long attributeId) throws Exception {
+        Attribute att = new Attribute()
+            .setConceptId(conceptId)
+            .setAttributeId(attributeId);
+
+        return this.filer.storeAndApply(
+            "Endeavour Health",
+            TransactionAction.CREATE,
+            TransactionTable.ATTRIBUTE_MODEL,
+            att);
+    }
+
+    @Override
+    public Long saveRelationship(Long sourceId, Long targetId, Long relationshipId) throws Exception {
+        Relationship rel = new Relationship()
+            .setSource(sourceId)
+            .setTarget(targetId)
+            .setRelationship(relationshipId);
+
+        return this.filer.storeAndApply(
+            "Endeavour Health",
+            TransactionAction.CREATE,
+            TransactionTable.RELATIONSHIP,
+            rel);
+    }
+
     private List<ConceptSummary> getSummaryResultSet(PreparedStatement stmt) throws SQLException {
         List<ConceptSummary> result = new ArrayList<>();
 

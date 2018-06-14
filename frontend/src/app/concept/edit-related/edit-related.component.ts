@@ -53,7 +53,7 @@ export class EditRelatedComponent implements OnInit {
   }
 
   ok() {
-    this.activeModal.close({concept: this.targetConcept, link: this.linkage});
+    this.activeModal.close(this.linkage);
   }
 
   cancel() {

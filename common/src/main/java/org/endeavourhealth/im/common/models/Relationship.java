@@ -2,7 +2,7 @@ package org.endeavourhealth.im.common.models;
 
 public class Relationship extends DbEntity<Relationship> {
     private Long source;
-    private ConceptRelationship relationship;
+    private Long relationship;
     private Long target;
     private Integer order;
     private Boolean mandatory;
@@ -18,11 +18,11 @@ public class Relationship extends DbEntity<Relationship> {
         return this;
     }
 
-    public ConceptRelationship getRelationship() {
+    public Long getRelationship() {
         return relationship;
     }
 
-    public Relationship setRelationship(ConceptRelationship relationship) {
+    public Relationship setRelationship(Long relationship) {
         this.relationship = relationship;
         return this;
     }

@@ -64,7 +64,7 @@ public class ComponentFilerForRelationships extends ComponentFiler {
         int i = 1;
 
         if (relationship.getSource() != null) statement.setLong(i++, relationship.getSource());
-        if (relationship.getRelationship() != null) statement.setLong(i++, relationship.getRelationship().getId());
+        if (relationship.getRelationship() != null) statement.setLong(i++, relationship.getRelationship());
         if (relationship.getTarget() != null) statement.setLong(i++, relationship.getTarget());
         if (relationship.getOrder() != null) statement.setInt(i++, relationship.getOrder());
         if (relationship.getMandatory() != null) statement.setBoolean(i++, relationship.getMandatory());

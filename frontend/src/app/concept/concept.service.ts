@@ -79,4 +79,21 @@ export class ConceptService {
     return this.http.get('api/Concept/Relationships')
       .map((result) => result.json());
   }
+
+  saveAttribute(conceptId: number, attributeId: number): Observable<any> {
+    const params = new URLSearchParams();
+    params.append('conceptId', conceptId.toString());
+    params.append('attributeId', attributeId.toString());
+    return this.http.post('api/Concept/Attribute', {}, {search: params})
+      .map((result) => result.json());
+  }
+
+  saveRelationship(sourceId: number, targetId: number, relationshipId: number): Observable<any> {
+    const params = new URLSearchParams();
+    params.append('sourceId', sourceId.toString());
+    params.append('targetId', targetId.toString());
+    params.append('relationshipId', relationshipId.toString());
+    return this.http.post('api/Concept/Relationship', {}, {search: params})
+      .map((result) => result.json());
+  }
 }

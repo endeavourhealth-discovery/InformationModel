@@ -38,9 +38,9 @@ public class ConceptEndpoint {
         Concept concept = new ConceptLogic().get(id);
 
         return Response
-                .ok()
-                .entity(concept)
-                .build();
+            .ok()
+            .entity(concept)
+            .build();
     }
 
     @GET
@@ -50,16 +50,16 @@ public class ConceptEndpoint {
     @Timed(absolute = true, name = "InformationModel.ConceptEndpoint.Get")
     @ApiOperation(value = "Returns Concept by id")
     public Response getSummaries(@Context SecurityContext sc,
-                        @ApiParam(value = "Page number") @QueryParam("page") Integer page
+                                 @ApiParam(value = "Page number") @QueryParam("page") Integer page
     ) throws Exception {
         LOG.debug("Get concept summaries");
 
         List<ConceptSummary> concepts = new ConceptLogic().getSummaries(page);
 
         return Response
-                .ok()
-                .entity(concepts)
-                .build();
+            .ok()
+            .entity(concepts)
+            .build();
     }
 
     @POST
@@ -68,16 +68,16 @@ public class ConceptEndpoint {
     @Timed(absolute = true, name = "InformationModel.ConceptEndpoint.Post")
     @ApiOperation(value = "Saves a concept")
     public Response save(@Context SecurityContext sc,
-                                 @ApiParam(value = "Concept to save") Concept concept
+                         @ApiParam(value = "Concept to save") Concept concept
     ) throws Exception {
         LOG.debug("Save concept");
 
         Long id = new ConceptLogic().save(concept);
 
         return Response
-                .ok()
-                .entity(id)
-                .build();
+            .ok()
+            .entity(id)
+            .build();
     }
 
 
@@ -88,16 +88,16 @@ public class ConceptEndpoint {
     @Timed(absolute = true, name = "InformationModel.ConceptEndpoint.Search")
     @ApiOperation(value = "Returns Concept summaries based on search criteria")
     public Response search(@Context SecurityContext sc,
-                                 @ApiParam(value = "Search criteria") @QueryParam("criteria") String criteria
+                           @ApiParam(value = "Search criteria") @QueryParam("criteria") String criteria
     ) throws Exception {
         LOG.debug("Get concept summaries");
 
         List<ConceptSummary> concepts = new ConceptLogic().search(criteria);
 
         return Response
-                .ok()
-                .entity(concepts)
-                .build();
+            .ok()
+            .entity(concepts)
+            .build();
     }
 
     @GET
@@ -107,7 +107,7 @@ public class ConceptEndpoint {
     @Timed(absolute = true, name = "InformationModel.ConceptEndpoint.RelatedTargets")
     @ApiOperation(value = "Returns related target concepts by id")
     public Response getRelatedTargets(@Context SecurityContext sc,
-                                 @ApiParam(value = "Concept Id") @QueryParam("id") Long id
+                                      @ApiParam(value = "Concept Id") @QueryParam("id") Long id
     ) throws Exception {
         LOG.debug("Get related target concepts");
 
@@ -123,10 +123,10 @@ public class ConceptEndpoint {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/RelatedSources")
-    @Timed(absolute = true, name = "InformationModel.ConceptEndpoint.RelatedSources")
+    @Timed(absolute = true, name = "InformationModel.ConceptEndpoint.RelatedSources.Get")
     @ApiOperation(value = "Returns related source concepts by id")
     public Response getRelatedSources(@Context SecurityContext sc,
-                               @ApiParam(value = "Concept Id") @QueryParam("id") Long id
+                                      @ApiParam(value = "Concept Id") @QueryParam("id") Long id
     ) throws Exception {
         LOG.debug("Get related source concepts");
 
@@ -143,10 +143,10 @@ public class ConceptEndpoint {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/Attribute")
-    @Timed(absolute = true, name = "InformationModel.ConceptEndpoint.Attribute")
+    @Timed(absolute = true, name = "InformationModel.ConceptEndpoint.Attribute.Get")
     @ApiOperation(value = "Returns a list of attributes of a concept")
     public Response getAttributes(@Context SecurityContext sc,
-                                      @ApiParam(value = "Concept Id") @QueryParam("id") Long id
+                                  @ApiParam(value = "Concept Id") @QueryParam("id") Long id
     ) throws Exception {
         LOG.debug("Get concept attributes");
 
@@ -162,10 +162,10 @@ public class ConceptEndpoint {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/AttributeOf")
-    @Timed(absolute = true, name = "InformationModel.ConceptEndpoint.AttributeOf")
+    @Timed(absolute = true, name = "InformationModel.ConceptEndpoint.AttributeOf.Get")
     @ApiOperation(value = "Returns a list of concepts that this is an attribute of")
     public Response getAttributeOf(@Context SecurityContext sc,
-                                  @ApiParam(value = "Concept Id") @QueryParam("id") Long id
+                                   @ApiParam(value = "Concept Id") @QueryParam("id") Long id
     ) throws Exception {
         LOG.debug("Get attribute of concepts");
 
@@ -181,7 +181,7 @@ public class ConceptEndpoint {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/Relationships")
-    @Timed(absolute = true, name = "InformationModel.ConceptEndpoint.Relationships")
+    @Timed(absolute = true, name = "InformationModel.ConceptEndpoint.Relationships.Get")
     @ApiOperation(value = "Returns a list of relationship concepts")
     public Response getRelationships(@Context SecurityContext sc) throws Exception {
         LOG.debug("Get relationship concepts");
@@ -191,6 +191,46 @@ public class ConceptEndpoint {
         return Response
             .ok()
             .entity(relationships)
+            .build();
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/Attribute")
+    @Timed(absolute = true, name = "InformationModel.ConceptEndpoint.Attribute.Post")
+    @ApiOperation(value = "Add an attribute")
+    public Response addAttribute(@Context SecurityContext sc,
+                                 @ApiParam(value = "Concept Id") @QueryParam("conceptId") Long conceptId,
+                                 @ApiParam(value = "Attribute Id") @QueryParam("attributeId") Long attributeId) throws Exception {
+        LOG.debug("Add attribiute");
+
+        Long result = new ConceptLogic().addAttribute(conceptId, attributeId);
+
+        return Response
+            .ok()
+            .entity(result)
+            .build();
+    }
+
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/Relationship")
+    @Timed(absolute = true, name = "InformationModel.ConceptEndpoint.Relationship.Post")
+    @ApiOperation(value = "Add a relationship")
+    public Response addRelationship(@Context SecurityContext sc,
+                                    @ApiParam(value = "Source Id") @QueryParam("sourceId") Long sourceId,
+                                    @ApiParam(value = "Target Id") @QueryParam("targetId") Long targetId,
+                                    @ApiParam(value = "Relationship Id") @QueryParam("relationshipId") Long relationshipId) throws Exception {
+        LOG.debug("Add relationship");
+
+        Long result = new ConceptLogic().addRelationship(sourceId, targetId, relationshipId);
+
+        return Response
+            .ok()
+            .entity(result)
             .build();
     }
 }

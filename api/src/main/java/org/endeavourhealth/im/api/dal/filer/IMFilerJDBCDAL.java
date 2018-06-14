@@ -137,7 +137,8 @@ public class IMFilerJDBCDAL implements IMFilerDAL {
             case TASK:
                 return applyTransactionComponent(transaction, transactionComponent, new ComponentFilerForTasks());
             case ATTRIBUTE_MODEL:
-                return applyTransactionComponent(transaction, transactionComponent, new ComponentFilerForAttributeModels());
+                return applyTransactionComponent(transaction, transactionComponent, new ComponentFilerForAttributes());
+//                return applyTransactionComponent(transaction, transactionComponent, new ComponentFilerForAttributeModels());
             case TERM_MAPPING:
                 return applyTransactionComponent(transaction, transactionComponent, new ComponentFilerForTermMappings());
             case RELATIONSHIP:

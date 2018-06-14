@@ -107,7 +107,7 @@ public class TermLogic {
 
                 Relationship relationship = new Relationship()
                     .setSource(parentConceptId)
-                    .setRelationship(ConceptRelationship.HAS_CHILD)
+                    .setRelationship(ConceptRelationship.HAS_CHILD.getId())
                     .setTarget(conceptId);
 
                 this.conceptLogic.save(relationship);
