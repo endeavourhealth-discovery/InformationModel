@@ -34,6 +34,9 @@ export class NodeGraphComponent implements AfterViewInit {
   @Output()
   nodeDblClick = new EventEmitter();
 
+  @Output()
+  linkClick = new EventEmitter();
+
   constructor() { }
 
   ngAfterViewInit() {
@@ -70,7 +73,7 @@ export class NodeGraphComponent implements AfterViewInit {
     this.nodes = layer2.selectAll('circle');
     this.nodelabels = layer3.selectAll('.nodelabel');
     this.edgepaths = layer1.selectAll('.edgepath');
-    this.edgelabels = layer1.selectAll('.edgelabel');
+    this.edgelabels = layer3.selectAll('.edgelabel');
 
     this.force = d3.layout.force()
       .nodes(this.nodeData)
@@ -91,12 +94,12 @@ export class NodeGraphComponent implements AfterViewInit {
       this.nodeData.push({id: id, label: label, group: group, data: data, x: 0, y: 0});
   }
 
-  addEdgeData(source: number, target: number, label: string) {
+  addEdgeData(source: number, target: number, label: string, data: any) {
     let src = this.nodeData.find(i => i.id === source);
     let tgt = this.nodeData.find(i => i.id === target);
 
     if (this.edgeData.findIndex(i => i.source === src && i.target === tgt) === -1)
-      this.edgeData.push({source: src, target: tgt, label: label, x: 0, y: 0, d: 0});
+      this.edgeData.push({source: src, target: tgt, label: label, data: data, x: 0, y: 0, d: 0});
   }
 
   start() {
@@ -106,8 +109,8 @@ export class NodeGraphComponent implements AfterViewInit {
       .attr('id', (d, i) => 'edge' + i)
       .attr('marker-end', 'url(#arrowhead)')
       .attr('overflow', 'invisible')
-      .style('stroke', '#ccc')
-      .style('pointer-events', 'none');
+      .style('pointer-events', 'none')
+      .style('stroke', '#ccc');
     this.edges.exit().remove();
 
     this.nodes = this.nodes.data(this.force.nodes());
@@ -140,22 +143,21 @@ export class NodeGraphComponent implements AfterViewInit {
         'fill': 'blue',
         'stroke': 'red',
         'id': (d, i) => 'edgepath' + i })
-      .style('pointer-events', 'none');
+       .style('pointer-events', 'none');
     this.edgepaths.exit().remove();
 
     this.edgelabels = this.edgelabels.data(this.force.links());
     this.edgelabels.enter()
       .append('text')
-      .style('pointer-events', 'none')
       .attr({'class': 'edgelabel',
         'id': (d, i) => 'edgelabel' + i,
         'dx': (d,i) => (this.linkDistance * 0.5) - (d.label.length * 2.5),
         'dy': 0,
         'font-size': 10,
         'fill': '#aaa'})
+      .on("click", (link) => this.linkClicked(link))
       .append('textPath')
       .attr('xlink:href', (d, i) => '#edgepath' + i)
-      .style('pointer-events', 'none')
       .text((d: any, i) => d.label);
     this.edgelabels.exit().remove();
 
@@ -187,6 +189,10 @@ export class NodeGraphComponent implements AfterViewInit {
         return 'rotate(0)';
       }
     });
+  }
+
+  linkClicked(link: any) {
+    this.linkClick.emit(link);
   }
 
   onResize(svg: any, force: any) {

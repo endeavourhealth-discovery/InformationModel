@@ -22,7 +22,29 @@
             <div class="card h-100" id="relatedGraph">
               <div class="card-header card-success"><h4>Concept links <small> (double-click to expand)</small><button class="btn btn-info pull-right" (click)="addConcept()">Add...</button></h4> </div>
               <div class="card-block">
-                <nodeGraph #nodeGraph (nodeClick)="nodeClick($event)" (nodeDblClick)="nodeDblClick($event)"></nodeGraph>
+                <div class="row" *ngIf="selectedLink">
+                  <div class="col-md-4 form-group">
+                    <label for="source">Link</label>
+                    <input class="form-control" id="source" type="text" value="{{selectedLink.source.label}}" name="source" readonly>
+                  </div>
+                  <div class="col-md-4 form-group">
+                    <label for="relationship">&nbsp;</label>
+                    <input class="form-control" id="relationship" type="text" value="{{selectedLink.label}}" name="relationship" readonly>
+                  </div>
+                  <div class="col-md-4 form-group">
+                    <label for="target">&nbsp;</label>
+                    <input class="form-control" id="target" type="text" value="{{selectedLink.target.label}}" name="target" readonly>
+                  </div>
+                </div>
+                <div class="row" *ngIf="selectedNode">
+                  <div class="col-md-4 form-group">
+                    <label for="context">Context</label>
+                    <input class="form-control" id="context" type="text" value="{{selectedNode.label}}" name="source" readonly>
+                  </div>
+                </div>
+              </div>
+              <div class="card-block">
+                <nodeGraph #nodeGraph (nodeClick)="nodeClick($event)" (nodeDblClick)="nodeDblClick($event)" (linkClick)="linkClick($event)"></nodeGraph>
               </div>
             </div>
           </div>

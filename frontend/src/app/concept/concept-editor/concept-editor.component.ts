@@ -25,6 +25,8 @@ export class ConceptEditorComponent implements AfterViewInit {
   data: any;
   nodes: any[];
   edges: any[];
+  selectedLink: any;
+  selectedNode: any;
 
   @ViewChild('nodeGraph') graph: NodeGraphComponent;
 
@@ -78,19 +80,19 @@ export class ConceptEditorComponent implements AfterViewInit {
   extendData(conceptId: number, targets: RelatedConcept[], sources: RelatedConcept[], attributes: ConceptSummary[], attributeOf: ConceptSummary[]) {
     for (let target of targets) {
       this.graph.addNodeData(target.id, target.context, 2, target);
-      this.graph.addEdgeData(conceptId, target.id, target.relationship);
+      this.graph.addEdgeData(conceptId, target.id, target.relationship, target);
     }
     for (let source of sources) {
       this.graph.addNodeData(source.id, source.context, 2, source);
-      this.graph.addEdgeData(source.id, conceptId, source.relationship);
+      this.graph.addEdgeData(source.id, conceptId, source.relationship, source);
     }
     for (let attribute of attributes) {
       this.graph.addNodeData(attribute.id, attribute.context, 3, attribute);
-      this.graph.addEdgeData(conceptId, attribute.id, 'Has attribute');
+      this.graph.addEdgeData(conceptId, attribute.id, 'Has attribute', attribute);
     }
     for (let concept of attributeOf) {
       this.graph.addNodeData(concept.id, concept.context, 2, concept);
-      this.graph.addEdgeData(concept.id, conceptId, 'Has attribute');
+      this.graph.addEdgeData(concept.id, conceptId, 'Has attribute', concept);
     }
     this.graph.start();
   }
@@ -161,13 +163,15 @@ export class ConceptEditorComponent implements AfterViewInit {
       this.graph.addNodeData(target.id, target.context, 2, target);
     }
 
-    this.graph.addEdgeData(this.model.id, target.id, relationship.name);
+    this.graph.addEdgeData(this.model.id, target.id, relationship.name, relationship);
     this.graph.start();
   }
 
   nodeClick(node) {
     console.log("Click");
     console.log(node);
+    this.selectedNode = node;
+    this.selectedLink = null;
   }
 
   nodeDblClick(node) {
@@ -177,6 +181,13 @@ export class ConceptEditorComponent implements AfterViewInit {
       node.data.loaded = true;
       this.loadDetails(node.data.id);
     }
+  }
+
+  linkClick(link) {
+    console.log("Click - link");
+    console.log(link);
+    this.selectedNode = null;
+    this.selectedLink = link;
   }
 
   save() {
