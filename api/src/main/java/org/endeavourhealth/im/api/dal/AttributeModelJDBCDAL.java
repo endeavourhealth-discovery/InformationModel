@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 public class AttributeModelJDBCDAL implements AttributeModelDAL {
+    /*
     private static final Logger LOG = LoggerFactory.getLogger(AttributeModelJDBCDAL.class);
     private static final int PAGE_SIZE = 15;
     private final IMFilerDAL filer;
@@ -137,4 +138,5 @@ public class AttributeModelJDBCDAL implements AttributeModelDAL {
 
         return result;
     }
+    */
 }

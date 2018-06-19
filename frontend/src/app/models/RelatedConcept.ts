@@ -1,5 +1,13 @@
+import {ConceptSummary} from './ConceptSummary';
+
 export class RelatedConcept {
-  public id: number;
-  public context: string;
-  public relationship: string;
+  id: number;
+  sourceId: number;
+  source: ConceptSummary;
+  targetId: number;
+  target: ConceptSummary;
+  relationship: string;
+  order: number;
+  mandatory: boolean;
+  limit: number;
 }

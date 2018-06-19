@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class AttributeModelLogic {
+    /*
     private AttributeModelDAL dal;
 
     public AttributeModelLogic() {
@@ -45,4 +46,5 @@ public class AttributeModelLogic {
     public List<ConceptSummary> getAttributes(Long conceptId) throws SQLException {
         return this.dal.getAttributes(conceptId);
     }
+    */
 }

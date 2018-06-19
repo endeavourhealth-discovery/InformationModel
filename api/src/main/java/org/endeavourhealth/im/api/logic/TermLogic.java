@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class TermLogic {
+    /*
     private TermDAL dal;
     private TaskLogic taskLogic;
     private ConceptLogic conceptLogic;
@@ -116,5 +117,5 @@ public class TermLogic {
             }
         }
     }
-
+*/
 }

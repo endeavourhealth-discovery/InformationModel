@@ -4,11 +4,27 @@ import {Observable} from 'rxjs/Observable';
 import {Concept} from '../models/Concept';
 import {ConceptSummary} from '../models/ConceptSummary';
 import {RelatedConcept} from '../models/RelatedConcept';
+import {ConceptSummaryList} from '../models/ConceptSummaryList';
+import {Attribute} from '../models/Attribute';
+import {ConceptBundle} from '../models/ConceptBundle';
 
 @Injectable()
 export class ConceptService {
 
   constructor(private http: Http) { }
+
+  getMRU(): Observable<ConceptSummaryList> {
+    return this.http.get('api/Concept/MRU')
+      .map((result) => result.json());
+  }
+
+  search(searchTerm: string) {
+      const params = new URLSearchParams();
+      params.append('searchTerm', searchTerm.toString());
+
+      return this.http.get('api/Concept/Search', {search: params})
+        .map((result) => result.json());
+  }
 
   getConcept(conceptId: number): Observable<Concept> {
     const params = new URLSearchParams();
@@ -19,32 +35,20 @@ export class ConceptService {
       .map((result) => result.json());
   }
 
-  getSummaries(page?: number): Observable<ConceptSummary[]> {
+  getConceptBundle(conceptId: number): Observable<ConceptBundle> {
     const params = new URLSearchParams();
 
-    if (page) {
-      params.append('page', page.toString());
-    }
+    params.append('id', conceptId.toString());
 
-    return this.http.get('api/Concept/Summaries', {search: params})
+    return this.http.get('api/Concept/Bundle', {search: params})
       .map((result) => result.json());
   }
 
-  save(model: Concept): Observable<number> {
-    return this.http.post('api/Concept', model)
-      .map((result) => result.json());
-  }
 
-  find(criteria: string): Observable<ConceptSummary[]> {
+  getAttributes(conceptId: number): Observable<Attribute[]> {
     const params = new URLSearchParams();
-    params.append('criteria', criteria);
-
-    return this.http.get('api/Concept/Search', {search: params})
-      .map((result) => result.json());
-  }
-
-  createDraftConcept(concept: Concept): Observable<number> {
-    return this.http.post('api/Concept', concept)
+    params.append('id', conceptId.toString());
+    return this.http.get('api/Concept/Attribute', {search: params})
       .map((result) => result.json());
   }
 
@@ -62,12 +66,60 @@ export class ConceptService {
       .map((result) => result.json());
   }
 
-  getAttributes(conceptId: number): Observable<ConceptSummary[]> {
-    const params = new URLSearchParams();
-    params.append('id', conceptId.toString());
-    return this.http.get('api/Concept/Attribute', {search: params})
+  getRelationships(): Observable<ConceptSummary[]> {
+    return this.http.get('api/Concept/Relationships')
       .map((result) => result.json());
   }
+
+  saveBundle(bundle: ConceptBundle): Observable<number> {
+    return this.http.post('api/Concept/Bundle', bundle)
+      .map((result) => result.json());
+  }
+
+  save(concept: Concept): Observable<number> {
+    return this.http.post('api/Concept', concept)
+      .map((result) => result.json());
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  getSummaries(page?: number): Observable<ConceptSummary[]> {
+    const params = new URLSearchParams();
+
+    if (page) {
+      params.append('page', page.toString());
+    }
+
+    return this.http.get('api/Concept/Summaries', {search: params})
+      .map((result) => result.json());
+  }
+
+  find(criteria: string): Observable<ConceptSummary[]> {
+    const params = new URLSearchParams();
+    params.append('criteria', criteria);
+
+    return this.http.get('api/Concept/Search', {search: params})
+      .map((result) => result.json());
+  }
+
+  createDraftConcept(concept: Concept): Observable<number> {
+    return this.http.post('api/Concept', concept)
+      .map((result) => result.json());
+  }
+
+
   getAttributeOf(conceptId: number): Observable<ConceptSummary[]> {
     const params = new URLSearchParams();
     params.append('id', conceptId.toString());
@@ -75,10 +127,6 @@ export class ConceptService {
       .map((result) => result.json());
   }
 
-  getRelationships(): Observable<ConceptSummary[]> {
-    return this.http.get('api/Concept/Relationships')
-      .map((result) => result.json());
-  }
 
   saveAttribute(conceptId: number, attributeId: number): Observable<any> {
     const params = new URLSearchParams();
@@ -96,4 +144,5 @@ export class ConceptService {
     return this.http.post('api/Concept/Relationship', {}, {search: params})
       .map((result) => result.json());
   }
+
 }

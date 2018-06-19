@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TaskLogic {
+    /*
     private TaskDAL dal;
 
     public TaskLogic() {
@@ -33,4 +34,5 @@ public class TaskLogic {
     public List<Task> getTasks(TaskType taskType) throws Exception {
         return dal.getTasks(taskType);
     }
+    */
 }

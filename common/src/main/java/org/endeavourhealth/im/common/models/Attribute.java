@@ -2,7 +2,9 @@ package org.endeavourhealth.im.common.models;
 
 public class Attribute extends DbEntity<Attribute> {
     private Long conceptId;
+    // TODO: private ConceptSummary concept; -- For "Is Attribute of"
     private Long attributeId;
+    private ConceptSummary attribute;
     private Integer order;
     private Boolean mandatory;
     private Integer limit;
@@ -22,6 +24,10 @@ public class Attribute extends DbEntity<Attribute> {
 
     public Attribute setAttributeId(Long attributeId) {
         this.attributeId = attributeId;
+
+        if (attribute != null)
+            this.attribute.setId(attributeId);
+
         return this;
     }
 
@@ -49,6 +55,15 @@ public class Attribute extends DbEntity<Attribute> {
 
     public Attribute setLimit(Integer limit) {
         this.limit = limit;
+        return this;
+    }
+
+    public ConceptSummary getAttribute() {
+        return attribute;
+    }
+
+    public Attribute setAttribute(ConceptSummary attribute) {
+        this.attribute = attribute;
         return this;
     }
 }

@@ -21,7 +21,7 @@ import javax.ws.rs.core.SecurityContext;
 @Api(description = "API for all calls relating to Messages")
 public class MessageEndpoint {
     private static final Logger LOG = LoggerFactory.getLogger(MessageEndpoint.class);
-
+/*
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -40,4 +40,5 @@ public class MessageEndpoint {
                 .entity(isValid)
                 .build();
     }
+    */
 }

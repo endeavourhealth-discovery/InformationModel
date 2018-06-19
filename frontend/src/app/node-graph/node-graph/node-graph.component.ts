@@ -12,6 +12,7 @@ export class NodeGraphComponent implements AfterViewInit {
   data: any;
   nodeData: GraphNode[] = [];
   edgeData: GraphEdge[] = [];
+  svg: any;
 
   force: any;
   nodes: any;
@@ -40,6 +41,11 @@ export class NodeGraphComponent implements AfterViewInit {
   constructor() { }
 
   ngAfterViewInit() {
+    this.initialize();
+    let rs = new ResizeSensor(this.graphSvg.nativeElement.parentElement.parentElement, () => this.onResize(this.svg, this.force))
+  }
+
+  initialize() {
     const linkDistance = 100;
     const computedStyle = window.getComputedStyle(this.graphSvg.nativeElement.parentElement.parentElement);
     const hPadding = parseFloat(computedStyle.paddingLeft) + parseFloat(computedStyle.paddingRight) + 5;
@@ -47,11 +53,11 @@ export class NodeGraphComponent implements AfterViewInit {
     const vPadding = parseFloat(computedStyle.paddingTop) + parseFloat(computedStyle.paddingBottom) + 5;
     const height = parseFloat(computedStyle.height) - vPadding;
 
-    const svg = d3.select('svg')
+    this.svg = d3.select('svg')
       .attr('width', width)
       .attr('height', height);
 
-    svg.append('defs').append('marker')
+    this.svg.append('defs').append('marker')
       .attr({'id': 'arrowhead',
         'viewBox': '-0 -5 10 10',
         'refX': 25,
@@ -65,15 +71,15 @@ export class NodeGraphComponent implements AfterViewInit {
       .attr('fill', '#ccc')
       .attr('stroke', '#ccc');
 
-    const layer1 = svg.append('g');
-    const layer2 = svg.append('g');
-    const layer3 = svg.append('g');
+    const layer1 = this.svg.append('g');
+    const layer2 = this.svg.append('g');
+    const layer3 = this.svg.append('g');
 
     this.edges = layer1.selectAll('line');
     this.nodes = layer2.selectAll('circle');
     this.nodelabels = layer3.selectAll('.nodelabel');
     this.edgepaths = layer1.selectAll('.edgepath');
-    this.edgelabels = layer3.selectAll('.edgelabel');
+    this.edgelabels = layer2.selectAll('.edgelabel');
 
     this.force = d3.layout.force()
       .nodes(this.nodeData)
@@ -85,8 +91,18 @@ export class NodeGraphComponent implements AfterViewInit {
       .gravity(0.05)
       .on("tick", () => this.tick(this.nodes, this.edges, this.nodelabels, this.edgepaths, this.edgelabels));
       // .start();
+  }
 
-    let rs = new ResizeSensor(this.graphSvg.nativeElement.parentElement.parentElement, () => this.onResize(svg, this.force))
+  clear() {
+    this.data = null;
+    this.nodeData = [];
+    this.edgeData = [];
+    this.initialize();
+  }
+
+  assignColours(indexes: any[]) {
+    for(let index of indexes)
+      this.colors(index);
   }
 
   addNodeData(id: number, label: string, group: number, data: any) {

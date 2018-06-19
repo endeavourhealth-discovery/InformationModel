@@ -16,6 +16,7 @@ import java.util.Date;
 import java.util.List;
 
 public class TaskJDBCDAL implements TaskDAL {
+    /*
     private final IMFilerDAL filer;
 
     public TaskJDBCDAL() {
@@ -87,4 +88,5 @@ public class TaskJDBCDAL implements TaskDAL {
 
         return tasks;
     }
+    */
 }

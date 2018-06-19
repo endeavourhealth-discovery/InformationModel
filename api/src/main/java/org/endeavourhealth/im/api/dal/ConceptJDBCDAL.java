@@ -25,6 +25,251 @@ public class ConceptJDBCDAL implements ConceptDAL {
         this.filer = filer;
     }
 
+
+    @Override
+    public ConceptSummaryList getMRU() throws SQLException {
+        Connection conn = ConnectionPool.InformationModel.pop();
+        String sql = "SELECT id, context, full_name, status, version FROM concept LIMIT ?";
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, PAGE_SIZE);
+
+            return new ConceptSummaryList()
+            .setPage(1)
+            .setCount(PAGE_SIZE)
+            .setConcepts(getSummaryResultSet(stmt));
+        } finally {
+            ConnectionPool.InformationModel.push(conn);
+        }
+    }
+
+    @Override
+    public ConceptSummaryList search(String searchTerm) throws SQLException {
+        searchTerm = "%" + searchTerm + "%";
+
+        String sql = "SELECT id, context, full_name, status, version " +
+            "FROM concept " +
+            "WHERE context like ? OR full_name like ? " +
+            "LIMIT ?";
+
+        Connection conn = ConnectionPool.InformationModel.pop();
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, searchTerm);
+            stmt.setString(2, searchTerm);
+            stmt.setInt(3, PAGE_SIZE);
+            return new ConceptSummaryList()
+                .setPage(1)
+                .setCount(PAGE_SIZE)
+                .setConcepts(getSummaryResultSet(stmt));
+        } finally {
+            ConnectionPool.InformationModel.push(conn);
+        }
+    }
+
+    @Override
+    public Concept get(Long id) throws SQLException {
+        Connection conn = ConnectionPool.InformationModel.pop();
+
+        String sql = "SELECT c.*, t.id as typeId, t.full_name as typeName " +
+            "FROM concept c " +
+            "JOIN concept t ON t.id = c.type " +
+            "WHERE c.id = ?";
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, id);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                return getConceptFromResultSet(rs);
+            }
+        } finally {
+            ConnectionPool.InformationModel.push(conn);
+        }
+
+        return null;
+    }
+
+    @Override
+    public List<Attribute> getAttributes(Long id) throws SQLException {
+        List<Attribute> result = new ArrayList<>();
+
+        String sql = "SELECT c.id, c.context, c.full_name, c.status, c.version, a.order, a.mandatory, a.`limit` " +
+            "FROM concept c " +
+            "JOIN concept_attribute a ON a.attribute_id = c.id " +
+            "WHERE a.concept_id = ?";
+
+        Connection conn = ConnectionPool.InformationModel.pop();
+
+        try(PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, id);
+            ResultSet rs = stmt.executeQuery();
+            while(rs.next()) {
+                result.add(
+                    new Attribute()
+                        .setAttributeId(rs.getLong("id"))
+                        .setOrder(rs.getInt("order"))
+                        .setMandatory(rs.getBoolean("mandatory"))
+                        .setLimit(rs.getInt("limit"))
+                        .setAttribute(getConceptSummary(rs))
+                );
+            }
+        } finally {
+            ConnectionPool.InformationModel.push(conn);
+        }
+
+        return result;
+    }
+
+
+    @Override
+    public List<RelatedConcept> getRelatedTargets(Long sourceId) throws SQLException {
+        String sql = "SELECT r.id, c.id as targetId, c.context, c.full_name, c.version, c.status, rc.full_name as relationship " +
+            "FROM concept c " +
+            "JOIN concept_relationship r ON r.target = c.id " +
+            "JOIN concept rc ON rc.id = r.relationship " +
+            "WHERE r.source = ?";
+
+        Connection conn = ConnectionPool.InformationModel.pop();
+
+        List<RelatedConcept> result = new ArrayList<>();
+        try(PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, sourceId);
+            ResultSet rs = stmt.executeQuery();
+
+            while(rs.next()) {
+                RelatedConcept related = new RelatedConcept()
+                    .setId(rs.getLong("id"))
+                    .setSourceId(sourceId)
+                    .setTargetId(rs.getLong("targetId"))
+                    .setTarget(
+                        new ConceptSummary()
+                        .setId(rs.getLong("targetId"))
+                        .setContext(rs.getString("context"))
+                        .setName(rs.getString("full_name"))
+                        .setStatus(rs.getString("status"))
+                        .setVersion(rs.getString("version"))
+                    )
+                    .setRelationship(rs.getString("relationship"));
+
+                result.add(related);
+            }
+
+
+        } finally {
+            ConnectionPool.InformationModel.push(conn);
+        }
+
+        return result;
+    }
+
+    @Override
+    public List<RelatedConcept> getRelatedSources(Long targetId) throws SQLException {
+        String sql = "SELECT r.id, c.id as sourceId, c.context, c.full_name, c.version, c.status, rc.full_name as relationship " +
+            "FROM concept c " +
+            "JOIN concept_relationship r ON r.source = c.id " +
+            "JOIN concept rc ON rc.id = r.relationship " +
+            "WHERE r.target = ?";
+
+        Connection conn = ConnectionPool.InformationModel.pop();
+
+        List<RelatedConcept> result = new ArrayList<>();
+        try(PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, targetId);
+            ResultSet rs = stmt.executeQuery();
+
+            while(rs.next()) {
+                RelatedConcept related = new RelatedConcept()
+                    .setId(rs.getLong("id"))
+                    .setTargetId(targetId)
+                    .setSourceId(rs.getLong("sourceId"))
+                    .setSource(
+                        new ConceptSummary()
+                            .setId(rs.getLong("sourceId"))
+                            .setContext(rs.getString("context"))
+                            .setName(rs.getString("full_name"))
+                            .setStatus(rs.getString("status"))
+                            .setVersion(rs.getString("version"))
+                    )
+                    .setRelationship(rs.getString("relationship"));
+
+                result.add(related);
+            }
+
+
+        } finally {
+            ConnectionPool.InformationModel.push(conn);
+        }
+
+        return result;
+    }
+
+    @Override
+    public List<ConceptSummary> getRelationships() throws SQLException {
+        String sql = "SELECT c.id, c.context, c.full_name, c.status, c.version " +
+            "FROM concept c " +
+            "WHERE c.type = 8"; // 8 == Relationship
+
+        Connection conn = ConnectionPool.InformationModel.pop();
+
+        try(PreparedStatement stmt = conn.prepareStatement(sql)) {
+            return getSummaryResultSet(stmt);
+        } finally {
+            ConnectionPool.InformationModel.push(conn);
+        }
+    }
+
+    private List<ConceptSummary> getSummaryResultSet(PreparedStatement stmt) throws SQLException {
+        List<ConceptSummary> result = new ArrayList<>();
+
+        ResultSet rs = stmt.executeQuery();
+        while(rs.next()) {
+            result.add(getConceptSummary(rs));
+        }
+
+        return result;
+    }
+
+    private ConceptSummary getConceptSummary(ResultSet rs) throws SQLException {
+        return new ConceptSummary()
+            .setId(rs.getLong("id"))
+            .setContext(rs.getString("context"))
+            .setName(rs.getString("full_name"))
+            .setStatus(ConceptStatus.byValue(rs.getByte("status")).getName())
+            .setVersion(rs.getString("version"));
+    }
+
+    private Concept getConceptFromResultSet(ResultSet rs) throws SQLException {
+        return new Concept()
+            .setId(rs.getLong("id"))
+            .setType(
+                new ConceptReference()
+                .setId(rs.getLong("typeId"))
+                .setContext(rs.getString("typeName"))
+            )
+            .setContext(rs.getString("context"))
+            .setDescription(rs.getString("description"))
+            .setFullName(rs.getString("full_name"))
+            .setCriteria(rs.getString("criteria"))
+            .setExpression(rs.getString("Expression"))
+            .setUrl(rs.getString("url"))
+            .setVersion(rs.getString("version"))
+            .setStatus(ConceptStatus.byValue(rs.getByte("status")));
+    }
+    /*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     @Override
     public List<ConceptSummary> getSummaries(Integer page) throws SQLException {
         Connection conn = ConnectionPool.InformationModel.pop();
@@ -95,86 +340,7 @@ public class ConceptJDBCDAL implements ConceptDAL {
         }
     }
 
-    @Override
-    public List<RelatedConcept> getRelatedTargets(Long id) throws SQLException {
-        String sql = "SELECT c.id, c.context, rc.full_name as relationship " +
-            "FROM concept c " +
-            "JOIN concept_relationship r ON r.target = c.id " +
-            "JOIN concept rc ON rc.id = r.relationship " +
-            "WHERE r.source = ?";
 
-        Connection conn = ConnectionPool.InformationModel.pop();
-
-        List<RelatedConcept> result = new ArrayList<>();
-        try(PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setLong(1, id);
-            ResultSet rs = stmt.executeQuery();
-
-            while(rs.next()) {
-                RelatedConcept summary = new RelatedConcept()
-                    .setId(rs.getLong("id"))
-                    .setContext(rs.getString("context"))
-                    .setRelationship(rs.getString("relationship"));
-
-                result.add(summary);
-            }
-
-
-        } finally {
-            ConnectionPool.InformationModel.push(conn);
-        }
-
-        return result;
-    }
-
-    @Override
-    public List<RelatedConcept> getRelatedSources(Long id) throws SQLException {
-        String sql = "SELECT c.id, c.context, rc.full_name as relationship " +
-            "FROM concept c " +
-            "JOIN concept_relationship r ON r.source = c.id " +
-            "JOIN concept rc ON rc.id = r.relationship " +
-            "WHERE r.target = ?";
-
-        Connection conn = ConnectionPool.InformationModel.pop();
-
-        List<RelatedConcept> result = new ArrayList<>();
-        try(PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setLong(1, id);
-            ResultSet rs = stmt.executeQuery();
-
-            while(rs.next()) {
-                RelatedConcept summary = new RelatedConcept()
-                    .setId(rs.getLong("id"))
-                    .setContext(rs.getString("context"))
-                    .setRelationship(rs.getString("relationship"));
-
-                result.add(summary);
-            }
-
-
-        } finally {
-            ConnectionPool.InformationModel.push(conn);
-        }
-
-        return result;
-    }
-
-    @Override
-    public List<ConceptSummary> getAttributes(Long id) throws SQLException {
-        String sql = "SELECT c.id, c.context, c.full_name, c.status, c.version " +
-            "FROM concept c " +
-            "JOIN concept_attribute a ON a.attribute_id = c.id " +
-            "WHERE a.concept_id = ?";
-
-        Connection conn = ConnectionPool.InformationModel.pop();
-
-        try(PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setLong(1, id);
-            return getSummaryResultSet(stmt);
-        } finally {
-            ConnectionPool.InformationModel.push(conn);
-        }
-    }
 
     @Override
     public List<ConceptSummary> getAttributeOf(Long id) throws SQLException {
@@ -193,20 +359,6 @@ public class ConceptJDBCDAL implements ConceptDAL {
         }
     }
 
-    @Override
-    public List<ConceptSummary> getRelationships() throws SQLException {
-        String sql = "SELECT c.id, c.context, c.full_name, c.status, c.version " +
-            "FROM concept c " +
-            "WHERE c.type = 8"; // 8 == Relationship
-
-        Connection conn = ConnectionPool.InformationModel.pop();
-
-        try(PreparedStatement stmt = conn.prepareStatement(sql)) {
-            return getSummaryResultSet(stmt);
-        } finally {
-            ConnectionPool.InformationModel.push(conn);
-        }
-    }
 
     @Override
     public Long saveAttribute(Long conceptId, Long attributeId) throws Exception {
@@ -235,24 +387,6 @@ public class ConceptJDBCDAL implements ConceptDAL {
             rel);
     }
 
-    private List<ConceptSummary> getSummaryResultSet(PreparedStatement stmt) throws SQLException {
-        List<ConceptSummary> result = new ArrayList<>();
-
-        ResultSet rs = stmt.executeQuery();
-
-        while(rs.next()) {
-            ConceptSummary summary = new ConceptSummary()
-                .setId(rs.getLong("id"))
-                .setContext(rs.getString("context"))
-                .setName(rs.getString("full_name"))
-                .setStatus(ConceptStatus.byValue(rs.getByte("status")).getName())
-                .setVersion(rs.getString("version"));
-
-            result.add(summary);
-        }
-
-        return result;
-    }
 
     @Override
     public Concept getConceptByContext(String context) throws SQLException {
@@ -279,16 +413,5 @@ public class ConceptJDBCDAL implements ConceptDAL {
         return this.filer.storeAndApply("Endeavour Health", TransactionAction.CREATE, TransactionTable.CONCEPT, concept);
     }
 
-    private Concept getConceptFromResultSet(ResultSet rs) throws SQLException {
-        return new Concept()
-                .setId(rs.getLong("id"))
-                .setContext(rs.getString("context"))
-                .setDescription(rs.getString("description"))
-                .setFullName(rs.getString("full_name"))
-                .setCriteria(rs.getString("criteria"))
-                .setExpression(rs.getString("Expression"))
-                .setUrl(rs.getString("url"))
-                .setVersion(rs.getString("version"))
-                .setStatus(ConceptStatus.byValue(rs.getByte("status")));
-    }
+*/
 }

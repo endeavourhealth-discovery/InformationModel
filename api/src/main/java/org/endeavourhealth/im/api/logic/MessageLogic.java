@@ -7,6 +7,7 @@ import org.endeavourhealth.im.common.models.*;
 import java.util.Map;
 
 public class MessageLogic {
+    /*
     private MessageDAL dal;
 
     public MessageLogic() {
@@ -125,4 +126,5 @@ public class MessageLogic {
             taskLogic.createTask("Incomplete map", TaskType.MESSAGE_MAPPINGS, message.getId());
         }
     }
+    */
 }

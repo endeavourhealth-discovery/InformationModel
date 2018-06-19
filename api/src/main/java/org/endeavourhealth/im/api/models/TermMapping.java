@@ -3,7 +3,7 @@ package org.endeavourhealth.im.api.models;
 import org.endeavourhealth.im.common.models.DbEntity;
 
 public class TermMapping extends DbEntity<TermMapping> {
-    private String organisation;
+/*    private String organisation;
     private String context;
     private String system;
     private String code;
@@ -53,4 +53,5 @@ public class TermMapping extends DbEntity<TermMapping> {
         this.conceptId = conceptId;
         return this;
     }
+    */
 }

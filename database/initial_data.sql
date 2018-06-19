@@ -92,6 +92,6 @@ VALUES
 #   (1000, 1002, 10, 0, 0),
 #   (1000, 1008, 10, 0, 0);
 #
-INSERT INTO table_id (table_name, id)
-  SELECT 'concept', MAX(id) + 1 as id
-  FROM concept;
+# INSERT INTO table_id (table_name, id)
+#   SELECT 'concept', MAX(id) + 1 as id
+#   FROM concept;

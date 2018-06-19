@@ -1,7 +1,7 @@
 <div class="module">
   <div class="container-fluid">
     <div class="module-heading">
-      Attribute model editor : {{model?.context}}
+      Concept editor : {{model?.context}}
         <div class="pull-right">
           <button class="btn btn-success" (click)="save()">Save</button>
           <button class="btn btn-warning" (click)="close(true)">Cancel</button>
@@ -10,41 +10,74 @@
     <div class="module-body">
       <form>
         <div class="row">
-          <div class="col-md-4">
-            <div class="card h-100" id="detailCard" *ngIf="model">
-              <div class="card-header card-success"><h4>Details</h4></div>
-              <div class="card-block">
-                <app-concept-details [(ngModel)]="model" name="details"></app-concept-details>
+          <div class="col-md-8">
+            <div class="row">
+              <div class="col-md-12 mb-4">
+                <div class="card h-100" id="detailCard" *ngIf="model">
+                  <div class="card-header card-success"><h4>Concept details</h4></div>
+                  <div class="card-block">
+                    <app-concept-details [(ngModel)]="model" name="details"></app-concept-details>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-12">
+                <div class="card h-100" id="attributeCard" *ngIf="attributes">
+                  <div class="card-header card-success"><h4>Linked concepts <button class="btn btn-sm btn-info" (click)="addConcept()">Add...</button></h4> </div>
+                  <div class="card-block">
+                    <div class="row">
+                      <div class="col-md-8">
+                        <table class="table table-striped table-sm table-hover">
+                          <thead>
+                            <tr>
+                              <th>Link</th>
+                              <th></th>
+                              <th></th>
+                              <th>Mandatory</th>
+                              <th>Limit</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr *ngFor="let item of attributes" [ngClass]="{'selection': selectedNode == item}" (click)="selectedNode = item">
+                              <td><i class="fa fa-tag fa-fw"></i> {{model.context}}</td>
+                              <td>Has attribute</td>
+                              <td>{{item.attribute.context}}</td>
+                              <td>{{item.mandatory}}</td>
+                              <td>{{item.limit}}</td>
+                            </tr>
+                            <tr *ngFor="let item of related" [ngClass]="{'selection': selectedNode == item}" (click)="selectedNode = item">
+                              <td>
+                                <i class="fa fa-fw" [ngClass]="{'fa-sign-in': item.source, 'fa-sign-out': item.target}"></i>
+                                {{item.source ? item.source.context : model.context}}
+                              </td>
+                              <td>{{item.relationship}}</td>
+                              <td>{{item.target ? item.target.context : model.context }}</td>
+                              <td>{{item.mandatory}}</td>
+                              <td>{{item.limit}}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div class="col-md-4" *ngIf="selectedNode && selectedNode != model">
+                        <div class="form-group">
+                          <label class="label" for="mandatory">Is mandatory</label>
+                          <input class="form-control" id="mandatory" value="{{selectedNode.mandatory}}" readonly>
+                        </div>
+                        <div class="form-group">
+                          <label class="label" for="limit">Occurrence limit</label>
+                          <input class="form-control" id="limit" value="{{selectedNode.limit}}" readonly>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-          <div class="col-md-8">
+          <div class="col-md-4 row-">
             <div class="card h-100" id="relatedGraph">
-              <div class="card-header card-success"><h4>Concept links <small> (double-click to expand)</small><button class="btn btn-info pull-right" (click)="addConcept()">Add...</button></h4> </div>
+              <div class="card-header card-success"><h4>Diagram<small> (double-click to expand)</small></h4> </div>
               <div class="card-block">
-                <div class="row" *ngIf="selectedLink">
-                  <div class="col-md-4 form-group">
-                    <label for="source">Link</label>
-                    <input class="form-control" id="source" type="text" value="{{selectedLink.source.label}}" name="source" readonly>
-                  </div>
-                  <div class="col-md-4 form-group">
-                    <label for="relationship">&nbsp;</label>
-                    <input class="form-control" id="relationship" type="text" value="{{selectedLink.label}}" name="relationship" readonly>
-                  </div>
-                  <div class="col-md-4 form-group">
-                    <label for="target">&nbsp;</label>
-                    <input class="form-control" id="target" type="text" value="{{selectedLink.target.label}}" name="target" readonly>
-                  </div>
-                </div>
-                <div class="row" *ngIf="selectedNode">
-                  <div class="col-md-4 form-group">
-                    <label for="context">Context</label>
-                    <input class="form-control" id="context" type="text" value="{{selectedNode.label}}" name="source" readonly>
-                  </div>
-                </div>
-              </div>
-              <div class="card-block">
-                <nodeGraph #nodeGraph (nodeClick)="nodeClick($event)" (nodeDblClick)="nodeDblClick($event)" (linkClick)="linkClick($event)"></nodeGraph>
+                <nodeGraph #nodeGraph (nodeClick)="nodeClick($event)" (nodeDblClick)="nodeDblClick($event)"></nodeGraph>
               </div>
             </div>
           </div>

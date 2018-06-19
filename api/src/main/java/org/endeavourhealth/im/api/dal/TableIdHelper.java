@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class TableIdHelper {
+/*
     public static Long getNextId(String tableName) throws SQLException {
         Long nextId = null;
 
@@ -36,4 +37,5 @@ public class TableIdHelper {
 
         return nextId;
     }
+    */
 }

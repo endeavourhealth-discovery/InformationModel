@@ -53,7 +53,7 @@ export class AttributeModelEditorComponent implements AfterViewInit {
     forkJoin([
         this.conceptService.getRelatedTargets(this.model.id),
         this.conceptService.getRelatedSources(this.model.id),
-        this.attributeService.getAttributes(this.model.id)
+        // this.attributeService.getAttributes(this.model.id)
     ])
       .subscribe(
         (results) => this.buildRelated(results),

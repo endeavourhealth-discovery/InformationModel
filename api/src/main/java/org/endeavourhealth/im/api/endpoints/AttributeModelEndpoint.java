@@ -23,7 +23,7 @@ import java.util.List;
 @Api(description = "API for all calls relating to Attribute Models")
 public class AttributeModelEndpoint {
     private static final Logger LOG = LoggerFactory.getLogger(AttributeModelEndpoint.class);
-
+/*
     @GET
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -61,4 +61,5 @@ public class AttributeModelEndpoint {
             .entity(attributes)
             .build();
     }
+    */
 }

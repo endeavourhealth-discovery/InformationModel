@@ -12,6 +12,8 @@ import {RelatedConcept} from '../../models/RelatedConcept';
 import {ConceptSummary} from '../../models/ConceptSummary';
 import {NodeGraphComponent} from '../../node-graph/node-graph/node-graph.component';
 import {EditRelatedComponent} from '../edit-related/edit-related.component';
+import {Attribute} from '../../models/Attribute';
+import {ConceptBundle} from '../../models/ConceptBundle';
 
 @Component({
   selector: 'app-concept-editor',
@@ -22,10 +24,10 @@ import {EditRelatedComponent} from '../edit-related/edit-related.component';
 })
 export class ConceptEditorComponent implements AfterViewInit {
   model: Concept;
+  attributes: Attribute[];
+  related: RelatedConcept[];
+
   data: any;
-  nodes: any[];
-  edges: any[];
-  selectedLink: any;
   selectedNode: any;
 
   @ViewChild('nodeGraph') graph: NodeGraphComponent;
@@ -47,53 +49,52 @@ export class ConceptEditorComponent implements AfterViewInit {
   }
 
   loadConcept(id: number) {
-    this.conceptService.getConcept(id)
+    this.conceptService.getConceptBundle(id)
       .subscribe(
         (result) => this.setConcept(result),
         (error) => this.logger.error(error)
       );
   }
 
-  setConcept(concept: Concept) {
-    this.model = concept;
+  setConcept(conceptBundle: ConceptBundle) {
+    this.model = conceptBundle.concept;
     this.data = null;
-    this.nodes = [{name: this.model.context, group: 1}];
-    this.edges = [];
-    this.graph.addNodeData(concept.id, concept.context, 1, concept);
-    this.loadDetails(concept.id);
+    this.graph.clear();
+    this.graph.assignColours([1,2,3]);
+    this.graph.addNodeData(conceptBundle.concept.id, conceptBundle.concept.context, 1, conceptBundle.concept);
+    this.setLinkedConcepts(conceptBundle.concept.id, conceptBundle.attributes, conceptBundle.related);
   }
 
   loadDetails(conceptId: number) {
-
-    forkJoin(
-        this.conceptService.getRelatedTargets(conceptId),
-        this.conceptService.getRelatedSources(conceptId),
-        this.conceptService.getAttributes(conceptId),
-        this.conceptService.getAttributeOf(conceptId)
-    )
+    this.conceptService.getConceptBundle(conceptId)
       .subscribe(
-        ([targets, sources, attributes, attributeOf]) => this.extendData(conceptId, targets, sources, attributes, attributeOf),
+        (result) => this.setLinkedConcepts(result.concept.id, result.attributes, result.related),
         (error) => this.logger.error(error)
       );
   }
 
-  extendData(conceptId: number, targets: RelatedConcept[], sources: RelatedConcept[], attributes: ConceptSummary[], attributeOf: ConceptSummary[]) {
-    for (let target of targets) {
-      this.graph.addNodeData(target.id, target.context, 2, target);
-      this.graph.addEdgeData(conceptId, target.id, target.relationship, target);
+  setLinkedConcepts(conceptId: number, /*,*/ attributes: Attribute[], related: RelatedConcept[]) {
+    if (conceptId === this.model.id) {
+      this.attributes = attributes;
+      this.related = related;
     }
-    for (let source of sources) {
-      this.graph.addNodeData(source.id, source.context, 2, source);
-      this.graph.addEdgeData(source.id, conceptId, source.relationship, source);
-    }
+
     for (let attribute of attributes) {
-      this.graph.addNodeData(attribute.id, attribute.context, 3, attribute);
-      this.graph.addEdgeData(conceptId, attribute.id, 'Has attribute', attribute);
+      this.graph.addNodeData(attribute.attributeId, attribute.attribute.context, 3, attribute);
+      this.graph.addEdgeData(conceptId, attribute.attributeId, 'Has attribute', attribute);
     }
-    for (let concept of attributeOf) {
-      this.graph.addNodeData(concept.id, concept.context, 2, concept);
-      this.graph.addEdgeData(concept.id, conceptId, 'Has attribute', concept);
+
+    for (let item of related) {
+      if (item.sourceId == conceptId) {
+        this.graph.addNodeData(item.targetId, item.target.context, 2, item);
+        this.graph.addEdgeData(conceptId, item.targetId, item.relationship, item);
+      } else {
+        // for (let source of sources) {
+        this.graph.addNodeData(item.sourceId, item.source.context, 2, item);
+        this.graph.addEdgeData(item.sourceId, conceptId, item.relationship, item);
+      }
     }
+
     this.graph.start();
   }
 
@@ -122,7 +123,7 @@ export class ConceptEditorComponent implements AfterViewInit {
   }
 
   saveLinkedConcept(relationship: ConceptSummary, target) {
-    if (relationship) {
+/*    if (relationship) {
 
       console.log(target);
       console.log(relationship);
@@ -164,36 +165,30 @@ export class ConceptEditorComponent implements AfterViewInit {
     }
 
     this.graph.addEdgeData(this.model.id, target.id, relationship.name, relationship);
-    this.graph.start();
+    this.graph.start(); */
   }
 
   nodeClick(node) {
-    console.log("Click");
-    console.log(node);
-    this.selectedNode = node;
-    this.selectedLink = null;
+    this.selectedNode = node.data;
   }
 
   nodeDblClick(node) {
-    console.log("Double Click");
-    console.log(node);
     if (!node.data.loaded) {
       node.data.loaded = true;
-      this.loadDetails(node.data.id);
+      this.loadDetails(node.id);
     }
   }
 
-  linkClick(link) {
-    console.log("Click - link");
-    console.log(link);
-    this.selectedNode = null;
-    this.selectedLink = link;
-  }
-
   save() {
-    this.conceptService.save(this.model)
+    let conceptBundle: ConceptBundle = {
+      concept: this.model,
+      attributes: this.attributes,
+      related: this.related
+    };
+
+    this.conceptService.saveBundle(conceptBundle)
       .subscribe(
-        (result) => this.close(false),
+        () => this.close(false),
         (error) => this.logger.error('Error during save', error, 'Save')
       );
   }

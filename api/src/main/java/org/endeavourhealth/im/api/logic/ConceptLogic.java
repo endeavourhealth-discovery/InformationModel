@@ -1,10 +1,12 @@
 package org.endeavourhealth.im.api.logic;
 
+import org.bouncycastle.util.Arrays;
 import org.endeavourhealth.im.api.dal.ConceptDAL;
 import org.endeavourhealth.im.api.dal.ConceptJDBCDAL;
 import org.endeavourhealth.im.common.models.*;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ConceptLogic {
@@ -16,6 +18,69 @@ public class ConceptLogic {
     protected ConceptLogic(ConceptDAL dal) {
         this.dal = dal;
     }
+
+    public ConceptSummaryList getMRU() throws Exception {
+        return dal.getMRU();
+    }
+
+    public ConceptSummaryList search(String searchTerm) throws Exception {
+        return dal.search(searchTerm);
+    }
+
+    public Concept get(Long id) throws Exception {
+        return this.dal.get(id);
+    }
+
+    public ConceptBundle getBundle(Long id) throws Exception {
+        return new ConceptBundle()
+            .setConcept(this.dal.get(id))
+            .setAttributes(this.getAttributes(id))
+            .setRelated(this.getRelated(id));
+    }
+
+    public List<Attribute> getAttributes(Long id) throws Exception {
+        return this.dal.getAttributes(id);
+    }
+
+    public List<RelatedConcept> getRelated(Long id) throws Exception {
+        List<RelatedConcept> result = new ArrayList<>();
+        result.addAll(this.getRelatedTargets(id));
+        result.addAll(this.getRelatedSources(id));
+        return result;
+    }
+
+    public List<RelatedConcept> getRelatedTargets(Long id) throws Exception {
+        return this.dal.getRelatedTargets(id);
+    }
+
+    public List<RelatedConcept> getRelatedSources(Long id) throws Exception {
+        return this.dal.getRelatedSources(id);
+    }
+
+    public List<ConceptSummary> getRelationships() throws Exception {
+        return this.dal.getRelationships();
+    }
+
+    public Long save(ConceptBundle conceptBundle) throws Exception {
+        return 0L; // this.dal.save(concept);
+    }
+    /*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     public boolean validateAndCreateDraft(ConceptReference ref) throws Exception {
         return validateAndCreateDraft(ref, false);
@@ -46,9 +111,7 @@ public class ConceptLogic {
         return this.dal.getSummaries(page);
     }
 
-    public Concept get(Long id) throws Exception {
-        return this.dal.get(id);
-    }
+
 
     public Concept get(String context) throws Exception {
         return this.dal.getConceptByContext(context);
@@ -66,25 +129,12 @@ public class ConceptLogic {
         return this.dal.search(criteria);
     }
 
-    public List<RelatedConcept> getRelatedTargets(Long id) throws Exception {
-        return this.dal.getRelatedTargets(id);
-    }
 
-    public List<RelatedConcept> getRelatedSources(Long id) throws Exception {
-        return this.dal.getRelatedSources(id);
-    }
-
-    public List<ConceptSummary> getAttributes(Long id) throws Exception {
-        return this.dal.getAttributes(id);
-    }
 
     public List<ConceptSummary> getAttributeOf(Long id) throws Exception {
         return this.dal.getAttributeOf(id);
     }
 
-    public List<ConceptSummary> getRelationships() throws Exception {
-        return this.dal.getRelationships();
-    }
 
     public Long addAttribute(Long conceptId, Long attributeId) throws Exception {
         return this.dal.saveAttribute(conceptId, attributeId);
@@ -93,4 +143,5 @@ public class ConceptLogic {
     public Long addRelationship(Long sourceId, Long targetId, Long relationshipId) throws Exception {
         return this.dal.saveRelationship(sourceId, targetId, relationshipId);
     }
+*/
 }

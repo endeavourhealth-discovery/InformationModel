@@ -1,3 +1,4 @@
+/*
 package org.endeavourhealth.im.api.dal.filer;
 
 import org.endeavourhealth.common.cache.ObjectMapperPool;
@@ -48,3 +49,4 @@ public class ComponentFilerForTermMappings extends ComponentFiler {
         return ObjectMapperPool.getInstance().readValue(transactionComponent.getData(), TermMapping.class);
     }
 }
+*/

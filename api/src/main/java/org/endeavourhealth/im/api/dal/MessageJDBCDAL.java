@@ -7,6 +7,7 @@ import org.endeavourhealth.im.common.models.MessageResourceField;
 import java.sql.*;
 
 public class MessageJDBCDAL implements MessageDAL {
+/*
     @Override
     public Long getMessageId(Long systemId, Long messageTypeId, String version) throws SQLException {
         Connection conn = ConnectionPool.InformationModel.pop();
@@ -117,4 +118,5 @@ public class MessageJDBCDAL implements MessageDAL {
             ConnectionPool.InformationModel.push(conn);
         }
     }
+    */
 }

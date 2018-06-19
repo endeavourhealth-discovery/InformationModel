@@ -1,3 +1,4 @@
+/*
 package org.endeavourhealth.im.api.dal.filer;
 
 import org.endeavourhealth.im.api.models.TransactionComponent;
@@ -16,3 +17,4 @@ public class ComponentFilerForMessages extends ComponentFiler {
     public void delete(TransactionComponent transactionComponent) throws Exception {
     }
 }
+*/

@@ -3,12 +3,12 @@ package org.endeavourhealth.im.api.models;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum TransactionTable {
-    CONCEPT ((byte)0, "Concept"),
-    MESSAGE ((byte)1, "Message"),
-    TASK ((byte)2, "Task"),
-    ATTRIBUTE_MODEL((byte)3, "Attribute Model" ),
-    TERM_MAPPING((byte)4, "Term Mapping"),
-    RELATIONSHIP((byte)5, "Relationship");
+    CONCEPT ((byte)0, "Concept");
+//    MESSAGE ((byte)1, "Message"),
+//    TASK ((byte)2, "Task"),
+//    ATTRIBUTE_MODEL((byte)3, "Attribute Model" ),
+//    TERM_MAPPING((byte)4, "Term Mapping"),
+//    RELATIONSHIP((byte)5, "Relationship");
 
     private final Byte value;
     private final String name;

@@ -1,7 +1,8 @@
 import {ConceptSummary} from './ConceptSummary';
+import {ConceptReference} from './ConceptReference';
 
 export class Concept extends ConceptSummary {
-  public type: number = 1;    // Basic class
+  public type: ConceptReference = {id: 1, context: "Concept"};
   public url: string;
   public fullName: string;
   public description: string;

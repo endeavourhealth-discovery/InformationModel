@@ -2,17 +2,17 @@ DROP DATABASE IF EXISTS im;
 CREATE DATABASE im;
 USE im;
 
-DROP TABLE IF EXISTS table_id;
-CREATE TABLE table_id (
-  table_name VARCHAR(25) PRIMARY KEY            COMMENT 'Name of the table for this id counter',
-  id BIGINT NOT NULL                            COMMENT 'The next id available on that table'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+# DROP TABLE IF EXISTS table_id;
+# CREATE TABLE table_id (
+#   table_name VARCHAR(25) PRIMARY KEY            COMMENT 'Name of the table for this id counter',
+#   id BIGINT NOT NULL                            COMMENT 'The next id available on that table'
+# ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ********** CORE INFORMATION MODEL TABLE **********
 
 DROP TABLE IF EXISTS concept;
 CREATE TABLE concept(
-  id BIGINT PRIMARY KEY                         COMMENT 'Main concept id, common across all tables',
+  id BIGINT AUTO_INCREMENT PRIMARY KEY          COMMENT 'Main concept id, common across all tables',
   type BIGINT NOT NULL                          COMMENT 'The data type of this concept',
   url VARCHAR(250)                              COMMENT 'URL for where documentation for this concept is published',
   full_name VARCHAR(4096)                       COMMENT 'Full, clear, unambiguous name for the concept',

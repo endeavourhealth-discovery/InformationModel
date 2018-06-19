@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TermJDBCDAL implements TermDAL {
+    /*
     private final IMFilerDAL filer;
 
     public TermJDBCDAL() {
@@ -131,4 +132,5 @@ public class TermJDBCDAL implements TermDAL {
 
         return null;
     }
+    */
 }
