@@ -1,4 +1,3 @@
-/*
 package org.endeavourhealth.im.api.dal.filer;
 
 import org.endeavourhealth.common.cache.ObjectMapperPool;
@@ -90,7 +89,7 @@ public class ComponentFilerForConcepts extends ComponentFiler {
             statement.setLong(i++, concept.getId());
 
         if (concept.getType() != null)
-            statement.setLong(i++, concept.getType());
+            statement.setLong(i++, concept.getType().getId());
 
         if (concept.getUrl() != null)
             statement.setString(i++, concept.getUrl());
@@ -123,4 +122,3 @@ public class ComponentFilerForConcepts extends ComponentFiler {
     }
 
 }
-*/

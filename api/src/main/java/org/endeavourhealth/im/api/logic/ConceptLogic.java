@@ -61,8 +61,11 @@ public class ConceptLogic {
         return this.dal.getRelationships();
     }
 
-    public Long save(ConceptBundle conceptBundle) throws Exception {
-        return 0L; // this.dal.save(concept);
+    public void save(ConceptBundle conceptBundle) throws Exception {
+        this.dal.save(conceptBundle.getConcept());
+
+        for(RelatedConcept rel : conceptBundle.getRelated())
+            this.dal.save(rel);
     }
     /*
 

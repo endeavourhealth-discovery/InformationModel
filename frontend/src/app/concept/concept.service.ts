@@ -71,9 +71,8 @@ export class ConceptService {
       .map((result) => result.json());
   }
 
-  saveBundle(bundle: ConceptBundle): Observable<number> {
-    return this.http.post('api/Concept/Bundle', bundle)
-      .map((result) => result.json());
+  saveBundle(bundle: ConceptBundle): Observable<any> {
+    return this.http.post('api/Concept/Bundle', bundle);
   }
 
   save(concept: Concept): Observable<number> {

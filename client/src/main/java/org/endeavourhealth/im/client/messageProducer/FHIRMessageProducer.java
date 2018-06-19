@@ -22,7 +22,7 @@ public class FHIRMessageProducer {
     private MessageResource getMessageResource(Resource fhirResource) {
         MessageResource messageResource = new MessageResource()
                 .setResourceType(new ConceptReference()
-                        .setContext(getResourceType(fhirResource.getResourceType()))
+                        .setText(getResourceType(fhirResource.getResourceType()))
                 );
 
         addResourceProperties(fhirResource.children(), messageResource, "");

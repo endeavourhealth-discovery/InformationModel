@@ -181,11 +181,10 @@ public class ConceptEndpoint {
     ) throws Exception {
         LOG.debug("Save concept bundle");
 
-        Long id = new ConceptLogic().save(conceptBundle);
+        new ConceptLogic().save(conceptBundle);
 
         return Response
             .ok()
-            .entity(id)
             .build();
     }
     /*

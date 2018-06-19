@@ -2,7 +2,7 @@ package org.endeavourhealth.im.common.models;
 
 public class ConceptReference {
     private Long id;
-    private String context;
+    private String text;
 
     public Long getId() {
         return id;
@@ -13,12 +13,12 @@ public class ConceptReference {
         return this;
     }
 
-    public String getContext() {
-        return context;
+    public String getText() {
+        return text;
     }
 
-    public ConceptReference setContext(String context) {
-        this.context = context;
+    public ConceptReference setText(String text) {
+        this.text = text;
         return this;
     }
 }

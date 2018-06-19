@@ -5,10 +5,11 @@ public class RelatedConcept extends DbEntity<RelatedConcept> {
     private ConceptSummary source;
     private Long targetId;
     private ConceptSummary target;
-    private String relationship;
+    private ConceptReference relationship;
     private Integer order;
     private Boolean mandatory;
     private Integer limit;
+    private Integer weighting;
 
     public Long getSourceId() {
         return (source == null) ? sourceId : source.getId();
@@ -52,11 +53,11 @@ public class RelatedConcept extends DbEntity<RelatedConcept> {
         return this;
     }
 
-    public String getRelationship() {
+    public ConceptReference getRelationship() {
         return relationship;
     }
 
-    public RelatedConcept setRelationship(String relationship) {
+    public RelatedConcept setRelationship(ConceptReference relationship) {
         this.relationship = relationship;
         return this;
     }
@@ -85,6 +86,15 @@ public class RelatedConcept extends DbEntity<RelatedConcept> {
 
     public RelatedConcept setLimit(Integer limit) {
         this.limit = limit;
+        return this;
+    }
+
+    public Integer getWeighting() {
+        return weighting;
+    }
+
+    public RelatedConcept setWeighting(Integer weighting) {
+        this.weighting = weighting;
         return this;
     }
 }

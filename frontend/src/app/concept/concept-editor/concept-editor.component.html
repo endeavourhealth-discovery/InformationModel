@@ -49,7 +49,7 @@
                                 <i class="fa fa-fw" [ngClass]="{'fa-sign-in': item.source, 'fa-sign-out': item.target}"></i>
                                 {{item.source ? item.source.context : model.context}}
                               </td>
-                              <td>{{item.relationship}}</td>
+                              <td>{{item.relationship.text}}</td>
                               <td>{{item.target ? item.target.context : model.context }}</td>
                               <td>{{item.mandatory}}</td>
                               <td>{{item.limit}}</td>

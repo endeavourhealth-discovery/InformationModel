@@ -123,7 +123,8 @@ public class ConceptJDBCDAL implements ConceptDAL {
 
     @Override
     public List<RelatedConcept> getRelatedTargets(Long sourceId) throws SQLException {
-        String sql = "SELECT r.id, c.id as targetId, c.context, c.full_name, c.version, c.status, rc.full_name as relationship " +
+        String sql = "SELECT r.id, c.id as targetId, c.context, c.full_name, c.version, c.status, " +
+            "rc.id as relationshipId, rc.full_name as relationshipName, r.order, r.mandatory, r.limit, r.weighting " +
             "FROM concept c " +
             "JOIN concept_relationship r ON r.target = c.id " +
             "JOIN concept rc ON rc.id = r.relationship " +
@@ -149,7 +150,15 @@ public class ConceptJDBCDAL implements ConceptDAL {
                         .setStatus(rs.getString("status"))
                         .setVersion(rs.getString("version"))
                     )
-                    .setRelationship(rs.getString("relationship"));
+                    .setRelationship(
+                        new ConceptReference()
+                        .setId(rs.getLong("relationshipId"))
+                        .setText(rs.getString("relationshipName"))
+                    )
+                    .setOrder(rs.getInt("order"))
+                    .setMandatory(rs.getBoolean("mandatory"))
+                    .setLimit(rs.getInt("limit"))
+                    .setWeighting(rs.getInt("weighting"));
 
                 result.add(related);
             }
@@ -164,7 +173,8 @@ public class ConceptJDBCDAL implements ConceptDAL {
 
     @Override
     public List<RelatedConcept> getRelatedSources(Long targetId) throws SQLException {
-        String sql = "SELECT r.id, c.id as sourceId, c.context, c.full_name, c.version, c.status, rc.full_name as relationship " +
+        String sql = "SELECT r.id, c.id as sourceId, c.context, c.full_name, c.version, c.status, " +
+            "rc.id as relationshipId, rc.full_name as relationshipName, r.order, r.mandatory, r.limit, r.weighting " +
             "FROM concept c " +
             "JOIN concept_relationship r ON r.source = c.id " +
             "JOIN concept rc ON rc.id = r.relationship " +
@@ -190,7 +200,15 @@ public class ConceptJDBCDAL implements ConceptDAL {
                             .setStatus(rs.getString("status"))
                             .setVersion(rs.getString("version"))
                     )
-                    .setRelationship(rs.getString("relationship"));
+                    .setRelationship(
+                        new ConceptReference()
+                        .setId(rs.getLong("relationshipId"))
+                        .setText(rs.getString("relationshipName"))
+                    )
+                    .setOrder(rs.getInt("order"))
+                    .setMandatory(rs.getBoolean("mandatory"))
+                    .setLimit(rs.getInt("limit"))
+                    .setWeighting(rs.getInt("weighting"));
 
                 result.add(related);
             }
@@ -216,6 +234,24 @@ public class ConceptJDBCDAL implements ConceptDAL {
         } finally {
             ConnectionPool.InformationModel.push(conn);
         }
+    }
+
+    @Override
+    public Long save(Concept concept) throws Exception {
+        return this.filer.storeAndApply(
+            "Endeavour Health",
+            concept.getId() == null ? TransactionAction.CREATE : TransactionAction.UPDATE,
+            TransactionTable.CONCEPT,
+            concept);
+    }
+
+    @Override
+    public Long save(RelatedConcept relatedConcept) throws Exception {
+        return this.filer.storeAndApply(
+            "Endeavour Health",
+            relatedConcept.getId() == null ? TransactionAction.CREATE : TransactionAction.UPDATE,
+            TransactionTable.RELATIONSHIP,
+            relatedConcept);
     }
 
     private List<ConceptSummary> getSummaryResultSet(PreparedStatement stmt) throws SQLException {
@@ -244,7 +280,7 @@ public class ConceptJDBCDAL implements ConceptDAL {
             .setType(
                 new ConceptReference()
                 .setId(rs.getLong("typeId"))
-                .setContext(rs.getString("typeName"))
+                .setText(rs.getString("typeName"))
             )
             .setContext(rs.getString("context"))
             .setDescription(rs.getString("description"))

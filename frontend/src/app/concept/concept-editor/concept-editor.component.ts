@@ -87,11 +87,11 @@ export class ConceptEditorComponent implements AfterViewInit {
     for (let item of related) {
       if (item.sourceId == conceptId) {
         this.graph.addNodeData(item.targetId, item.target.context, 2, item);
-        this.graph.addEdgeData(conceptId, item.targetId, item.relationship, item);
+        this.graph.addEdgeData(conceptId, item.targetId, item.relationship.text, item);
       } else {
         // for (let source of sources) {
         this.graph.addNodeData(item.sourceId, item.source.context, 2, item);
-        this.graph.addEdgeData(item.sourceId, conceptId, item.relationship, item);
+        this.graph.addEdgeData(item.sourceId, conceptId, item.relationship.text, item);
       }
     }
 
