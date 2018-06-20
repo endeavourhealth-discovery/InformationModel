@@ -14,7 +14,7 @@
         <div ngbDropdown id="relationship">
           <button class="btn dropdown-toggle btn-block text-left" id="relationshipDropdown" ngbDropdownToggle [disabled]="readonly">{{getLinkageText()}}<i class="fa fa-caret-down pull-right"></i> </button>
           <div class="dropdown-menu"  aria-labelledby="relationshipDropdown">
-            <button *ngFor="let rel of relationships" class="dropdown-item" (click)="setLinkage(rel)">{{rel.name}}</button>
+            <button *ngFor="let rel of relationships" class="dropdown-item" (click)="setLinkage(rel)">{{rel.text}}</button>
           </div>
         </div>
       </div>

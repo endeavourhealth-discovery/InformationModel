@@ -99,10 +99,9 @@ export class TermMappingsEditorComponent implements AfterViewInit {
   }
 
   addRelationship() {
-    ConceptPickerComponent.open(this.modal).result
+    ConceptPickerComponent.open(this.modal, true).result
       .then(
-        (result) => this.processRelationship(result),
-        (error) => this.logger.error(error)
+        (result) => this.processRelationship(result)
       );
   }
 

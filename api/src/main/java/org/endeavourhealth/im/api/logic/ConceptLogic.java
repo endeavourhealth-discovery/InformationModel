@@ -57,7 +57,7 @@ public class ConceptLogic {
         return this.dal.getRelatedSources(id);
     }
 
-    public List<ConceptSummary> getRelationships() throws Exception {
+    public List<ConceptReference> getRelationships() throws Exception {
         return this.dal.getRelationships();
     }
 

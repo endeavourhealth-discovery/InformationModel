@@ -224,15 +224,26 @@ public class ConceptJDBCDAL implements ConceptDAL {
     }
 
     @Override
-    public List<ConceptSummary> getRelationships() throws SQLException {
-        String sql = "SELECT c.id, c.context, c.full_name, c.status, c.version " +
+    public List<ConceptReference> getRelationships() throws SQLException {
+        String sql = "SELECT c.id, c.full_name " +
             "FROM concept c " +
             "WHERE c.type = 8"; // 8 == Relationship
 
         Connection conn = ConnectionPool.InformationModel.pop();
 
+        List<ConceptReference> result = new ArrayList<>();
+
         try(PreparedStatement stmt = conn.prepareStatement(sql)) {
-            return getSummaryResultSet(stmt);
+            ResultSet rs = stmt.executeQuery();
+            while(rs.next()) {
+                result.add(
+                    new ConceptReference()
+                    .setId(rs.getLong("id"))
+                    .setText(rs.getString("full_name"))
+                );
+            }
+
+            return result;
         } finally {
             ConnectionPool.InformationModel.push(conn);
         }

@@ -12,7 +12,7 @@ public interface ConceptDAL {
     List<Attribute> getAttributes(Long id) throws SQLException;
     List<RelatedConcept> getRelatedTargets(Long id) throws SQLException;
     List<RelatedConcept> getRelatedSources(Long id) throws SQLException;
-    List<ConceptSummary> getRelationships() throws SQLException;
+    List<ConceptReference> getRelationships() throws SQLException;
     Long save(Concept concept) throws Exception;
     Long save(RelatedConcept relatedConcept) throws Exception;
     Long save(Attribute att) throws Exception;

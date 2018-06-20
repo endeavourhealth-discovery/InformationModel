@@ -2,6 +2,9 @@ import {Component, forwardRef, Input} from '@angular/core';
 import {ConceptStatus, ConceptStatusHelper} from '../../models/ConceptStatus';
 import {Concept} from '../../models/Concept';
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/forms';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConceptPickerComponent} from '../concept-picker/concept-picker.component';
+import {LoggerService} from 'eds-angular4';
 
 @Component({
   selector: 'app-concept-details',
@@ -25,6 +28,8 @@ export class ConceptDetailsComponent implements ControlValueAccessor {
 
   model: Concept;
 
+  constructor(private modal: NgbModal, private logger: LoggerService) {}
+
   getConceptStatusName(status: ConceptStatus): string {
     return ConceptStatusHelper.getName(status);
   }
@@ -47,5 +52,16 @@ export class ConceptDetailsComponent implements ControlValueAccessor {
 
   registerOnTouched(fn: any): void {
     this.touched.push(fn);
+  }
+
+  pickType() {
+    ConceptPickerComponent.open(this.modal, false).result
+      .then(
+        (result) => this.setType(result)
+      );
+  }
+
+  setType(typeConcept: Concept) {
+    this.model.type = {id: typeConcept.id, text: typeConcept.context};
   }
 }

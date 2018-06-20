@@ -5,6 +5,7 @@ import {LoggerService} from 'eds-angular4';
 import {Concept} from '../../models/Concept';
 import {ConceptSummary} from '../../models/ConceptSummary';
 import {ConceptStatus} from '../../models/ConceptStatus';
+import {ConceptReference} from '../../models/ConceptReference';
 
 @Component({
   selector: 'app-edit-related',
@@ -23,16 +24,13 @@ export class EditRelatedComponent implements OnInit {
   sourceConcept: Concept;
   targetConcept: Concept;
   readonly: boolean;
-  relationships: ConceptSummary[] = [
+  relationships: ConceptReference[] = [
     {
       id: 0,
-      context: 'Attribute',
-      name: 'Has attribute',
-      status: ConceptStatus.ACTIVE,
-      version: '1.0'
+      text: 'Has attribute',
     }
   ];
-  linkage: ConceptSummary;
+  linkage: ConceptReference;
 
   constructor(public activeModal: NgbActiveModal, private logger: LoggerService, private conceptService: ConceptService) { }
 
@@ -44,12 +42,12 @@ export class EditRelatedComponent implements OnInit {
       );
   }
 
-  setLinkage(linkage: ConceptSummary) {
+  setLinkage(linkage: ConceptReference) {
     this.linkage = linkage;
   }
 
   getLinkageText() {
-    return this.linkage?this.linkage.name:null;
+    return this.linkage?this.linkage.text:null;
   }
 
   ok() {

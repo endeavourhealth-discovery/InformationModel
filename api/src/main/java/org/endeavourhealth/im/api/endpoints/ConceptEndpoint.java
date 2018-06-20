@@ -126,11 +126,11 @@ public class ConceptEndpoint {
     ) throws Exception {
         LOG.debug("Get related target concepts");
 
-        List<RelatedConcept> concepts = new ConceptLogic().getRelatedTargets(id);
+        List<RelatedConcept> result = new ConceptLogic().getRelatedTargets(id);
 
         return Response
             .ok()
-            .entity(concepts)
+            .entity(result)
             .build();
     }
 
@@ -145,11 +145,11 @@ public class ConceptEndpoint {
     ) throws Exception {
         LOG.debug("Get related source concepts");
 
-        List<RelatedConcept> concepts = new ConceptLogic().getRelatedSources(id);
+        List<RelatedConcept> result = new ConceptLogic().getRelatedSources(id);
 
         return Response
             .ok()
-            .entity(concepts)
+            .entity(result)
             .build();
     }
 
@@ -162,11 +162,11 @@ public class ConceptEndpoint {
     public Response getRelationships(@Context SecurityContext sc) throws Exception {
         LOG.debug("Get relationship concepts");
 
-        List<ConceptSummary> relationships = new ConceptLogic().getRelationships();
+        List<ConceptReference> result = new ConceptLogic().getRelationships();
 
         return Response
             .ok()
-            .entity(relationships)
+            .entity(result)
             .build();
     }
 

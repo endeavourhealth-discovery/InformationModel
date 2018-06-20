@@ -12,11 +12,13 @@ import {Concept} from '../../models/Concept';
 })
 export class ConceptPickerComponent implements OnInit {
   criteria = '';
+  allowAddNew: boolean = false;
   result: ConceptSummary[] = [];
   selection: ConceptSummary;
 
-  public static open(modalService: NgbModal) {
+  public static open(modalService: NgbModal, allowAddNew: boolean) {
     const modalRef = modalService.open(ConceptPickerComponent, { backdrop: 'static'});
+    modalRef.componentInstance.allowAddNew = allowAddNew;
     return modalRef;
   }
 
@@ -27,9 +29,9 @@ export class ConceptPickerComponent implements OnInit {
 
   search() {
     this.result = null;
-    this.conceptService.find(this.criteria)
+    this.conceptService.search(this.criteria)
       .subscribe(
-        (result) => this.result = result,
+        (result) => this.result = result.concepts,
         (error) => this.logger.error(error)
       );
   }
@@ -37,14 +39,18 @@ export class ConceptPickerComponent implements OnInit {
   new() {
     this.selection = new Concept();
     this.selection.context = this.criteria;
-    this.ok();
-  }
-
-  ok() {
     this.activeModal.close(this.selection);
   }
 
+  ok() {
+    this.conceptService.getConcept(this.selection.id)
+      .subscribe(
+        (result) => this.activeModal.close(result),
+        (error) => this.logger.error(error)
+      );
+  }
+
   cancel() {
-    this.activeModal.dismiss('cancel');
+    this.activeModal.dismiss();
   }
 }

@@ -7,6 +7,7 @@ import {RelatedConcept} from '../models/RelatedConcept';
 import {ConceptSummaryList} from '../models/ConceptSummaryList';
 import {Attribute} from '../models/Attribute';
 import {ConceptBundle} from '../models/ConceptBundle';
+import {ConceptReference} from '../models/ConceptReference';
 
 @Injectable()
 export class ConceptService {
@@ -66,7 +67,7 @@ export class ConceptService {
       .map((result) => result.json());
   }
 
-  getRelationships(): Observable<ConceptSummary[]> {
+  getRelationships(): Observable<ConceptReference[]> {
     return this.http.get('api/Concept/Relationships')
       .map((result) => result.json());
   }
@@ -87,13 +88,6 @@ export class ConceptService {
 
 
 
-
-
-
-
-
-
-
   getSummaries(page?: number): Observable<ConceptSummary[]> {
     const params = new URLSearchParams();
 
@@ -105,13 +99,6 @@ export class ConceptService {
       .map((result) => result.json());
   }
 
-  find(criteria: string): Observable<ConceptSummary[]> {
-    const params = new URLSearchParams();
-    params.append('criteria', criteria);
-
-    return this.http.get('api/Concept/Search', {search: params})
-      .map((result) => result.json());
-  }
 
   createDraftConcept(concept: Concept): Observable<number> {
     return this.http.post('api/Concept', concept)

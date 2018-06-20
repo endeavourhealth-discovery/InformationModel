@@ -1,11 +1,14 @@
 <div class="row" *ngIf="model">
-  <div class="col-md-12 col-lg-6 form-group">
+  <div class="col-md-12 col-lg-4 form-group">
     <label for="conceptName">Full name</label>
     <input class="form-control" id="conceptName" type="text" [(ngModel)]="model.fullName" name="conceptName" [readonly]="readonly">
   </div>
-  <div class="col-md-6 col-lg-2 form-group">
+  <div class="col-md-6 col-lg-4 form-group">
     <label for="conceptType">Type</label>
-    <input class="form-control" id="conceptType" type="text" value="{{model.type.context}}" name="conceptType" readonly>
+    <div class="input-group">
+      <input class="form-control" id="conceptType" type="text" value="{{model.type.text}}" name="conceptType" readonly>
+      <button *ngIf="!model.id" class="input-group-addon" type="button" (click)="pickType()"><i class="fa fa-search"></i></button>
+    </div>
   </div>
   <div class="col-md-6 col-lg-2 form-group">
     <label for="conceptVersion">Version</label>

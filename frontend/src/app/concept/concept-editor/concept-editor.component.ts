@@ -7,13 +7,13 @@ import {ConceptPickerComponent} from '../concept-picker/concept-picker.component
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConceptService} from '../concept.service';
 import {Location} from '@angular/common';
-import {forkJoin} from 'rxjs/observable/forkJoin';
 import {RelatedConcept} from '../../models/RelatedConcept';
 import {ConceptSummary} from '../../models/ConceptSummary';
 import {NodeGraphComponent} from '../../node-graph/node-graph/node-graph.component';
 import {EditRelatedComponent} from '../edit-related/edit-related.component';
 import {Attribute} from '../../models/Attribute';
 import {ConceptBundle} from '../../models/ConceptBundle';
+import {ConceptReference} from '../../models/ConceptReference';
 
 @Component({
   selector: 'app-concept-editor',
@@ -58,20 +58,14 @@ export class ConceptEditorComponent implements AfterViewInit {
 
   setConcept(conceptBundle: ConceptBundle) {
     this.model = conceptBundle.concept;
+    this.attributes = conceptBundle.attributes;
+    this.related = conceptBundle.related;
+
     this.data = null;
     this.graph.clear();
     this.graph.assignColours([1,2,3]);
     this.graph.addNodeData(conceptBundle.concept.id, conceptBundle.concept.context, 1, conceptBundle.concept);
-    this.setDetails(conceptBundle.concept.id, conceptBundle.attributes, conceptBundle.related);
-  }
-
-  setDetails(conceptId: number, /*,*/ attributes: Attribute[], related: RelatedConcept[]) {
-    if (conceptId === this.model.id) {
-      this.attributes = attributes;
-      this.related = related;
-    }
-
-    this.updateDiagram(conceptId, attributes, related);
+    this.updateDiagram(conceptBundle.concept.id, conceptBundle.attributes, conceptBundle.related);
   }
 
   loadDetails(conceptId: number) {
@@ -82,7 +76,7 @@ export class ConceptEditorComponent implements AfterViewInit {
       );
   }
 
-  updateDiagram(conceptId: number, /*,*/ attributes: Attribute[], related: RelatedConcept[]) {
+  updateDiagram(conceptId: number, attributes: Attribute[], related: RelatedConcept[]) {
     for (let attribute of attributes) {
       this.graph.addNodeData(attribute.attributeId, attribute.attribute.context, 3, attribute);
       this.graph.addEdgeData(conceptId, attribute.attributeId, 'Has attribute', attribute);
@@ -93,7 +87,6 @@ export class ConceptEditorComponent implements AfterViewInit {
         this.graph.addNodeData(item.targetId, item.target.context, 2, item);
         this.graph.addEdgeData(conceptId, item.targetId, item.relationship.text, item);
       } else {
-        // for (let source of sources) {
         this.graph.addNodeData(item.sourceId, item.source.context, 2, item);
         this.graph.addEdgeData(item.sourceId, conceptId, item.relationship.text, item);
       }
@@ -120,10 +113,9 @@ export class ConceptEditorComponent implements AfterViewInit {
   }
 
   addConcept() {
-    ConceptPickerComponent.open(this.modal).result
+    ConceptPickerComponent.open(this.modal, true).result
       .then(
-        (result) => this.editLinkedConcept(result),
-        (error) => this.logger.error(error)
+        (result) => this.editLinkedConcept(result)
       );
   }
 
@@ -135,50 +127,33 @@ export class ConceptEditorComponent implements AfterViewInit {
     )
   }
 
-  saveLinkedConcept(relationship: ConceptSummary, target) {
-/*    if (relationship) {
-
-      console.log(target);
-      console.log(relationship);
-
-      if (!target.id) {
-        this.conceptService.save(target)
-          .subscribe(
-            (result) => {target.id = result; this.saveLink(target, relationship)},
-            (error) => this.logger.error(error)
-          );
-      } else {
-        this.saveLink(target, relationship)
-      }
-    }
-  }
-
-  saveLink(target: Concept, relationship: any) {
-
-    if (relationship.id === 0) {
-      this.conceptService.saveAttribute(this.model.id, target.id)
-        .subscribe(
-          (result) => this.addLinkToGraph(target, relationship),
-          (error) => this.logger.error(error)
-        );
+  saveLinkedConcept(linkage: ConceptReference, target: Concept) {
+    if (linkage.id == 0) { // Its an attribute
+      let attribute: Attribute = {
+        conceptId: this.model.id,
+        attributeId: target.id,
+        attribute: target,
+        mandatory: false,
+        limit: 0,
+        order: this.attributes.length + 1
+      };
+      this.attributes.push(attribute);
+      this.updateDiagram(this.model.id, [attribute], []);
     } else {
-      this.conceptService.saveRelationship(this.model.id, target.id, relationship.id)
-        .subscribe(
-          (result) => this.addLinkToGraph(target, relationship),
-          (error) => this.logger.error(error)
-        );
+      let related: RelatedConcept = {
+        id: null,
+        sourceId: this.model.id,
+        source: this.model,
+        targetId: target.id,
+        target: target,
+        relationship: linkage,
+        mandatory: false,
+        limit: 0,
+        order: this.related.length + 1
+      };
+      this.related.push(related);
+      this.updateDiagram(this.model.id, [], [related]);
     }
-  }
-
-  addLinkToGraph(target: Concept, relationship: any) {
-    if (relationship.id === 0) {
-      this.graph.addNodeData(target.id, target.context, 3, target);
-    } else {
-      this.graph.addNodeData(target.id, target.context, 2, target);
-    }
-
-    this.graph.addEdgeData(this.model.id, target.id, relationship.name, relationship);
-    this.graph.start(); */
   }
 
   nodeClick(node) {
