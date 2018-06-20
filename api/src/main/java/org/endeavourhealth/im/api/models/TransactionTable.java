@@ -6,7 +6,7 @@ public enum TransactionTable {
     CONCEPT ((byte)0, "Concept"),
 //    MESSAGE ((byte)1, "Message"),
 //    TASK ((byte)2, "Task"),
-//    ATTRIBUTE_MODEL((byte)3, "Attribute Model" ),
+    ATTRIBUTE((byte)3, "Attribute" ),
 //    TERM_MAPPING((byte)4, "Term Mapping"),
     RELATIONSHIP((byte)5, "Relationship");
 

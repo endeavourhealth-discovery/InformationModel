@@ -15,6 +15,7 @@ public interface ConceptDAL {
     List<ConceptSummary> getRelationships() throws SQLException;
     Long save(Concept concept) throws Exception;
     Long save(RelatedConcept relatedConcept) throws Exception;
+    Long save(Attribute att) throws Exception;
 /*
 
 

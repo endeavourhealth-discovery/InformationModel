@@ -132,16 +132,17 @@ public class IMFilerJDBCDAL implements IMFilerDAL {
         switch (transactionComponent.getTable()) {
             case CONCEPT:
                 return applyTransactionComponent(transaction, transactionComponent, new ComponentFilerForConcepts());
+            case ATTRIBUTE:
+                return applyTransactionComponent(transaction, transactionComponent, new ComponentFilerForAttributes());
+            case RELATIONSHIP:
+                return applyTransactionComponent(transaction, transactionComponent, new ComponentFilerForRelationships());
 /*            case MESSAGE:
                 return applyTransactionComponent(transaction, transactionComponent, new ComponentFilerForMessages());
             case TASK:
                 return applyTransactionComponent(transaction, transactionComponent, new ComponentFilerForTasks());
-            case ATTRIBUTE_MODEL:
-                return applyTransactionComponent(transaction, transactionComponent, new ComponentFilerForAttributes());
             case TERM_MAPPING:
                 return applyTransactionComponent(transaction, transactionComponent, new ComponentFilerForTermMappings());
-*/            case RELATIONSHIP:
-                return applyTransactionComponent(transaction, transactionComponent, new ComponentFilerForRelationships());
+*/
             default:
                 throw new IllegalArgumentException("No component filer defined for the given type");
         }

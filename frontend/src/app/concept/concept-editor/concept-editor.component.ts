@@ -62,23 +62,27 @@ export class ConceptEditorComponent implements AfterViewInit {
     this.graph.clear();
     this.graph.assignColours([1,2,3]);
     this.graph.addNodeData(conceptBundle.concept.id, conceptBundle.concept.context, 1, conceptBundle.concept);
-    this.setLinkedConcepts(conceptBundle.concept.id, conceptBundle.attributes, conceptBundle.related);
+    this.setDetails(conceptBundle.concept.id, conceptBundle.attributes, conceptBundle.related);
   }
 
-  loadDetails(conceptId: number) {
-    this.conceptService.getConceptBundle(conceptId)
-      .subscribe(
-        (result) => this.setLinkedConcepts(result.concept.id, result.attributes, result.related),
-        (error) => this.logger.error(error)
-      );
-  }
-
-  setLinkedConcepts(conceptId: number, /*,*/ attributes: Attribute[], related: RelatedConcept[]) {
+  setDetails(conceptId: number, /*,*/ attributes: Attribute[], related: RelatedConcept[]) {
     if (conceptId === this.model.id) {
       this.attributes = attributes;
       this.related = related;
     }
 
+    this.updateDiagram(conceptId, attributes, related);
+  }
+
+  loadDetails(conceptId: number) {
+    this.conceptService.getConceptBundle(conceptId)
+      .subscribe(
+        (result) => this.updateDiagram(result.concept.id, result.attributes, result.related),
+        (error) => this.logger.error(error)
+      );
+  }
+
+  updateDiagram(conceptId: number, /*,*/ attributes: Attribute[], related: RelatedConcept[]) {
     for (let attribute of attributes) {
       this.graph.addNodeData(attribute.attributeId, attribute.attribute.context, 3, attribute);
       this.graph.addEdgeData(conceptId, attribute.attributeId, 'Has attribute', attribute);
@@ -96,6 +100,15 @@ export class ConceptEditorComponent implements AfterViewInit {
     }
 
     this.graph.start();
+  }
+
+  decLimit(item: any) {
+    if (item.limit > 0)
+      item.limit--;
+  }
+
+  incLimit(item: any) {
+    item.limit++;
   }
 
   getConceptStatusName(status: ConceptStatus): string {

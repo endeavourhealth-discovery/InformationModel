@@ -12,7 +12,6 @@ import {LayoutComponent} from 'eds-angular4/dist/layout/layout.component';
 import {ToastModule} from 'ng2-toastr/ng2-toastr';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {WorkflowManagerModule} from './workflow-manager/workflow-manager.module';
-import {AttributeModelModule} from './attribute-model/attribute-model.module';
 import {ConceptModule} from './concept/concept.module';
 import {TermMappingsModule} from './term-mappings/term-mappings.module';
 
@@ -27,7 +26,6 @@ import {TermMappingsModule} from './term-mappings/term-mappings.module';
     DialogsModule,
 
     WorkflowManagerModule,
-    AttributeModelModule,
     ConceptModule,
     TermMappingsModule,
 

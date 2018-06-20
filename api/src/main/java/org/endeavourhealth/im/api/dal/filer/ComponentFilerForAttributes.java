@@ -1,12 +1,9 @@
-/*
 package org.endeavourhealth.im.api.dal.filer;
 
 import org.endeavourhealth.common.cache.ObjectMapperPool;
 import org.endeavourhealth.im.api.dal.ConnectionPool;
-import org.endeavourhealth.im.api.dal.TableIdHelper;
 import org.endeavourhealth.im.api.models.TransactionComponent;
 import org.endeavourhealth.im.common.models.Attribute;
-import org.endeavourhealth.im.common.models.Concept;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -67,9 +64,9 @@ public class ComponentFilerForAttributes extends ComponentFiler {
         if (attribute.getId() != null) fields.add("id");
         if (attribute.getConceptId() != null) fields.add("concept_id");
         if (attribute.getAttributeId() != null) fields.add("attribute_id");
-        if (attribute.getOrder() != null) fields.add("order");
+        if (attribute.getOrder() != null) fields.add("`order`");
         if (attribute.getMandatory() != null) fields.add("mandatory");
-        if (attribute.getLimit() != null) fields.add("limit");
+        if (attribute.getLimit() != null) fields.add("`limit`");
 
         return fields;
     }
@@ -88,4 +85,3 @@ public class ComponentFilerForAttributes extends ComponentFiler {
     }
 
 }
-*/

@@ -93,7 +93,7 @@ public class ConceptJDBCDAL implements ConceptDAL {
     public List<Attribute> getAttributes(Long id) throws SQLException {
         List<Attribute> result = new ArrayList<>();
 
-        String sql = "SELECT c.id, c.context, c.full_name, c.status, c.version, a.order, a.mandatory, a.`limit` " +
+        String sql = "SELECT a.id, a.attribute_id, c.context, c.full_name, c.status, c.version, a.order, a.mandatory, a.`limit` " +
             "FROM concept c " +
             "JOIN concept_attribute a ON a.attribute_id = c.id " +
             "WHERE a.concept_id = ?";
@@ -106,7 +106,9 @@ public class ConceptJDBCDAL implements ConceptDAL {
             while(rs.next()) {
                 result.add(
                     new Attribute()
-                        .setAttributeId(rs.getLong("id"))
+                        .setId(rs.getLong("id"))
+                        .setConceptId(id)
+                        .setAttributeId(rs.getLong("attribute_id"))
                         .setOrder(rs.getInt("order"))
                         .setMandatory(rs.getBoolean("mandatory"))
                         .setLimit(rs.getInt("limit"))
@@ -238,20 +240,40 @@ public class ConceptJDBCDAL implements ConceptDAL {
 
     @Override
     public Long save(Concept concept) throws Exception {
-        return this.filer.storeAndApply(
+        Long id = this.filer.storeAndApply(
             "Endeavour Health",
             concept.getId() == null ? TransactionAction.CREATE : TransactionAction.UPDATE,
             TransactionTable.CONCEPT,
             concept);
+
+        concept.setId(id);
+        return id;
+    }
+
+    @Override
+    public Long save(Attribute att) throws Exception {
+        Long id = this.filer.storeAndApply(
+            "Endeavour Health",
+            att.getId() == null ? TransactionAction.CREATE : TransactionAction.UPDATE,
+            TransactionTable.ATTRIBUTE,
+            att);
+
+        att.setId(id);
+
+        return id;
     }
 
     @Override
     public Long save(RelatedConcept relatedConcept) throws Exception {
-        return this.filer.storeAndApply(
+        Long id = this.filer.storeAndApply(
             "Endeavour Health",
             relatedConcept.getId() == null ? TransactionAction.CREATE : TransactionAction.UPDATE,
             TransactionTable.RELATIONSHIP,
             relatedConcept);
+
+        relatedConcept.setId(id);
+
+        return id;
     }
 
     private List<ConceptSummary> getSummaryResultSet(PreparedStatement stmt) throws SQLException {

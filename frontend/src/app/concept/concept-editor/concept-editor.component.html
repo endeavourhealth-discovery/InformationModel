@@ -25,7 +25,7 @@
                   <div class="card-header card-success"><h4>Linked concepts <button class="btn btn-sm btn-info" (click)="addConcept()">Add...</button></h4> </div>
                   <div class="card-block">
                     <div class="row">
-                      <div class="col-md-8">
+                      <div class="col-md-12">
                         <table class="table table-striped table-sm table-hover">
                           <thead>
                             <tr>
@@ -41,8 +41,12 @@
                               <td><i class="fa fa-tag fa-fw"></i> {{model.context}}</td>
                               <td>Has attribute</td>
                               <td>{{item.attribute.context}}</td>
-                              <td>{{item.mandatory}}</td>
-                              <td>{{item.limit}}</td>
+                              <td><input type="checkbox" [checked]="item.mandatory" (change)="item.mandatory = !item.mandatory" name="mandatory"></td>
+                              <td>
+                                <i class="fa fa-minus" (click)="decLimit(item)"></i>
+                                {{item.limit}}
+                                <i class="fa fa-plus" (click)="incLimit(item)"></i>
+                              </td>
                             </tr>
                             <tr *ngFor="let item of related" [ngClass]="{'selection': selectedNode == item}" (click)="selectedNode = item">
                               <td>
@@ -51,12 +55,17 @@
                               </td>
                               <td>{{item.relationship.text}}</td>
                               <td>{{item.target ? item.target.context : model.context }}</td>
-                              <td>{{item.mandatory}}</td>
-                              <td>{{item.limit}}</td>
+                              <td><input type="checkbox" [checked]="item.mandatory" (change)="item.mandatory = !item.mandatory" name="mandatory"></td>
+                              <td>
+                                <i class="fa fa-minus" (click)="decLimit(item)"></i>
+                                {{item.limit}}
+                                <i class="fa fa-plus" (click)="incLimit(item)"></i>
+                              </td>
                             </tr>
                           </tbody>
                         </table>
                       </div>
+<!--
                       <div class="col-md-4" *ngIf="selectedNode && selectedNode != model">
                         <div class="form-group">
                           <label class="label" for="mandatory">Is mandatory</label>
@@ -67,6 +76,7 @@
                           <input class="form-control" id="limit" value="{{selectedNode.limit}}" readonly>
                         </div>
                       </div>
+-->
                     </div>
                   </div>
                 </div>

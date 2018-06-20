@@ -4,7 +4,6 @@ import org.endeavourhealth.common.cache.ObjectMapperPool;
 import org.endeavourhealth.im.api.dal.ConnectionPool;
 import org.endeavourhealth.im.api.models.TransactionComponent;
 import org.endeavourhealth.im.common.models.RelatedConcept;
-import org.endeavourhealth.im.common.models.Relationship;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -37,7 +36,21 @@ public class ComponentFilerForRelationships extends ComponentFiler {
 
     @Override
     public void update(TransactionComponent transactionComponent) throws Exception {
-    }
+        RelatedConcept relatedConcept = getRelatedConcept(transactionComponent);
+        List<String> fieldList = getPopulatedFieldList(relatedConcept);
+        String sql = "UPDATE concept_relationship SET " +
+            getUpdateList(fieldList) +
+            " WHERE id = ?";
+        Connection conn = ConnectionPool.InformationModel.pop();
+        try (PreparedStatement statement = conn.prepareStatement(sql)) {
+            int i = setParameters(statement, relatedConcept);
+
+            statement.setLong(i++, relatedConcept.getId());
+
+            statement.executeUpdate();
+        } finally {
+            ConnectionPool.InformationModel.push(conn);
+        }    }
 
     @Override
     public void delete(TransactionComponent transactionComponent) throws Exception {
@@ -53,9 +66,9 @@ public class ComponentFilerForRelationships extends ComponentFiler {
         if (relatedConcept.getSource() != null) fields.add("source");
         if (relatedConcept.getRelationship() != null) fields.add("relationship");
         if (relatedConcept.getTarget() != null) fields.add("target");
-        if (relatedConcept.getOrder() != null) fields.add("order");
+        if (relatedConcept.getOrder() != null) fields.add("`order`");
         if (relatedConcept.getMandatory() != null) fields.add("mandatory");
-        if (relatedConcept.getLimit() != null) fields.add("unlimited");
+        if (relatedConcept.getLimit() != null) fields.add("`limit`");
         if (relatedConcept.getWeighting() != null) fields.add("weighting");
 
         return fields;

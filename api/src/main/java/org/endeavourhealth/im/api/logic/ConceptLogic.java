@@ -64,6 +64,9 @@ public class ConceptLogic {
     public void save(ConceptBundle conceptBundle) throws Exception {
         this.dal.save(conceptBundle.getConcept());
 
+        for(Attribute att: conceptBundle.getAttributes())
+            this.dal.save(att);
+
         for(RelatedConcept rel : conceptBundle.getRelated())
             this.dal.save(rel);
     }
