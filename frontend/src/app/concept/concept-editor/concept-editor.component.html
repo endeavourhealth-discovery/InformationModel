@@ -28,38 +28,57 @@
                       <div class="col-md-12">
                         <table class="table table-striped table-sm table-hover">
                           <thead>
-                            <tr>
-                              <th>Link</th>
-                              <th></th>
-                              <th></th>
-                              <th>Mandatory</th>
-                              <th>Limit</th>
+                            <tr class="d-flex">
+                              <th class="col-3">Link</th>
+                              <th class="col-3"></th>
+                              <th class="col-3"></th>
+                              <th class="col-1">Mandatory</th>
+                              <th class="col-1">Limit</th>
+                              <th class="col-1"></th>
                             </tr>
                           </thead>
                           <tbody>
-                            <tr *ngFor="let item of attributes" [ngClass]="{'selection': selectedNode == item}" (click)="selectedNode = item">
-                              <td><i class="fa fa-tag fa-fw"></i> {{model.context}}</td>
-                              <td>Has attribute</td>
-                              <td>{{item.attribute.context}}</td>
-                              <td><input type="checkbox" [checked]="item.mandatory" (change)="item.mandatory = !item.mandatory" name="mandatory"></td>
-                              <td>
+                            <tr class="d-flex show-child-on-hover" *ngFor="let item of attributes" [ngClass]="{'selection': selectedNode == item}" (click)="selectedNode = item">
+                              <td class="col-3"><i class="fa fa-tag fa-fw"></i> {{model.context}}</td>
+                              <td class="col-3">Has attribute</td>
+                              <td class="col-3">{{item.attribute.context}}</td>
+                              <td class="col-1"><input type="checkbox" [checked]="item.mandatory" (change)="item.mandatory = !item.mandatory" name="mandatory"></td>
+                              <td class="col-1">
                                 <i class="fa fa-minus" (click)="decLimit(item)"></i>
                                 {{item.limit}}
                                 <i class="fa fa-plus" (click)="incLimit(item)"></i>
                               </td>
+                              <td class="col-1">
+                                <div ngbDropdown>
+                                  <button class="btn btn-sm btn-default child-to-show pull-right" ngbDropdownToggle id="linkedMenu1"><i class="fa fa-fw fa-ellipsis-h"></i></button>
+                                  <div class="dropdown-menu" aria-labelledby="linkedMenu1">
+                                    <button class="dropdown-item" (click)="gotoConcept(item.attributeId)">View</button>
+                                    <button class="dropdown-item" (click)="deleteAttribute(item)">Delete</button>
+                                  </div>
+                                </div>
+                              </td>
                             </tr>
-                            <tr *ngFor="let item of related" [ngClass]="{'selection': selectedNode == item}" (click)="selectedNode = item">
-                              <td>
+                            <tr class="d-flex show-child-on-hover" *ngFor="let item of related" [ngClass]="{'selection': selectedNode == item}" (click)="selectedNode = item">
+                              <td class="col-3">
                                 <i class="fa fa-fw" [ngClass]="{'fa-sign-in': item.source, 'fa-sign-out': item.target}"></i>
                                 {{item.source ? item.source.context : model.context}}
                               </td>
-                              <td>{{item.relationship.text}}</td>
-                              <td>{{item.target ? item.target.context : model.context }}</td>
-                              <td><input type="checkbox" [checked]="item.mandatory" (change)="item.mandatory = !item.mandatory" name="mandatory"></td>
-                              <td>
+                              <td class="col-3">{{item.relationship.text}}</td>
+                              <td class="col-3">{{item.target ? item.target.context : model.context }}</td>
+                              <td class="col-1"><input type="checkbox" [checked]="item.mandatory" (change)="item.mandatory = !item.mandatory" name="mandatory"></td>
+                              <td class="col-1">
                                 <i class="fa fa-minus" (click)="decLimit(item)"></i>
                                 {{item.limit}}
                                 <i class="fa fa-plus" (click)="incLimit(item)"></i>
+                              </td>
+                              <td class="col-1">
+                                <div ngbDropdown class="show-child-on-hover">
+                                  <button class="btn btn-sm btn-default child-to-show pull-right" ngbDropdownToggle id="linkedMenu1"><i class="fa fa-fw fa-ellipsis-h"></i></button>
+                                  <div class="dropdown-menu" aria-labelledby="linkedMenu1">
+                                    <button class="dropdown-item" (click)="gotoConcept(item.target ? item.targetId : item.sourceId)">View</button>
+                                    <button class="dropdown-item" (click)="deleteRelationship(item)">Delete</button>
+                                  </div>
+                                </div>
                               </td>
                             </tr>
                           </tbody>

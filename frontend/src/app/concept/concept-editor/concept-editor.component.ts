@@ -1,6 +1,6 @@
 import {AfterViewInit, Component, ViewChild} from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
-import {LoggerService} from 'eds-angular4';
+import {ActivatedRoute, Router} from '@angular/router';
+import {LoggerService, MessageBoxDialog} from 'eds-angular4';
 import {Concept} from '../../models/Concept';
 import {ConceptStatus, ConceptStatusHelper} from '../../models/ConceptStatus';
 import {ConceptPickerComponent} from '../concept-picker/concept-picker.component';
@@ -8,7 +8,6 @@ import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConceptService} from '../concept.service';
 import {Location} from '@angular/common';
 import {RelatedConcept} from '../../models/RelatedConcept';
-import {ConceptSummary} from '../../models/ConceptSummary';
 import {NodeGraphComponent} from '../../node-graph/node-graph/node-graph.component';
 import {EditRelatedComponent} from '../edit-related/edit-related.component';
 import {Attribute} from '../../models/Attribute';
@@ -35,7 +34,8 @@ export class ConceptEditorComponent implements AfterViewInit {
   // Local enum instance
   ConceptStatus = ConceptStatus;
 
-  constructor(private route: ActivatedRoute,
+  constructor(private router: Router,
+              private route: ActivatedRoute,
               private location: Location,
               private logger: LoggerService,
               private modal: NgbModal,
@@ -165,6 +165,27 @@ export class ConceptEditorComponent implements AfterViewInit {
       node.data.loaded = true;
       this.loadDetails(node.id);
     }
+  }
+
+  gotoConcept(conceptId: number) {
+    this.router.navigate(['concept', conceptId]);
+  }
+
+  deleteAttribute(attribute: Attribute) {
+    MessageBoxDialog.open(this.modal, 'Delete attribute', 'Are you sure that you want to delete the attribute "' + attribute.attribute.context + '"?', 'Delete attribute', 'Cancel')
+      .result.then(
+      (ok) => {},
+      (cancel) => {}
+    );
+  }
+
+  deleteRelationship(relatedConcept: RelatedConcept) {
+    let context = relatedConcept.target ? relatedConcept.target.context : relatedConcept.source.context;
+    MessageBoxDialog.open(this.modal, 'Delete relationship', 'Are you sure that you want to delete the relationship with "' + context + '"?', 'Delete relationship', 'Cancel')
+      .result.then(
+      (ok) => {},
+      (cancel) => {}
+    );
   }
 
   save() {

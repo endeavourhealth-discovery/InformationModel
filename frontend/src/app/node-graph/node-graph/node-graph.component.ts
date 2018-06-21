@@ -53,6 +53,8 @@ export class NodeGraphComponent implements AfterViewInit {
     const vPadding = parseFloat(computedStyle.paddingTop) + parseFloat(computedStyle.paddingBottom) + 5;
     const height = parseFloat(computedStyle.height) - vPadding;
 
+    d3.select('svg').selectAll("*").remove();
+
     this.svg = d3.select('svg')
       .attr('width', width)
       .attr('height', height);
