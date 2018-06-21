@@ -22,9 +22,7 @@ import {ConceptReference} from '../../models/ConceptReference';
   ]
 })
 export class ConceptEditorComponent implements AfterViewInit {
-  model: Concept;
-  attributes: Attribute[];
-  related: RelatedConcept[];
+  conceptBundle: ConceptBundle;
 
   data: any;
   selectedNode: any;
@@ -57,9 +55,7 @@ export class ConceptEditorComponent implements AfterViewInit {
   }
 
   setConcept(conceptBundle: ConceptBundle) {
-    this.model = conceptBundle.concept;
-    this.attributes = conceptBundle.attributes;
-    this.related = conceptBundle.related;
+    this.conceptBundle = conceptBundle;
 
     this.data = null;
     this.graph.clear();
@@ -109,7 +105,7 @@ export class ConceptEditorComponent implements AfterViewInit {
   }
 
   setStatus(status: ConceptStatus) {
-    this.model.status = status;
+    this.conceptBundle.concept.status = status;
   }
 
   addConcept() {
@@ -120,7 +116,7 @@ export class ConceptEditorComponent implements AfterViewInit {
   }
 
   editLinkedConcept(target: Concept) {
-    EditRelatedComponent.open(this.modal, this.model, target)
+    EditRelatedComponent.open(this.modal, this.conceptBundle.concept, target)
       .result.then(
       (result) => this.saveLinkedConcept(result, target),
       (error) => this.logger.error(error)
@@ -128,31 +124,33 @@ export class ConceptEditorComponent implements AfterViewInit {
   }
 
   saveLinkedConcept(linkage: ConceptReference, target: Concept) {
+    // TODO : Logic for checking and removing from DELETED lists
     if (linkage.id == 0) { // Its an attribute
       let attribute: Attribute = {
-        conceptId: this.model.id,
+        id: null,
+        conceptId: this.conceptBundle.concept.id,
         attributeId: target.id,
         attribute: target,
         mandatory: false,
         limit: 0,
-        order: this.attributes.length + 1
+        order: this.conceptBundle.attributes.length + 1
       };
-      this.attributes.push(attribute);
-      this.updateDiagram(this.model.id, [attribute], []);
+      this.conceptBundle.attributes.push(attribute);
+      this.updateDiagram(this.conceptBundle.concept.id, [attribute], []);
     } else {
       let related: RelatedConcept = {
         id: null,
-        sourceId: this.model.id,
-        source: this.model,
+        sourceId: this.conceptBundle.concept.id,
+        source: this.conceptBundle.concept,
         targetId: target.id,
         target: target,
         relationship: linkage,
         mandatory: false,
         limit: 0,
-        order: this.related.length + 1
+        order: this.conceptBundle.related.length + 1
       };
-      this.related.push(related);
-      this.updateDiagram(this.model.id, [], [related]);
+      this.conceptBundle.related.push(related);
+      this.updateDiagram(this.conceptBundle.concept.id, [], [related]);
     }
   }
 
@@ -171,31 +169,42 @@ export class ConceptEditorComponent implements AfterViewInit {
     this.router.navigate(['concept', conceptId]);
   }
 
-  deleteAttribute(attribute: Attribute) {
-    MessageBoxDialog.open(this.modal, 'Delete attribute', 'Are you sure that you want to delete the attribute "' + attribute.attribute.context + '"?', 'Delete attribute', 'Cancel')
+  confirmDeleteAttribute(attribute: Attribute) {
+    MessageBoxDialog.open(this.modal, 'Concept editor', 'Are you sure that you want to delete the attribute "' + attribute.attribute.context + '"?', 'Delete attribute', 'Cancel')
       .result.then(
-      (ok) => {},
-      (cancel) => {}
+      (ok) => this.deleteAttribute(attribute),
+      (error) => this.logger.error(error)
+    );
+  }
+
+  deleteAttribute(attribute: Attribute) {
+    let idx = this.conceptBundle.attributes.indexOf(attribute);
+    if (idx > -1) {
+      this.conceptBundle.attributes.splice(idx, 1);
+      if (attribute.id != 0)
+        this.conceptBundle.deletedAttributeIds.push(attribute.id);
+    }
+  }
+
+  confirmDeleteRelationship(relatedConcept: RelatedConcept) {
+    let context = relatedConcept.target ? relatedConcept.target.context : relatedConcept.source.context;
+    MessageBoxDialog.open(this.modal, 'Concept editor', 'Are you sure that you want to delete the relationship with "' + context + '"?', 'Delete relationship', 'Cancel')
+      .result.then(
+      (ok) => this.deleteRelationship(relatedConcept)
     );
   }
 
   deleteRelationship(relatedConcept: RelatedConcept) {
-    let context = relatedConcept.target ? relatedConcept.target.context : relatedConcept.source.context;
-    MessageBoxDialog.open(this.modal, 'Delete relationship', 'Are you sure that you want to delete the relationship with "' + context + '"?', 'Delete relationship', 'Cancel')
-      .result.then(
-      (ok) => {},
-      (cancel) => {}
-    );
+    let idx = this.conceptBundle.related.indexOf(relatedConcept);
+    if (idx > -1) {
+      this.conceptBundle.related.splice(idx, 1);
+      if (relatedConcept.id > 0)
+        this.conceptBundle.deletedRelatedIds.push(relatedConcept.id);
+    }
   }
 
   save() {
-    let conceptBundle: ConceptBundle = {
-      concept: this.model,
-      attributes: this.attributes,
-      related: this.related
-    };
-
-    this.conceptService.saveBundle(conceptBundle)
+    this.conceptService.saveBundle(this.conceptBundle)
       .subscribe(
         () => this.close(false),
         (error) => this.logger.error('Error during save', error, 'Save')

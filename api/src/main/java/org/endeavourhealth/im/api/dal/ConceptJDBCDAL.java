@@ -14,6 +14,7 @@ import java.util.List;
 
 public class ConceptJDBCDAL implements ConceptDAL {
     private static final Logger LOG = LoggerFactory.getLogger(ConceptJDBCDAL.class);
+    private static final String OWNER = "Endeavour-Health";
     private static final int PAGE_SIZE = 15;
     private final IMFilerDAL filer;
 
@@ -252,7 +253,7 @@ public class ConceptJDBCDAL implements ConceptDAL {
     @Override
     public Long save(Concept concept) throws Exception {
         Long id = this.filer.storeAndApply(
-            "Endeavour Health",
+            OWNER,
             concept.getId() == null ? TransactionAction.CREATE : TransactionAction.UPDATE,
             TransactionTable.CONCEPT,
             concept);
@@ -264,7 +265,7 @@ public class ConceptJDBCDAL implements ConceptDAL {
     @Override
     public Long save(Attribute att) throws Exception {
         Long id = this.filer.storeAndApply(
-            "Endeavour Health",
+            OWNER,
             att.getId() == null ? TransactionAction.CREATE : TransactionAction.UPDATE,
             TransactionTable.ATTRIBUTE,
             att);
@@ -275,9 +276,19 @@ public class ConceptJDBCDAL implements ConceptDAL {
     }
 
     @Override
+    public void deleteAttribute(Long attributeId) throws Exception {
+        this.filer.storeAndApply(
+            OWNER,
+            TransactionAction.DELETE,
+            TransactionTable.ATTRIBUTE,
+            new DbEntity().setId(attributeId)
+        );
+    }
+
+    @Override
     public Long save(RelatedConcept relatedConcept) throws Exception {
         Long id = this.filer.storeAndApply(
-            "Endeavour Health",
+            OWNER,
             relatedConcept.getId() == null ? TransactionAction.CREATE : TransactionAction.UPDATE,
             TransactionTable.RELATIONSHIP,
             relatedConcept);
@@ -375,7 +386,7 @@ public class ConceptJDBCDAL implements ConceptDAL {
     @Override
     public Long save(Concept concept) throws Exception {
         return this.filer.storeAndApply(
-                "Endeavour Health",
+                OWNER,
                 concept.getId() == null ? TransactionAction.CREATE : TransactionAction.UPDATE,
                 TransactionTable.CONCEPT,
                 concept);
@@ -384,7 +395,7 @@ public class ConceptJDBCDAL implements ConceptDAL {
     @Override
     public Long save(Relationship relationship) throws Exception {
         return this.filer.storeAndApply(
-            "Endeavour Health",
+            OWNER,
             relationship.getId() == null ? TransactionAction.CREATE : TransactionAction.UPDATE,
             TransactionTable.RELATIONSHIP,
             relationship);
@@ -436,7 +447,7 @@ public class ConceptJDBCDAL implements ConceptDAL {
             .setAttributeId(attributeId);
 
         return this.filer.storeAndApply(
-            "Endeavour Health",
+            OWNER,
             TransactionAction.CREATE,
             TransactionTable.ATTRIBUTE_MODEL,
             att);
@@ -450,7 +461,7 @@ public class ConceptJDBCDAL implements ConceptDAL {
             .setRelationship(relationshipId);
 
         return this.filer.storeAndApply(
-            "Endeavour Health",
+            OWNER,
             TransactionAction.CREATE,
             TransactionTable.RELATIONSHIP,
             rel);
@@ -479,7 +490,7 @@ public class ConceptJDBCDAL implements ConceptDAL {
         Concept concept = new Concept()
                 .setContext(context);
 
-        return this.filer.storeAndApply("Endeavour Health", TransactionAction.CREATE, TransactionTable.CONCEPT, concept);
+        return this.filer.storeAndApply(OWNER, TransactionAction.CREATE, TransactionTable.CONCEPT, concept);
     }
 
 */

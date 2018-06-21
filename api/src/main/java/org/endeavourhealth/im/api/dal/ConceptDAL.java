@@ -16,6 +16,8 @@ public interface ConceptDAL {
     Long save(Concept concept) throws Exception;
     Long save(RelatedConcept relatedConcept) throws Exception;
     Long save(Attribute att) throws Exception;
+
+    void deleteAttribute(Long attributeId) throws Exception;
 /*
 
 

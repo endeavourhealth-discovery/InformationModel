@@ -81,13 +81,6 @@ export class ConceptService {
       .map((result) => result.json());
   }
 
-
-
-
-
-
-
-
   getSummaries(page?: number): Observable<ConceptSummary[]> {
     const params = new URLSearchParams();
 

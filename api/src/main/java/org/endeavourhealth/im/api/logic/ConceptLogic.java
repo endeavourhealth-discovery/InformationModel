@@ -69,6 +69,9 @@ public class ConceptLogic {
 
         for(RelatedConcept rel : conceptBundle.getRelated())
             this.dal.save(rel);
+
+        for(Long attId: conceptBundle.getDeletedAttributeIds())
+            this.dal.deleteAttribute(attId);
     }
     /*
 

@@ -1,7 +1,7 @@
 <div class="module">
   <div class="container-fluid">
     <div class="module-heading">
-      Concept editor : {{model?.context}}
+      Concept editor : {{conceptBundle?.concept?.context}}
         <div class="pull-right">
           <button class="btn btn-success" (click)="save()">Save</button>
           <button class="btn btn-warning" (click)="close(true)">Cancel</button>
@@ -13,16 +13,16 @@
           <div class="col-md-8">
             <div class="row">
               <div class="col-md-12 mb-4">
-                <div class="card h-100" id="detailCard" *ngIf="model">
+                <div class="card h-100" id="detailCard" *ngIf="conceptBundle?.concept">
                   <div class="card-header card-success"><h4>Concept details</h4></div>
                   <div class="card-block">
-                    <app-concept-details [(ngModel)]="model" name="details"></app-concept-details>
+                    <app-concept-details [(ngModel)]="conceptBundle.concept" name="details"></app-concept-details>
                   </div>
                 </div>
               </div>
               <div class="col-md-12">
-                <div class="card h-100" id="attributeCard" *ngIf="attributes">
-                  <div class="card-header card-success"><h4>Linked concepts <button class="btn btn-sm btn-info" (click)="addConcept()">Add...</button></h4> </div>
+                <div class="card h-100" id="attributeCard" *ngIf="conceptBundle?.attributes || conceptBundle?.related">
+                  <div class="card-header card-success"><h4>Linked concepts <button class="btn btn-info pull-right" (click)="addConcept()">Add</button></h4> </div>
                   <div class="card-block">
                     <div class="row">
                       <div class="col-md-12">
@@ -38,8 +38,8 @@
                             </tr>
                           </thead>
                           <tbody>
-                            <tr class="d-flex show-child-on-hover" *ngFor="let item of attributes" [ngClass]="{'selection': selectedNode == item}" (click)="selectedNode = item">
-                              <td class="col-3"><i class="fa fa-tag fa-fw"></i> {{model.context}}</td>
+                            <tr class="d-flex show-child-on-hover" *ngFor="let item of conceptBundle.attributes" [ngClass]="{'selection': selectedNode == item}" (click)="selectedNode = item">
+                              <td class="col-3"><i class="fa fa-tag fa-fw"></i> {{conceptBundle.concept.context}}</td>
                               <td class="col-3">Has attribute</td>
                               <td class="col-3">{{item.attribute.context}}</td>
                               <td class="col-1"><input type="checkbox" [checked]="item.mandatory" (change)="item.mandatory = !item.mandatory" name="mandatory"></td>
@@ -53,18 +53,18 @@
                                   <button class="btn btn-sm btn-default child-to-show pull-right" ngbDropdownToggle id="linkedMenu1"><i class="fa fa-fw fa-ellipsis-h"></i></button>
                                   <div class="dropdown-menu" aria-labelledby="linkedMenu1">
                                     <button class="dropdown-item" (click)="gotoConcept(item.attributeId)">View</button>
-                                    <button class="dropdown-item" (click)="deleteAttribute(item)">Delete</button>
+                                    <button class="dropdown-item" (click)="confirmDeleteAttribute(item)">Delete</button>
                                   </div>
                                 </div>
                               </td>
                             </tr>
-                            <tr class="d-flex show-child-on-hover" *ngFor="let item of related" [ngClass]="{'selection': selectedNode == item}" (click)="selectedNode = item">
+                            <tr class="d-flex show-child-on-hover" *ngFor="let item of conceptBundle.related" [ngClass]="{'selection': selectedNode == item}" (click)="selectedNode = item">
                               <td class="col-3">
                                 <i class="fa fa-fw" [ngClass]="{'fa-sign-in': item.source, 'fa-sign-out': item.target}"></i>
-                                {{item.source ? item.source.context : model.context}}
+                                {{item.source ? item.source.context : conceptBundle.concept.context}}
                               </td>
                               <td class="col-3">{{item.relationship.text}}</td>
-                              <td class="col-3">{{item.target ? item.target.context : model.context }}</td>
+                              <td class="col-3">{{item.target ? item.target.context : conceptBundle.concept.context }}</td>
                               <td class="col-1"><input type="checkbox" [checked]="item.mandatory" (change)="item.mandatory = !item.mandatory" name="mandatory"></td>
                               <td class="col-1">
                                 <i class="fa fa-minus" (click)="decLimit(item)"></i>
@@ -73,10 +73,10 @@
                               </td>
                               <td class="col-1">
                                 <div ngbDropdown class="show-child-on-hover">
-                                  <button class="btn btn-sm btn-default child-to-show pull-right" ngbDropdownToggle id="linkedMenu1"><i class="fa fa-fw fa-ellipsis-h"></i></button>
-                                  <div class="dropdown-menu" aria-labelledby="linkedMenu1">
+                                  <button class="btn btn-sm btn-default child-to-show pull-right" ngbDropdownToggle id="linkedMenu2"><i class="fa fa-fw fa-ellipsis-h"></i></button>
+                                  <div class="dropdown-menu" aria-labelledby="linkedMenu2">
                                     <button class="dropdown-item" (click)="gotoConcept(item.target ? item.targetId : item.sourceId)">View</button>
-                                    <button class="dropdown-item" (click)="deleteRelationship(item)">Delete</button>
+                                    <button class="dropdown-item" (click)="confirmDeleteRelationship(item)">Delete</button>
                                   </div>
                                 </div>
                               </td>
@@ -84,18 +84,6 @@
                           </tbody>
                         </table>
                       </div>
-<!--
-                      <div class="col-md-4" *ngIf="selectedNode && selectedNode != model">
-                        <div class="form-group">
-                          <label class="label" for="mandatory">Is mandatory</label>
-                          <input class="form-control" id="mandatory" value="{{selectedNode.mandatory}}" readonly>
-                        </div>
-                        <div class="form-group">
-                          <label class="label" for="limit">Occurrence limit</label>
-                          <input class="form-control" id="limit" value="{{selectedNode.limit}}" readonly>
-                        </div>
-                      </div>
--->
                     </div>
                   </div>
                 </div>

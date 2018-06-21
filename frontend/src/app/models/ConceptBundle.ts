@@ -6,4 +6,6 @@ export class ConceptBundle {
   concept: Concept;
   attributes: Attribute[];
   related: RelatedConcept[];
+  deletedAttributeIds: number[];
+  deletedRelatedIds: number[];
 }

@@ -1,6 +1,7 @@
 import {ConceptSummary} from './ConceptSummary';
+import {DbEntity} from './DbEntity';
 
-export class Attribute {
+export class Attribute extends DbEntity {
   conceptId: number;
   attributeId: number;
   attribute: ConceptSummary;
