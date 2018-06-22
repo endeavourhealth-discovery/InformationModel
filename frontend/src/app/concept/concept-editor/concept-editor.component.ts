@@ -13,6 +13,7 @@ import {EditRelatedComponent} from '../edit-related/edit-related.component';
 import {Attribute} from '../../models/Attribute';
 import {ConceptBundle} from '../../models/ConceptBundle';
 import {ConceptReference} from '../../models/ConceptReference';
+import {ConceptSummary} from '../../models/ConceptSummary';
 
 @Component({
   selector: 'app-concept-editor',
@@ -130,7 +131,7 @@ export class ConceptEditorComponent implements AfterViewInit {
         id: null,
         conceptId: this.conceptBundle.concept.id,
         attributeId: target.id,
-        attribute: target,
+        attribute: new ConceptSummary(target),
         mandatory: false,
         limit: 0,
         order: this.conceptBundle.attributes.length + 1
@@ -141,9 +142,9 @@ export class ConceptEditorComponent implements AfterViewInit {
       let related: RelatedConcept = {
         id: null,
         sourceId: this.conceptBundle.concept.id,
-        source: this.conceptBundle.concept,
+        source: null,
         targetId: target.id,
-        target: target,
+        target: new ConceptSummary(target),
         relationship: linkage,
         mandatory: false,
         limit: 0,

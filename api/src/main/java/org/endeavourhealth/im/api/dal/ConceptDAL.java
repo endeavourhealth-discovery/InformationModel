@@ -18,6 +18,8 @@ public interface ConceptDAL {
     Long save(Attribute att) throws Exception;
 
     void deleteAttribute(Long attributeId) throws Exception;
+
+    void deleteRelationship(Long relId) throws Exception;
 /*
 
 

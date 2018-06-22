@@ -2,7 +2,7 @@ package org.endeavourhealth.im.common.models;
 
 public class ConceptSummary extends DbEntity<ConceptSummary> {
     private String context;
-    private String name;
+    private String fullName;
     private String status;
     private String version;
 
@@ -15,12 +15,12 @@ public class ConceptSummary extends DbEntity<ConceptSummary> {
         return this;
     }
 
-    public String getName() {
-        return name;
+    public String getFullName() {
+        return fullName;
     }
 
-    public ConceptSummary setName(String name) {
-        this.name = name;
+    public ConceptSummary setFullName(String fullName) {
+        this.fullName = fullName;
         return this;
     }
 

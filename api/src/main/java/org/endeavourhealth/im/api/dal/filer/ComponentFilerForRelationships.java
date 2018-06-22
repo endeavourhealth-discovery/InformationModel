@@ -3,6 +3,7 @@ package org.endeavourhealth.im.api.dal.filer;
 import org.endeavourhealth.common.cache.ObjectMapperPool;
 import org.endeavourhealth.im.api.dal.ConnectionPool;
 import org.endeavourhealth.im.api.models.TransactionComponent;
+import org.endeavourhealth.im.common.models.DbEntity;
 import org.endeavourhealth.im.common.models.RelatedConcept;
 
 import java.sql.*;
@@ -54,6 +55,15 @@ public class ComponentFilerForRelationships extends ComponentFiler {
 
     @Override
     public void delete(TransactionComponent transactionComponent) throws Exception {
+        DbEntity dbEntity = getDbEntity(transactionComponent);
+        String sql = "DELETE FROM concept_relationship WHERE id = ?";
+        Connection conn = ConnectionPool.InformationModel.pop();
+        try (PreparedStatement statement = conn.prepareStatement(sql)) {
+            statement.setLong(1, dbEntity.getId());
+            statement.executeUpdate();
+        } finally {
+            ConnectionPool.InformationModel.push(conn);
+        }
     }
 
     private RelatedConcept getRelatedConcept(TransactionComponent transactionComponent) throws java.io.IOException {
@@ -63,9 +73,9 @@ public class ComponentFilerForRelationships extends ComponentFiler {
     private List<String> getPopulatedFieldList(RelatedConcept relatedConcept) {
         List<String> fields = new ArrayList<>();
 
-        if (relatedConcept.getSource() != null) fields.add("source");
+        if (relatedConcept.getSourceId() != null) fields.add("source");
         if (relatedConcept.getRelationship() != null) fields.add("relationship");
-        if (relatedConcept.getTarget() != null) fields.add("target");
+        if (relatedConcept.getTargetId() != null) fields.add("target");
         if (relatedConcept.getOrder() != null) fields.add("`order`");
         if (relatedConcept.getMandatory() != null) fields.add("mandatory");
         if (relatedConcept.getLimit() != null) fields.add("`limit`");
@@ -77,9 +87,9 @@ public class ComponentFilerForRelationships extends ComponentFiler {
     private Integer setParameters(PreparedStatement statement, RelatedConcept relatedConcept) throws SQLException {
         int i = 1;
 
-        if (relatedConcept.getSource() != null) statement.setLong(i++, relatedConcept.getSource().getId());
+        if (relatedConcept.getSourceId() != null) statement.setLong(i++, relatedConcept.getSourceId());
         if (relatedConcept.getRelationship() != null) statement.setLong(i++, relatedConcept.getRelationship().getId());
-        if (relatedConcept.getTarget() != null) statement.setLong(i++, relatedConcept.getTarget().getId());
+        if (relatedConcept.getTargetId() != null) statement.setLong(i++, relatedConcept.getTargetId());
         if (relatedConcept.getOrder() != null) statement.setInt(i++, relatedConcept.getOrder());
         if (relatedConcept.getMandatory() != null) statement.setBoolean(i++, relatedConcept.getMandatory());
         if (relatedConcept.getLimit() != null) statement.setInt(i++, relatedConcept.getLimit());

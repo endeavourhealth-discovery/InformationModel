@@ -72,6 +72,9 @@ public class ConceptLogic {
 
         for(Long attId: conceptBundle.getDeletedAttributeIds())
             this.dal.deleteAttribute(attId);
+
+        for(Long relId: conceptBundle.getDeletedRelatedIds())
+            this.dal.deleteRelationship(relId);
     }
     /*
 

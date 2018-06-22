@@ -149,7 +149,7 @@ public class ConceptJDBCDAL implements ConceptDAL {
                         new ConceptSummary()
                         .setId(rs.getLong("targetId"))
                         .setContext(rs.getString("context"))
-                        .setName(rs.getString("full_name"))
+                        .setFullName(rs.getString("full_name"))
                         .setStatus(rs.getString("status"))
                         .setVersion(rs.getString("version"))
                     )
@@ -199,7 +199,7 @@ public class ConceptJDBCDAL implements ConceptDAL {
                         new ConceptSummary()
                             .setId(rs.getLong("sourceId"))
                             .setContext(rs.getString("context"))
-                            .setName(rs.getString("full_name"))
+                            .setFullName(rs.getString("full_name"))
                             .setStatus(rs.getString("status"))
                             .setVersion(rs.getString("version"))
                     )
@@ -286,6 +286,16 @@ public class ConceptJDBCDAL implements ConceptDAL {
     }
 
     @Override
+    public void deleteRelationship(Long relId) throws Exception{
+        this.filer.storeAndApply(
+            OWNER,
+            TransactionAction.DELETE,
+            TransactionTable.RELATIONSHIP,
+            new DbEntity().setId(relId)
+        );
+    }
+
+    @Override
     public Long save(RelatedConcept relatedConcept) throws Exception {
         Long id = this.filer.storeAndApply(
             OWNER,
@@ -313,7 +323,7 @@ public class ConceptJDBCDAL implements ConceptDAL {
         return new ConceptSummary()
             .setId(rs.getLong("id"))
             .setContext(rs.getString("context"))
-            .setName(rs.getString("full_name"))
+            .setFullName(rs.getString("full_name"))
             .setStatus(ConceptStatus.byValue(rs.getByte("status")).getName())
             .setVersion(rs.getString("version"));
     }

@@ -4,6 +4,7 @@ import org.endeavourhealth.common.cache.ObjectMapperPool;
 import org.endeavourhealth.im.api.dal.ConnectionPool;
 import org.endeavourhealth.im.api.models.TransactionComponent;
 import org.endeavourhealth.im.common.models.Attribute;
+import org.endeavourhealth.im.common.models.DbEntity;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -51,7 +52,16 @@ public class ComponentFilerForAttributes extends ComponentFiler {
     }
 
     @Override
-    public void delete(TransactionComponent transactionComponent) {
+    public void delete(TransactionComponent transactionComponent) throws Exception {
+        DbEntity dbEntity = getDbEntity(transactionComponent);
+        String sql = "DELETE FROM concept_attribute WHERE id = ?";
+        Connection conn = ConnectionPool.InformationModel.pop();
+        try (PreparedStatement statement = conn.prepareStatement(sql)) {
+            statement.setLong(1, dbEntity.getId());
+            statement.executeUpdate();
+        } finally {
+            ConnectionPool.InformationModel.push(conn);
+        }
     }
 
     private Attribute getAttribute(TransactionComponent transactionComponent) throws java.io.IOException {

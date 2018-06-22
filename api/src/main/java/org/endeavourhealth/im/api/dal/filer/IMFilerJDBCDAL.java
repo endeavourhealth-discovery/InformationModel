@@ -154,8 +154,10 @@ public class IMFilerJDBCDAL implements IMFilerDAL {
                 return componentFiler.create(transactionComponent);
             case UPDATE:
                 componentFiler.update(transactionComponent);
+                break;
             case DELETE:
                 componentFiler.delete(transactionComponent);
+                break;
         }
         return null;
     }
