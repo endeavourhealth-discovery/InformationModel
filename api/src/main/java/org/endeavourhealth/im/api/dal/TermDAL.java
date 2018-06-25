@@ -15,7 +15,7 @@ public interface TermDAL {
     Term getSnomedParent(String code) throws SQLException;
     String getICD10Term(String code);
     String getOpcsTerm(String code);
-//
-//    List<TermMapping> getMappings(Long conceptId) throws Exception;
-//
+
+    List<TermMapping> getMappings(Long conceptId) throws Exception;
+
 }

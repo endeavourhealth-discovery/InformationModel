@@ -116,10 +116,8 @@ public class TermLogic {
             }
         }
     }
-/*
+
     public List<TermMapping> getMappings(Long conceptId) throws Exception {
         return this.dal.getMappings(conceptId);
     }
-
-*/
 }

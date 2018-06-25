@@ -3,6 +3,7 @@ import {LoggerService} from 'eds-angular4';
 import {ConceptSummary} from '../models/ConceptSummary';
 import {Router} from '@angular/router';
 import {TermMappingsService} from './term-mappings.service';
+import {ConceptSummaryList} from '../models/ConceptSummaryList';
 
 @Component({
   selector: 'app-term-mappings',
@@ -11,7 +12,7 @@ import {TermMappingsService} from './term-mappings.service';
 })
 export class TermMappingsComponent implements OnInit {
   private page: number;
-  models: ConceptSummary[];
+  summaryList: ConceptSummaryList;
 
   constructor(private router: Router,
               private termMappingsService: TermMappingsService,
@@ -26,7 +27,7 @@ export class TermMappingsComponent implements OnInit {
   getTermMappings() {
     this.termMappingsService.getSummaries(this.page)
       .subscribe(
-        (result) => this.models = result,
+        (result) => this.summaryList = result,
         (error) => this.log.error(error)
       );
   }

@@ -46,7 +46,7 @@ public class TermEndpoint {
             .build();
     }
 
-/*    @GET
+    @GET
     @Path("/Mappings")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -64,5 +64,4 @@ public class TermEndpoint {
             .entity(result)
             .build();
     }
-    */
 }

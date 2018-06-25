@@ -11,7 +11,7 @@
     <div class="module-body">
       <form>
         <div class="row">
-          <div class="col-md-8">
+          <div class="col-md-12">
             <div class="card h-100" id="detailCard" *ngIf="model">
               <div class="card-header card-success"><h4>Details</h4></div>
               <div class="card-block">
@@ -53,18 +53,10 @@
               </div>
             </div>
           </div>
-          <div class="col-md-4">
-            <div class="card h-100" id="relatedGraph">
-              <div class="card-header card-success"><h4>Related</h4></div>
-              <div class="card-block">
-                    <!--<nodeGraph [graphData]="data"></nodeGraph>-->
-              </div>
-            </div>
-          </div>
         </div>
         <br>
         <div class="row">
-          <div class="col-md-8">
+          <div class="col-md-12">
             <div class="card h-100" id="mapsCard" [hidden]="!maps">
               <div class="card-header card-success"><h4>Mappings</h4></div>
               <div class="card-block">
@@ -90,32 +82,6 @@
                           <button class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></button>
                         </div>
                       </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="card h-100" id="relatedCard" [hidden]="!data">
-              <div class="card-header card-success"><h4>Attributes</h4></div>
-              <div class="card-block">
-                <button class="btn btn-sm btn-success" (click)="addRelationship()">Add</button>
-                <br>
-                <br>
-                <table class="table table-sm table-striped table-hover" *ngIf="data">
-                  <thead>
-                    <tr class="d-flex">
-                      <th class="col-6">Concept</th>
-                      <th class="col-5">Relationship</th>
-                      <th class="col-1"></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr *ngFor="let item of data.nodes" class="d-flex show-child-on-hover" ngClass="" (click)="selectRelated(item)" [class.selection]="item == selectedRelation">
-                      <td class="col-6">{{item.name}}</td>
-                      <td class="col-5">{{item.group}}</td>
-                      <td class="col-1"><button class="btn btn-sm btn-danger pull-right child-to-show"><i class="fa fa-trash"></i></button> </td>
                     </tr>
                   </tbody>
                 </table>

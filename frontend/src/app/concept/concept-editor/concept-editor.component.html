@@ -61,12 +61,12 @@
                             <tr class="d-flex show-child-on-hover" *ngFor="let item of conceptBundle.related" [ngClass]="{'selection': selectedNode == item}" (click)="selectedNode = item">
                               <td class="col-3">
                                 <a href="#/concept/{{item.sourceId}}" *ngIf="item.source">{{item.source.context}}</a>
-                                <span *ngIf="!item.source">(This concept)</span>
+                                <span *ngIf="!item.source">{{conceptBundle.concept.context}}</span>
                               </td>
                               <td class="col-3">{{item.relationship.text}}</td>
                               <td class="col-3">
                                 <a href="#/concept/{{item.targetId}}" *ngIf="item.target">{{item.target.context}}</a>
-                                <span *ngIf="!item.target">(This concept)</span>
+                                <span *ngIf="!item.target">{{conceptBundle.concept.context}}</span>
                               </td>
                               <td class="col-1"><input type="checkbox" [checked]="item.mandatory" (change)="item.mandatory = !item.mandatory" name="mandatory"></td>
                               <td class="col-1">
@@ -75,13 +75,7 @@
                                 <i class="fa fa-plus" (click)="incLimit(item)"></i>
                               </td>
                               <td class="col-1">
-                                <div ngbDropdown class="show-child-on-hover">
-                                  <button class="btn btn-sm btn-default child-to-show pull-right" ngbDropdownToggle id="linkedMenu2"><i class="fa fa-fw fa-ellipsis-h"></i></button>
-                                  <div class="dropdown-menu" aria-labelledby="linkedMenu2">
-                                    <button class="dropdown-item" (click)="gotoConcept(item.target ? item.targetId : item.sourceId)">View</button>
-                                    <button class="dropdown-item" (click)="confirmDeleteRelationship(item)">Delete</button>
-                                  </div>
-                                </div>
+                                <button class="btn btn-sm btn-danger child-to-show pull-right" (click)="confirmDeleteRelationship(item)"><i class="fa fa-trash fa-fw fa-lg"></i></button>
                               </td>
                             </tr>
                           </tbody>

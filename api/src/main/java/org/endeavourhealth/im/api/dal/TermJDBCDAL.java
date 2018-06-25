@@ -46,11 +46,11 @@ public class TermJDBCDAL implements TermDAL {
     @Override
     public void createTermMap(String organisation, String context, String system, String code, Long termId) throws Exception {
         TermMapping termMapping = new TermMapping()
-                .setOrganisation(organisation)
-                .setContext(context)
-                .setSystem(system)
-                .setCode(code)
-                .setConceptId(termId);
+            .setOrganisation(organisation)
+            .setContext(context)
+            .setSystem(system)
+            .setCode(code)
+            .setConceptId(termId);
 
         this.filer.storeAndApply("Endeavour Health", TransactionAction.CREATE, TransactionTable.TERM_MAPPING, termMapping);
     }
@@ -107,7 +107,7 @@ public class TermJDBCDAL implements TermDAL {
     public String getOpcsTerm(String code) {
         return null;
     }
-/*
+
     @Override
     public List<TermMapping> getMappings(Long conceptId) throws Exception {
         List<TermMapping> result = new ArrayList<>();
@@ -119,7 +119,7 @@ public class TermJDBCDAL implements TermDAL {
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 result.add(new TermMapping()
-                .setOrganisation(rs.getString("organisation"))
+                    .setOrganisation(rs.getString("organisation"))
                     .setContext(rs.getString("context"))
                     .setSystem(rs.getString("system"))
                     .setCode(rs.getString("code"))
@@ -132,6 +132,4 @@ public class TermJDBCDAL implements TermDAL {
 
         return result;
     }
-
-    */
 }
