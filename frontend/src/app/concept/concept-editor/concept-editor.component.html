@@ -60,11 +60,14 @@
                             </tr>
                             <tr class="d-flex show-child-on-hover" *ngFor="let item of conceptBundle.related" [ngClass]="{'selection': selectedNode == item}" (click)="selectedNode = item">
                               <td class="col-3">
-                                <i class="fa fa-fw" [ngClass]="{'fa-sign-in': item.source, 'fa-sign-out': item.target}"></i>
-                                {{item.source ? item.source.context : conceptBundle.concept.context}}
+                                <a href="#/concept/{{item.sourceId}}" *ngIf="item.source">{{item.source.context}}</a>
+                                <span *ngIf="!item.source">(This concept)</span>
                               </td>
                               <td class="col-3">{{item.relationship.text}}</td>
-                              <td class="col-3">{{item.target ? item.target.context : conceptBundle.concept.context }}</td>
+                              <td class="col-3">
+                                <a href="#/concept/{{item.targetId}}" *ngIf="item.target">{{item.target.context}}</a>
+                                <span *ngIf="!item.target">(This concept)</span>
+                              </td>
                               <td class="col-1"><input type="checkbox" [checked]="item.mandatory" (change)="item.mandatory = !item.mandatory" name="mandatory"></td>
                               <td class="col-1">
                                 <i class="fa fa-minus" (click)="decLimit(item)"></i>

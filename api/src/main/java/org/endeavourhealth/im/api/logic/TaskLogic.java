@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TaskLogic {
-    /*
     private TaskDAL dal;
 
     public TaskLogic() {
@@ -27,12 +26,13 @@ public class TaskLogic {
         dal.createTask(title, description, taskType, resourceId);
     }
 
-    public Long getTaskIdByTypeAndResourceId(TaskType taskType, Long resourceId) throws Exception {
-        return dal.getTaskIdByTypeAndResourceId(taskType, resourceId);
-    }
-
     public List<Task> getTasks(TaskType taskType) throws Exception {
         return dal.getTasks(taskType);
+    }
+
+    /*
+    public Long getTaskIdByTypeAndResourceId(TaskType taskType, Long resourceId) throws Exception {
+        return dal.getTaskIdByTypeAndResourceId(taskType, resourceId);
     }
     */
 }

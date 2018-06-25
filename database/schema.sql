@@ -56,30 +56,7 @@ CREATE TABLE concept_relationship (
   CONSTRAINT concept_relationship_relationship_fk FOREIGN KEY (relationship) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT concept_relationship_target_fk       FOREIGN KEY (target) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-#
-# DROP TABLE IF EXISTS record_type;
-# CREATE TABLE record_type (
-#   id BIGINT NOT NULL PRIMARY KEY                COMMENT 'Record type id - synonymous with concept.id',
-#   inherits_from BIGINT                          COMMENT 'Reference to the class (concept.id) that this record type inherits from',
-#
-#   CONSTRAINT record_type_id_fk FOREIGN KEY (id) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
-#   CONSTRAINT record_type_inherits_from_fk FOREIGN KEY (inherits_from) REFERENCES record_type(id) ON DELETE NO ACTION ON UPDATE NO ACTION
-# ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-#
-# DROP TABLE IF EXISTS record_type_attribute;
-# CREATE TABLE record_type_attribute (
-#   id BIGINT AUTO_INCREMENT PRIMARY KEY          COMMENT 'Record type attribute unique identifier',
-#   record_type BIGINT NOT NULL                   COMMENT 'Reference to the record type that this is an attribute of',
-#   data_type BIGINT NOT NULL                     COMMENT 'Reference to the data type (concept.id) of this attribute',
-#   value BIGINT NOT NULL                         COMMENT 'If data_type is "Record Type", then the id of the actual record type',
-#   mandatory BOOLEAN NOT NULL                    COMMENT 'Is this attribute optional (0:??) or mandatory (1:??)',
-#   unlimited BOOLEAN NOT NULL                    COMMENT 'Is this attribute limited (??:1) or unlimited (??:*)',
-#
-#   CONSTRAINT record_type_attribute_record_type_fk FOREIGN KEY (record_type) REFERENCES record_type(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
-#   CONSTRAINT record_type_attribute_data_type_fk FOREIGN KEY (data_type) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
-#   CONSTRAINT record_type_attribute_value_fk FOREIGN KEY (value) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION
-# ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-#
+
 # -- ********** TRANSACTION TABLES **********
 
 DROP TABLE IF EXISTS transaction_action;
@@ -138,6 +115,21 @@ CREATE TABLE task (
   CONSTRAINT task_type_fk FOREIGN KEY (type) REFERENCES task_type(id) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+-- ********** TERM/MAPPING TABLES **********
+
+DROP TABLE IF EXISTS term_mapping;
+CREATE TABLE term_mapping (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  organisation VARCHAR(36) NOT NULL,
+  context VARCHAR(50) NOT NULL,
+  system VARCHAR(15) NOT NULL,
+  code VARCHAR(25) NOT NULL,
+  concept_id BIGINT NOT NULL,
+
+  UNIQUE KEY term_mapping_organisation_context_system_code_idx (organisation, context, system, code),
+  CONSTRAINT term_mapping_term_id_fk FOREIGN KEY (concept_id) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 -- ********** INBOUND MESSAGE TABLES **********
 #
 # DROP TABLE IF EXISTS message;
@@ -188,15 +180,3 @@ CREATE TABLE task (
 #   CONSTRAINT message_mapping_target_record_type_attribute_fk FOREIGN KEY (target_record_type_attribute) REFERENCES record_type_attribute(id) ON DELETE NO ACTION ON UPDATE NO ACTION
 # ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 #
-# DROP TABLE IF EXISTS term_mapping;
-# CREATE TABLE term_mapping (
-#   id BIGINT AUTO_INCREMENT PRIMARY KEY,
-#   organisation VARCHAR(36) NOT NULL,
-#   context VARCHAR(50) NOT NULL,
-#   system VARCHAR(15) NOT NULL,
-#   code VARCHAR(25) NOT NULL,
-#   concept_id BIGINT NOT NULL,
-#
-#   UNIQUE KEY term_mapping_organisation_context_system_code_idx (organisation, context, system, code),
-#   CONSTRAINT term_mapping_term_id_fk FOREIGN KEY (concept_id) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION
-# ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

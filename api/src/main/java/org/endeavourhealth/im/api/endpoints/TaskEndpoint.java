@@ -26,7 +26,7 @@ import java.util.List;
 @Api(description = "API for all calls relating to Tasks")
 public class TaskEndpoint {
     private static final Logger LOG = LoggerFactory.getLogger(TaskEndpoint.class);
-/*
+
     @GET
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -44,5 +44,4 @@ public class TaskEndpoint {
             .entity(tasks)
             .build();
     }
-    */
 }

@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TermJDBCDAL implements TermDAL {
-    /*
+
     private final IMFilerDAL filer;
 
     public TermJDBCDAL() {
@@ -74,6 +74,31 @@ public class TermJDBCDAL implements TermDAL {
     }
 
     @Override
+    public Term getSnomedParent(String code) throws SQLException {
+        String sql = "SELECT p.code, p.display " +
+            "FROM trm_concept p " +
+            "JOIN trm_concept_pc_link l ON l.parent_pid = p.pid " +
+            "JOIN trm_concept c ON c.pid = l.child_pid " +
+            "WHERE c.code = ? " +
+            "AND l.rel_type = 0";
+
+        Connection conn = ConnectionPool.Snomed.pop();
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, code);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next())
+                return new Term()
+                    .setId(rs.getLong("code"))
+                    .setText(rs.getString("display"));
+        } finally {
+            ConnectionPool.Snomed.push(conn);
+        }
+
+        return null;
+    }
+
+    @Override
     public String getICD10Term(String code) {
         return null;
     }
@@ -82,7 +107,7 @@ public class TermJDBCDAL implements TermDAL {
     public String getOpcsTerm(String code) {
         return null;
     }
-
+/*
     @Override
     public List<TermMapping> getMappings(Long conceptId) throws Exception {
         List<TermMapping> result = new ArrayList<>();
@@ -108,29 +133,5 @@ public class TermJDBCDAL implements TermDAL {
         return result;
     }
 
-    @Override
-    public Term getSnomedParent(String code) throws SQLException {
-        String sql = "SELECT p.code, p.display " +
-            "FROM trm_concept p " +
-            "JOIN trm_concept_pc_link l ON l.parent_pid = p.pid " +
-            "JOIN trm_concept c ON c.pid = l.child_pid " +
-            "WHERE c.code = ? " +
-            "AND l.rel_type = 0";
-
-        Connection conn = ConnectionPool.Snomed.pop();
-
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, code);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next())
-                return new Term()
-                .setId(rs.getLong("code"))
-                .setText(rs.getString("display"));
-        } finally {
-            ConnectionPool.Snomed.push(conn);
-        }
-
-        return null;
-    }
     */
 }

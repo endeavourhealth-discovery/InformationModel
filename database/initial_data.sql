@@ -41,6 +41,7 @@ VALUES
 
   -- RELATIONSHIPS
   (100, 8, '', 'Is a',                     'Relationship.IsA',               0, '1.0', 'Points to target concepts that are parent types of the source concept. Equivalent t', null, null),
+  (101, 8, '', 'Has child',                'Relationship.HasChild',          0, '1.0', 'Points to a target concept that is a child of the source concept.', null, null),
 
 -- ****************************************************************************
 -- * The following data is "dynamic", i.e. NOT base IM data                   *
@@ -57,7 +58,10 @@ VALUES
   (1006, 1, '', 'Property identifier',                       'Property.Identifier',             0, '1.0', 'Types of identifiers of properties', null, null),
   (1007, 1, '', 'Property related characteristic',           'Property.Characteristic',         0, '1.0', 'Characteristics relating to properties', null, null),
   (1008, 7, '', 'Property purpose',                          'Property.Purpose',                0, '1.0', 'The purpose of a property such as a residence or prison or care home', null, null),
-  (1009, 1, '', 'Care home',                                 'Property.Purpose.CareHome',       0, '1.0', 'A property that is used as a care home', null, null)
+  (1009, 1, '', 'Care home',                                 'Property.Purpose.CareHome',       0, '1.0', 'A property that is used as a care home', null, null),
+
+  (1010, 1, '', 'Coding system',                             'CodingSystem',                    0, '1.0', 'A system for coding terms for subsequent use in a computable manner', null, null),
+  (1011, 1, '', 'SNOMED CT',                                 'CodingSystem.Snomed',             0, '1.0', 'The SNOMED CT coding system', null, null)
 ;
 
 INSERT INTO concept_relationship

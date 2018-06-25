@@ -16,7 +16,6 @@ import java.util.Date;
 import java.util.List;
 
 public class TaskJDBCDAL implements TaskDAL {
-    /*
     private final IMFilerDAL filer;
 
     public TaskJDBCDAL() {
@@ -39,24 +38,6 @@ public class TaskJDBCDAL implements TaskDAL {
     }
 
     @Override
-    public Long getTaskIdByTypeAndResourceId(TaskType taskType, Long resourceId) throws SQLException {
-        Connection conn = ConnectionPool.InformationModel.pop();
-
-        try (PreparedStatement stmt = conn.prepareStatement("SELECT id FROM task WHERE type = ? and identifier = ?")) {
-            stmt.setLong(1, taskType.getValue());
-            stmt.setLong(2, resourceId);
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next())
-                return rs.getLong(1);
-            else
-                return null;
-        } finally {
-            ConnectionPool.InformationModel.push(conn);
-        }
-    }
-
-    @Override
     public List<Task> getTasks(TaskType taskType) throws SQLException {
         List<Task> tasks = new ArrayList<>();
 
@@ -74,12 +55,12 @@ public class TaskJDBCDAL implements TaskDAL {
 
             while(rs.next()) {
                 tasks.add(
-                        new Task()
-                                .setName(rs.getString("title"))
-                                .setType(TaskType.byValue(rs.getByte("type")))
-                                .setCreated(rs.getTimestamp("created"))
-                                .setId(rs.getLong("id"))
-                                .setIdentifier(rs.getLong("identifier"))
+                    new Task()
+                        .setName(rs.getString("title"))
+                        .setType(TaskType.byValue(rs.getByte("type")))
+                        .setCreated(rs.getTimestamp("created"))
+                        .setId(rs.getLong("id"))
+                        .setIdentifier(rs.getLong("identifier"))
                 );
             }
         } finally {
@@ -88,5 +69,25 @@ public class TaskJDBCDAL implements TaskDAL {
 
         return tasks;
     }
+    /*
+
+    @Override
+    public Long getTaskIdByTypeAndResourceId(TaskType taskType, Long resourceId) throws SQLException {
+        Connection conn = ConnectionPool.InformationModel.pop();
+
+        try (PreparedStatement stmt = conn.prepareStatement("SELECT id FROM task WHERE type = ? and identifier = ?")) {
+            stmt.setLong(1, taskType.getValue());
+            stmt.setLong(2, resourceId);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next())
+                return rs.getLong(1);
+            else
+                return null;
+        } finally {
+            ConnectionPool.InformationModel.push(conn);
+        }
+    }
+
     */
 }

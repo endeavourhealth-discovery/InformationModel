@@ -23,7 +23,7 @@ import java.util.List;
 @Api(description = "API for all calls relating to Terms")
 public class TermEndpoint {
     private static final Logger LOG = LoggerFactory.getLogger(TermEndpoint.class);
-/*
+
     @GET
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -46,7 +46,7 @@ public class TermEndpoint {
             .build();
     }
 
-    @GET
+/*    @GET
     @Path("/Mappings")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)

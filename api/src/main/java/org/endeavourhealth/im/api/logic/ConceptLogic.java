@@ -31,6 +31,10 @@ public class ConceptLogic {
         return this.dal.get(id);
     }
 
+    public Concept get(String context) throws Exception {
+        return this.dal.getConceptByContext(context);
+    }
+
     public ConceptBundle getBundle(Long id) throws Exception {
         return new ConceptBundle()
             .setConcept(this.dal.get(id))
@@ -59,6 +63,16 @@ public class ConceptLogic {
 
     public List<ConceptReference> getRelationships() throws Exception {
         return this.dal.getRelationships();
+    }
+
+    public Long save(Concept concept) throws Exception {
+        concept.setId(this.dal.save(concept));
+        return concept.getId();
+    }
+
+    public Long save(RelatedConcept relatedConcept) throws Exception {
+        relatedConcept.setId(this.dal.save(relatedConcept));
+        return relatedConcept.getId();
     }
 
     public void save(ConceptBundle conceptBundle) throws Exception {
@@ -125,17 +139,11 @@ public class ConceptLogic {
 
 
 
-    public Concept get(String context) throws Exception {
-        return this.dal.getConceptByContext(context);
-    }
 
-    public Long save(Concept concept) throws Exception {
-        return this.dal.save(concept);
-    }
 
-    public Long save(Relationship relationship) throws Exception {
-        return this.dal.save(relationship);
-    }
+
+
+
 
     public List<ConceptSummary> search(String criteria) throws Exception {
         return this.dal.search(criteria);

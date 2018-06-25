@@ -19,7 +19,7 @@ public class ComponentFilerForConcepts extends ComponentFiler {
     }
 
     protected Long createConcept(Concept concept) throws SQLException {
-        concept.setId(TableIdHelper.getNextId("concept"));
+        // concept.setId(TableIdHelper.getNextId("concept"));
 
         List<String> fieldList = getPopulatedFieldList(concept);
         String paramList = getParamList(fieldList);
@@ -28,10 +28,12 @@ public class ComponentFilerForConcepts extends ComponentFiler {
                 "VALUES (" + paramList + ")";
 
         Connection conn = ConnectionPool.InformationModel.pop();
-        try (PreparedStatement statement = conn.prepareStatement(sql)) {
+        try (PreparedStatement statement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             setParameters(statement, concept);
             statement.executeUpdate();
-            return concept.getId();
+            ResultSet rs = statement.getGeneratedKeys();
+            rs.next();
+            return rs.getLong(1);
         } finally {
             ConnectionPool.InformationModel.push(conn);
         }

@@ -5,9 +5,9 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public enum TransactionTable {
     CONCEPT ((byte)0, "Concept"),
 //    MESSAGE ((byte)1, "Message"),
-//    TASK ((byte)2, "Task"),
+    TASK ((byte)2, "Task"),
     ATTRIBUTE((byte)3, "Attribute" ),
-//    TERM_MAPPING((byte)4, "Term Mapping"),
+    TERM_MAPPING((byte)4, "Term Mapping"),
     RELATIONSHIP((byte)5, "Relationship");
 
     private final Byte value;

@@ -30,7 +30,7 @@ public class ConceptJDBCDAL implements ConceptDAL {
     @Override
     public ConceptSummaryList getMRU() throws SQLException {
         Connection conn = ConnectionPool.InformationModel.pop();
-        String sql = "SELECT id, context, full_name, status, version FROM concept LIMIT ?";
+        String sql = "SELECT id, context, full_name, status, version FROM concept ORDER BY id DESC LIMIT ?";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, PAGE_SIZE);
@@ -88,6 +88,29 @@ public class ConceptJDBCDAL implements ConceptDAL {
         }
 
         return null;
+    }
+
+    @Override
+    public Concept getConceptByContext(String context) throws SQLException {
+        Concept concept = null;
+        Connection conn = ConnectionPool.InformationModel.pop();
+
+        String sql = "SELECT c.*, t.id as typeId, t.full_name as typeName " +
+            "FROM concept c " +
+            "JOIN concept t ON t.id = c.type " +
+            "WHERE c.context = ?";
+
+        try (PreparedStatement statement = conn.prepareStatement(sql)) {
+            statement.setString(1, context);
+            ResultSet res = statement.executeQuery();
+            if (res.next()) {
+                concept = getConceptFromResultSet(res);
+            }
+        } finally {
+            ConnectionPool.InformationModel.push(conn);
+        }
+
+        return concept;
     }
 
     @Override
@@ -252,6 +275,9 @@ public class ConceptJDBCDAL implements ConceptDAL {
 
     @Override
     public Long save(Concept concept) throws Exception {
+        // Resolve references first, if required
+        checkAndResolve(concept.getType());
+
         Long id = this.filer.storeAndApply(
             OWNER,
             concept.getId() == null ? TransactionAction.CREATE : TransactionAction.UPDATE,
@@ -276,6 +302,20 @@ public class ConceptJDBCDAL implements ConceptDAL {
     }
 
     @Override
+    public Long save(RelatedConcept relatedConcept) throws Exception {
+        checkAndResolve(relatedConcept.getRelationship());
+        Long id = this.filer.storeAndApply(
+            OWNER,
+            relatedConcept.getId() == null ? TransactionAction.CREATE : TransactionAction.UPDATE,
+            TransactionTable.RELATIONSHIP,
+            relatedConcept);
+
+        relatedConcept.setId(id);
+
+        return id;
+    }
+
+    @Override
     public void deleteAttribute(Long attributeId) throws Exception {
         this.filer.storeAndApply(
             OWNER,
@@ -293,19 +333,6 @@ public class ConceptJDBCDAL implements ConceptDAL {
             TransactionTable.RELATIONSHIP,
             new DbEntity().setId(relId)
         );
-    }
-
-    @Override
-    public Long save(RelatedConcept relatedConcept) throws Exception {
-        Long id = this.filer.storeAndApply(
-            OWNER,
-            relatedConcept.getId() == null ? TransactionAction.CREATE : TransactionAction.UPDATE,
-            TransactionTable.RELATIONSHIP,
-            relatedConcept);
-
-        relatedConcept.setId(id);
-
-        return id;
     }
 
     private List<ConceptSummary> getSummaryResultSet(PreparedStatement stmt) throws SQLException {
@@ -345,6 +372,15 @@ public class ConceptJDBCDAL implements ConceptDAL {
             .setVersion(rs.getString("version"))
             .setStatus(ConceptStatus.byValue(rs.getByte("status")));
     }
+
+    private void checkAndResolve(ConceptReference ref) throws SQLException {
+        if (ref == null || ref.getId() != null)
+            return;
+
+        Concept concept = getConceptByContext(ref.getText());
+        ref.setId(concept.getId());
+    }
+
     /*
 
 
@@ -402,14 +438,6 @@ public class ConceptJDBCDAL implements ConceptDAL {
                 concept);
     }
 
-    @Override
-    public Long save(Relationship relationship) throws Exception {
-        return this.filer.storeAndApply(
-            OWNER,
-            relationship.getId() == null ? TransactionAction.CREATE : TransactionAction.UPDATE,
-            TransactionTable.RELATIONSHIP,
-            relationship);
-    }
 
     @Override
     public List<ConceptSummary> search(String criteria) throws Exception {
@@ -478,22 +506,7 @@ public class ConceptJDBCDAL implements ConceptDAL {
     }
 
 
-    @Override
-    public Concept getConceptByContext(String context) throws SQLException {
-        Concept concept = null;
-        Connection conn = ConnectionPool.InformationModel.pop();
-        try (PreparedStatement statement = conn.prepareStatement("SELECT * FROM concept WHERE context = ?")) {
-            statement.setString(1, context);
-            ResultSet res = statement.executeQuery();
-            if (res.next()) {
-                concept = getConceptFromResultSet(res);
-            }
-        } finally {
-            ConnectionPool.InformationModel.push(conn);
-        }
 
-        return concept;
-    }
 
     @Override
     public Long createDraftConcept(String context) throws Exception {

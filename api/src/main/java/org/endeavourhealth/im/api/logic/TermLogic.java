@@ -9,7 +9,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class TermLogic {
-    /*
+
     private TermDAL dal;
     private TaskLogic taskLogic;
     private ConceptLogic conceptLogic;
@@ -50,12 +50,14 @@ public class TermLogic {
                 if (officialTerm != null) {
                     // If one was found, just use it
                     concept.setStatus(ConceptStatus.ACTIVE)
+                        .setType(new ConceptReference().setText("Class.Code"))
                         .setFullName(officialTerm);
                     conceptId = this.conceptLogic.save(concept);
                     importParentHierarchy(conceptId, system, code);
                 } else {
                     // otherwise create a draft/temporary one and associated task
                     concept.setStatus(ConceptStatus.DRAFT)
+                        .setType(new ConceptReference().setText("Class.Code"))
                         .setFullName(termText);
                     conceptId = this.conceptLogic.save(concept);
                     this.taskLogic.createTask("New draft term", termConceptContext + " => " + termText, TaskType.TERM_MAPPINGS, conceptId);
@@ -69,10 +71,6 @@ public class TermLogic {
         return new Term()
                 .setId(conceptId)
                 .setText(concept.getFullName());
-    }
-
-    public List<TermMapping> getMappings(Long conceptId) throws Exception {
-        return this.dal.getMappings(conceptId);
     }
 
     private String getOfficialTermForCode(String system, String code) throws Exception {
@@ -91,31 +89,37 @@ public class TermLogic {
             importSnomedParentHierarchy(conceptId, code);
     }
 
+
     private void importSnomedParentHierarchy(Long conceptId, String code) throws Exception {
         Term parent = this.dal.getSnomedParent(code);
         if (parent != null) {
             String context = "Term.Snomed." + parent.getId().toString();
-
             Concept concept = this.conceptLogic.get(context);
 
             if (concept == null) {
                 concept = new Concept()
                     .setContext(context)
+                    .setType(new ConceptReference().setText("Class.Code"))
                     .setStatus(ConceptStatus.ACTIVE)
                     .setFullName(parent.getText());
 
                 Long parentConceptId = this.conceptLogic.save(concept);
 
-                Relationship relationship = new Relationship()
-                    .setSource(parentConceptId)
-                    .setRelationship(ConceptRelationship.HAS_CHILD.getId())
-                    .setTarget(conceptId);
+                RelatedConcept relatedConcept = new RelatedConcept()
+                    .setSourceId(parentConceptId)
+                    .setRelationship(new ConceptReference().setText("Relationship.HasChild"))
+                    .setTargetId(conceptId);
 
-                this.conceptLogic.save(relationship);
+                this.conceptLogic.save(relatedConcept);
 
                 importSnomedParentHierarchy(parentConceptId, parent.getId().toString());
             }
         }
     }
+/*
+    public List<TermMapping> getMappings(Long conceptId) throws Exception {
+        return this.dal.getMappings(conceptId);
+    }
+
 */
 }
