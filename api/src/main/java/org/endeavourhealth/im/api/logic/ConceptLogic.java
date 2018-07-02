@@ -76,13 +76,21 @@ public class ConceptLogic {
     }
 
     public void save(ConceptBundle conceptBundle) throws Exception {
-        this.dal.save(conceptBundle.getConcept());
+        Long conceptId = this.dal.save(conceptBundle.getConcept());
 
-        for(Attribute att: conceptBundle.getAttributes())
+        for(Attribute att: conceptBundle.getAttributes()) {
+            if (att.getConceptId() == null)
+                att.setConceptId(conceptId);
             this.dal.save(att);
+        }
 
-        for(RelatedConcept rel : conceptBundle.getRelated())
+        for(RelatedConcept rel : conceptBundle.getRelated()) {
+            if (rel.getTargetId() == null)
+                rel.setTargetId(conceptId);
+            else if (rel.getSourceId() == null)
+                rel.setSourceId(conceptId);
             this.dal.save(rel);
+        }
 
         for(Long attId: conceptBundle.getDeletedAttributeIds())
             this.dal.deleteAttribute(attId);

@@ -1,6 +1,6 @@
-import {AfterViewInit, Component, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
-import {LoggerService, MessageBoxDialog} from 'eds-angular4';
+import {InputBoxDialog, LoggerService, MessageBoxDialog} from 'eds-angular4';
 import {Concept} from '../../models/Concept';
 import {ConceptStatus, ConceptStatusHelper} from '../../models/ConceptStatus';
 import {ConceptPickerComponent} from '../concept-picker/concept-picker.component';
@@ -47,22 +47,48 @@ export class ConceptEditorComponent implements AfterViewInit {
       });
   }
 
-  loadConcept(id: number) {
-    this.conceptService.getConceptBundle(id)
-      .subscribe(
-        (result) => this.setConcept(result),
-        (error) => this.logger.error(error)
-      );
+  loadConcept(id: any) {
+    if (id === 'add') {
+      setTimeout(() => this.promptContext());
+    } else {
+      this.conceptService.getConceptBundle(id)
+        .subscribe(
+          (result) => this.setConcept(result),
+          (error) => this.logger.error(error)
+        );
+    }
+  }
+
+  promptContext() {
+    InputBoxDialog.open(this.modal, 'Add concept', 'Enter context name for the new concept', '')
+      .result.then(
+      (result) => this.newConcept(result)
+    );
+  }
+
+  newConcept(context: string) {
+    let concept = new Concept();
+    concept.context = context;
+    this.setConcept({
+      concept: concept,
+      related: [],
+      attributes: [],
+      deletedRelatedIds: [],
+      deletedAttributeIds: []
+    });
   }
 
   setConcept(conceptBundle: ConceptBundle) {
     this.conceptBundle = conceptBundle;
+    this.refresh();
+  }
 
+  refresh() {
     this.data = null;
     this.graph.clear();
     this.graph.assignColours([1,2,3]);
-    this.graph.addNodeData(conceptBundle.concept.id, conceptBundle.concept.context, 1, conceptBundle.concept);
-    this.updateDiagram(conceptBundle.concept.id, conceptBundle.attributes, conceptBundle.related);
+    this.graph.addNodeData(this.conceptBundle.concept.id, this.conceptBundle.concept.context, 1, this.conceptBundle.concept);
+    this.updateDiagram(this.conceptBundle.concept.id, this.conceptBundle.attributes, this.conceptBundle.related);
   }
 
   loadDetails(conceptId: number) {

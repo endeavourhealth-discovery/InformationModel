@@ -50,4 +50,8 @@ export class ConceptLibraryComponent implements OnInit {
     this.searchTerm = '';
     this.getMRU();
   }
+
+  addConcept() {
+    this.router.navigate(['concept', 'add']);
+  }
 }
