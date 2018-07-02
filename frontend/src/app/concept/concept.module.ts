@@ -6,7 +6,7 @@ import {FormsModule} from '@angular/forms';
 import {ControlsModule} from 'eds-angular4/dist/controls';
 import {ConceptLibraryComponent} from './concept-library.component';
 import {ConceptEditorComponent} from './concept-editor/concept-editor.component';
-import {NodeGraphModule} from '../node-graph/node-graph.module';
+import {NodeGraphModule} from 'eds-angular4/dist/node-graph';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {NvD3Module} from 'ng2-nvd3';
 import { ConceptDetailsComponent } from './concept-details/concept-details.component';

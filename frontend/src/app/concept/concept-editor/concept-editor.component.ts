@@ -8,12 +8,12 @@ import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConceptService} from '../concept.service';
 import {Location} from '@angular/common';
 import {RelatedConcept} from '../../models/RelatedConcept';
-import {NodeGraphComponent} from '../../node-graph/node-graph/node-graph.component';
 import {EditRelatedComponent} from '../edit-related/edit-related.component';
 import {Attribute} from '../../models/Attribute';
 import {ConceptBundle} from '../../models/ConceptBundle';
 import {ConceptReference} from '../../models/ConceptReference';
 import {ConceptSummary} from '../../models/ConceptSummary';
+import {NodeGraphComponent} from 'eds-angular4/dist/node-graph/node-graph.component';
 
 @Component({
   selector: 'app-concept-editor',

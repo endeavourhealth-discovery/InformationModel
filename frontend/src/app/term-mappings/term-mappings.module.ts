@@ -8,8 +8,8 @@ import {NvD3Module} from 'ng2-nvd3';
 import 'd3';
 import 'nvd3';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
-import {NodeGraphModule} from '../node-graph/node-graph.module';
 import {TermMappingsService} from './term-mappings.service';
+import {NodeGraphModule} from 'eds-angular4/dist/node-graph';
 
 @NgModule({
   imports: [

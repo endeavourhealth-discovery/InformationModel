@@ -39,9 +39,9 @@
                           </thead>
                           <tbody>
                             <tr class="d-flex show-child-on-hover" *ngFor="let item of conceptBundle.attributes" [ngClass]="{'selection': selectedNode == item}" (click)="selectedNode = item">
-                              <td class="col-3"><i class="fa fa-tag fa-fw"></i> {{conceptBundle.concept.context}}</td>
+                              <td class="col-3">{{conceptBundle.concept.context}}</td>
                               <td class="col-3">Has attribute</td>
-                              <td class="col-3">{{item.attribute.context}}</td>
+                              <td class="col-3"><a href="#/concept/{{item.attributeId}}">{{item.attribute.context}}</a></td>
                               <td class="col-1"><input type="checkbox" [checked]="item.mandatory" (change)="item.mandatory = !item.mandatory" name="mandatory"></td>
                               <td class="col-1">
                                 <i class="fa fa-minus" (click)="decLimit(item)"></i>
