@@ -37,9 +37,9 @@ export class ConceptPickerComponent implements OnInit {
   }
 
   new() {
-    this.selection = new Concept();
-    this.selection.context = this.criteria;
-    this.activeModal.close(this.selection);
+    let newConcept = new Concept();
+    newConcept.context = this.criteria;
+    this.activeModal.close(newConcept);
   }
 
   ok() {

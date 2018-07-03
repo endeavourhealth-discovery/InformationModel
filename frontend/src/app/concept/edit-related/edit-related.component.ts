@@ -51,7 +51,16 @@ export class EditRelatedComponent implements OnInit {
   }
 
   ok() {
-    this.activeModal.close(this.linkage);
+    if (!this.targetConcept.id) {
+      this.conceptService.save(this.targetConcept)
+        .subscribe(
+          (result) => {
+            this.targetConcept.id = result;
+            this.activeModal.close(this.linkage);
+          }
+        );
+    } else
+      this.activeModal.close(this.linkage);
   }
 
   cancel() {

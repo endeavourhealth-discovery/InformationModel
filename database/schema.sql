@@ -57,6 +57,15 @@ CREATE TABLE concept_relationship (
   CONSTRAINT concept_relationship_target_fk       FOREIGN KEY (target) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS concept_value;
+CREATE TABLE concept_value (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY          COMMENT '',
+  concept_id BIGINT NOT NULL                    COMMENT '',
+  value_data LONGTEXT                           COMMENT '',
+
+  CONSTRAINT concept_value_concept_fk           FOREIGN KEY (concept_id) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 # -- ********** TRANSACTION TABLES **********
 
 DROP TABLE IF EXISTS transaction_action;

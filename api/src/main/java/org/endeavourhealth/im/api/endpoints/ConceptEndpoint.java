@@ -76,6 +76,23 @@ public class ConceptEndpoint {
             .build();
     }
 
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.TEXT_PLAIN)
+    @Timed(absolute = true, name = "InformationModel.ConceptEndpoint.POST")
+    @ApiOperation(value = "Saves a concept")
+    public Response save(@Context SecurityContext sc,
+                         @ApiParam(value = "Concept to save") Concept concept
+    ) throws Exception {
+        LOG.debug("Save concept");
+
+        Long id = new ConceptLogic().save(concept);
+
+        return Response
+            .ok(id)
+            .build();
+    }
+
     @GET
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -176,7 +193,7 @@ public class ConceptEndpoint {
     @Path("/Bundle")
     @Timed(absolute = true, name = "InformationModel.ConceptEndpoint.Bundle.POST")
     @ApiOperation(value = "Saves a concept bundle")
-    public Response save(@Context SecurityContext sc,
+    public Response saveBundle(@Context SecurityContext sc,
                          @ApiParam(value = "Concept to save") ConceptBundle conceptBundle
     ) throws Exception {
         LOG.debug("Save concept bundle");

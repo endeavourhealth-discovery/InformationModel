@@ -81,6 +81,13 @@ public class ConceptLogic {
         for(Attribute att: conceptBundle.getAttributes()) {
             if (att.getConceptId() == null)
                 att.setConceptId(conceptId);
+
+            if (att.getId() == null) {
+                // Dynamic created attribute concept
+                System.out.println("Need to save attribute!");
+            }
+
+
             this.dal.save(att);
         }
 
