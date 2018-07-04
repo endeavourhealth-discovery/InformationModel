@@ -38,4 +38,12 @@ export class ValueSummaryComponent implements OnInit {
   editConceptValue(item: ValueSummary) {
     this.router.navigate(['value', item.id]);
   }
+
+  search() {
+
+  }
+
+  clear() {
+
+  }
 }
