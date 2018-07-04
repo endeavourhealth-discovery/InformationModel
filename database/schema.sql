@@ -57,13 +57,50 @@ CREATE TABLE concept_relationship (
   CONSTRAINT concept_relationship_target_fk       FOREIGN KEY (target) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+# -- ********** CONCEPT VALUE/INSTANCE TABLES **********
+
 DROP TABLE IF EXISTS concept_value;
 CREATE TABLE concept_value (
   id BIGINT AUTO_INCREMENT PRIMARY KEY          COMMENT '',
   concept_id BIGINT NOT NULL                    COMMENT '',
-  value_data LONGTEXT                           COMMENT '',
+  name VARCHAR(50)                              COMMENT '',
 
   CONSTRAINT concept_value_concept_fk           FOREIGN KEY (concept_id) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS concept_attribute_value;
+CREATE TABLE concept_attribute_value (
+  id BIGINT PRIMARY KEY                         COMMENT '',
+  concept_value_id BIGINT NOT NULL              COMMENT '',
+  attribute_id BIGINT NOT NULL                  COMMENT '',
+  numeric_value BIGINT                          COMMENT '',
+  text_value LONGTEXT                           COMMENT '',
+
+  KEY concept_value_id_idx (concept_value_id),
+  KEY attribute_id_numeric_value_idx (attribute_id, numeric_value),
+  CONSTRAINT concept_attribute_value_concept_value_id_fk  FOREIGN KEY (concept_value_id) REFERENCES concept_value(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT concept_attribute_value_attribute_id_fk      FOREIGN KEY (attribute_id) REFERENCES concept_attribute(id) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+DROP TABLE IF EXISTS concept_value_relationship;
+CREATE TABLE concept_value_relationship (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY              COMMENT '',
+  source BIGINT NOT NULL                            COMMENT '',
+  relationship BIGINT NOT NULL                      COMMENT '',
+  target BIGINT NOT NULL                            COMMENT '',
+
+  CONSTRAINT concept_value_relationship_source_fk       FOREIGN KEY (source) REFERENCES concept_value(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT concept_value_relationship_target_fk       FOREIGN KEY (target) REFERENCES concept_value(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT concept_value_relationship_relationship_fk FOREIGN KEY (relationship) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS concept_attribute_ui;
+CREATE TABLE concept_attribute_ui (
+  id BIGINT PRIMARY KEY                   COMMENT '',
+  template LONGTEXT NOT NULL              COMMENT '',
+
+  CONSTRAINT concept_attribute_ui_id_fk   FOREIGN KEY (id) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 # -- ********** TRANSACTION TABLES **********

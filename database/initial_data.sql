@@ -61,41 +61,46 @@ VALUES
   (1009, 1, '', 'Care home',                                 'Property.Purpose.CareHome',       0, '1.0', 'A property that is used as a care home', null, null),
 
   (1010, 1, '', 'Coding system',                             'CodingSystem',                    0, '1.0', 'A system for coding terms for subsequent use in a computable manner', null, null),
-  (1011, 1, '', 'SNOMED CT',                                 'CodingSystem.Snomed',             0, '1.0', 'The SNOMED CT coding system', null, null)
+  (1011, 1, '', 'SNOMED CT',                                 'CodingSystem.Snomed',             0, '1.0', 'The SNOMED CT coding system', null, null),
+  (1012, 4, '', 'Snomed code',                               'CodingSystem.Snomed.Code',        0, '1.0', 'Snomed CT clinical code id', null, null),
+  (1013, 5, '', 'Snomed term',                               'CodingSystem.Snomed.Term',        0, '1.0', 'Snomed CT clinical code id', null, null)
 ;
 
 INSERT INTO concept_relationship
-  (source, relationship, target, `order`, mandatory, `limit`, weighting)
+  (id, source, relationship, target, `order`, mandatory, `limit`, weighting)
 VALUES
-  (1001, 100, 1006, 0, 0, 0, 0),  -- UPRN --> Is a --> Property identifier
-  (1006, 100, 1007, 0, 0, 0, 0),  -- Property identifier --> Is a --> Property related characteristic
-  (1002, 100, 1007, 0, 0, 0, 0),  -- Property match qualifier --> Is a --> Property related characteristic
-  (1003, 100, 1002, 0, 0, 0, 0),  -- Parent property --> Is a --> Property approximation qualifier
-  (1004, 100, 1002, 0, 0, 0, 0),  -- Child property --> Is a --> Property approximation qualifier
-  (1005, 100, 1002, 0, 0, 0, 0),  -- Sibling property --> Is a --> Property approximation qualifier
-  (1008, 100, 1007, 0, 0, 0, 0),  -- Property purpose --> Is a --> Property related characteristic
-  (1009, 100, 1008, 0, 0, 0, 0)   -- Care home --> Is a --> Property purpose
+  (1, 1001, 100, 1006, 0, 0, 0, 0),  -- UPRN --> Is a --> Property identifier
+  (2, 1006, 100, 1007, 0, 0, 0, 0),  -- Property identifier --> Is a --> Property related characteristic
+  (3, 1002, 100, 1007, 0, 0, 0, 0),  -- Property match qualifier --> Is a --> Property related characteristic
+  (4, 1003, 100, 1002, 0, 0, 0, 0),  -- Parent property --> Is a --> Property approximation qualifier
+  (5, 1004, 100, 1002, 0, 0, 0, 0),  -- Child property --> Is a --> Property approximation qualifier
+  (6, 1005, 100, 1002, 0, 0, 0, 0),  -- Sibling property --> Is a --> Property approximation qualifier
+  (7, 1008, 100, 1007, 0, 0, 0, 0),  -- Property purpose --> Is a --> Property related characteristic
+  (8, 1009, 100, 1008, 0, 0, 0, 0),  -- Care home --> Is a --> Property purpose
+  (9, 1011, 100, 1010, 0, 0, 0, 0)   -- CodingSystem.Snomed --> Is a --> CodingSystem
 ;
 
 INSERT INTO concept_attribute
-  (concept_id, attribute_id, `order`, mandatory, `limit`)
+  (id, concept_id, attribute_id, `order`, mandatory, `limit`)
 VALUES
-  (1000, 1001, 0, 0, 1),          -- Property has UPRN (0:1)
-  (1000, 1008, 1, 1, 1)           -- Property has purpose (1:1)
+  (1, 1000, 1001, 0, 0, 1),          -- Property has UPRN (0:1)
+  (2, 1000, 1008, 1, 1, 1),          -- Property has purpose (1:1)
+  (3, 1011, 1012, 1, 1, 1),          -- Snomed concept has a code (1:1)
+  (4, 1011, 1013, 2, 1, 1)           -- Snomed concept has a term (1:1)
 ;
-#
-# INSERT INTO record_type
-#   (id, inherits_from)
-# VALUES
-#   (1000, null);
-#
-# INSERT INTO record_type_attribute
-#   (record_type, data_type, value, mandatory, unlimited)
-# VALUES
-#   (1000, 1001,  5, 1, 1),
-#   (1000, 1002, 10, 0, 0),
-#   (1000, 1008, 10, 0, 0);
-#
-# INSERT INTO table_id (table_name, id)
-#   SELECT 'concept', MAX(id) + 1 as id
-#   FROM concept;
+
+INSERT INTO concept_value
+  (id, concept_id, name)
+VALUES
+  (1, 1011, 'Asthma'),                      -- Snomed Asthma concept
+  (2, 1011, 'Respiratory disorder')         -- Snomed Respiratory disorder concept
+;
+
+INSERT INTO concept_attribute_value
+  (id, concept_value_id, attribute_id, numeric_value, text_value)
+VALUES
+  (1, 1, 3, 195967001, null),
+  (2, 1, 4, null, 'Hyperreactive airway disease'),
+  (3, 2, 3, 50043002, null),
+  (4, 2, 4, null, 'Disorder of respiratory system')
+;
