@@ -89,9 +89,9 @@
           </div>
           <div class="col-md-4 row-">
             <div class="card h-100" id="relatedGraph">
-              <div class="card-header card-success"><h4>Diagram<small> (double-click to expand)</small></h4> </div>
+              <div class="card-header card-success"><h4>Diagram<small> (double-click to expand)</small><button class="btn pull-right" (click)="zoom()">Zoom</button></h4></div>
               <div class="card-block">
-                <nodeGraph #nodeGraph (nodeClick)="nodeClick($event)" (nodeDblClick)="nodeDblClick($event)"></nodeGraph>
+                <nodeGraph #nodeGraph (nodeClick)="nodeClick($event)" (nodeDblClick)="nodeDblClick($event)" ></nodeGraph>
               </div>
             </div>
           </div>

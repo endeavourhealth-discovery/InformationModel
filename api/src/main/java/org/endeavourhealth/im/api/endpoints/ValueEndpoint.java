@@ -4,6 +4,7 @@ import com.codahale.metrics.annotation.Timed;
 import io.astefanutti.metrics.aspectj.Metrics;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.endeavourhealth.im.api.logic.ValueLogic;
 import org.endeavourhealth.im.common.models.*;
 import org.slf4j.Logger;
@@ -37,6 +38,24 @@ public class ValueEndpoint {
             .entity(result)
             .build();
     }
+
+    @GET
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Timed(absolute = true, name = "InformationModel.ValueEndpoint.GET")
+    @ApiOperation(value = "Returns concept value by id")
+    public Response get(@Context SecurityContext sc,
+                        @ApiParam(value = "Id") @QueryParam("id") Long id
+    ) throws Exception {
+        LOG.debug("Get concept value");
+
+        ValueSummary result = new ValueLogic().get(id);
+
+        return Response
+            .ok()
+            .entity(result)
+            .build();
+    }
 /*
     @GET
     @Path("/Search")
@@ -56,23 +75,6 @@ public class ValueEndpoint {
             .build();
     }
 
-    @GET
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    @Timed(absolute = true, name = "InformationModel.ConceptEndpoint.GET")
-    @ApiOperation(value = "Returns Concept by id")
-    public Response get(@Context SecurityContext sc,
-                        @ApiParam(value = "Concept Id") @QueryParam("id") Long id
-    ) throws Exception {
-        LOG.debug("Get concept");
-
-        Concept result = new ConceptLogic().get(id);
-
-        return Response
-            .ok()
-            .entity(result)
-            .build();
-    }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)

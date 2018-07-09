@@ -11,6 +11,7 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {NvD3Module} from 'ng2-nvd3';
 import { ConceptDetailsComponent } from './concept-details/concept-details.component';
 import { EditRelatedComponent } from './edit-related/edit-related.component';
+import { NodeGraphDialogComponent } from './node-graph-dialog/node-graph-dialog.component';
 
 @NgModule({
   imports: [
@@ -21,8 +22,8 @@ import { EditRelatedComponent } from './edit-related/edit-related.component';
     NgbModule,
     NodeGraphModule
   ],
-  declarations: [ConceptPickerComponent, ConceptLibraryComponent, ConceptEditorComponent, ConceptDetailsComponent, EditRelatedComponent],
-  entryComponents: [ConceptPickerComponent, EditRelatedComponent],
+  declarations: [ConceptPickerComponent, ConceptLibraryComponent, ConceptEditorComponent, ConceptDetailsComponent, EditRelatedComponent, NodeGraphDialogComponent],
+  entryComponents: [ConceptPickerComponent, EditRelatedComponent, NodeGraphDialogComponent],
   providers: [ConceptService]
 })
 export class ConceptModule { }

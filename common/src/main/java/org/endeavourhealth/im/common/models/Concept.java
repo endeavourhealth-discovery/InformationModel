@@ -11,6 +11,8 @@ public class Concept extends DbEntity<Concept> {
     private String expression;
     private String criteria;
     private Long useCount;
+    private Boolean autoTemplate = true;
+    private String template;
 
     public ConceptReference getType() {
         return type;
@@ -99,6 +101,24 @@ public class Concept extends DbEntity<Concept> {
 
     public Concept setUseCount(Long useCount) {
         this.useCount = useCount;
+        return this;
+    }
+
+    public Boolean getAutoTemplate() {
+        return autoTemplate;
+    }
+
+    public Concept setAutoTemplate(Boolean autoTemplate) {
+        this.autoTemplate = autoTemplate;
+        return this;
+    }
+
+    public String getTemplate() {
+        return template;
+    }
+
+    public Concept setTemplate(String template) {
+        this.template = template;
         return this;
     }
 }

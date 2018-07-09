@@ -119,7 +119,7 @@ export class TermMappingsEditorComponent implements AfterViewInit {
       contextName = this.model.context + '.' + contextName;
     }
 
-    InputBoxDialog.open(this.modal, 'Create new concept', 'Create a new concept with the context name', contextName)
+    InputBoxDialog.open(this.modal, 'Create new concept', 'Create a new concept with the context name', contextName, 'OK', 'Cancel')
       .result.then(
       (result) => { concept.context = result; this.createAndAddRelatedConcept(concept); },
       (error) => this.logger.error(error )

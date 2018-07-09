@@ -17,4 +17,8 @@ public class ValueLogic {
     public ValueSummaryList getMRU() throws Exception {
         return dal.getMRU();
     }
+
+    public ValueSummary get(Long id) throws Exception {
+        return dal.get(id);
+    }
 }

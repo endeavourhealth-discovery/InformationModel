@@ -35,6 +35,27 @@ public class ValueJDBCDAL implements ValueDAL {
         }
     }
 
+    @Override
+    public ValueSummary get(Long id) throws Exception {
+        Connection conn = ConnectionPool.InformationModel.pop();
+        String sql = "SELECT v.id, v.concept_id, v.name, c.context " +
+            "FROM concept_value v " +
+            "JOIN concept c ON c.id = v.concept_id " +
+            "WHERE v.id = ?";
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, id);
+
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next())
+                return getValueSummary(rs);
+            else
+                return null;
+        } finally {
+            ConnectionPool.InformationModel.push(conn);
+        }
+    }
+
     private List<ValueSummary> getSummaryResultSet(PreparedStatement stmt) throws SQLException {
         List<ValueSummary> result = new ArrayList<>();
 

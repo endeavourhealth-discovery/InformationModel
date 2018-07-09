@@ -22,7 +22,9 @@ CREATE TABLE concept(
   description VARCHAR(4096)                     COMMENT 'Full textual description of the concept',
   expression VARCHAR(1024)                      COMMENT 'Definition of this concept, based on other concepts, using ECL',
   criteria VARCHAR(1024)                        COMMENT 'Definition of this concept, using a criteria in D/IMQL',
-  use_count BIGINT NOT NULL DEFAULT 0           COMMENT 'Counter for number of occurrences of use (could be used for ordering?)'
+  use_count BIGINT NOT NULL DEFAULT 0           COMMENT 'Counter for number of occurrences of use (could be used for ordering?)',
+  auto_template BOOLEAN NOT NULL DEFAULT 1      COMMENT 'Flag denoting system generated value template',
+  template LONGTEXT                             COMMENT 'Angular html template for editing values of this concept type'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS concept_attribute;

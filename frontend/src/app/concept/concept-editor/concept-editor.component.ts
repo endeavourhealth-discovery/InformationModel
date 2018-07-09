@@ -14,6 +14,7 @@ import {ConceptBundle} from '../../models/ConceptBundle';
 import {ConceptReference} from '../../models/ConceptReference';
 import {ConceptSummary} from '../../models/ConceptSummary';
 import {NodeGraphComponent} from 'eds-angular4/dist/node-graph/node-graph.component';
+import {NodeGraphDialogComponent} from '../node-graph-dialog/node-graph-dialog.component';
 
 @Component({
   selector: 'app-concept-editor',
@@ -60,7 +61,7 @@ export class ConceptEditorComponent implements AfterViewInit {
   }
 
   promptContext() {
-    InputBoxDialog.open(this.modal, 'Add concept', 'Enter context name for the new concept', '')
+    InputBoxDialog.open(this.modal, 'Add concept', 'Enter context name for the new concept', '', 'OK', 'Cancel')
       .result.then(
       (result) => this.newConcept(result)
     );
@@ -86,32 +87,39 @@ export class ConceptEditorComponent implements AfterViewInit {
   refresh() {
     this.data = null;
     this.graph.clear();
-    this.graph.assignColours([1,2,3]);
+    this.graph.assignColours([1,2,3,0]);
     this.graph.addNodeData(this.conceptBundle.concept.id, this.conceptBundle.concept.context, 1, this.conceptBundle.concept);
-    this.updateDiagram(this.conceptBundle.concept.id, this.conceptBundle.attributes, this.conceptBundle.related);
+
+    this.updateDiagram(this.conceptBundle.concept, this.conceptBundle.attributes, this.conceptBundle.related);
   }
 
   loadDetails(conceptId: number) {
     this.conceptService.getConceptBundle(conceptId)
       .subscribe(
-        (result) => this.updateDiagram(result.concept.id, result.attributes, result.related),
+        (result) => this.updateDiagram(result.concept, result.attributes, result.related),
         (error) => this.logger.error(error)
       );
   }
 
-  updateDiagram(conceptId: number, attributes: Attribute[], related: RelatedConcept[]) {
+  updateDiagram(concept: Concept, attributes: Attribute[], related: RelatedConcept[]) {
+    // Base type (if not base "Concept")
+    if (concept.type.id != 1) {
+      this.graph.addNodeData(concept.type.id, concept.type.text, 0, concept.type);
+      this.graph.addEdgeData(concept.id, concept.type.id, 'Is type', concept.type);
+    }
+
     for (let attribute of attributes) {
       this.graph.addNodeData(attribute.attributeId, attribute.attribute.context, 3, attribute);
-      this.graph.addEdgeData(conceptId, attribute.attributeId, 'Has attribute', attribute);
+      this.graph.addEdgeData(concept.id, attribute.attributeId, 'Has attribute', attribute);
     }
 
     for (let item of related) {
-      if (item.sourceId == conceptId) {
+      if (item.sourceId == concept.id) {
         this.graph.addNodeData(item.targetId, item.target.context, 2, item);
-        this.graph.addEdgeData(conceptId, item.targetId, item.relationship.text, item);
+        this.graph.addEdgeData(concept.id, item.targetId, item.relationship.text, item);
       } else {
         this.graph.addNodeData(item.sourceId, item.source.context, 2, item);
-        this.graph.addEdgeData(item.sourceId, conceptId, item.relationship.text, item);
+        this.graph.addEdgeData(item.sourceId, concept.id, item.relationship.text, item);
       }
     }
 
@@ -163,7 +171,7 @@ export class ConceptEditorComponent implements AfterViewInit {
         order: this.conceptBundle.attributes.length + 1
       };
       this.conceptBundle.attributes.push(attribute);
-      this.updateDiagram(this.conceptBundle.concept.id, [attribute], []);
+      this.updateDiagram(this.conceptBundle.concept, [attribute], []);
     } else {
       let related: RelatedConcept = {
         id: null,
@@ -177,7 +185,7 @@ export class ConceptEditorComponent implements AfterViewInit {
         order: this.conceptBundle.related.length + 1
       };
       this.conceptBundle.related.push(related);
-      this.updateDiagram(this.conceptBundle.concept.id, [], [related]);
+      this.updateDiagram(this.conceptBundle.concept, [], [related]);
     }
   }
 
@@ -228,6 +236,13 @@ export class ConceptEditorComponent implements AfterViewInit {
       if (relatedConcept.id > 0)
         this.conceptBundle.deletedRelatedIds.push(relatedConcept.id);
     }
+  }
+
+  zoom() {
+    NodeGraphDialogComponent.open(this.modal, 'Concept graph', this.graph.nodeData, this.graph.edgeData)
+      .result.then(
+      () => {}
+    );
   }
 
   save() {

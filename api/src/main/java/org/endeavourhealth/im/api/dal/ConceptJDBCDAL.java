@@ -370,7 +370,9 @@ public class ConceptJDBCDAL implements ConceptDAL {
             .setExpression(rs.getString("Expression"))
             .setUrl(rs.getString("url"))
             .setVersion(rs.getString("version"))
-            .setStatus(ConceptStatus.byValue(rs.getByte("status")));
+            .setStatus(ConceptStatus.byValue(rs.getByte("status")))
+            .setAutoTemplate(rs.getBoolean("auto_template"))
+            .setTemplate(rs.getString("template"));
     }
 
     private void checkAndResolve(ConceptReference ref) throws SQLException {
