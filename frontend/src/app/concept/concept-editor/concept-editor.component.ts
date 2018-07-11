@@ -67,6 +67,20 @@ export class ConceptEditorComponent implements AfterViewInit {
     );
   }
 
+  changeType() {
+    ConceptPickerComponent.open(this.modal, false)
+      .result.then(
+      (result) => this.setType(result)
+    );
+  }
+
+  setType(type: ConceptSummary) {
+    this.conceptBundle.concept.type = {
+      id: type.id,
+      text: type.fullName
+    };
+  }
+
   newConcept(context: string) {
     let concept = new Concept();
     concept.context = context;
@@ -88,7 +102,7 @@ export class ConceptEditorComponent implements AfterViewInit {
     this.data = null;
     this.graph.clear();
     this.graph.assignColours([1,2,3,0]);
-    this.graph.addNodeData(this.conceptBundle.concept.id, this.conceptBundle.concept.context, 1, this.conceptBundle.concept);
+    this.graph.addNodeData(this.conceptBundle.concept.id, this.conceptBundle.concept.fullName, 1, this.conceptBundle.concept);
 
     this.updateDiagram(this.conceptBundle.concept, this.conceptBundle.attributes, this.conceptBundle.related);
   }
@@ -105,7 +119,7 @@ export class ConceptEditorComponent implements AfterViewInit {
     // Base type (if not base "Concept")
     if (concept.type.id != 1) {
       this.graph.addNodeData(concept.type.id, concept.type.text, 0, concept.type);
-      this.graph.addEdgeData(concept.id, concept.type.id, 'Is type', concept.type);
+      this.graph.addEdgeData(concept.id, concept.type.id, 'Inherits from', concept.type);
     }
 
     for (let attribute of attributes) {
@@ -115,10 +129,10 @@ export class ConceptEditorComponent implements AfterViewInit {
 
     for (let item of related) {
       if (item.sourceId == concept.id) {
-        this.graph.addNodeData(item.targetId, item.target.context, 2, item);
+        this.graph.addNodeData(item.targetId, item.target.fullName, 2, item);
         this.graph.addEdgeData(concept.id, item.targetId, item.relationship.text, item);
       } else {
-        this.graph.addNodeData(item.sourceId, item.source.context, 2, item);
+        this.graph.addNodeData(item.sourceId, item.source.fullName, 2, item);
         this.graph.addEdgeData(item.sourceId, concept.id, item.relationship.text, item);
       }
     }

@@ -4,7 +4,7 @@
     <input class="form-control" id="conceptName" type="text" [(ngModel)]="model.fullName" name="conceptName" [readonly]="readonly">
   </div>
   <div class="col-md-6 col-lg-4 form-group">
-    <label for="conceptType">Type</label>
+    <label for="conceptType">Inherits from</label>
     <div class="input-group">
       <input class="form-control" id="conceptType" type="text" value="{{model.type.text}}" name="conceptType" readonly>
       <button *ngIf="!model.id" class="input-group-addon" type="button" (click)="pickType()"><i class="fa fa-search"></i></button>
