@@ -1,7 +1,10 @@
 package org.endeavourhealth.im.api.dal;
 
+import org.endeavourhealth.im.api.models.ConceptRuleSet;
 import org.endeavourhealth.im.common.models.*;
 
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
 
 public interface ConceptDAL {
@@ -20,6 +23,8 @@ public interface ConceptDAL {
     void deleteAttribute(Long attributeId) throws Exception;
 
     void deleteRelationship(Long relId) throws Exception;
+
+    List<ConceptRuleSet> getConceptRuleSets(Long conceptId) throws SQLException, IOException;
 /*
 
 

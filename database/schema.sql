@@ -178,6 +178,19 @@ CREATE TABLE term_mapping (
   CONSTRAINT term_mapping_term_id_fk FOREIGN KEY (concept_id) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+-- ********** CONCEPT RULE TABLES **********
+DROP TABLE IF EXISTS concept_rule;
+CREATE TABLE concept_rule (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY          COMMENT '',
+  concept_id BIGINT NOT NULL                    COMMENT '',
+  target_id BIGINT NOT NULL                     COMMENT '',
+  run_order INT NOT NULL DEFAULT 0              COMMENT '',
+  ruleset LONGTEXT                              COMMENT '',
+
+  CONSTRAINT concept_rule_concept_id_fk FOREIGN KEY (concept_id) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT concept_rule_target_id_fk FOREIGN KEY (target_id) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 -- ********** INBOUND MESSAGE TABLES **********
 #
 # DROP TABLE IF EXISTS message;

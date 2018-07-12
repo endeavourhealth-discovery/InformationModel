@@ -204,4 +204,23 @@ public class ConceptEndpoint {
             .ok()
             .build();
     }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/Calculate")
+    @Timed(absolute = true, name = "InformationModel.ConceptEndpoint.Calculate.GET")
+    @ApiOperation(value = "Returns Concept by JSON")
+    public Response calculate(@Context SecurityContext sc,
+                        @ApiParam(value = "JSON") String json
+    ) throws Exception {
+        LOG.debug("Get concept");
+
+        Concept result = new ConceptLogic().calculate(json);
+
+        return Response
+            .ok()
+            .entity(result)
+            .build();
+    }
 }

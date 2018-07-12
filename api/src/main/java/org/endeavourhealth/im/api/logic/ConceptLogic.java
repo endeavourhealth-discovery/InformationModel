@@ -1,12 +1,15 @@
 package org.endeavourhealth.im.api.logic;
 
-import org.bouncycastle.util.Arrays;
+import com.fasterxml.jackson.databind.JsonNode;
+import org.endeavourhealth.common.cache.ObjectMapperPool;
 import org.endeavourhealth.im.api.dal.ConceptDAL;
 import org.endeavourhealth.im.api.dal.ConceptJDBCDAL;
+import org.endeavourhealth.im.api.models.ConceptRule;
+import org.endeavourhealth.im.api.models.ConceptRuleSet;
 import org.endeavourhealth.im.common.models.*;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ConceptLogic {
@@ -134,6 +137,81 @@ public class ConceptLogic {
         conceptBundle.getConcept().setTemplate(sb.toString());
     }
 
+    public Concept calculate(String json) throws Exception {
+        JsonNode object = ObjectMapperPool.getInstance().readTree(json);
+
+        return calculateChild(object, 1L);  // Call with root "Concept"
+    }
+
+    private Concept calculateChild(JsonNode object, Long conceptId) throws Exception {
+        List<ConceptRuleSet> ruleSets = this.dal.getConceptRuleSets(conceptId);
+
+        // If no rulesets then we're at the bottom so have found the concept
+        if (ruleSets == null || ruleSets.isEmpty())
+            return this.dal.get(conceptId);
+
+        // Otherwise, find matching child
+        for(ConceptRuleSet ruleSet: ruleSets) {
+            if (meetsCriteria(object, ruleSet))
+                return calculateChild(object, ruleSet.getTargetId());
+        }
+
+        Concept c = this.dal.get(conceptId);
+        System.out.println("Its a new/unknown type of " + c.getFullName() + " (" + c.getContext() + ")");
+        return null;    // TODO: Create draft concept or task
+    }
+
+    private Boolean meetsCriteria(JsonNode object, ConceptRuleSet ruleSet) {
+        for (ConceptRule rule: ruleSet.getRules()) {
+           if(testRule(object, rule) == false)
+               return false;
+        }
+        return true;
+    }
+
+    private Boolean testRule(JsonNode object, ConceptRule rule) {
+        try {
+            String value = getNodeValue(object, rule.getProperty());
+            System.out.println(value);
+
+            return compare(value, rule.getValue(), rule.getComparator());
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+    }
+
+    private String getNodeValue(JsonNode object, String path) {
+        JsonNode find = object;
+        String[] nodes = path.split("\\.");
+
+        for (String node : nodes) {
+            find = find.get(node);
+
+            if (find == null)
+                throw new IllegalArgumentException("Path not found ["+path+"]");
+        }
+
+        return find.textValue();
+    }
+
+    private Boolean compare(String val1, String val2, String comparator) {
+        if ("=".equals(comparator))
+            return val1.equals(val2);
+        if ("<".equals(comparator))
+            return val1.compareTo(val2) < 0;
+        if ("<=".equals(comparator))
+            return val1.compareTo(val2) <= 0;
+        if (">".equals(comparator))
+            return val1.compareTo(val2) > 0;
+        if (">=".equals(comparator))
+            return val1.compareTo(val2) >= 0;
+        if ("in".equals(comparator)) {
+            List<String> vals = Arrays.asList(val2.split(","));
+            return vals.contains(val1);
+        }
+
+        throw new IllegalArgumentException("Unknown comparator ["+comparator+"]");
+    }
     /*
 
 

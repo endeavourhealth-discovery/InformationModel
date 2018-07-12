@@ -63,7 +63,13 @@ VALUES
   (1010, 1, '', 'Coding system',                             'CodingSystem',                    0, '1.0', 'A system for coding terms for subsequent use in a computable manner', null, null),
   (1011, 1, '', 'SNOMED CT',                                 'CodingSystem.Snomed',             0, '1.0', 'The SNOMED CT coding system', null, null),
   (1012, 4, '', 'Snomed code',                               'CodingSystem.Snomed.Code',        0, '1.0', 'Snomed CT clinical code id', null, null),
-  (1013, 5, '', 'Snomed term',                               'CodingSystem.Snomed.Term',        0, '1.0', 'Snomed CT clinical code id', null, null)
+  (1013, 5, '', 'Snomed term',                               'CodingSystem.Snomed.Term',        0, '1.0', 'Snomed CT clinical code id', null, null),
+
+  (1014, 1, '', 'Observation',                               'Observation',                     0, '1.0', 'Clinical observation', null, null),
+  (1015, 1, '', 'Lab result',                                'Observation.Lab',                 0, '1.0', 'Observation containing a lab result', null, null),
+  (1016, 1, '', 'Haemoglobin estimation',                    'HaemoglobinEstimation',           0, '1.0', 'Haemoglobin estimation', null, null),
+  (1017, 1, '', 'Haemoglobin estimation (g/l)',              'HaemoglobinEstimation.G/L',       0, '1.0', 'Haemoglobin estimation (UOM = g/l)', null, null),
+  (1018, 1, '', 'Haemoglobin estimation (g/dl)',             'HaemoglobinEstimation.G/DL',      0, '1.0', 'Haemoglobin estimation (UOM = g/dl)', null, null)
 ;
 
 INSERT INTO concept_relationship
@@ -103,4 +109,15 @@ VALUES
   (2, 1, 4, null, 'Hyperreactive airway disease'),
   (3, 2, 3, 50043002, null),
   (4, 2, 4, null, 'Disorder of respiratory system')
+;
+
+-- ********** CONCEPT RULES **********
+INSERT INTO concept_rule
+  (concept_id, target_id, run_order, ruleset)
+VALUES
+  (1,    1014, 0, '[{"property": "resourceType", "comparator": "=", "value": "Observation"}]'),                      -- ROOT -> Obs
+  (1014, 1015, 0, '[{"property": "category.coding.code", "comparator": "=", "value": "laboratory"}]'),               -- Obs -> Lab
+  (1015, 1016, 0, '[{"property": "code.coding.code", "comparator": "in", "value": "1003671000000109, 443911005"}]'), -- Lab -> Haem Est. NOTE: Could skip this level and add rule to below
+  (1016, 1017, 0, '[{"property": "valueQuantity.unit", "comparator": "=", "value": "g/l"}]'),                        -- Haem Est. -> Haem Est. g/l
+  (1016, 1018, 1, '[{"property": "valueQuantity.unit", "comparator": "=", "value": "g/dl"}]')                        -- Haem Est. -> Haem Est. g/dl
 ;
