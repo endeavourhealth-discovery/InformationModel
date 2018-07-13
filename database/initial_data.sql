@@ -113,11 +113,17 @@ VALUES
 
 -- ********** CONCEPT RULES **********
 INSERT INTO concept_rule
-  (concept_id, target_id, run_order, ruleset)
+  (concept_id, target_id, run_order, resource_type, ruleset)
 VALUES
-  (1,    1014, 0, '[{"property": "resourceType", "comparator": "=", "value": "Observation"}]'),                      -- ROOT -> Obs
-  (1014, 1015, 0, '[{"property": "category.coding.code", "comparator": "=", "value": "laboratory"}]'),               -- Obs -> Lab
-  (1015, 1016, 0, '[{"property": "code.coding.code", "comparator": "in", "value": "1003671000000109, 443911005"}]'), -- Lab -> Haem Est. NOTE: Could skip this level and add rule to below
-  (1016, 1017, 0, '[{"property": "valueQuantity.unit", "comparator": "=", "value": "g/l"}]'),                        -- Haem Est. -> Haem Est. g/l
-  (1016, 1018, 1, '[{"property": "valueQuantity.unit", "comparator": "=", "value": "g/dl"}]')                        -- Haem Est. -> Haem Est. g/dl
+  (1,    1014, 0, 'Observation', '[]'),                                                                                             -- ROOT -> Obs
+  (1014, 1015, 0, 'Observation', '[{"property": "category.coding.code", "comparator": "=", "value": "laboratory"}]'),               -- Obs -> Lab
+  (1015, 1016, 0, 'Observation', '[{"property": "code.coding.code", "comparator": "in", "value": "1003671000000109, 443911005"}]'), -- Lab -> Haem Est. NOTE: Could skip this level and add rule to below
+  (1016, 1017, 0, 'Observation', '[{"property": "valueQuantity.unit", "comparator": "=", "value": "g/l"}]'),                        -- Haem Est. -> Haem Est. g/l
+  (1016, 1018, 1, 'Observation', '[{"property": "valueQuantity.unit", "comparator": "=", "value": "g/dl"}]'),                       -- Haem Est. -> Haem Est. g/dl
+
+  (1,       7, 0, 'CodeableConcept', '[]'),                                                                                         -- ROOT -> Codeable Concept
+  (7,    1016, 0, 'CodeableConcept', '[{"property": "coding.system", "comparator": "=", "value": "SnomedCT"},
+                                       {"property": "coding.code", "comparator": "in", "value": "1003671000000109"}]'),             -- Snomed 1003671000000109 -> Haem Est.
+  (7,    1016, 1, 'CodeableConcept', '[{"property": "coding.system", "comparator": "=", "value": "OPCS"},
+                                       {"property": "coding.code", "comparator": "=", "value": "12345"}]')                          -- OPCS 12345 -> Haem Est.
 ;

@@ -184,6 +184,7 @@ CREATE TABLE concept_rule (
   id BIGINT AUTO_INCREMENT PRIMARY KEY          COMMENT '',
   concept_id BIGINT NOT NULL                    COMMENT '',
   target_id BIGINT NOT NULL                     COMMENT '',
+  resource_type VARCHAR(100)                    COMMENT '',
   run_order INT NOT NULL DEFAULT 0              COMMENT '',
   ruleset LONGTEXT                              COMMENT '',
 

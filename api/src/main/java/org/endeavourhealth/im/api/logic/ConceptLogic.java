@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.endeavourhealth.common.cache.ObjectMapperPool;
 import org.endeavourhealth.im.api.dal.ConceptDAL;
 import org.endeavourhealth.im.api.dal.ConceptJDBCDAL;
-import org.endeavourhealth.im.api.models.ConceptRule;
-import org.endeavourhealth.im.api.models.ConceptRuleSet;
+import org.endeavourhealth.im.common.models.ConceptRule;
+import org.endeavourhealth.im.common.models.ConceptRuleSet;
 import org.endeavourhealth.im.common.models.*;
 
 import java.util.ArrayList;
@@ -42,7 +42,8 @@ public class ConceptLogic {
         return new ConceptBundle()
             .setConcept(this.dal.get(id))
             .setAttributes(this.getAttributes(id))
-            .setRelated(this.getRelated(id));
+            .setRelated(this.getRelated(id))
+            .setRuleSets(this.getRuleSets(id));
     }
 
     public List<Attribute> getAttributes(Long id) throws Exception {
@@ -66,6 +67,10 @@ public class ConceptLogic {
 
     public List<ConceptReference> getRelationships() throws Exception {
         return this.dal.getRelationships();
+    }
+
+    public List<ConceptRuleSet> getRuleSets(Long id) throws Exception {
+        return this.dal.getConceptRuleSets(id, null);
     }
 
     public Long save(Concept concept) throws Exception {
@@ -137,27 +142,39 @@ public class ConceptLogic {
         conceptBundle.getConcept().setTemplate(sb.toString());
     }
 
-    public Concept calculate(String json) throws Exception {
+    public CalculationResult calculate(String json) throws Exception {
         JsonNode object = ObjectMapperPool.getInstance().readTree(json);
 
-        return calculateChild(object, 1L);  // Call with root "Concept"
+        String resourceType = object.has("resourceType") ? object.get("resourceType").textValue() : null;
+
+        CalculationResult result = new CalculationResult();
+
+        ConceptReference rootConcept = new ConceptReference().setId(1L).setText("Concept");
+
+        return calculateChild(resourceType, object, rootConcept, result);  // Call with root "Concept"
     }
 
-    private Concept calculateChild(JsonNode object, Long conceptId) throws Exception {
-        List<ConceptRuleSet> ruleSets = this.dal.getConceptRuleSets(conceptId);
+    private CalculationResult calculateChild(String resourceType, JsonNode object, ConceptReference concept, CalculationResult result) throws Exception {
+        List<ConceptRuleSet> ruleSets = this.dal.getConceptRuleSets(concept.getId(), resourceType);
+        result.getStackTrace().add(concept);
 
         // If no rulesets then we're at the bottom so have found the concept
-        if (ruleSets == null || ruleSets.isEmpty())
-            return this.dal.get(conceptId);
+        if (ruleSets == null || ruleSets.isEmpty()) {
+            result.setResult(this.dal.get(concept.getId()));
+            result.setStatus(0);    // OK
+            return result;
+        }
 
         // Otherwise, find matching child
         for(ConceptRuleSet ruleSet: ruleSets) {
             if (meetsCriteria(object, ruleSet))
-                return calculateChild(object, ruleSet.getTargetId());
+                return calculateChild(resourceType, object, ruleSet.getTarget(), result);
         }
 
-        Concept c = this.dal.get(conceptId);
+        Concept c = this.dal.get(concept.getId());
         System.out.println("Its a new/unknown type of " + c.getFullName() + " (" + c.getContext() + ")");
+        result.setResult(c);
+        result.setStatus(1); // Create draft concept/task
         return null;    // TODO: Create draft concept or task
     }
 

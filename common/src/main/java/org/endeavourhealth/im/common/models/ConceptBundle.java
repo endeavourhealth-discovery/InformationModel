@@ -7,8 +7,10 @@ public class ConceptBundle {
     private Concept concept;
     private List<Attribute> attributes = new ArrayList<>();
     private List<RelatedConcept> related = new ArrayList<>();
+    private List<ConceptRuleSet> ruleSets = new ArrayList<>();
     private List<Long> deletedAttributeIds = new ArrayList<>();
     private List<Long> deletedRelatedIds = new ArrayList<>();
+    private List<Long> deletedRuleSetIds = new ArrayList<>();
 
     public Concept getConcept() {
         return concept;
@@ -52,6 +54,24 @@ public class ConceptBundle {
 
     public ConceptBundle setDeletedRelatedIds(List<Long> deletedRelatedIds) {
         this.deletedRelatedIds = deletedRelatedIds;
+        return this;
+    }
+
+    public List<ConceptRuleSet> getRuleSets() {
+        return ruleSets;
+    }
+
+    public ConceptBundle setRuleSets(List<ConceptRuleSet> ruleSets) {
+        this.ruleSets = ruleSets;
+        return this;
+    }
+
+    public List<Long> getDeletedRuleSetIds() {
+        return deletedRuleSetIds;
+    }
+
+    public ConceptBundle setDeletedRuleSetIds(List<Long> deletedRuleSetIds) {
+        this.deletedRuleSetIds = deletedRuleSetIds;
         return this;
     }
 }

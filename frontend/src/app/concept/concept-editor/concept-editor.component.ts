@@ -15,6 +15,7 @@ import {ConceptReference} from '../../models/ConceptReference';
 import {ConceptSummary} from '../../models/ConceptSummary';
 import {NodeGraphComponent} from 'eds-angular4/dist/node-graph/node-graph.component';
 import {NodeGraphDialogComponent} from '../node-graph-dialog/node-graph-dialog.component';
+import {ConceptRuleset} from '../../models/ConceptRuleset';
 
 @Component({
   selector: 'app-concept-editor',
@@ -88,8 +89,10 @@ export class ConceptEditorComponent implements AfterViewInit {
       concept: concept,
       related: [],
       attributes: [],
+      ruleSets: [],
       deletedRelatedIds: [],
-      deletedAttributeIds: []
+      deletedAttributeIds: [],
+      deletedRuleSetIds: []
     });
   }
 
@@ -250,6 +253,17 @@ export class ConceptEditorComponent implements AfterViewInit {
       if (relatedConcept.id > 0)
         this.conceptBundle.deletedRelatedIds.push(relatedConcept.id);
     }
+  }
+
+  getRuleText(item: ConceptRuleset) {
+    let ruleText: string = '';
+    for(let i in item.rules) {
+      if (i !== '0')
+        ruleText += ' AND ';
+      ruleText += item.rules[i].property + " " + item.rules[i].comparator + " " + item.rules[i].value;
+    }
+
+    return ruleText;
   }
 
   zoom() {

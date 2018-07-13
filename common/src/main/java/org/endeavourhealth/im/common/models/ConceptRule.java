@@ -1,4 +1,4 @@
-package org.endeavourhealth.im.api.models;
+package org.endeavourhealth.im.common.models;
 
 public class ConceptRule {
     private String property;

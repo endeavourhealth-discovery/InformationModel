@@ -4,15 +4,14 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import org.endeavourhealth.common.cache.ObjectMapperPool;
 import org.endeavourhealth.im.api.dal.filer.IMFilerDAL;
 import org.endeavourhealth.im.api.dal.filer.IMFilerJDBCDAL;
-import org.endeavourhealth.im.api.models.ConceptRule;
-import org.endeavourhealth.im.api.models.ConceptRuleSet;
+import org.endeavourhealth.im.common.models.ConceptRule;
+import org.endeavourhealth.im.common.models.ConceptRuleSet;
 import org.endeavourhealth.im.api.models.TransactionAction;
 import org.endeavourhealth.im.api.models.TransactionTable;
 import org.endeavourhealth.im.common.models.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -341,8 +340,16 @@ public class ConceptJDBCDAL implements ConceptDAL {
     }
 
     @Override
-    public List<ConceptRuleSet> getConceptRuleSets(Long conceptId) throws SQLException, IOException {
-        String sql = "SELECT * FROM concept_rule WHERE concept_id = ? ORDER BY run_order";
+    public List<ConceptRuleSet> getConceptRuleSets(Long conceptId, String resourceType) throws Exception {
+        String sql = "SELECT r.*, c.full_name " +
+            "FROM concept_rule r " +
+            "JOIN concept c ON c.id = r.target_id " +
+            "WHERE r.concept_id = ? ";
+
+        if (resourceType!=null && !resourceType.isEmpty())
+            sql += "AND r.resource_type = ? ";
+
+        sql += "ORDER BY r.run_order ";
 
         Connection conn = ConnectionPool.InformationModel.pop();
 
@@ -350,15 +357,23 @@ public class ConceptJDBCDAL implements ConceptDAL {
 
         try(PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setLong(1, conceptId);
+            if (resourceType!=null && !resourceType.isEmpty())
+                stmt.setString(2, resourceType);
+
             ResultSet rs = stmt.executeQuery();
             while(rs.next()) {
-                List<ConceptRule> rules = ObjectMapperPool.getInstance().readValue(rs.getString("ruleset"), new TypeReference<List<ConceptRule>>(){});
+                List<ConceptRule> rules = ObjectMapperPool.getInstance().readValue(rs.getString("ruleset"), new TypeReference<List<ConceptRule>>() {});
                 result.add(
                     new ConceptRuleSet()
-                    .setId(rs.getLong("id"))
-                    .setConceptId(conceptId)
-                    .setTargetId(rs.getLong("target_id"))
-                    .setRules(rules)
+                        .setId(rs.getLong("id"))
+                        .setConceptId(conceptId)
+                        .setTarget(new ConceptReference()
+                            .setId(rs.getLong("target_id"))
+                            .setText(rs.getString("full_name"))
+                        )
+                        .setOrder(rs.getInt("run_order"))
+                        .setResourceType(rs.getString("resource_type"))
+                        .setRules(rules)
                 );
             }
 

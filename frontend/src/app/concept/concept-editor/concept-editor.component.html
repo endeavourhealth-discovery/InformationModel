@@ -14,15 +14,15 @@
             <div class="row">
               <div class="col-md-12 mb-4">
                 <div class="card h-100" id="detailCard" *ngIf="conceptBundle?.concept">
-                  <div class="card-header card-success"><h4>Concept details</h4></div>
+                  <div class="card-header"><h4>Concept details</h4></div>
                   <div class="card-block">
                     <app-concept-details [(ngModel)]="conceptBundle.concept" name="details"></app-concept-details>
                   </div>
                 </div>
               </div>
-              <div class="col-md-12">
+              <div class="col-md-12 mb-4">
                 <div class="card h-100" id="attributeCard" *ngIf="conceptBundle?.attributes || conceptBundle?.related">
-                  <div class="card-header card-success"><h4>Linked concepts <button class="btn btn-info pull-right" (click)="addConcept()">Add</button></h4> </div>
+                  <div class="card-header"><h4>Linked concepts <button class="btn btn-success pull-right" (click)="addConcept()">Add</button></h4> </div>
                   <div class="card-block">
                     <div class="row">
                       <div class="col-md-12">
@@ -93,11 +93,42 @@
                   </div>
                 </div>
               </div>
+              <div class="col-md-12">
+                <div class="card h-100" id="rulesCard" *ngIf="conceptBundle?.ruleSets">
+                  <div class="card-header"><h4>Rule sets <button class="btn btn-success pull-right" (click)="addRuleset()">Add</button></h4> </div>
+                  <div class="card-block">
+                    <div class="row">
+                      <div class="col-md-12">
+                        <table class="table table-striped table-sm table-hover">
+                          <thead>
+                            <tr class="d-flex">
+                              <th class="col-3">Resource</th>
+                              <th class="col-5">Rules</th>
+                              <th class="col-3">Target</th>
+                              <th class="col-1"></th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr class="d-flex show-child-on-hover" *ngFor="let item of conceptBundle.ruleSets">
+                              <td class="col-3">{{item.resourceType}}</td>
+                              <td class="col-5">{{getRuleText(item)}}</td>
+                              <td class="col-3"><a href="#/concept/{{item.target.id}}">{{item.target.text}}</a></td>
+                              <td class="col-1">
+                                <button type="button" class="btn btn-sm btn-danger pull-right child-to-show" (click)="confirmDeleteAttribute(item)"><i class="fa fa-fw fa-trash fa-lg"></i></button>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-          <div class="col-md-4 row-">
+          <div class="col-md-4">
             <div class="card h-100" id="relatedGraph">
-              <div class="card-header card-success"><h4>Diagram<small> (double-click to expand)</small><button class="btn pull-right" (click)="zoom()">Zoom</button></h4></div>
+              <div class="card-header"><h4>Diagram<small> (double-click to expand)</small><button class="btn btn-info pull-right" (click)="zoom()">Zoom</button></h4></div>
               <div class="card-block">
                 <nodeGraph #nodeGraph (nodeClick)="nodeClick($event)" (nodeDblClick)="nodeDblClick($event)" ></nodeGraph>
               </div>

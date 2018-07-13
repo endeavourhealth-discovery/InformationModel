@@ -14,7 +14,6 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {WorkflowManagerModule} from './workflow-manager/workflow-manager.module';
 import {ConceptModule} from './concept/concept.module';
 import {TermMappingsModule} from './term-mappings/term-mappings.module';
-import {ValueModule} from './value/value.module';
 
 @NgModule({
   imports: [
@@ -29,7 +28,6 @@ import {ValueModule} from './value/value.module';
     WorkflowManagerModule,
     ConceptModule,
     TermMappingsModule,
-    ValueModule,
 
     RouterModule.forRoot(AppMenuService.getRoutes(), {useHash: true}),
     NgbModule.forRoot(),

@@ -1,6 +1,6 @@
 @import "~bootstrap/scss/variables";
 
-$theme-colour: #337ab7;
+$theme-colour: #4678A1;
 
 $global_rem_scale: (14rem/16); // Browser default typically `16px` so scale to 14px
 
@@ -123,7 +123,7 @@ $jumbotron-padding:              ($global-rem-scale * 2);
 
 $card-spacer-x:            ($global-rem-scale * 1.25);
 $card-spacer-y:            ($global-rem-scale * .75);
-$card-cap-bg:              lighten($theme-colour, 20%);
+$card-cap-bg:              lighten($theme-colour, 15%);
 $card-bg:                  $gray-lightest;
 
 $card-img-overlay-padding: ($global-rem-scale * 1.25);

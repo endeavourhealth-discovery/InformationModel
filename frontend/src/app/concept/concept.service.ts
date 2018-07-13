@@ -8,6 +8,7 @@ import {ConceptSummaryList} from '../models/ConceptSummaryList';
 import {Attribute} from '../models/Attribute';
 import {ConceptBundle} from '../models/ConceptBundle';
 import {ConceptReference} from '../models/ConceptReference';
+import {ConceptRuleset} from '../models/ConceptRuleset';
 
 @Injectable()
 export class ConceptService {
@@ -123,5 +124,4 @@ export class ConceptService {
     return this.http.post('api/Concept/Relationship', {}, {search: params})
       .map((result) => result.json());
   }
-
 }
