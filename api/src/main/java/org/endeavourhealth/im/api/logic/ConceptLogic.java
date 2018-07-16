@@ -175,7 +175,7 @@ public class ConceptLogic {
         System.out.println("Its a new/unknown type of " + c.getFullName() + " (" + c.getContext() + ")");
         result.setResult(c);
         result.setStatus(1); // Create draft concept/task
-        return null;    // TODO: Create draft concept or task
+        return result;    // TODO: Create draft concept or task
     }
 
     private Boolean meetsCriteria(JsonNode object, ConceptRuleSet ruleSet) {
