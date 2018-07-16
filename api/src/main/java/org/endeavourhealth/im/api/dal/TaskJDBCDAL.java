@@ -12,7 +12,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class TaskJDBCDAL implements TaskDAL {
@@ -51,18 +50,20 @@ public class TaskJDBCDAL implements TaskDAL {
             if (taskType != null)
                 stmt.setByte(1, taskType.getValue());
 
-            ResultSet rs = stmt.executeQuery();
+            try (ResultSet rs = stmt.executeQuery()) {
 
-            while(rs.next()) {
-                tasks.add(
-                    new Task()
-                        .setName(rs.getString("title"))
-                        .setType(TaskType.byValue(rs.getByte("type")))
-                        .setCreated(rs.getTimestamp("created"))
-                        .setId(rs.getLong("id"))
-                        .setIdentifier(rs.getLong("identifier"))
-                );
+                while (rs.next()) {
+                    tasks.add(
+                        new Task()
+                            .setName(rs.getString("title"))
+                            .setType(TaskType.byValue(rs.getByte("type")))
+                            .setCreated(rs.getTimestamp("created"))
+                            .setId(rs.getLong("id"))
+                            .setIdentifier(rs.getLong("identifier"))
+                    );
+                }
             }
+
         } finally {
             ConnectionPool.InformationModel.push(conn);
         }

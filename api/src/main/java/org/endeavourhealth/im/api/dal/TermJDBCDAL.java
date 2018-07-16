@@ -28,19 +28,21 @@ public class TermJDBCDAL implements TermDAL {
     public Long getConceptId(String organisation, String context, String system, String code) throws Exception {
         String sql = "SELECT concept_id FROM term_mapping WHERE organisation = ? AND context = ? AND system = ? AND code = ?";
         Connection conn = ConnectionPool.InformationModel.pop();
+        Long result = null;
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, organisation);
             stmt.setString(2, context);
             stmt.setString(3, system);
             stmt.setString(4, code);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next())
-                return rs.getLong(1);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next())
+                    result = rs.getLong(1);
+            }
+            return result;
+
         } finally {
             ConnectionPool.InformationModel.push(conn);
         }
-
-        return null;
     }
 
     @Override
@@ -58,19 +60,21 @@ public class TermJDBCDAL implements TermDAL {
     @Override
     public String getSnomedTerm(String code) throws SQLException {
         String sql = "SELECT display FROM trm_concept WHERE code = ?";
+        String result = null;
 
         Connection conn = ConnectionPool.Snomed.pop();
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, code);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next())
-                return rs.getString(1);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next())
+                    result = rs.getString(1);
+
+            }
+            return result;
         } finally {
             ConnectionPool.Snomed.push(conn);
         }
-
-        return null;
     }
 
     @Override
@@ -83,19 +87,19 @@ public class TermJDBCDAL implements TermDAL {
             "AND l.rel_type = 0";
 
         Connection conn = ConnectionPool.Snomed.pop();
-
+        Term result = null;
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, code);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next())
-                return new Term()
-                    .setId(rs.getLong("code"))
-                    .setText(rs.getString("display"));
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next())
+                    result = new Term()
+                        .setId(rs.getLong("code"))
+                        .setText(rs.getString("display"));
+            }
+            return result;
         } finally {
             ConnectionPool.Snomed.push(conn);
         }
-
-        return null;
     }
 
     @Override
@@ -116,16 +120,18 @@ public class TermJDBCDAL implements TermDAL {
         Connection conn = ConnectionPool.InformationModel.pop();
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setLong(1, conceptId);
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                result.add(new TermMapping()
-                    .setOrganisation(rs.getString("organisation"))
-                    .setContext(rs.getString("context"))
-                    .setSystem(rs.getString("system"))
-                    .setCode(rs.getString("code"))
-                    .setConceptId(conceptId)
-                );
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    result.add(new TermMapping()
+                        .setOrganisation(rs.getString("organisation"))
+                        .setContext(rs.getString("context"))
+                        .setSystem(rs.getString("system"))
+                        .setCode(rs.getString("code"))
+                        .setConceptId(conceptId)
+                    );
+                }
             }
+
         } finally {
             ConnectionPool.InformationModel.push(conn);
         }

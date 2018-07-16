@@ -5,7 +5,6 @@ import org.endeavourhealth.im.api.dal.TermJDBCDAL;
 import org.endeavourhealth.im.api.models.TermMapping;
 import org.endeavourhealth.im.common.models.*;
 
-import java.sql.SQLException;
 import java.util.List;
 
 public class TermLogic {
@@ -77,12 +76,17 @@ public class TermLogic {
 
     private String getOfficialTermForCode(String system, String code) throws Exception {
         String officialTerm = null;
-        if (system.toLowerCase().equals("snomed"))
-            officialTerm = this.dal.getSnomedTerm(code);    // Switch to official SNOMED term text
-        else if (system.toLowerCase().equals("icd10"))
-            officialTerm = this.dal.getICD10Term(code);     // Switch to official ICD10 term text
-        else if (system.toLowerCase().equals("opcs"))
-            officialTerm = this.dal.getOpcsTerm(code);      // Switch to official OPCS term text
+        switch (system.toLowerCase()) {
+            case "snomed":
+                officialTerm = this.dal.getSnomedTerm(code);    // Switch to official SNOMED term text
+                break;
+            case "icd10":
+                officialTerm = this.dal.getICD10Term(code);     // Switch to official ICD10 term text
+                break;
+            case "opcs":
+                officialTerm = this.dal.getOpcsTerm(code);      // Switch to official OPCS term text
+                break;
+        }
         return officialTerm;
     }
 

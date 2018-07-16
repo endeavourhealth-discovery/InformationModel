@@ -43,7 +43,7 @@ public class ComponentFilerForAttributes extends ComponentFiler {
         try (PreparedStatement statement = conn.prepareStatement(sql)) {
             int i = setParameters(statement, attribute);
 
-            statement.setLong(i++, attribute.getId());
+            statement.setLong(i, attribute.getId());
 
             statement.executeUpdate();
         } finally {

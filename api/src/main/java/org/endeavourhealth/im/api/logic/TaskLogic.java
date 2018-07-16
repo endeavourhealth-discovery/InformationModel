@@ -5,7 +5,6 @@ import org.endeavourhealth.im.api.dal.TaskJDBCDAL;
 import org.endeavourhealth.im.common.models.Task;
 import org.endeavourhealth.im.common.models.TaskType;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class TaskLogic {

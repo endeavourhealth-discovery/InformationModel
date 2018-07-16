@@ -46,7 +46,7 @@ public class ComponentFilerForRelationships extends ComponentFiler {
         try (PreparedStatement statement = conn.prepareStatement(sql)) {
             int i = setParameters(statement, relatedConcept);
 
-            statement.setLong(i++, relatedConcept.getId());
+            statement.setLong(i, relatedConcept.getId());
 
             statement.executeUpdate();
         } finally {

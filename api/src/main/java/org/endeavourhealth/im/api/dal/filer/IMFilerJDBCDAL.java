@@ -6,7 +6,6 @@ import org.endeavourhealth.im.api.models.TransactionAction;
 import org.endeavourhealth.im.api.models.TransactionComponent;
 import org.endeavourhealth.im.api.models.TransactionTable;
 import org.endeavourhealth.im.common.models.DbEntity;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.sql.*;
 import java.util.ArrayList;

@@ -1,20 +1,20 @@
 package org.endeavourhealth.im.api.endpoints;
 
-import com.codahale.metrics.annotation.Timed;
+//import com.codahale.metrics.annotation.Timed;
 import io.astefanutti.metrics.aspectj.Metrics;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import org.endeavourhealth.im.api.logic.MessageLogic;
-import org.endeavourhealth.im.common.models.Message;
+//import io.swagger.annotations.ApiOperation;
+//import io.swagger.annotations.ApiParam;
+//import org.endeavourhealth.im.api.logic.MessageLogic;
+//import org.endeavourhealth.im.common.models.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.SecurityContext;
+//import javax.ws.rs.core.Context;
+//import javax.ws.rs.core.MediaType;
+//import javax.ws.rs.core.Response;
+//import javax.ws.rs.core.SecurityContext;
 
 @Path("/Message")
 @Metrics(registry = "MessageMetricRegistry")

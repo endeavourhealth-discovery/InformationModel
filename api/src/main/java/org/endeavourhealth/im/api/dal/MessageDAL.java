@@ -1,10 +1,10 @@
 package org.endeavourhealth.im.api.dal;
 
-import org.endeavourhealth.im.common.models.Message;
-import org.endeavourhealth.im.common.models.MessageResource;
-import org.endeavourhealth.im.common.models.MessageResourceField;
-
-import java.sql.SQLException;
+//import org.endeavourhealth.im.common.models.Message;
+//import org.endeavourhealth.im.common.models.MessageResource;
+//import org.endeavourhealth.im.common.models.MessageResourceField;
+//
+//import java.sql.SQLException;
 
 public interface MessageDAL {
 /*

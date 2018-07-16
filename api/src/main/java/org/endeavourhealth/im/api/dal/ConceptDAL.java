@@ -1,6 +1,6 @@
 package org.endeavourhealth.im.api.dal;
 
-import org.endeavourhealth.im.common.models.ConceptRuleSet;
+//import org.endeavourhealth.im.common.models.ConceptRuleSet;
 import org.endeavourhealth.im.common.models.*;
 
 import java.util.List;

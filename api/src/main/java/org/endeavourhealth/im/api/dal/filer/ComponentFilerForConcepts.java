@@ -2,7 +2,6 @@ package org.endeavourhealth.im.api.dal.filer;
 
 import org.endeavourhealth.common.cache.ObjectMapperPool;
 import org.endeavourhealth.im.api.dal.ConnectionPool;
-import org.endeavourhealth.im.api.dal.TableIdHelper;
 import org.endeavourhealth.im.common.models.Concept;
 import org.endeavourhealth.im.api.models.TransactionComponent;
 
@@ -50,7 +49,7 @@ public class ComponentFilerForConcepts extends ComponentFiler {
         try (PreparedStatement statement = conn.prepareStatement(sql)) {
             int i = setParameters(statement, concept);
 
-            statement.setLong(i++, concept.getId());
+            statement.setLong(i, concept.getId());
 
             statement.executeUpdate();
         } finally {

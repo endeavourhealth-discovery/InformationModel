@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public final class ServerException {
-    private String message = null;
+    private String message;
 
     public ServerException(String message) {
         this.message = message;

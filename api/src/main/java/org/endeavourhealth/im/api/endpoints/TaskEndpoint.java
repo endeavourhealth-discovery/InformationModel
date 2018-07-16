@@ -1,14 +1,11 @@
 package org.endeavourhealth.im.api.endpoints;
 
 import com.codahale.metrics.annotation.Timed;
-import com.datastax.driver.mapping.annotations.Query;
 import io.astefanutti.metrics.aspectj.Metrics;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.endeavourhealth.im.api.logic.MessageLogic;
 import org.endeavourhealth.im.api.logic.TaskLogic;
-import org.endeavourhealth.im.common.models.Message;
 import org.endeavourhealth.im.common.models.Task;
 import org.endeavourhealth.im.common.models.TaskType;
 import org.slf4j.Logger;

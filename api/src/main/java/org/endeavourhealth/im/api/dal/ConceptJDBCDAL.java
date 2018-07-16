@@ -4,8 +4,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import org.endeavourhealth.common.cache.ObjectMapperPool;
 import org.endeavourhealth.im.api.dal.filer.IMFilerDAL;
 import org.endeavourhealth.im.api.dal.filer.IMFilerJDBCDAL;
-import org.endeavourhealth.im.common.models.ConceptRule;
-import org.endeavourhealth.im.common.models.ConceptRuleSet;
+//import org.endeavourhealth.im.common.models.ConceptRule;
+//import org.endeavourhealth.im.common.models.ConceptRuleSet;
 import org.endeavourhealth.im.api.models.TransactionAction;
 import org.endeavourhealth.im.api.models.TransactionTable;
 import org.endeavourhealth.im.common.models.*;
@@ -74,23 +74,22 @@ public class ConceptJDBCDAL implements ConceptDAL {
     @Override
     public Concept get(Long id) throws SQLException {
         Connection conn = ConnectionPool.InformationModel.pop();
-
+        Concept result = null;
         String sql = "SELECT c.* " +
             "FROM concept c " +
             "WHERE c.id = ?";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setLong(1, id);
-            ResultSet rs = stmt.executeQuery();
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next())
+                    result = getConceptFromResultSet(rs);
 
-            if (rs.next()) {
-                return getConceptFromResultSet(rs);
+                return result;
             }
         } finally {
             ConnectionPool.InformationModel.push(conn);
         }
-
-        return null;
     }
 
     @Override
@@ -104,9 +103,10 @@ public class ConceptJDBCDAL implements ConceptDAL {
 
         try (PreparedStatement statement = conn.prepareStatement(sql)) {
             statement.setString(1, context);
-            ResultSet res = statement.executeQuery();
-            if (res.next()) {
-                concept = getConceptFromResultSet(res);
+            try (ResultSet res = statement.executeQuery()) {
+                if (res.next()) {
+                    concept = getConceptFromResultSet(res);
+                }
             }
         } finally {
             ConnectionPool.InformationModel.push(conn);
@@ -128,19 +128,21 @@ public class ConceptJDBCDAL implements ConceptDAL {
 
         try(PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setLong(1, id);
-            ResultSet rs = stmt.executeQuery();
-            while(rs.next()) {
-                result.add(
-                    new Attribute()
-                        .setId(rs.getLong("id"))
-                        .setConceptId(id)
-                        .setAttributeId(rs.getLong("attribute_id"))
-                        .setOrder(rs.getInt("order"))
-                        .setMandatory(rs.getBoolean("mandatory"))
-                        .setLimit(rs.getInt("limit"))
-                        .setAttribute(getConceptSummary(rs))
-                );
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    result.add(
+                        new Attribute()
+                            .setId(rs.getLong("id"))
+                            .setConceptId(id)
+                            .setAttributeId(rs.getLong("attribute_id"))
+                            .setOrder(rs.getInt("order"))
+                            .setMandatory(rs.getBoolean("mandatory"))
+                            .setLimit(rs.getInt("limit"))
+                            .setAttribute(getConceptSummary(rs))
+                    );
+                }
             }
+
         } finally {
             ConnectionPool.InformationModel.push(conn);
         }
@@ -163,32 +165,33 @@ public class ConceptJDBCDAL implements ConceptDAL {
         List<RelatedConcept> result = new ArrayList<>();
         try(PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setLong(1, sourceId);
-            ResultSet rs = stmt.executeQuery();
+            try (ResultSet rs = stmt.executeQuery()) {
 
-            while(rs.next()) {
-                RelatedConcept related = new RelatedConcept()
-                    .setId(rs.getLong("id"))
-                    .setSourceId(sourceId)
-                    .setTargetId(rs.getLong("targetId"))
-                    .setTarget(
-                        new ConceptSummary()
-                        .setId(rs.getLong("targetId"))
-                        .setContext(rs.getString("context"))
-                        .setFullName(rs.getString("full_name"))
-                        .setStatus(rs.getString("status"))
-                        .setVersion(rs.getString("version"))
-                    )
-                    .setRelationship(
-                        new ConceptReference()
-                        .setId(rs.getLong("relationshipId"))
-                        .setText(rs.getString("relationshipName"))
-                    )
-                    .setOrder(rs.getInt("order"))
-                    .setMandatory(rs.getBoolean("mandatory"))
-                    .setLimit(rs.getInt("limit"))
-                    .setWeighting(rs.getInt("weighting"));
+                while (rs.next()) {
+                    RelatedConcept related = new RelatedConcept()
+                        .setId(rs.getLong("id"))
+                        .setSourceId(sourceId)
+                        .setTargetId(rs.getLong("targetId"))
+                        .setTarget(
+                            new ConceptSummary()
+                                .setId(rs.getLong("targetId"))
+                                .setContext(rs.getString("context"))
+                                .setFullName(rs.getString("full_name"))
+                                .setStatus(rs.getString("status"))
+                                .setVersion(rs.getString("version"))
+                        )
+                        .setRelationship(
+                            new ConceptReference()
+                                .setId(rs.getLong("relationshipId"))
+                                .setText(rs.getString("relationshipName"))
+                        )
+                        .setOrder(rs.getInt("order"))
+                        .setMandatory(rs.getBoolean("mandatory"))
+                        .setLimit(rs.getInt("limit"))
+                        .setWeighting(rs.getInt("weighting"));
 
-                result.add(related);
+                    result.add(related);
+                }
             }
 
 
@@ -213,35 +216,34 @@ public class ConceptJDBCDAL implements ConceptDAL {
         List<RelatedConcept> result = new ArrayList<>();
         try(PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setLong(1, targetId);
-            ResultSet rs = stmt.executeQuery();
+            try (ResultSet rs = stmt.executeQuery()) {
 
-            while(rs.next()) {
-                RelatedConcept related = new RelatedConcept()
-                    .setId(rs.getLong("id"))
-                    .setTargetId(targetId)
-                    .setSourceId(rs.getLong("sourceId"))
-                    .setSource(
-                        new ConceptSummary()
-                            .setId(rs.getLong("sourceId"))
-                            .setContext(rs.getString("context"))
-                            .setFullName(rs.getString("full_name"))
-                            .setStatus(rs.getString("status"))
-                            .setVersion(rs.getString("version"))
-                    )
-                    .setRelationship(
-                        new ConceptReference()
-                        .setId(rs.getLong("relationshipId"))
-                        .setText(rs.getString("relationshipName"))
-                    )
-                    .setOrder(rs.getInt("order"))
-                    .setMandatory(rs.getBoolean("mandatory"))
-                    .setLimit(rs.getInt("limit"))
-                    .setWeighting(rs.getInt("weighting"));
+                while (rs.next()) {
+                    RelatedConcept related = new RelatedConcept()
+                        .setId(rs.getLong("id"))
+                        .setTargetId(targetId)
+                        .setSourceId(rs.getLong("sourceId"))
+                        .setSource(
+                            new ConceptSummary()
+                                .setId(rs.getLong("sourceId"))
+                                .setContext(rs.getString("context"))
+                                .setFullName(rs.getString("full_name"))
+                                .setStatus(rs.getString("status"))
+                                .setVersion(rs.getString("version"))
+                        )
+                        .setRelationship(
+                            new ConceptReference()
+                                .setId(rs.getLong("relationshipId"))
+                                .setText(rs.getString("relationshipName"))
+                        )
+                        .setOrder(rs.getInt("order"))
+                        .setMandatory(rs.getBoolean("mandatory"))
+                        .setLimit(rs.getInt("limit"))
+                        .setWeighting(rs.getInt("weighting"));
 
-                result.add(related);
+                    result.add(related);
+                }
             }
-
-
         } finally {
             ConnectionPool.InformationModel.push(conn);
         }
@@ -262,15 +264,15 @@ public class ConceptJDBCDAL implements ConceptDAL {
         List<ConceptReference> result = new ArrayList<>();
 
         try(PreparedStatement stmt = conn.prepareStatement(sql)) {
-            ResultSet rs = stmt.executeQuery();
-            while(rs.next()) {
-                result.add(
-                    new ConceptReference()
-                    .setId(rs.getLong("id"))
-                    .setText(rs.getString("full_name"))
-                );
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    result.add(
+                        new ConceptReference()
+                            .setId(rs.getLong("id"))
+                            .setText(rs.getString("full_name"))
+                    );
+                }
             }
-
             return result;
         } finally {
             ConnectionPool.InformationModel.push(conn);
@@ -357,21 +359,23 @@ public class ConceptJDBCDAL implements ConceptDAL {
             if (resourceType!=null && !resourceType.isEmpty())
                 stmt.setString(2, resourceType);
 
-            ResultSet rs = stmt.executeQuery();
-            while(rs.next()) {
-                List<ConceptRule> rules = ObjectMapperPool.getInstance().readValue(rs.getString("ruleset"), new TypeReference<List<ConceptRule>>() {});
-                result.add(
-                    new ConceptRuleSet()
-                        .setId(rs.getLong("id"))
-                        .setConceptId(conceptId)
-                        .setTarget(new ConceptReference()
-                            .setId(rs.getLong("target_id"))
-                            .setText(rs.getString("full_name"))
-                        )
-                        .setOrder(rs.getInt("run_order"))
-                        .setResourceType(rs.getString("resource_type"))
-                        .setRules(rules)
-                );
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    List<ConceptRule> rules = ObjectMapperPool.getInstance().readValue(rs.getString("ruleset"), new TypeReference<List<ConceptRule>>() {
+                    });
+                    result.add(
+                        new ConceptRuleSet()
+                            .setId(rs.getLong("id"))
+                            .setConceptId(conceptId)
+                            .setTarget(new ConceptReference()
+                                .setId(rs.getLong("target_id"))
+                                .setText(rs.getString("full_name"))
+                            )
+                            .setOrder(rs.getInt("run_order"))
+                            .setResourceType(rs.getString("resource_type"))
+                            .setRules(rules)
+                    );
+                }
             }
 
             return result;
@@ -383,9 +387,10 @@ public class ConceptJDBCDAL implements ConceptDAL {
     private List<ConceptSummary> getSummaryResultSet(PreparedStatement stmt) throws SQLException {
         List<ConceptSummary> result = new ArrayList<>();
 
-        ResultSet rs = stmt.executeQuery();
-        while(rs.next()) {
-            result.add(getConceptSummary(rs));
+        try (ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                result.add(getConceptSummary(rs));
+            }
         }
 
         return result;
