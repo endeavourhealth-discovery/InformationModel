@@ -1,7 +1,6 @@
 package org.endeavourhealth.im.common.models;
 
 public class Concept extends DbEntity<Concept> {
-    private ConceptReference type;
     private String url;
     private String fullName;
     private String context;
@@ -13,15 +12,6 @@ public class Concept extends DbEntity<Concept> {
     private Long useCount;
     private Boolean autoTemplate = true;
     private String template;
-
-    public ConceptReference getType() {
-        return type;
-    }
-
-    public Concept setType(ConceptReference type) {
-        this.type = type;
-        return this;
-    }
 
     public String getUrl() {
         return url;

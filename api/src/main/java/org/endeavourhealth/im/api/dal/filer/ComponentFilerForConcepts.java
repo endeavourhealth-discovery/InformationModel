@@ -70,7 +70,6 @@ public class ComponentFilerForConcepts extends ComponentFiler {
         List<String> fields = new ArrayList<>();
 
         if (concept.getId() != null) fields.add("id");
-        if (concept.getType() != null) fields.add("type");
         if (concept.getUrl() != null) fields.add("url");
         if (concept.getFullName() != null) fields.add("full_name");
         if (concept.getContext() != null) fields.add("context");
@@ -89,9 +88,6 @@ public class ComponentFilerForConcepts extends ComponentFiler {
 
         if (concept.getId() != null)
             statement.setLong(i++, concept.getId());
-
-        if (concept.getType() != null)
-            statement.setLong(i++, concept.getType().getId());
 
         if (concept.getUrl() != null)
             statement.setString(i++, concept.getUrl());

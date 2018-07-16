@@ -50,14 +50,16 @@ public class TermLogic {
                 if (officialTerm != null) {
                     // If one was found, just use it
                     concept.setStatus(ConceptStatus.ACTIVE)
-                        .setType(new ConceptReference().setText("Class.Code"))
+                        // TODO: Replace with relationship
+                        // .setType(new ConceptReference().setText("Class.Code"))
                         .setFullName(officialTerm);
                     conceptId = this.conceptLogic.save(concept);
                     importParentHierarchy(conceptId, system, code);
                 } else {
                     // otherwise create a draft/temporary one and associated task
                     concept.setStatus(ConceptStatus.DRAFT)
-                        .setType(new ConceptReference().setText("Class.Code"))
+                        // TODO: Replace with relationship
+                        // .setType(new ConceptReference().setText("Class.Code"))
                         .setFullName(termText);
                     conceptId = this.conceptLogic.save(concept);
                     this.taskLogic.createTask("New draft term", termConceptContext + " => " + termText, TaskType.TERM_MAPPINGS, conceptId);
@@ -99,7 +101,8 @@ public class TermLogic {
             if (concept == null) {
                 concept = new Concept()
                     .setContext(context)
-                    .setType(new ConceptReference().setText("Class.Code"))
+                    // TODO: Replace with relationship
+                    // .setType(new ConceptReference().setText("Class.Code"))
                     .setStatus(ConceptStatus.ACTIVE)
                     .setFullName(parent.getText());
 

@@ -68,20 +68,6 @@ export class ConceptEditorComponent implements AfterViewInit {
     );
   }
 
-  changeType() {
-    ConceptPickerComponent.open(this.modal, false)
-      .result.then(
-      (result) => this.setType(result)
-    );
-  }
-
-  setType(type: ConceptSummary) {
-    this.conceptBundle.concept.type = {
-      id: type.id,
-      text: type.fullName
-    };
-  }
-
   newConcept(context: string) {
     let concept = new Concept();
     concept.context = context;
@@ -119,12 +105,6 @@ export class ConceptEditorComponent implements AfterViewInit {
   }
 
   updateDiagram(concept: Concept, attributes: Attribute[], related: RelatedConcept[]) {
-    // Base type (if not base "Concept")
-    if (concept.type.id != 1) {
-      this.graph.addNodeData(concept.type.id, concept.type.text, 0, concept.type);
-      this.graph.addEdgeData(concept.id, concept.type.id, 'Inherits from', concept.type);
-    }
-
     for (let attribute of attributes) {
       this.graph.addNodeData(attribute.attributeId, attribute.attribute.context, 3, attribute);
       this.graph.addEdgeData(concept.id, attribute.attributeId, 'Has attribute', attribute);

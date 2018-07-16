@@ -53,15 +53,4 @@ export class ConceptDetailsComponent implements ControlValueAccessor {
   registerOnTouched(fn: any): void {
     this.touched.push(fn);
   }
-
-  pickType() {
-    ConceptPickerComponent.open(this.modal, false).result
-      .then(
-        (result) => this.setType(result)
-      );
-  }
-
-  setType(typeConcept: Concept) {
-    this.model.type = {id: typeConcept.id, text: typeConcept.context};
-  }
 }

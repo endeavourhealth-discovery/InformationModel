@@ -38,20 +38,6 @@
                             </tr>
                           </thead>
                           <tbody>
-                            <tr class="d-flex show-child-on-hover" [ngClass]="{'selection': selectedNode == conceptBundle.concept.type}" (click)="selectedNode = conceptBundle.concept.type">
-                              <td class="col-3">{{conceptBundle.concept.fullName}}</td>
-                              <td class="col-3">Inherits from</td>
-                              <td class="col-3"><a href="#/concept/{{conceptBundle.concept.type.id}}">{{conceptBundle.concept.type.text}}</a></td>
-                              <td class="col-1"><input type="checkbox" checked disabled></td>
-                              <td class="col-1">
-                                <i class="fa fa-fw fa-blank"></i>
-                                1
-                                <i class="fa fa-fw fa-blank"></i>
-                              </td>
-                              <td class="col-1">
-                                <button type="button" class="btn btn-sm btn-info pull-right child-to-show" (click)="changeType()"><i class="fa fa-fw fa-refresh fa-lg"></i></button>
-                              </td>
-                            </tr>
                             <tr class="d-flex show-child-on-hover" *ngFor="let item of conceptBundle.attributes" [ngClass]="{'selection': selectedNode == item}" (click)="selectedNode = item">
                               <td class="col-3">{{conceptBundle.concept.context}}</td>
                               <td class="col-3">Has attribute</td>

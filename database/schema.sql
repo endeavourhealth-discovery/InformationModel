@@ -13,7 +13,6 @@ USE im;
 DROP TABLE IF EXISTS concept;
 CREATE TABLE concept(
   id BIGINT AUTO_INCREMENT PRIMARY KEY          COMMENT 'Main concept id, common across all tables',
-  type BIGINT NOT NULL                          COMMENT 'The data type of this concept',
   url VARCHAR(250)                              COMMENT 'URL for where documentation for this concept is published',
   full_name VARCHAR(4096)                       COMMENT 'Full, clear, unambiguous name for the concept',
   context VARCHAR(250) NOT NULL                 COMMENT 'Unique, computable (immutable) name for the concept',

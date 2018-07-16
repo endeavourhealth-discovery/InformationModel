@@ -75,9 +75,8 @@ public class ConceptJDBCDAL implements ConceptDAL {
     public Concept get(Long id) throws SQLException {
         Connection conn = ConnectionPool.InformationModel.pop();
 
-        String sql = "SELECT c.*, t.id as typeId, t.full_name as typeName " +
+        String sql = "SELECT c.* " +
             "FROM concept c " +
-            "JOIN concept t ON t.id = c.type " +
             "WHERE c.id = ?";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -99,9 +98,8 @@ public class ConceptJDBCDAL implements ConceptDAL {
         Concept concept = null;
         Connection conn = ConnectionPool.InformationModel.pop();
 
-        String sql = "SELECT c.*, t.id as typeId, t.full_name as typeName " +
+        String sql = "SELECT c.* " +
             "FROM concept c " +
-            "JOIN concept t ON t.id = c.type " +
             "WHERE c.context = ?";
 
         try (PreparedStatement statement = conn.prepareStatement(sql)) {
@@ -255,7 +253,9 @@ public class ConceptJDBCDAL implements ConceptDAL {
     public List<ConceptReference> getRelationships() throws SQLException {
         String sql = "SELECT c.id, c.full_name " +
             "FROM concept c " +
-            "WHERE c.type = 8"; // 8 == Relationship
+            "JOIN concept_relationship r ON r.source = c.id " +
+            "WHERE r.relationship = 100 " +        // 100 = Is a
+            "AND r.target = 8 ";                   // 8 == Relationship
 
         Connection conn = ConnectionPool.InformationModel.pop();
 
@@ -279,9 +279,6 @@ public class ConceptJDBCDAL implements ConceptDAL {
 
     @Override
     public Long save(Concept concept) throws Exception {
-        // Resolve references first, if required
-        checkAndResolve(concept.getType());
-
         Long id = this.filer.storeAndApply(
             OWNER,
             concept.getId() == null ? TransactionAction.CREATE : TransactionAction.UPDATE,
@@ -406,11 +403,6 @@ public class ConceptJDBCDAL implements ConceptDAL {
     private Concept getConceptFromResultSet(ResultSet rs) throws SQLException {
         return new Concept()
             .setId(rs.getLong("id"))
-            .setType(
-                new ConceptReference()
-                .setId(rs.getLong("typeId"))
-                .setText(rs.getString("typeName"))
-            )
             .setContext(rs.getString("context"))
             .setDescription(rs.getString("description"))
             .setFullName(rs.getString("full_name"))

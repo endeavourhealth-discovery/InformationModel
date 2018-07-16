@@ -18,8 +18,8 @@ import { NodeGraphDialogComponent } from './node-graph-dialog/node-graph-dialog.
     CommonModule,
     FormsModule,
     ControlsModule,
-    NvD3Module,
     NgbModule,
+    NvD3Module,
     NodeGraphModule
   ],
   declarations: [ConceptPickerComponent, ConceptLibraryComponent, ConceptEditorComponent, ConceptDetailsComponent, EditRelatedComponent, NodeGraphDialogComponent],
