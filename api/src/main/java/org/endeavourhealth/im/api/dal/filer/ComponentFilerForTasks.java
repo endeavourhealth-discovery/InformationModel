@@ -67,9 +67,9 @@ public class ComponentFilerForTasks extends ComponentFiler {
         if (task.getDescription() != null) statement.setString(i++, task.getDescription());
         if (task.getIdentifier() != null) statement.setLong(i++, task.getIdentifier());
         if (task.getCreated() != null)
-            statement.setDate(i++, new java.sql.Date(task.getCreated().getTime()));
+            statement.setTimestamp(i++, new java.sql.Timestamp(task.getCreated().getTime()));
         else
-            statement.setDate(i++, new java.sql.Date(new Date().getTime()));
+            statement.setTimestamp(i++, new java.sql.Timestamp(new Date().getTime()));
 
         return i;
     }

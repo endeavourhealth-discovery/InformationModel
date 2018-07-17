@@ -39,7 +39,7 @@ export class WorkflowManagerComponent implements OnInit {
   gotoTask(task: Task) {
     switch (task.type) {
       case TaskType.ATTRIBUTE_MODEL: {
-        this.router.navigate(['attributeModel', task.identifier]);
+        this.router.navigate(['concept', task.identifier]);
         break;
       }
       case TaskType.TERM_MAPPINGS: {

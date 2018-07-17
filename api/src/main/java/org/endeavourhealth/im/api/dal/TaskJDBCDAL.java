@@ -56,6 +56,7 @@ public class TaskJDBCDAL implements TaskDAL {
                     tasks.add(
                         new Task()
                             .setName(rs.getString("title"))
+                            .setDescription(rs.getString("description"))
                             .setType(TaskType.byValue(rs.getByte("type")))
                             .setCreated(rs.getTimestamp("created"))
                             .setId(rs.getLong("id"))

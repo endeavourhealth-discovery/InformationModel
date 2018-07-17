@@ -151,7 +151,12 @@ public class ConceptLogic {
 
         ConceptReference rootConcept = new ConceptReference().setId(1L).setText("Concept");
 
-        return calculateChild(resourceType, object, rootConcept, result);  // Call with root "Concept"
+        result = calculateChild(resourceType, object, rootConcept, result);  // Call with root "Concept"
+
+        if (result.getStatus() == 1)
+            new TaskLogic().createTask("Unknown type of " + result.getResult().getContext(), json, TaskType.ATTRIBUTE_MODEL, result.getResult().getId());
+
+        return result;
     }
 
     private CalculationResult calculateChild(String resourceType, JsonNode object, ConceptReference concept, CalculationResult result) throws Exception {
@@ -175,6 +180,7 @@ public class ConceptLogic {
         System.out.println("Its a new/unknown type of " + c.getFullName() + " (" + c.getContext() + ")");
         result.setResult(c);
         result.setStatus(1); // Create draft concept/task
+
         return result;    // TODO: Create draft concept or task
     }
 
@@ -212,21 +218,14 @@ public class ConceptLogic {
     }
 
     private Boolean compare(String val1, String val2, String comparator) {
-        if ("=".equals(comparator))
-            return val1.equals(val2);
-        if ("<".equals(comparator))
-            return val1.compareTo(val2) < 0;
-        if ("<=".equals(comparator))
-            return val1.compareTo(val2) <= 0;
-        if (">".equals(comparator))
-            return val1.compareTo(val2) > 0;
-        if (">=".equals(comparator))
-            return val1.compareTo(val2) >= 0;
-        if ("in".equals(comparator)) {
-            List<String> vals = Arrays.asList(val2.split(","));
-            return vals.contains(val1);
+        switch (comparator) {
+            case "=": return val1.equals(val2);
+            case "<": return val1.compareTo(val2) < 0;
+            case "<=": return val1.compareTo(val2) <= 0;
+            case ">": return val1.compareTo(val2) > 0;
+            case ">=": return val1.compareTo(val2) >= 0;
+            case "in": return Arrays.asList(val2.split(",")).contains(val1);
         }
-
         throw new IllegalArgumentException("Unknown comparator ["+comparator+"]");
     }
     /*
