@@ -15,8 +15,7 @@
                     <h4>Task type</h4>
                     <div class="">
                       <div class="hover-box" [class.selection]="taskTypeFilter == null" (click)="loadTasks()"><i class="fa fa-fw fa-folder"></i>&nbsp;All</div>
-                      <div class="hover-box" [class.selection]="taskTypeFilter == 0" (click)="loadTasks(0)"><i class="fa fa-blank"></i><i class="fa fa-fw fa-sitemap"></i>&nbsp;Attribute model</div>
-                      <div class="hover-box" [class.selection]="taskTypeFilter == 1" (click)="loadTasks(1)"><i class="fa fa-blank"></i><i class="fa fa-fw fa-list-ol"></i>&nbsp;Value model</div>
+                      <div class="hover-box" [class.selection]="taskTypeFilter == 0" (click)="loadTasks(0)"><i class="fa fa-blank"></i><i class="fa fa-fw fa-lightbulb-o"></i>&nbsp;Concepts</div>
                       <div class="hover-box" [class.selection]="taskTypeFilter == 2" (click)="loadTasks(2)"><i class="fa fa-blank"></i><i class="fa fa-fw fa-exchange"></i>&nbsp;Message Mappings</div>
                       <div class="hover-box" [class.selection]="taskTypeFilter == 3" (click)="loadTasks(3)"><i class="fa fa-blank"></i><i class="fa fa-fw fa-code"></i>&nbsp;Term Mappings</div>
                     </div>

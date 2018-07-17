@@ -12,6 +12,7 @@ import {NvD3Module} from 'ng2-nvd3';
 import { ConceptDetailsComponent } from './concept-details/concept-details.component';
 import { EditRelatedComponent } from './edit-related/edit-related.component';
 import { NodeGraphDialogComponent } from './node-graph-dialog/node-graph-dialog.component';
+import { TestResultDialogComponent } from './test-result-dialog/test-result-dialog.component';
 
 @NgModule({
   imports: [
@@ -22,8 +23,8 @@ import { NodeGraphDialogComponent } from './node-graph-dialog/node-graph-dialog.
     NvD3Module,
     NodeGraphModule
   ],
-  declarations: [ConceptPickerComponent, ConceptLibraryComponent, ConceptEditorComponent, ConceptDetailsComponent, EditRelatedComponent, NodeGraphDialogComponent],
-  entryComponents: [ConceptPickerComponent, EditRelatedComponent, NodeGraphDialogComponent],
+  declarations: [ConceptPickerComponent, ConceptLibraryComponent, ConceptEditorComponent, ConceptDetailsComponent, EditRelatedComponent, NodeGraphDialogComponent, TestResultDialogComponent],
+  entryComponents: [ConceptPickerComponent, EditRelatedComponent, NodeGraphDialogComponent, TestResultDialogComponent],
   providers: [ConceptService]
 })
 export class ConceptModule { }

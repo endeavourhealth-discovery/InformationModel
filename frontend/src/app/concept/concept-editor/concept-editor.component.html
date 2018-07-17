@@ -81,7 +81,10 @@
               </div>
               <div class="col-md-12">
                 <div class="card h-100" id="rulesCard" *ngIf="conceptBundle?.ruleSets">
-                  <div class="card-header"><h4>Rule sets <button class="btn btn-success pull-right" (click)="addRuleset()">Add</button></h4> </div>
+                  <div class="card-header"><h4>Rule sets <div class="pull-right">
+                    <button class="btn btn-info" (click)="testRuleset()">Test</button>
+                    <button class="btn btn-success" (click)="addRuleset()">Add</button>
+                  </div></h4> </div>
                   <div class="card-block">
                     <div class="row">
                       <div class="col-md-12">

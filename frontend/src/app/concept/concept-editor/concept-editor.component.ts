@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ViewChild} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {InputBoxDialog, LoggerService, MessageBoxDialog} from 'eds-angular4';
 import {Concept} from '../../models/Concept';
@@ -16,6 +16,8 @@ import {ConceptSummary} from '../../models/ConceptSummary';
 import {NodeGraphComponent} from 'eds-angular4/dist/node-graph/node-graph.component';
 import {NodeGraphDialogComponent} from '../node-graph-dialog/node-graph-dialog.component';
 import {ConceptRuleset} from '../../models/ConceptRuleset';
+import {ModuleStateService} from 'eds-angular4/dist/common';
+import {TestResultDialogComponent} from '../test-result-dialog/test-result-dialog.component';
 
 @Component({
   selector: 'app-concept-editor',
@@ -40,7 +42,8 @@ export class ConceptEditorComponent implements AfterViewInit {
               private location: Location,
               private logger: LoggerService,
               private modal: NgbModal,
-              private conceptService: ConceptService) { }
+              private conceptService: ConceptService,
+              private stateService: ModuleStateService) { }
 
   ngAfterViewInit() {
     this.route.params.subscribe(
@@ -68,6 +71,30 @@ export class ConceptEditorComponent implements AfterViewInit {
     );
   }
 
+  testRuleset() {
+    let testJson = this.stateService.getState('ConceptEditor');
+    if (!testJson)
+      testJson = '';
+    InputBoxDialog.open(this.modal, 'Test ruleset', 'Enter JSON data to test', testJson, 'OK', 'Cancel')
+      .result.then(
+      (result) => this.runTest(result)
+    );
+  }
+
+  runTest(testJson: string) {
+    this.conceptService.executeRules(testJson, this.conceptBundle.concept.id)
+      .subscribe(
+      (result) => this.displayTestResult(result)
+    );
+  }
+
+  displayTestResult(result: any) {
+    TestResultDialogComponent.open(this.modal, result)
+      .result.then(
+      () => {}
+    );
+  }
+
   newConcept(context: string) {
     let concept = new Concept();
     concept.context = context;
@@ -85,6 +112,9 @@ export class ConceptEditorComponent implements AfterViewInit {
   setConcept(conceptBundle: ConceptBundle) {
     this.conceptBundle = conceptBundle;
     this.refresh();
+    let testJson = this.stateService.getState('ConceptEditor');
+    if (testJson)
+      this.runTest(testJson);
   }
 
   refresh() {

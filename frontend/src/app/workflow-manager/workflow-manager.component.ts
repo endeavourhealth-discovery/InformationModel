@@ -4,6 +4,7 @@ import {Task} from 'app/models/Task';
 import {LoggerService} from 'eds-angular4';
 import {TaskType, TaskTypeHelper} from '../models/TaskType';
 import {Router} from '@angular/router';
+import {ModuleStateService} from 'eds-angular4/dist/common';
 
 @Component({
   selector: 'app-workflow-manager',
@@ -16,7 +17,8 @@ export class WorkflowManagerComponent implements OnInit {
 
   constructor(protected logger: LoggerService,
               protected workflowManagerService: WorkflowManagerService,
-              protected router: Router) {
+              protected router: Router,
+              protected stateService: ModuleStateService ) {
   }
 
   ngOnInit(): void {
@@ -39,6 +41,7 @@ export class WorkflowManagerComponent implements OnInit {
   gotoTask(task: Task) {
     switch (task.type) {
       case TaskType.ATTRIBUTE_MODEL: {
+        this.stateService.setState('ConceptEditor', task.description);
         this.router.navigate(['concept', task.identifier]);
         break;
       }

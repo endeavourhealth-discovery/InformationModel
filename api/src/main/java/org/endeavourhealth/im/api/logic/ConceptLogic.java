@@ -142,18 +142,22 @@ public class ConceptLogic {
         conceptBundle.getConcept().setTemplate(sb.toString());
     }
 
-    public CalculationResult calculate(String json) throws Exception {
+    public CalculationResult calculate(String json, Long conceptId, Boolean createTask) throws Exception {
         JsonNode object = ObjectMapperPool.getInstance().readTree(json);
 
         String resourceType = object.has("resourceType") ? object.get("resourceType").textValue() : null;
 
         CalculationResult result = new CalculationResult();
 
-        ConceptReference rootConcept = new ConceptReference().setId(1L).setText("Concept");
+        ConceptReference rootConcept = new ConceptReference();
+        if (conceptId == null)
+            rootConcept.setId(1L).setText("Concept");
+        else
+            rootConcept.setId(conceptId).setText("");
 
         result = calculateChild(resourceType, object, rootConcept, result);  // Call with root "Concept"
 
-        if (result.getStatus() == 1)
+        if (createTask && result.getStatus() == 1)
             new TaskLogic().createTask("Unknown type of " + result.getResult().getContext(), json, TaskType.ATTRIBUTE_MODEL, result.getResult().getId());
 
         return result;

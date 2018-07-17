@@ -212,11 +212,13 @@ public class ConceptEndpoint {
     @Timed(absolute = true, name = "InformationModel.ConceptEndpoint.Calculate.GET")
     @ApiOperation(value = "Returns Concept by JSON")
     public Response calculate(@Context SecurityContext sc,
+                        @ApiParam(value = "Root Concept Id") @QueryParam("conceptId") Long conceptId,
+                        @ApiParam(value = "Create task") @QueryParam("createTask") Boolean createTask,
                         @ApiParam(value = "JSON") String json
     ) throws Exception {
         LOG.debug("Get execute rules for concept");
 
-        CalculationResult result = new ConceptLogic().calculate(json);
+        CalculationResult result = new ConceptLogic().calculate(json, conceptId, createTask);
 
         return Response
             .ok()

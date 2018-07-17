@@ -9,6 +9,7 @@ import {Attribute} from '../models/Attribute';
 import {ConceptBundle} from '../models/ConceptBundle';
 import {ConceptReference} from '../models/ConceptReference';
 import {ConceptRuleset} from '../models/ConceptRuleset';
+import {CalculationResult} from '../models/CalculationResult';
 
 @Injectable()
 export class ConceptService {
@@ -46,6 +47,13 @@ export class ConceptService {
       .map((result) => result.json());
   }
 
+  executeRules(json: string, conceptId: number): Observable<CalculationResult> {
+    const params = new URLSearchParams();
+    params.append('conceptId', conceptId.toString());
+    params.append('createTask', "false");
+    return this.http.post('api/Concept/Rules/Execute', JSON.parse(json), {search: params})
+      .map((result) => result.json());
+  }
 
   getAttributes(conceptId: number): Observable<Attribute[]> {
     const params = new URLSearchParams();

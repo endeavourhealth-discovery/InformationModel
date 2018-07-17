@@ -5,6 +5,7 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {FormsModule} from '@angular/forms';
 import {BrowserModule} from '@angular/platform-browser';
 import {ControlsModule} from 'eds-angular4/dist/controls';
+import {CommonModule} from 'eds-angular4/dist/common';
 
 @NgModule({
   imports: [
@@ -12,6 +13,7 @@ import {ControlsModule} from 'eds-angular4/dist/controls';
     FormsModule,
     NgbModule,
     ControlsModule,
+    CommonModule,
   ],
   declarations: [WorkflowManagerComponent],
   providers: [WorkflowManagerService],
