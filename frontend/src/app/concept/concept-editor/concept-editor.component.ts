@@ -9,7 +9,7 @@ import {ConceptService} from '../concept.service';
 import {Location} from '@angular/common';
 import {RelatedConcept} from '../../models/RelatedConcept';
 import {EditRelatedComponent} from '../edit-related/edit-related.component';
-import {Attribute} from '../../models/Attribute';
+// import {Attribute} from '../../models/Attribute';
 import {ConceptBundle} from '../../models/ConceptBundle';
 import {ConceptReference} from '../../models/ConceptReference';
 import {ConceptSummary} from '../../models/ConceptSummary';
@@ -18,6 +18,8 @@ import {NodeGraphDialogComponent} from '../node-graph-dialog/node-graph-dialog.c
 import {ConceptRuleset} from '../../models/ConceptRuleset';
 import {ModuleStateService} from 'eds-angular4/dist/common';
 import {TestResultDialogComponent} from '../test-result-dialog/test-result-dialog.component';
+import {ConceptRule} from '../../models/ConceptRule';
+import {RuleEditorDialogComponent} from '../rule-editor-dialog/rule-editor-dialog.component';
 
 @Component({
   selector: 'app-concept-editor',
@@ -123,22 +125,24 @@ export class ConceptEditorComponent implements AfterViewInit {
     this.graph.assignColours([1,2,3,0]);
     this.graph.addNodeData(this.conceptBundle.concept.id, this.conceptBundle.concept.fullName, 1, this.conceptBundle.concept);
 
-    this.updateDiagram(this.conceptBundle.concept, this.conceptBundle.attributes, this.conceptBundle.related);
+    this.updateDiagram(this.conceptBundle.concept, /*this.conceptBundle.attributes, */this.conceptBundle.related);
   }
 
   loadDetails(conceptId: number) {
     this.conceptService.getConceptBundle(conceptId)
       .subscribe(
-        (result) => this.updateDiagram(result.concept, result.attributes, result.related),
+        (result) => this.updateDiagram(result.concept, /*result.attributes, */result.related),
         (error) => this.logger.error(error)
       );
   }
 
-  updateDiagram(concept: Concept, attributes: Attribute[], related: RelatedConcept[]) {
+  updateDiagram(concept: Concept, /*attributes: Attribute[],*/ related: RelatedConcept[]) {
+/*
     for (let attribute of attributes) {
       this.graph.addNodeData(attribute.attributeId, attribute.attribute.context, 3, attribute);
       this.graph.addEdgeData(concept.id, attribute.attributeId, 'Has attribute', attribute);
     }
+*/
 
     for (let item of related) {
       if (item.sourceId == concept.id) {
@@ -187,6 +191,7 @@ export class ConceptEditorComponent implements AfterViewInit {
 
   saveLinkedConcept(linkage: ConceptReference, target: Concept) {
     // TODO : Logic for checking and removing from DELETED lists
+/*
     if (linkage.id == 0) { // Its an attribute
       let attribute: Attribute = {
         id: null,
@@ -200,6 +205,7 @@ export class ConceptEditorComponent implements AfterViewInit {
       this.conceptBundle.attributes.push(attribute);
       this.updateDiagram(this.conceptBundle.concept, [attribute], []);
     } else {
+*/
       let related: RelatedConcept = {
         id: null,
         sourceId: this.conceptBundle.concept.id,
@@ -212,8 +218,8 @@ export class ConceptEditorComponent implements AfterViewInit {
         order: this.conceptBundle.related.length + 1
       };
       this.conceptBundle.related.push(related);
-      this.updateDiagram(this.conceptBundle.concept, [], [related]);
-    }
+      this.updateDiagram(this.conceptBundle.concept, /*[], */[related]);
+//    }
   }
 
   nodeClick(node) {
@@ -231,7 +237,7 @@ export class ConceptEditorComponent implements AfterViewInit {
     this.router.navigate(['concept', conceptId]);
   }
 
-  confirmDeleteAttribute(attribute: Attribute) {
+/*  confirmDeleteAttribute(attribute: Attribute) {
     MessageBoxDialog.open(this.modal, 'Concept editor', 'Are you sure that you want to delete the attribute "' + attribute.attribute.context + '"?', 'Delete attribute', 'Cancel')
       .result.then(
       (ok) => this.deleteAttribute(attribute),
@@ -246,7 +252,7 @@ export class ConceptEditorComponent implements AfterViewInit {
       if (attribute.id != 0)
         this.conceptBundle.deletedAttributeIds.push(attribute.id);
     }
-  }
+  }*/
 
   confirmDeleteRelationship(relatedConcept: RelatedConcept) {
     let context = relatedConcept.target ? relatedConcept.target.context : relatedConcept.source.context;
@@ -263,6 +269,27 @@ export class ConceptEditorComponent implements AfterViewInit {
       if (relatedConcept.id > 0)
         this.conceptBundle.deletedRelatedIds.push(relatedConcept.id);
     }
+  }
+
+  confirmDeleteRule(ruleset: ConceptRuleset) {
+    MessageBoxDialog.open(this.modal, 'Concept editor', 'Are you sure that you want to delete the selected rule set?', 'Delete rule set', 'Cancel')
+      .result.then(
+      (ok) => this.deleteRuleset(ruleset)
+    );
+  }
+
+  deleteRuleset(ruleset: ConceptRuleset) {
+    let idx = this.conceptBundle.ruleSets.indexOf(ruleset);
+    if (idx > -1) {
+      this.conceptBundle.ruleSets.splice(idx, 1);
+      if (ruleset.id > 0)
+        this.conceptBundle.deletedRuleSetIds.push(ruleset.id);
+    }
+  }
+
+  editRule(item: ConceptRuleset) {
+    RuleEditorDialogComponent.open(this.modal, item)
+      .result.then();
   }
 
   getRuleText(item: ConceptRuleset) {

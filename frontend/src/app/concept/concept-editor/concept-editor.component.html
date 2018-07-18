@@ -38,7 +38,7 @@
                             </tr>
                           </thead>
                           <tbody>
-                            <tr class="d-flex show-child-on-hover" *ngFor="let item of conceptBundle.attributes" [ngClass]="{'selection': selectedNode == item}" (click)="selectedNode = item">
+<!--                            <tr class="d-flex show-child-on-hover" *ngFor="let item of conceptBundle.attributes" [ngClass]="{'selection': selectedNode == item}" (click)="selectedNode = item">
                               <td class="col-3">{{conceptBundle.concept.context}}</td>
                               <td class="col-3">Has attribute</td>
                               <td class="col-3"><a href="#/concept/{{item.attributeId}}">{{item.attribute.context}}</a></td>
@@ -51,7 +51,7 @@
                               <td class="col-1">
                                 <button type="button" class="btn btn-sm btn-danger pull-right child-to-show" (click)="confirmDeleteAttribute(item)"><i class="fa fa-fw fa-trash fa-lg"></i></button>
                               </td>
-                            </tr>
+                            </tr>-->
                             <tr class="d-flex show-child-on-hover" *ngFor="let item of conceptBundle.related" [ngClass]="{'selection': selectedNode == item}" (click)="selectedNode = item">
                               <td class="col-3">
                                 <a href="#/concept/{{item.sourceId}}" *ngIf="item.source">{{item.source.fullName}}</a>
@@ -69,7 +69,7 @@
                                 <i class="fa fa-fw fa-plus" (click)="incLimit(item)"></i>
                               </td>
                               <td class="col-1">
-                                <button type="button" class="btn btn-sm btn-danger pull-right child-to-show" (click)="confirmDeleteAttribute(item)"><i class="fa fa-fw fa-trash fa-lg"></i></button>
+                                <button type="button" class="btn btn-sm btn-danger pull-right child-to-show" (click)="confirmDeleteRelationship(item)"><i class="fa fa-fw fa-trash fa-lg"></i></button>
                               </td>
                             </tr>
                           </tbody>
@@ -103,7 +103,10 @@
                               <td class="col-5">{{getRuleText(item)}}</td>
                               <td class="col-3"><a href="#/concept/{{item.target.id}}">{{item.target.text}}</a></td>
                               <td class="col-1">
-                                <button type="button" class="btn btn-sm btn-danger pull-right child-to-show" (click)="confirmDeleteAttribute(item)"><i class="fa fa-fw fa-trash fa-lg"></i></button>
+                                <div class="pull-right">
+                                  <button type="button" class="btn btn-sm btn-success child-to-show" (click)="editRule(item)"><i class="fa fa-fw fa-pencil fa-lg"></i></button>
+                                  <button type="button" class="btn btn-sm btn-danger child-to-show" (click)="confirmDeleteRule(item)"><i class="fa fa-fw fa-trash fa-lg"></i></button>
+                                </div>
                               </td>
                             </tr>
                           </tbody>
