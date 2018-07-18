@@ -19,7 +19,7 @@ import {ConceptRuleset} from '../../models/ConceptRuleset';
 import {ModuleStateService} from 'eds-angular4/dist/common';
 import {TestResultDialogComponent} from '../test-result-dialog/test-result-dialog.component';
 import {ConceptRule} from '../../models/ConceptRule';
-import {RuleEditorDialogComponent} from '../rule-editor-dialog/rule-editor-dialog.component';
+import {RulesetEditorDialogComponent} from '../rule-editor-dialog/ruleset-editor-dialog.component';
 
 @Component({
   selector: 'app-concept-editor',
@@ -271,7 +271,7 @@ export class ConceptEditorComponent implements AfterViewInit {
     }
   }
 
-  confirmDeleteRule(ruleset: ConceptRuleset) {
+  confirmDeleteRuleset(ruleset: ConceptRuleset) {
     MessageBoxDialog.open(this.modal, 'Concept editor', 'Are you sure that you want to delete the selected rule set?', 'Delete rule set', 'Cancel')
       .result.then(
       (ok) => this.deleteRuleset(ruleset)
@@ -287,12 +287,12 @@ export class ConceptEditorComponent implements AfterViewInit {
     }
   }
 
-  editRule(item: ConceptRuleset) {
-    RuleEditorDialogComponent.open(this.modal, item)
+  editRuleset(item: ConceptRuleset) {
+    RulesetEditorDialogComponent.open(this.modal, item)
       .result.then();
   }
 
-  getRuleText(item: ConceptRuleset) {
+  getRulesetText(item: ConceptRuleset) {
     let ruleText: string = '';
     for(let i in item.rules) {
       if (i !== '0')
@@ -300,7 +300,10 @@ export class ConceptEditorComponent implements AfterViewInit {
       ruleText += item.rules[i].property + " " + item.rules[i].comparator + " " + item.rules[i].value;
     }
 
-    return ruleText;
+    if (ruleText.length > 50)
+      return ruleText.substring(0, 50) + "...(more)";
+    else
+      return ruleText;
   }
 
   zoom() {
@@ -309,6 +312,7 @@ export class ConceptEditorComponent implements AfterViewInit {
       () => {}
     );
   }
+
 
   save() {
     this.conceptService.saveBundle(this.conceptBundle)

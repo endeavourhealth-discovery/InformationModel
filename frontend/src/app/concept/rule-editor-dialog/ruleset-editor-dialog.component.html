@@ -1,0 +1,74 @@
+<div class="modal-header">
+  <h4 class="modal-title">Ruleset editor</h4>
+  <button type="button" class="close" (click)="cancel()" aria-hidden="true">&times;</button>
+</div>
+<div class="modal-body">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="form-group col-md-6">
+        <label class="label">FHIR Resource type</label>
+        <input type="text" class="form-control" [(ngModel)]="ruleset.resourceType">
+      </div>
+      <div class="form-group col-md-6">
+        <label class="label">Target concept</label>
+        <div class="input-group">
+          <input type="text" class="form-control" readonly [(ngModel)]="ruleset.target.text">
+          <button class="btn input-group-addon" (click)="selectTarget()"><i class="fa fa-search"></i></button>
+        </div>
+      </div>
+      <div class="form-group col-md-8">
+        <label class="label">Rules</label> <button type="button" class="btn btn-sm btn-success" (click)="newRule()">Add</button>
+        <table class="table table-sm table-striped table-hover">
+          <thead class="thead-light">
+            <tr class="d-flex">
+              <th class="col-5">Attribute</th>
+              <th class="col-1"></th>
+              <th class="col-5">Value(s)</th>
+              <th class="col-1"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of ruleset.rules" class="d-flex show-child-on-hover" (click)="selectedRule=item" [class.selection]="item == selectedRule">
+              <td class="col-5">{{item.property}}</td>
+              <td class="col-1">{{item.comparator}}</td>
+              <td class="col-5">{{item.value}}</td>
+              <td class="col-1">
+                <div class="pull-right child-to-show">
+                  <button type="button" class="btn btn-sm btn-danger" (click)="deleteRule(item)"><i class="fa fa-fw fa-trash fa-lg"></i></button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="col-md-4" *ngIf="selectedRule">
+        <div class="form-group">
+          <label class="label">Attribute</label>
+          <input type="text" class="form-control" [(ngModel)]="selectedRule.property">
+        </div>
+        <div class="form-group">
+          <label class="label">Comparator</label>
+          <div ngbDropdown id="conceptStatus">
+            <button class="btn dropdown-toggle btn-block text-left" id="statusDropdown" ngbDropdownToggle [disabled]="readonly">{{selectedRule.comparator}}<i class="fa fa-caret-down pull-right"></i> </button>
+            <div class="dropdown-menu"  aria-labelledby="statusDropdown">
+              <button class="dropdown-item" (click)="selectedRule.comparator='='">= (equals)</button>
+              <button class="dropdown-item" (click)="selectedRule.comparator='>'">&gt; (greater than)</button>
+              <button class="dropdown-item" (click)="selectedRule.comparator='>='">&gt;= (greater than or equal)</button>
+              <button class="dropdown-item" (click)="selectedRule.comparator='<'">&lt; (less than)</button>
+              <button class="dropdown-item" (click)="selectedRule.comparator='<='">&lt;= (less than or equal)</button>
+              <button class="dropdown-item" (click)="selectedRule.comparator='in'">in (in - comma separated list)</button>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="label">Value(s)</label>
+          <input type="text" class="form-control" [(ngModel)]="selectedRule.value">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-success" (click)="ok()" name="ok">OK</button>
+  <button type="button" class="btn" (click)="cancel()" name="cancel">Close</button>
+</div>

@@ -185,7 +185,7 @@ public class ConceptLogic {
         result.setResult(c);
         result.setStatus(1); // Create draft concept/task
 
-        return result;    // TODO: Create draft concept or task
+        return result;
     }
 
     private Boolean meetsCriteria(JsonNode object, ConceptRuleSet ruleSet) {

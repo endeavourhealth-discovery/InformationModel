@@ -100,12 +100,12 @@
                           <tbody>
                             <tr class="d-flex show-child-on-hover" *ngFor="let item of conceptBundle.ruleSets">
                               <td class="col-3">{{item.resourceType}}</td>
-                              <td class="col-5">{{getRuleText(item)}}</td>
+                              <td class="col-5">{{getRulesetText(item)}}</td>
                               <td class="col-3"><a href="#/concept/{{item.target.id}}">{{item.target.text}}</a></td>
                               <td class="col-1">
-                                <div class="pull-right">
-                                  <button type="button" class="btn btn-sm btn-success child-to-show" (click)="editRule(item)"><i class="fa fa-fw fa-pencil fa-lg"></i></button>
-                                  <button type="button" class="btn btn-sm btn-danger child-to-show" (click)="confirmDeleteRule(item)"><i class="fa fa-fw fa-trash fa-lg"></i></button>
+                                <div class="pull-right child-to-show">
+                                  <button type="button" class="btn btn-sm btn-success" (click)="editRuleset(item)"><i class="fa fa-fw fa-pencil fa-lg"></i></button>
+                                  <button type="button" class="btn btn-sm btn-danger" (click)="confirmDeleteRuleset(item)"><i class="fa fa-fw fa-trash fa-lg"></i></button>
                                 </div>
                               </td>
                             </tr>

@@ -13,7 +13,7 @@ import { ConceptDetailsComponent } from './concept-details/concept-details.compo
 import { EditRelatedComponent } from './edit-related/edit-related.component';
 import { NodeGraphDialogComponent } from './node-graph-dialog/node-graph-dialog.component';
 import { TestResultDialogComponent } from './test-result-dialog/test-result-dialog.component';
-import { RuleEditorDialogComponent } from './rule-editor-dialog/rule-editor-dialog.component';
+import { RulesetEditorDialogComponent } from './rule-editor-dialog/ruleset-editor-dialog.component';
 
 @NgModule({
   imports: [
@@ -24,8 +24,8 @@ import { RuleEditorDialogComponent } from './rule-editor-dialog/rule-editor-dial
     NvD3Module,
     NodeGraphModule
   ],
-  declarations: [ConceptPickerComponent, ConceptLibraryComponent, ConceptEditorComponent, ConceptDetailsComponent, EditRelatedComponent, NodeGraphDialogComponent, TestResultDialogComponent, RuleEditorDialogComponent],
-  entryComponents: [ConceptPickerComponent, EditRelatedComponent, NodeGraphDialogComponent, TestResultDialogComponent, RuleEditorDialogComponent],
+  declarations: [ConceptPickerComponent, ConceptLibraryComponent, ConceptEditorComponent, ConceptDetailsComponent, EditRelatedComponent, NodeGraphDialogComponent, TestResultDialogComponent, RulesetEditorDialogComponent],
+  entryComponents: [ConceptPickerComponent, EditRelatedComponent, NodeGraphDialogComponent, TestResultDialogComponent, RulesetEditorDialogComponent],
   providers: [ConceptService]
 })
 export class ConceptModule { }

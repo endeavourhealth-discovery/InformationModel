@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { RuleEditorDialogComponent } from './rule-editor-dialog.component';
+import { RulesetEditorDialogComponent } from './ruleset-editor-dialog.component';
 
 describe('RuleEditorComponent', () => {
-  let component: RuleEditorDialogComponent;
-  let fixture: ComponentFixture<RuleEditorDialogComponent>;
+  let component: RulesetEditorDialogComponent;
+  let fixture: ComponentFixture<RulesetEditorDialogComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ RuleEditorDialogComponent ]
+      declarations: [ RulesetEditorDialogComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(RuleEditorDialogComponent);
+    fixture = TestBed.createComponent(RulesetEditorDialogComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
