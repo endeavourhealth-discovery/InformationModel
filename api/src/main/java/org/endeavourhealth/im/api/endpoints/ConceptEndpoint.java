@@ -218,7 +218,7 @@ public class ConceptEndpoint {
     ) throws Exception {
         LOG.debug("Get execute rules for concept");
 
-        CalculationResult result = new ConceptLogic().calculate(json, conceptId, createTask);
+        CalculationResult result = new ConceptLogic().calculate(json, conceptId, createTask == null ? false : createTask);
 
         return Response
             .ok()

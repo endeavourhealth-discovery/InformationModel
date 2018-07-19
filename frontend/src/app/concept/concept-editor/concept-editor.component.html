@@ -16,7 +16,7 @@
                 <div class="card h-100" id="detailCard" *ngIf="conceptBundle?.concept">
                   <div class="card-header"><h4>Concept details</h4></div>
                   <div class="card-block">
-                    <app-concept-details [(ngModel)]="conceptBundle.concept" name="details"></app-concept-details>
+                    <app-concept-details [(ngModel)]="conceptBundle.concept" name="details" (nameChanged)="nameChanged($event)"></app-concept-details>
                   </div>
                 </div>
               </div>
@@ -82,6 +82,7 @@
               <div class="col-md-12">
                 <div class="card h-100" id="rulesCard" *ngIf="conceptBundle?.ruleSets">
                   <div class="card-header"><h4>Rule sets <div class="pull-right">
+                    <small *ngIf="testJson">(Task test data loaded)</small>
                     <button class="btn btn-info" (click)="testRuleset()">Test</button>
                     <button class="btn btn-success" (click)="addRuleset()">Add</button>
                   </div></h4> </div>

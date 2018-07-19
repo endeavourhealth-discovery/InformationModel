@@ -1,7 +1,7 @@
 <div class="row" *ngIf="model">
   <div class="col-md-12 col-lg-6 form-group">
     <label for="conceptName">Full name</label>
-    <input class="form-control" id="conceptName" type="text" [(ngModel)]="model.fullName" name="conceptName" [readonly]="readonly">
+    <input class="form-control" id="conceptName" type="text" [(ngModel)]="model.fullName" name="conceptName" [readonly]="readonly" (change)="onNameChanged()">
   </div>
   <div class="col-md-6 col-lg-3 form-group">
     <label for="conceptVersion">Version</label>

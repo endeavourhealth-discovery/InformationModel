@@ -18,8 +18,8 @@ import {NodeGraphDialogComponent} from '../node-graph-dialog/node-graph-dialog.c
 import {ConceptRuleset} from '../../models/ConceptRuleset';
 import {ModuleStateService} from 'eds-angular4/dist/common';
 import {TestResultDialogComponent} from '../test-result-dialog/test-result-dialog.component';
-import {ConceptRule} from '../../models/ConceptRule';
 import {RulesetEditorDialogComponent} from '../rule-editor-dialog/ruleset-editor-dialog.component';
+import {InputBoxMultiLineDialog} from 'eds-angular4/dist/dialogs/inputBox/inputBoxMultiLine.dialog';
 
 @Component({
   selector: 'app-concept-editor',
@@ -33,6 +33,7 @@ export class ConceptEditorComponent implements AfterViewInit {
 
   data: any;
   selectedNode: any;
+  testJson: string;
 
   @ViewChild('nodeGraph') graph: NodeGraphComponent;
 
@@ -48,6 +49,7 @@ export class ConceptEditorComponent implements AfterViewInit {
               private stateService: ModuleStateService) { }
 
   ngAfterViewInit() {
+    this.testJson = this.stateService.getState('ConceptEditor');
     this.route.params.subscribe(
       params => {
         this.loadConcept(params['id']);
@@ -74,10 +76,24 @@ export class ConceptEditorComponent implements AfterViewInit {
   }
 
   testRuleset() {
-    let testJson = this.stateService.getState('ConceptEditor');
-    if (!testJson)
-      testJson = '';
-    InputBoxDialog.open(this.modal, 'Test ruleset', 'Enter JSON data to test', testJson, 'OK', 'Cancel')
+    MessageBoxDialog.open(this.modal, 'Test ruleset', 'Save concept before running the test?', 'Yes', 'No')
+      .result.then(
+      (yes) => this.saveAndPromptTestData(),
+      (no) => this.promptTestData()
+    )
+  }
+
+  saveAndPromptTestData() {
+    this.conceptService.saveBundle(this.conceptBundle)
+      .subscribe(
+        () => this.promptTestData(),
+        (error) => this.logger.error('Error during save', error, 'Save')
+      );
+  }
+
+  promptTestData() {
+    let testData = (this.testJson) ? this.testJson : '';
+    InputBoxMultiLineDialog.open(this.modal, 'Test ruleset', 'Enter FHIR (JSON) data to test', testData, 'OK', 'Cancel', 15)
       .result.then(
       (result) => this.runTest(result)
     );
@@ -100,6 +116,12 @@ export class ConceptEditorComponent implements AfterViewInit {
   newConcept(context: string) {
     let concept = new Concept();
     concept.context = context;
+    // Set full name to last part of context name as a default
+    let dot = context.lastIndexOf('.');
+    if (dot > 0)
+      concept.fullName = context.substring(dot + 1);
+    else
+      concept.fullName = context;
     this.setConcept({
       concept: concept,
       related: [],
@@ -117,6 +139,10 @@ export class ConceptEditorComponent implements AfterViewInit {
     let testJson = this.stateService.getState('ConceptEditor');
     if (testJson)
       this.runTest(testJson);
+  }
+
+  nameChanged(newName: string) {
+    this.refresh();
   }
 
   refresh() {

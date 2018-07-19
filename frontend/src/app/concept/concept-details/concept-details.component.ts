@@ -1,4 +1,4 @@
-import {Component, forwardRef, Input} from '@angular/core';
+import {Component, EventEmitter, forwardRef, Input, Output} from '@angular/core';
 import {ConceptStatus, ConceptStatusHelper} from '../../models/ConceptStatus';
 import {Concept} from '../../models/Concept';
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/forms';
@@ -26,6 +26,8 @@ export class ConceptDetailsComponent implements ControlValueAccessor {
   @Input('readonly')
   readonly: boolean;
 
+  @Output() nameChanged = new EventEmitter();
+
   model: Concept;
 
   constructor(private modal: NgbModal, private logger: LoggerService) {}
@@ -52,5 +54,9 @@ export class ConceptDetailsComponent implements ControlValueAccessor {
 
   registerOnTouched(fn: any): void {
     this.touched.push(fn);
+  }
+
+  onNameChanged() {
+    this.nameChanged.emit(this.model.fullName);
   }
 }
