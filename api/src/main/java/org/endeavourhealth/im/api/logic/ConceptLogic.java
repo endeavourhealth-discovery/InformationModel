@@ -41,14 +41,14 @@ public class ConceptLogic {
     public ConceptBundle getBundle(Long id) throws Exception {
         return new ConceptBundle()
             .setConcept(this.dal.get(id))
-            .setAttributes(this.getAttributes(id))
+//            .setAttributes(this.getAttributes(id))
             .setRelated(this.getRelated(id))
             .setRuleSets(this.getRuleSets(id));
     }
 
-    public List<Attribute> getAttributes(Long id) throws Exception {
-        return this.dal.getAttributes(id);
-    }
+//    public List<Attribute> getAttributes(Long id) throws Exception {
+//        return this.dal.getAttributes(id);
+//    }
 
     public List<RelatedConcept> getRelated(Long id) throws Exception {
         List<RelatedConcept> result = new ArrayList<>();
@@ -84,21 +84,21 @@ public class ConceptLogic {
     }
 
     public void save(ConceptBundle conceptBundle) throws Exception {
-        if (conceptBundle.getConcept().getAutoTemplate())
-            generateTemplate(conceptBundle);
+//        if (conceptBundle.getConcept().getAutoTemplate())
+//            generateTemplate(conceptBundle);
 
         Long conceptId = this.dal.save(conceptBundle.getConcept());
 
-        for(Attribute att: conceptBundle.getAttributes()) {
-            if (att.getConceptId() == null)
-                att.setConceptId(conceptId);
-
-            if (att.getId() == null) {
-                // Dynamic created attribute concept
-                System.out.println("Need to save attribute!");
-            }
-            this.dal.save(att);
-        }
+//        for(Attribute att: conceptBundle.getAttributes()) {
+//            if (att.getConceptId() == null)
+//                att.setConceptId(conceptId);
+//
+//            if (att.getId() == null) {
+//                // Dynamic created attribute concept
+//                System.out.println("Need to save attribute!");
+//            }
+//            this.dal.save(att);
+//        }
 
         for(RelatedConcept rel : conceptBundle.getRelated()) {
             if (rel.getTargetId() == null)
@@ -108,39 +108,39 @@ public class ConceptLogic {
             this.dal.save(rel);
         }
 
-        for(Long attId: conceptBundle.getDeletedAttributeIds())
-            this.dal.deleteAttribute(attId);
+//        for(Long attId: conceptBundle.getDeletedAttributeIds())
+//            this.dal.deleteAttribute(attId);
 
         for(Long relId: conceptBundle.getDeletedRelatedIds())
             this.dal.deleteRelationship(relId);
     }
-
-    private void generateTemplate(ConceptBundle conceptBundle) {
-        StringBuilder sb = new StringBuilder();
-
-        for(Attribute att: conceptBundle.getAttributes()) {
-            Long attributeType = att.getConceptId();
-            if (ConceptBaseType.NUMERIC.getId().equals(attributeType)) {
-                sb.append("    <label for='att_"+att.getAttributeId()+"'>"+att.getAttribute().getFullName()+"</label>" +
-                    "    <div class='input-group'>" +
-                    "      <input class='form-control' id='conceptType' type='number' value='{{getAttributeValue(" + att.getAttributeId() + ")}}' name='att_"+att.getAttributeId()+"' readonly>" +
-                    "    </div>");
-            } else if (ConceptBaseType.DATE_TIME.getId().equals(attributeType)) {
-
-            } else if (ConceptBaseType.CODE.getId().equals(attributeType)) {
-
-            } else if (ConceptBaseType.TEXT.getId().equals(attributeType)) {
-
-            } else if (ConceptBaseType.BOOLEAN.getId().equals(attributeType)) {
-
-            } else if (ConceptBaseType.CODEABLE_CONCEPT.getId().equals(attributeType)) {
-
-            } else {
-
-            }
-        }
-        conceptBundle.getConcept().setTemplate(sb.toString());
-    }
+//
+//    private void generateTemplate(ConceptBundle conceptBundle) {
+//        StringBuilder sb = new StringBuilder();
+//
+//        for(Attribute att: conceptBundle.getAttributes()) {
+//            Long attributeType = att.getConceptId();
+//            if (ConceptBaseType.NUMERIC.getId().equals(attributeType)) {
+//                sb.append("    <label for='att_"+att.getAttributeId()+"'>"+att.getAttribute().getFullName()+"</label>" +
+//                    "    <div class='input-group'>" +
+//                    "      <input class='form-control' id='conceptType' type='number' value='{{getAttributeValue(" + att.getAttributeId() + ")}}' name='att_"+att.getAttributeId()+"' readonly>" +
+//                    "    </div>");
+//            } else if (ConceptBaseType.DATE_TIME.getId().equals(attributeType)) {
+//
+//            } else if (ConceptBaseType.CODE.getId().equals(attributeType)) {
+//
+//            } else if (ConceptBaseType.TEXT.getId().equals(attributeType)) {
+//
+//            } else if (ConceptBaseType.BOOLEAN.getId().equals(attributeType)) {
+//
+//            } else if (ConceptBaseType.CODEABLE_CONCEPT.getId().equals(attributeType)) {
+//
+//            } else {
+//
+//            }
+//        }
+//        conceptBundle.getConcept().setTemplate(sb.toString());
+//    }
 
     public CalculationResult calculate(String json, Long conceptId, Boolean createTask) throws Exception {
         JsonNode object = ObjectMapperPool.getInstance().readTree(json);

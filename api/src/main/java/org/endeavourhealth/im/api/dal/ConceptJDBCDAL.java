@@ -115,40 +115,40 @@ public class ConceptJDBCDAL implements ConceptDAL {
         return concept;
     }
 
-    @Override
-    public List<Attribute> getAttributes(Long id) throws SQLException {
-        List<Attribute> result = new ArrayList<>();
-
-        String sql = "SELECT a.id, a.attribute_id, c.context, c.full_name, c.status, c.version, a.order, a.mandatory, a.`limit` " +
-            "FROM concept c " +
-            "JOIN concept_attribute a ON a.attribute_id = c.id " +
-            "WHERE a.concept_id = ?";
-
-        Connection conn = ConnectionPool.InformationModel.pop();
-
-        try(PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setLong(1, id);
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    result.add(
-                        new Attribute()
-                            .setId(rs.getLong("id"))
-                            .setConceptId(id)
-                            .setAttributeId(rs.getLong("attribute_id"))
-                            .setOrder(rs.getInt("order"))
-                            .setMandatory(rs.getBoolean("mandatory"))
-                            .setLimit(rs.getInt("limit"))
-                            .setAttribute(getConceptSummary(rs))
-                    );
-                }
-            }
-
-        } finally {
-            ConnectionPool.InformationModel.push(conn);
-        }
-
-        return result;
-    }
+//    @Override
+//    public List<Attribute> getAttributes(Long id) throws SQLException {
+//        List<Attribute> result = new ArrayList<>();
+//
+//        String sql = "SELECT a.id, a.attribute_id, c.context, c.full_name, c.status, c.version, a.order, a.mandatory, a.`limit` " +
+//            "FROM concept c " +
+//            "JOIN concept_attribute a ON a.attribute_id = c.id " +
+//            "WHERE a.concept_id = ?";
+//
+//        Connection conn = ConnectionPool.InformationModel.pop();
+//
+//        try(PreparedStatement stmt = conn.prepareStatement(sql)) {
+//            stmt.setLong(1, id);
+//            try (ResultSet rs = stmt.executeQuery()) {
+//                while (rs.next()) {
+//                    result.add(
+//                        new Attribute()
+//                            .setId(rs.getLong("id"))
+//                            .setConceptId(id)
+//                            .setAttributeId(rs.getLong("attribute_id"))
+//                            .setOrder(rs.getInt("order"))
+//                            .setMandatory(rs.getBoolean("mandatory"))
+//                            .setLimit(rs.getInt("limit"))
+//                            .setAttribute(getConceptSummary(rs))
+//                    );
+//                }
+//            }
+//
+//        } finally {
+//            ConnectionPool.InformationModel.push(conn);
+//        }
+//
+//        return result;
+//    }
 
 
     @Override
@@ -255,9 +255,7 @@ public class ConceptJDBCDAL implements ConceptDAL {
     public List<ConceptReference> getRelationships() throws SQLException {
         String sql = "SELECT c.id, c.full_name " +
             "FROM concept c " +
-            "JOIN concept_relationship r ON r.source = c.id " +
-            "WHERE r.relationship = 100 " +        // 100 = Is a
-            "AND r.target = 8 ";                   // 8 == Relationship
+            "WHERE c.type = 2 ";              // 2 == Relationship
 
         Connection conn = ConnectionPool.InformationModel.pop();
 
@@ -317,16 +315,16 @@ public class ConceptJDBCDAL implements ConceptDAL {
 
         return id;
     }
-
-    @Override
-    public void deleteAttribute(Long attributeId) throws Exception {
-        this.filer.storeAndApply(
-            OWNER,
-            TransactionAction.DELETE,
-            TransactionTable.ATTRIBUTE,
-            new DbEntity().setId(attributeId)
-        );
-    }
+//
+//    @Override
+//    public void deleteAttribute(Long attributeId) throws Exception {
+//        this.filer.storeAndApply(
+//            OWNER,
+//            TransactionAction.DELETE,
+//            TransactionTable.ATTRIBUTE,
+//            new DbEntity().setId(attributeId)
+//        );
+//    }
 
     @Override
     public void deleteRelationship(Long relId) throws Exception{
@@ -408,11 +406,10 @@ public class ConceptJDBCDAL implements ConceptDAL {
     private Concept getConceptFromResultSet(ResultSet rs) throws SQLException {
         return new Concept()
             .setId(rs.getLong("id"))
+            .setType(rs.getLong("type"))
             .setContext(rs.getString("context"))
             .setDescription(rs.getString("description"))
             .setFullName(rs.getString("full_name"))
-            .setCriteria(rs.getString("criteria"))
-            .setExpression(rs.getString("Expression"))
             .setUrl(rs.getString("url"))
             .setVersion(rs.getString("version"))
             .setStatus(ConceptStatus.byValue(rs.getByte("status")))

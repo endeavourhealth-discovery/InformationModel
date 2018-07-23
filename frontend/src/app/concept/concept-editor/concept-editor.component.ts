@@ -115,6 +115,7 @@ export class ConceptEditorComponent implements AfterViewInit {
 
   newConcept(context: string) {
     let concept = new Concept();
+    concept.type = 1; // Default to a concept
     concept.context = context;
     // Set full name to last part of context name as a default
     let dot = context.lastIndexOf('.');
@@ -125,10 +126,10 @@ export class ConceptEditorComponent implements AfterViewInit {
     this.setConcept({
       concept: concept,
       related: [],
-      attributes: [],
+      // attributes: [],
       ruleSets: [],
       deletedRelatedIds: [],
-      deletedAttributeIds: [],
+      // deletedAttributeIds: [],
       deletedRuleSetIds: []
     });
   }

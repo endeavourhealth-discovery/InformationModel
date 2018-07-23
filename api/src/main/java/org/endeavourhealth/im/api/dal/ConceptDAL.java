@@ -10,7 +10,7 @@ public interface ConceptDAL {
     ConceptSummaryList search(String searchTerm) throws Exception;
     Concept get(Long id) throws Exception;
     Concept getConceptByContext(String name) throws Exception;
-    List<Attribute> getAttributes(Long id) throws Exception;
+//    List<Attribute> getAttributes(Long id) throws Exception;
     List<RelatedConcept> getRelatedTargets(Long id) throws Exception;
     List<RelatedConcept> getRelatedSources(Long id) throws Exception;
     List<ConceptReference> getRelationships() throws Exception;
@@ -18,7 +18,7 @@ public interface ConceptDAL {
     Long save(Attribute att) throws Exception;
     Long save(RelatedConcept relatedConcept) throws Exception;
 
-    void deleteAttribute(Long attributeId) throws Exception;
+//    void deleteAttribute(Long attributeId) throws Exception;
 
     void deleteRelationship(Long relId) throws Exception;
 

@@ -5,7 +5,7 @@ import {Concept} from '../models/Concept';
 import {ConceptSummary} from '../models/ConceptSummary';
 import {RelatedConcept} from '../models/RelatedConcept';
 import {ConceptSummaryList} from '../models/ConceptSummaryList';
-import {Attribute} from '../models/Attribute';
+// import {Attribute} from '../models/Attribute';
 import {ConceptBundle} from '../models/ConceptBundle';
 import {ConceptReference} from '../models/ConceptReference';
 import {ConceptRuleset} from '../models/ConceptRuleset';
@@ -55,12 +55,12 @@ export class ConceptService {
       .map((result) => result.json());
   }
 
-  getAttributes(conceptId: number): Observable<Attribute[]> {
-    const params = new URLSearchParams();
-    params.append('id', conceptId.toString());
-    return this.http.get('api/Concept/Attribute', {search: params})
-      .map((result) => result.json());
-  }
+  // getAttributes(conceptId: number): Observable<Attribute[]> {
+  //   const params = new URLSearchParams();
+  //   params.append('id', conceptId.toString());
+  //   return this.http.get('api/Concept/Attribute', {search: params})
+  //     .map((result) => result.json());
+  // }
 
   getRelatedTargets(conceptId: number): Observable<RelatedConcept[]> {
     const params = new URLSearchParams();

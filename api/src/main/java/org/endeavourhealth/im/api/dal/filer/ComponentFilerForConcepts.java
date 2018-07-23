@@ -69,14 +69,13 @@ public class ComponentFilerForConcepts extends ComponentFiler {
         List<String> fields = new ArrayList<>();
 
         if (concept.getId() != null) fields.add("id");
+        if (concept.getType() != null) fields.add("type");
         if (concept.getUrl() != null) fields.add("url");
         if (concept.getFullName() != null) fields.add("full_name");
         if (concept.getContext() != null) fields.add("context");
         if (concept.getStatus() != null) fields.add("status");
         if (concept.getVersion() != null) fields.add("version");
         if (concept.getDescription() != null) fields.add("description");
-        if (concept.getExpression() != null) fields.add("expression");
-        if (concept.getCriteria() != null) fields.add("criteria");
         if (concept.getUseCount() != null) fields.add("use_count");
 
         return fields;
@@ -87,6 +86,9 @@ public class ComponentFilerForConcepts extends ComponentFiler {
 
         if (concept.getId() != null)
             statement.setLong(i++, concept.getId());
+
+        if (concept.getType() != null)
+            statement.setLong(i++, concept.getType());
 
         if (concept.getUrl() != null)
             statement.setString(i++, concept.getUrl());
@@ -105,12 +107,6 @@ public class ComponentFilerForConcepts extends ComponentFiler {
 
         if (concept.getDescription() != null)
             statement.setString(i++, concept.getDescription());
-
-        if (concept.getExpression() != null)
-            statement.setString(i++, concept.getExpression());
-
-        if (concept.getCriteria() != null)
-            statement.setString(i++, concept.getCriteria());
 
         if (concept.getUseCount() != null)
             statement.setLong(i++, concept.getUseCount());

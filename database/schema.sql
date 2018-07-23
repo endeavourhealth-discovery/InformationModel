@@ -13,31 +13,30 @@ USE im;
 DROP TABLE IF EXISTS concept;
 CREATE TABLE concept(
   id BIGINT AUTO_INCREMENT PRIMARY KEY          COMMENT 'Main concept id, common across all tables',
+  type BIGINT NOT NULL                          COMMENT 'Whether this is a concept or relationship',
   url VARCHAR(250)                              COMMENT 'URL for where documentation for this concept is published',
   full_name VARCHAR(4096)                       COMMENT 'Full, clear, unambiguous name for the concept',
   context VARCHAR(250) NOT NULL                 COMMENT 'Unique, computable (immutable) name for the concept',
   status TINYINT NOT NULL DEFAULT 0             COMMENT 'Concept status - 0=Draft, 1=Active, 2=Deprecated, 3=Temporary',
   version VARCHAR(10) NOT NULL DEFAULT '0.1'    COMMENT 'Concept version',
   description VARCHAR(4096)                     COMMENT 'Full textual description of the concept',
-  expression VARCHAR(1024)                      COMMENT 'Definition of this concept, based on other concepts, using ECL',
-  criteria VARCHAR(1024)                        COMMENT 'Definition of this concept, using a criteria in D/IMQL',
   use_count BIGINT NOT NULL DEFAULT 0           COMMENT 'Counter for number of occurrences of use (could be used for ordering?)',
   auto_template BOOLEAN NOT NULL DEFAULT 1      COMMENT 'Flag denoting system generated value template',
   template LONGTEXT                             COMMENT 'Angular html template for editing values of this concept type'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS concept_attribute;
-CREATE TABLE concept_attribute (
-  id BIGINT AUTO_INCREMENT PRIMARY KEY,
-  concept_id BIGINT NOT NULL                    COMMENT 'The concept that has the attribute',
-  attribute_id BIGINT NOT NULL                  COMMENT 'The attribute',
-  `order` INTEGER DEFAULT 0                     COMMENT 'Attribute display order',
-  mandatory BOOLEAN DEFAULT 0                   COMMENT 'Is this relationship optional (0:??) or mandatory (1:??)',
-  `limit` INTEGER DEFAULT 0                     COMMENT 'Is this relationship limited (??:n) or unlimited (??:0)',
-
-  CONSTRAINT concept_attribute_concept_id_fk    FOREIGN KEY (concept_id) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT concept_attribute_attribute_id_fk  FOREIGN KEY (attribute_id) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+# DROP TABLE IF EXISTS concept_attribute;
+# CREATE TABLE concept_attribute (
+#   id BIGINT AUTO_INCREMENT PRIMARY KEY,
+#   concept_id BIGINT NOT NULL                    COMMENT 'The concept that has the attribute',
+#   attribute_id BIGINT NOT NULL                  COMMENT 'The attribute',
+#   `order` INTEGER DEFAULT 0                     COMMENT 'Attribute display order',
+#   mandatory BOOLEAN DEFAULT 0                   COMMENT 'Is this relationship optional (0:??) or mandatory (1:??)',
+#   `limit` INTEGER DEFAULT 0                     COMMENT 'Is this relationship limited (??:n) or unlimited (??:0)',
+#
+#   CONSTRAINT concept_attribute_concept_id_fk    FOREIGN KEY (concept_id) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
+#   CONSTRAINT concept_attribute_attribute_id_fk  FOREIGN KEY (attribute_id) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION
+# ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS concept_relationship;
 CREATE TABLE concept_relationship (
@@ -60,50 +59,50 @@ CREATE TABLE concept_relationship (
 
 # -- ********** CONCEPT VALUE/INSTANCE TABLES **********
 
-DROP TABLE IF EXISTS concept_value;
-CREATE TABLE concept_value (
-  id BIGINT AUTO_INCREMENT PRIMARY KEY          COMMENT '',
-  concept_id BIGINT NOT NULL                    COMMENT '',
-  name VARCHAR(50)                              COMMENT '',
-
-  CONSTRAINT concept_value_concept_fk           FOREIGN KEY (concept_id) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS concept_attribute_value;
-CREATE TABLE concept_attribute_value (
-  id BIGINT PRIMARY KEY                         COMMENT '',
-  concept_value_id BIGINT NOT NULL              COMMENT '',
-  attribute_id BIGINT NOT NULL                  COMMENT '',
-  numeric_value BIGINT                          COMMENT '',
-  text_value LONGTEXT                           COMMENT '',
-
-  KEY concept_value_id_idx (concept_value_id),
-  KEY attribute_id_numeric_value_idx (attribute_id, numeric_value),
-  CONSTRAINT concept_attribute_value_concept_value_id_fk  FOREIGN KEY (concept_value_id) REFERENCES concept_value(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT concept_attribute_value_attribute_id_fk      FOREIGN KEY (attribute_id) REFERENCES concept_attribute(id) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-
-DROP TABLE IF EXISTS concept_value_relationship;
-CREATE TABLE concept_value_relationship (
-  id BIGINT AUTO_INCREMENT PRIMARY KEY              COMMENT '',
-  source BIGINT NOT NULL                            COMMENT '',
-  relationship BIGINT NOT NULL                      COMMENT '',
-  target BIGINT NOT NULL                            COMMENT '',
-
-  CONSTRAINT concept_value_relationship_source_fk       FOREIGN KEY (source) REFERENCES concept_value(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT concept_value_relationship_target_fk       FOREIGN KEY (target) REFERENCES concept_value(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT concept_value_relationship_relationship_fk FOREIGN KEY (relationship) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS concept_attribute_ui;
-CREATE TABLE concept_attribute_ui (
-  id BIGINT PRIMARY KEY                   COMMENT '',
-  template LONGTEXT NOT NULL              COMMENT '',
-
-  CONSTRAINT concept_attribute_ui_id_fk   FOREIGN KEY (id) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
+# DROP TABLE IF EXISTS concept_value;
+# CREATE TABLE concept_value (
+#   id BIGINT AUTO_INCREMENT PRIMARY KEY          COMMENT '',
+#   concept_id BIGINT NOT NULL                    COMMENT '',
+#   name VARCHAR(50)                              COMMENT '',
+#
+#   CONSTRAINT concept_value_concept_fk           FOREIGN KEY (concept_id) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION
+# ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+#
+# DROP TABLE IF EXISTS concept_attribute_value;
+# CREATE TABLE concept_attribute_value (
+#   id BIGINT PRIMARY KEY                         COMMENT '',
+#   concept_value_id BIGINT NOT NULL              COMMENT '',
+#   attribute_id BIGINT NOT NULL                  COMMENT '',
+#   numeric_value BIGINT                          COMMENT '',
+#   text_value LONGTEXT                           COMMENT '',
+#
+#   KEY concept_value_id_idx (concept_value_id),
+#   KEY attribute_id_numeric_value_idx (attribute_id, numeric_value),
+#   CONSTRAINT concept_attribute_value_concept_value_id_fk  FOREIGN KEY (concept_value_id) REFERENCES concept_value(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
+#   CONSTRAINT concept_attribute_value_attribute_id_fk      FOREIGN KEY (attribute_id) REFERENCES concept_attribute(id) ON DELETE NO ACTION ON UPDATE NO ACTION
+# ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+#
+#
+# DROP TABLE IF EXISTS concept_value_relationship;
+# CREATE TABLE concept_value_relationship (
+#   id BIGINT AUTO_INCREMENT PRIMARY KEY              COMMENT '',
+#   source BIGINT NOT NULL                            COMMENT '',
+#   relationship BIGINT NOT NULL                      COMMENT '',
+#   target BIGINT NOT NULL                            COMMENT '',
+#
+#   CONSTRAINT concept_value_relationship_source_fk       FOREIGN KEY (source) REFERENCES concept_value(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
+#   CONSTRAINT concept_value_relationship_target_fk       FOREIGN KEY (target) REFERENCES concept_value(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
+#   CONSTRAINT concept_value_relationship_relationship_fk FOREIGN KEY (relationship) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION
+# ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+#
+# DROP TABLE IF EXISTS concept_attribute_ui;
+# CREATE TABLE concept_attribute_ui (
+#   id BIGINT PRIMARY KEY                   COMMENT '',
+#   template LONGTEXT NOT NULL              COMMENT '',
+#
+#   CONSTRAINT concept_attribute_ui_id_fk   FOREIGN KEY (id) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION
+# ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+#
 # -- ********** TRANSACTION TABLES **********
 
 DROP TABLE IF EXISTS transaction_action;
@@ -164,18 +163,18 @@ CREATE TABLE task (
 
 -- ********** TERM/MAPPING TABLES **********
 
-DROP TABLE IF EXISTS term_mapping;
-CREATE TABLE term_mapping (
-  id BIGINT AUTO_INCREMENT PRIMARY KEY,
-  organisation VARCHAR(36) NOT NULL,
-  context VARCHAR(50) NOT NULL,
-  system VARCHAR(15) NOT NULL,
-  code VARCHAR(25) NOT NULL,
-  concept_id BIGINT NOT NULL,
-
-  UNIQUE KEY term_mapping_organisation_context_system_code_idx (organisation, context, system, code),
-  CONSTRAINT term_mapping_term_id_fk FOREIGN KEY (concept_id) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+# DROP TABLE IF EXISTS term_mapping;
+# CREATE TABLE term_mapping (
+#   id BIGINT AUTO_INCREMENT PRIMARY KEY,
+#   organisation VARCHAR(36) NOT NULL,
+#   context VARCHAR(50) NOT NULL,
+#   system VARCHAR(15) NOT NULL,
+#   code VARCHAR(25) NOT NULL,
+#   concept_id BIGINT NOT NULL,
+#
+#   UNIQUE KEY term_mapping_organisation_context_system_code_idx (organisation, context, system, code),
+#   CONSTRAINT term_mapping_term_id_fk FOREIGN KEY (concept_id) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION
+# ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ********** CONCEPT RULE TABLES **********
 DROP TABLE IF EXISTS concept_rule;

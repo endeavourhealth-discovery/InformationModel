@@ -111,25 +111,25 @@ public class ConceptEndpoint {
             .entity(result)
             .build();
     }
-
-    @GET
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    @Path("/Attribute")
-    @Timed(absolute = true, name = "InformationModel.ConceptEndpoint.Attribute.GET")
-    @ApiOperation(value = "Returns a list of attributes of a concept")
-    public Response getAttributes(@Context SecurityContext sc,
-                                  @ApiParam(value = "Concept Id") @QueryParam("id") Long id
-    ) throws Exception {
-        LOG.debug("Get concept attributes");
-
-        List<Attribute> result = new ConceptLogic().getAttributes(id);
-
-        return Response
-            .ok()
-            .entity(result)
-            .build();
-    }
+//
+//    @GET
+//    @Consumes(MediaType.APPLICATION_JSON)
+//    @Produces(MediaType.APPLICATION_JSON)
+//    @Path("/Attribute")
+//    @Timed(absolute = true, name = "InformationModel.ConceptEndpoint.Attribute.GET")
+//    @ApiOperation(value = "Returns a list of attributes of a concept")
+//    public Response getAttributes(@Context SecurityContext sc,
+//                                  @ApiParam(value = "Concept Id") @QueryParam("id") Long id
+//    ) throws Exception {
+//        LOG.debug("Get concept attributes");
+//
+//        List<Attribute> result = new ConceptLogic().getAttributes(id);
+//
+//        return Response
+//            .ok()
+//            .entity(result)
+//            .build();
+//    }
 
 
     @GET
