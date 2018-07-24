@@ -414,7 +414,8 @@ public class ConceptJDBCDAL implements ConceptDAL {
             .setVersion(rs.getString("version"))
             .setStatus(ConceptStatus.byValue(rs.getByte("status")))
             .setAutoTemplate(rs.getBoolean("auto_template"))
-            .setTemplate(rs.getString("template"));
+            .setTemplate(rs.getString("template"))
+            .setUseCount(rs.getLong("use_count"));
     }
 
     private void checkAndResolve(ConceptReference ref) throws SQLException {

@@ -26,6 +26,7 @@ import { RulesetEditorDialogComponent } from './rule-editor-dialog/ruleset-edito
   ],
   declarations: [ConceptPickerComponent, ConceptLibraryComponent, ConceptEditorComponent, ConceptDetailsComponent, EditRelatedComponent, NodeGraphDialogComponent, TestResultDialogComponent, RulesetEditorDialogComponent],
   entryComponents: [ConceptPickerComponent, EditRelatedComponent, NodeGraphDialogComponent, TestResultDialogComponent, RulesetEditorDialogComponent],
-  providers: [ConceptService]
+  providers: [ConceptService],
+  exports: [ConceptDetailsComponent]
 })
 export class ConceptModule { }

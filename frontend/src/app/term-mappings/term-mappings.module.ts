@@ -10,6 +10,7 @@ import 'nvd3';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {TermMappingsService} from './term-mappings.service';
 import {NodeGraphModule} from 'eds-angular4/dist/node-graph';
+import {ConceptModule} from '../concept/concept.module';
 
 @NgModule({
   imports: [
@@ -17,7 +18,8 @@ import {NodeGraphModule} from 'eds-angular4/dist/node-graph';
     CommonModule,
     NvD3Module,
     NgbModule,
-    NodeGraphModule
+    NodeGraphModule,
+    ConceptModule
   ],
   declarations: [TermMappingsComponent, TermMappingsEditorComponent],
   providers: [TermMappingsService]

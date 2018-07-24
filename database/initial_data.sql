@@ -46,6 +46,7 @@ VALUES
   (103, 2, 'Has value type',           'Relationship.ValueType',         'The target defines/restricts allowable values of the source'),
   (104, 2, 'Related to',               'Relationship.RelatedTo',         'A generalized relationship between two concepts'),
   (105, 2, 'Qualified by',             'Relationship.QualifiedBy',       'The target qualifies the meaning of the source'),
+  (106, 2, 'Has child',                'Relationship.HasChild',          'The target concept is a child of the source concept'),
 
 -- ****************************************************************************
 -- * The following data is "dynamic", i.e. NOT base IM data                   *

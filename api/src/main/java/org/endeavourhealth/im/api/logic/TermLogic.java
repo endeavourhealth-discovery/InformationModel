@@ -33,6 +33,8 @@ public class TermLogic {
         // Mapping exists, return it
         if (conceptId != null) {
             concept = this.conceptLogic.get(conceptId);
+            concept.incUseCount();
+            this.conceptLogic.save(concept);
         } else {
             // Try to find based on context
             String termConceptContext = "Term." + system + "." + code;
@@ -51,6 +53,7 @@ public class TermLogic {
                     concept.setStatus(ConceptStatus.ACTIVE)
                         // TODO: Replace with relationship
                         // .setType(new ConceptReference().setText("Class.Code"))
+                        .setType(1L)
                         .setFullName(officialTerm);
                     conceptId = this.conceptLogic.save(concept);
                     importParentHierarchy(conceptId, system, code);
@@ -59,9 +62,10 @@ public class TermLogic {
                     concept.setStatus(ConceptStatus.DRAFT)
                         // TODO: Replace with relationship
                         // .setType(new ConceptReference().setText("Class.Code"))
+                        .setType(1L)
                         .setFullName(termText);
                     conceptId = this.conceptLogic.save(concept);
-                    this.taskLogic.createTask("New draft term", termConceptContext + " => " + termText, TaskType.TERM_MAPPINGS, conceptId);
+                    this.taskLogic.createTask("New draft term [" + termText + "]", termConceptContext + " => " + termText, TaskType.TERM_MAPPINGS, conceptId);
                 }
             }
 
@@ -107,6 +111,7 @@ public class TermLogic {
                     .setContext(context)
                     // TODO: Replace with relationship
                     // .setType(new ConceptReference().setText("Class.Code"))
+                    .setType(1L)
                     .setStatus(ConceptStatus.ACTIVE)
                     .setFullName(parent.getText());
 

@@ -163,18 +163,18 @@ CREATE TABLE task (
 
 -- ********** TERM/MAPPING TABLES **********
 
-# DROP TABLE IF EXISTS term_mapping;
-# CREATE TABLE term_mapping (
-#   id BIGINT AUTO_INCREMENT PRIMARY KEY,
-#   organisation VARCHAR(36) NOT NULL,
-#   context VARCHAR(50) NOT NULL,
-#   system VARCHAR(15) NOT NULL,
-#   code VARCHAR(25) NOT NULL,
-#   concept_id BIGINT NOT NULL,
-#
-#   UNIQUE KEY term_mapping_organisation_context_system_code_idx (organisation, context, system, code),
-#   CONSTRAINT term_mapping_term_id_fk FOREIGN KEY (concept_id) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION
-# ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+DROP TABLE IF EXISTS term_mapping;
+CREATE TABLE term_mapping (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  organisation VARCHAR(36) NOT NULL,
+  context VARCHAR(50) NOT NULL,
+  system VARCHAR(15) NOT NULL,
+  code VARCHAR(25) NOT NULL,
+  concept_id BIGINT NOT NULL,
+
+  UNIQUE KEY term_mapping_organisation_context_system_code_idx (organisation, context, system, code),
+  CONSTRAINT term_mapping_term_id_fk FOREIGN KEY (concept_id) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ********** CONCEPT RULE TABLES **********
 DROP TABLE IF EXISTS concept_rule;

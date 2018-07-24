@@ -101,4 +101,8 @@ public class Concept extends DbEntity<Concept> {
         this.template = template;
         return this;
     }
+
+    public void incUseCount() {
+        this.useCount++;
+    }
 }
