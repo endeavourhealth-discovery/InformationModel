@@ -24,7 +24,7 @@ public enum ConceptStatus {
 
     public static ConceptStatus byValue(Byte value) {
         for (ConceptStatus t: ConceptStatus.values()) {
-            if (t.value == value)
+            if (t.value.equals(value))
                 return t;
         }
 

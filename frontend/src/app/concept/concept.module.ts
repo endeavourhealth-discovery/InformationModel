@@ -14,6 +14,7 @@ import { EditRelatedComponent } from './edit-related/edit-related.component';
 import { NodeGraphDialogComponent } from './node-graph-dialog/node-graph-dialog.component';
 import { TestResultDialogComponent } from './test-result-dialog/test-result-dialog.component';
 import { RulesetEditorDialogComponent } from './rule-editor-dialog/ruleset-editor-dialog.component';
+import {ConceptSelectorModule} from '../concept-selector/concept-selector.module';
 
 @NgModule({
   imports: [
@@ -22,7 +23,8 @@ import { RulesetEditorDialogComponent } from './rule-editor-dialog/ruleset-edito
     ControlsModule,
     NgbModule,
     NvD3Module,
-    NodeGraphModule
+    NodeGraphModule,
+    ConceptSelectorModule
   ],
   declarations: [ConceptPickerComponent, ConceptLibraryComponent, ConceptEditorComponent, ConceptDetailsComponent, EditRelatedComponent, NodeGraphDialogComponent, TestResultDialogComponent, RulesetEditorDialogComponent],
   entryComponents: [ConceptPickerComponent, EditRelatedComponent, NodeGraphDialogComponent, TestResultDialogComponent, RulesetEditorDialogComponent],

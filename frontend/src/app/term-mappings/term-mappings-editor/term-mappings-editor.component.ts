@@ -91,7 +91,7 @@ export class TermMappingsEditorComponent implements AfterViewInit {
   }
 
   setStatus(status: ConceptStatus) {
-    this.model.status = status;
+    this.model.status = ConceptStatusHelper.getName(status);
   }
 
   selectRelated(node: any) {

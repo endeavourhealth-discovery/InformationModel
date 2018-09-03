@@ -17,6 +17,7 @@ export class AppMenuService implements  AbstractMenuProvider {
       { path: '', redirectTo : 'conceptLibrary', pathMatch: 'full' },  // Default route
       { path: 'conceptLibrary', component: ConceptLibraryComponent },
       { path: 'concept/:id', component: ConceptEditorComponent },
+      { path: 'concept/:id/:context', component: ConceptEditorComponent },
       { path: 'workflowManager', component: WorkflowManagerComponent },
       { path: 'termMappings', component: TermMappingsComponent },
       { path: 'termMappings/:id', component: TermMappingsEditorComponent },
@@ -40,5 +41,9 @@ export class AppMenuService implements  AbstractMenuProvider {
       {caption: 'Workflow manager', state: 'workflowManager', icon: 'fa fa-code-fork', role: 'eds-info-manager:workflow'},
       {caption: 'Term mappings', state: 'termMappings', icon: 'fa fa-code', role: 'eds-info-manager:termMappings'}
     ];
+  }
+
+  useUserManagerForRoles(): boolean {
+    return false;
   }
 }

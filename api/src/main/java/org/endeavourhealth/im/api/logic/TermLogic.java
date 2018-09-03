@@ -1,10 +1,11 @@
 package org.endeavourhealth.im.api.logic;
 
-import org.endeavourhealth.im.api.dal.TermDAL;
-import org.endeavourhealth.im.api.dal.TermJDBCDAL;
-import org.endeavourhealth.im.api.models.TermMapping;
+import org.endeavourhealth.im.dal.TermDAL;
+import org.endeavourhealth.im.dal.TermJDBCDAL;
 import org.endeavourhealth.im.common.models.*;
 
+import java.io.*;
+import java.util.Arrays;
 import java.util.List;
 
 public class TermLogic {
@@ -53,7 +54,6 @@ public class TermLogic {
                     concept.setStatus(ConceptStatus.ACTIVE)
                         // TODO: Replace with relationship
                         // .setType(new ConceptReference().setText("Class.Code"))
-                        .setType(1L)
                         .setFullName(officialTerm);
                     conceptId = this.conceptLogic.save(concept);
                     importParentHierarchy(conceptId, system, code);
@@ -62,7 +62,6 @@ public class TermLogic {
                     concept.setStatus(ConceptStatus.DRAFT)
                         // TODO: Replace with relationship
                         // .setType(new ConceptReference().setText("Class.Code"))
-                        .setType(1L)
                         .setFullName(termText);
                     conceptId = this.conceptLogic.save(concept);
                     this.taskLogic.createTask("New draft term [" + termText + "]", termConceptContext + " => " + termText, TaskType.TERM_MAPPINGS, conceptId);
@@ -111,7 +110,6 @@ public class TermLogic {
                     .setContext(context)
                     // TODO: Replace with relationship
                     // .setType(new ConceptReference().setText("Class.Code"))
-                    .setType(1L)
                     .setStatus(ConceptStatus.ACTIVE)
                     .setFullName(parent.getText());
 
@@ -131,5 +129,46 @@ public class TermLogic {
 
     public List<TermMapping> getMappings(Long conceptId) throws Exception {
         return this.dal.getMappings(conceptId);
+    }
+
+    public void ProcessTrud(InputStream codeFileStream, InputStream relFileStream) throws IOException {
+        ImportCodes(codeFileStream);
+        ImportRelationships(relFileStream);
+    }
+
+    private void ImportCodes(InputStream codeFileStream) throws IOException {
+        // 900000000000013009 - Synonym
+        // 900000000000003001 - Fully qualified name
+
+        String[] expectedFields = {"id","effectiveTime","active","moduleId","conceptId","languageCode","typeId","term","caseSignificanceId"};
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(codeFileStream))) {
+            int i = 10;
+            String line = in.readLine();
+
+            if (line == null)
+                throw new IOException("File empty");
+
+            String[] fields = line.split("\t");
+            if (fields.length != 9) throw
+                new IOException("Invalid field count (<>9)");
+
+            if (!Arrays.asList(fields).containsAll(Arrays.asList(expectedFields)))
+                throw new IOException("File does not contain correct fields");
+
+            System.out.println("Fields: " + fields.length);
+
+            String lastCode = "";
+            while((line = in.readLine()) != null && i-- > 0) {
+                fields = line.split("\t");
+                if (fields[2].equals("1") && !fields[4].equals(lastCode)) {                 // Active & different
+                    System.out.println(fields[4] + " - " + fields[7]);
+                    lastCode = fields[4];
+                }
+            }
+        }
+    }
+
+    private void ImportRelationships(InputStream relFileStream) throws IOException {
+
     }
 }

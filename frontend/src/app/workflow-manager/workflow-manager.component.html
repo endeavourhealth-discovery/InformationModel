@@ -13,7 +13,7 @@
                 <div class="row">
                   <div class="col-md-2">
                     <h4>Tasks</h4>
-                    <div class="">
+                    <div>
                       <div class="hover-box" [class.selection]="taskTypeFilter == null" (click)="loadTasks()"><i class="fa fa-fw fa-folder"></i>&nbsp;All</div>
                       <div class="hover-box" [class.selection]="taskTypeFilter == 0" (click)="loadTasks(0)"><i class="fa fa-blank"></i><i class="fa fa-fw fa-lightbulb-o"></i>&nbsp;Concepts</div>
                       <div class="hover-box" [class.selection]="taskTypeFilter == 2" (click)="loadTasks(2)"><i class="fa fa-blank"></i><i class="fa fa-fw fa-exchange"></i>&nbsp;Message Mappings</div>

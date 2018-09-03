@@ -52,13 +52,13 @@ export class ConceptEditorComponent implements AfterViewInit {
     this.testJson = this.stateService.getState('ConceptEditor');
     this.route.params.subscribe(
       params => {
-        this.loadConcept(params['id']);
+        this.loadConcept(params['id'], params['context']);
       });
   }
 
-  loadConcept(id: any) {
+  loadConcept(id: any, context: string) {
     if (id === 'add') {
-      setTimeout(() => this.promptContext());
+      setTimeout(() => this.newConcept(context));
     } else {
       this.conceptService.getConceptBundle(id)
         .subscribe(
@@ -66,13 +66,6 @@ export class ConceptEditorComponent implements AfterViewInit {
           (error) => this.logger.error(error)
         );
     }
-  }
-
-  promptContext() {
-    InputBoxDialog.open(this.modal, 'Add concept', 'Enter context name for the new concept', '', 'OK', 'Cancel')
-      .result.then(
-      (result) => this.newConcept(result)
-    );
   }
 
   testRuleset() {
@@ -92,7 +85,7 @@ export class ConceptEditorComponent implements AfterViewInit {
   }
 
   promptTestData() {
-    let testData = (this.testJson) ? this.testJson : '';
+    const testData = (this.testJson) ? this.testJson : '';
     InputBoxMultiLineDialog.open(this.modal, 'Test ruleset', 'Enter FHIR (JSON) data to test', testData, 'OK', 'Cancel', 15)
       .result.then(
       (result) => this.runTest(result)
@@ -114,15 +107,16 @@ export class ConceptEditorComponent implements AfterViewInit {
   }
 
   newConcept(context: string) {
-    let concept = new Concept();
+    const concept = new Concept();
     concept.type = 1; // Default to a concept
     concept.context = context;
     // Set full name to last part of context name as a default
-    let dot = context.lastIndexOf('.');
-    if (dot > 0)
+    const dot = context.lastIndexOf('.');
+    if (dot > 0) {
       concept.fullName = context.substring(dot + 1);
-    else
+    } else {
       concept.fullName = context;
+    }
     this.setConcept({
       concept: concept,
       related: [],
@@ -137,9 +131,10 @@ export class ConceptEditorComponent implements AfterViewInit {
   setConcept(conceptBundle: ConceptBundle) {
     this.conceptBundle = conceptBundle;
     this.refresh();
-    let testJson = this.stateService.getState('ConceptEditor');
-    if (testJson)
+    const testJson = this.stateService.getState('ConceptEditor');
+    if (testJson) {
       this.runTest(testJson);
+    }
   }
 
   nameChanged(newName: string) {
@@ -149,7 +144,7 @@ export class ConceptEditorComponent implements AfterViewInit {
   refresh() {
     this.data = null;
     this.graph.clear();
-    this.graph.assignColours([1,2,3,0]);
+    this.graph.assignColours([1, 2, 3, 0]);
     this.graph.addNodeData(this.conceptBundle.concept.id, this.conceptBundle.concept.fullName, 1, this.conceptBundle.concept);
 
     this.updateDiagram(this.conceptBundle.concept, /*this.conceptBundle.attributes, */this.conceptBundle.related);
@@ -171,8 +166,8 @@ export class ConceptEditorComponent implements AfterViewInit {
     }
 */
 
-    for (let item of related) {
-      if (item.sourceId == concept.id) {
+    for (const item of related) {
+      if (item.sourceId === concept.id) {
         this.graph.addNodeData(item.targetId, item.target.fullName, 2, item);
         this.graph.addEdgeData(concept.id, item.targetId, item.relationship.text, item);
       } else {
@@ -185,8 +180,9 @@ export class ConceptEditorComponent implements AfterViewInit {
   }
 
   decLimit(item: any) {
-    if (item.limit > 0)
+    if (item.limit > 0) {
       item.limit--;
+    }
   }
 
   incLimit(item: any) {
@@ -198,7 +194,7 @@ export class ConceptEditorComponent implements AfterViewInit {
   }
 
   setStatus(status: ConceptStatus) {
-    this.conceptBundle.concept.status = status;
+    this.conceptBundle.concept.status = ConceptStatusHelper.getName(status);
   }
 
   addConcept() {
@@ -233,7 +229,7 @@ export class ConceptEditorComponent implements AfterViewInit {
       this.updateDiagram(this.conceptBundle.concept, [attribute], []);
     } else {
 */
-      let related: RelatedConcept = {
+      const related: RelatedConcept = {
         id: null,
         sourceId: this.conceptBundle.concept.id,
         source: null,
@@ -282,24 +278,28 @@ export class ConceptEditorComponent implements AfterViewInit {
   }*/
 
   confirmDeleteRelationship(relatedConcept: RelatedConcept) {
-    let context = relatedConcept.target ? relatedConcept.target.context : relatedConcept.source.context;
-    MessageBoxDialog.open(this.modal, 'Concept editor', 'Are you sure that you want to delete the relationship with "' + context + '"?', 'Delete relationship', 'Cancel')
+    const context = relatedConcept.target ? relatedConcept.target.context : relatedConcept.source.context;
+    MessageBoxDialog.open(this.modal, 'Concept editor',
+      'Are you sure that you want to delete the relationship with "' + context + '"?',
+      'Delete relationship', 'Cancel')
       .result.then(
       (ok) => this.deleteRelationship(relatedConcept)
     );
   }
 
   deleteRelationship(relatedConcept: RelatedConcept) {
-    let idx = this.conceptBundle.related.indexOf(relatedConcept);
+    const idx = this.conceptBundle.related.indexOf(relatedConcept);
     if (idx > -1) {
       this.conceptBundle.related.splice(idx, 1);
-      if (relatedConcept.id > 0)
+      if (relatedConcept.id > 0) {
         this.conceptBundle.deletedRelatedIds.push(relatedConcept.id);
+      }
     }
   }
 
   confirmDeleteRuleset(ruleset: ConceptRuleset) {
-    MessageBoxDialog.open(this.modal, 'Concept editor', 'Are you sure that you want to delete the selected rule set?', 'Delete rule set', 'Cancel')
+    MessageBoxDialog.open(this.modal, 'Concept editor',
+      'Are you sure that you want to delete the selected rule set?', 'Delete rule set', 'Cancel')
       .result.then(
       (ok) => this.deleteRuleset(ruleset)
     );

@@ -1,0 +1,13 @@
+# Created by .ignore support plugin (hsz.mobi)
+src
+.npmignore
+*.iml
+*.tgz
+pom.xml
+tsconfig.json
+index.ts
+typings
+typings.json
+target
+.idea
+aot

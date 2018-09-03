@@ -1,14 +1,15 @@
 package org.endeavourhealth.im.client.messageProducer;
 
 import org.endeavourhealth.im.common.models.ConceptReference;
-import org.endeavourhealth.im.common.models.Message;
-import org.endeavourhealth.im.common.models.MessageResource;
-import org.endeavourhealth.im.common.models.MessageResourceField;
+//import org.endeavourhealth.im.common.models.Message;
+//import org.endeavourhealth.im.common.models.MessageResource;
+//import org.endeavourhealth.im.common.models.MessageResourceField;
 import org.hl7.fhir.instance.model.*;
 
 import java.util.List;
 
 public class FHIRMessageProducer {
+/*
     public Message fhirToMessage(Resource fhirResource) {
 
         MessageResource msgResource = getMessageResource(fhirResource);
@@ -56,4 +57,5 @@ public class FHIRMessageProducer {
             }
         }
     }
+*/
 }

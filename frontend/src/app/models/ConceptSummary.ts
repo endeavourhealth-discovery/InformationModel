@@ -5,7 +5,7 @@ import {Concept} from './Concept';
 export class ConceptSummary extends DbEntity {
   context: string;
   fullName: string;
-  status: ConceptStatus = ConceptStatus.DRAFT;
+  status: string;
   version: string = "0.1";
 
   constructor(concept?: Concept) {

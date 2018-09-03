@@ -2,14 +2,12 @@ package org.endeavourhealth.im.common.models;
 
 public class Concept extends DbEntity<Concept> {
     private String url;
-    private Long type;
     private String fullName;
     private String context;
     private ConceptStatus status;
     private String version;
     private String description;
     private Long useCount;
-    private Boolean autoTemplate = true;
     private String template;
 
     public String getUrl() {
@@ -18,15 +16,6 @@ public class Concept extends DbEntity<Concept> {
 
     public Concept setUrl(String url) {
         this.url = url;
-        return this;
-    }
-
-    public Long getType() {
-        return type;
-    }
-
-    public Concept setType(Long type) {
-        this.type = type;
         return this;
     }
 
@@ -81,15 +70,6 @@ public class Concept extends DbEntity<Concept> {
 
     public Concept setUseCount(Long useCount) {
         this.useCount = useCount;
-        return this;
-    }
-
-    public Boolean getAutoTemplate() {
-        return autoTemplate;
-    }
-
-    public Concept setAutoTemplate(Boolean autoTemplate) {
-        this.autoTemplate = autoTemplate;
         return this;
     }
 

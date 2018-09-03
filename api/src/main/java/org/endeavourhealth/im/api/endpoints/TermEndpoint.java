@@ -6,8 +6,10 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.endeavourhealth.im.api.logic.TermLogic;
-import org.endeavourhealth.im.api.models.TermMapping;
 import org.endeavourhealth.im.common.models.Term;
+import org.endeavourhealth.im.common.models.TermMapping;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,6 +18,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
+import java.io.InputStream;
 import java.util.List;
 
 @Path("Term")
@@ -23,6 +26,26 @@ import java.util.List;
 @Api(description = "API for all calls relating to Terms")
 public class TermEndpoint {
     private static final Logger LOG = LoggerFactory.getLogger(TermEndpoint.class);
+
+    @POST
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Timed(absolute = true, name = "InformationModel.TermEndpoint.Post")
+    @ApiOperation(value = "Import TRUD data file")
+    public Response uploadTrudDataFile(@Context SecurityContext sc,
+                                       @ApiParam(value = "Code data file") @FormDataParam("codeFile") InputStream codeFileStream,
+                                       @FormDataParam("codeFile") FormDataContentDisposition codeFileDetail,
+                                       @ApiParam(value = "Relationship data file") @FormDataParam("relFile") InputStream relFileStream,
+                                       @FormDataParam("relFile") FormDataContentDisposition relFileDetail) throws Exception {
+        LOG.debug("Code file " + codeFileDetail.getFileName());
+        LOG.debug("Rel file " + relFileDetail.getFileName());
+
+        new TermLogic().ProcessTrud(codeFileStream, relFileStream);
+
+        return Response
+            .ok()
+            .build();
+    }
 
     @GET
     @Consumes(MediaType.APPLICATION_JSON)

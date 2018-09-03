@@ -3,7 +3,6 @@ import {ConceptStatus, ConceptStatusHelper} from '../../models/ConceptStatus';
 import {Concept} from '../../models/Concept';
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/forms';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {ConceptPickerComponent} from '../concept-picker/concept-picker.component';
 import {LoggerService} from 'eds-angular4';
 
 @Component({
@@ -37,7 +36,7 @@ export class ConceptDetailsComponent implements ControlValueAccessor {
   }
 
   setStatus(status: ConceptStatus) {
-    this.model.status = status;
+    this.model.status = ConceptStatusHelper.getName(status);
   }
 
   touch() {

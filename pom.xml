@@ -11,9 +11,11 @@
 
     <modules>
         <module>common</module>
+        <module>dal</module>
         <module>client</module>
         <module>api</module>
         <module>frontend</module>
+        <module>TrudImport</module>
     </modules>
 
     <properties>

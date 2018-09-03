@@ -19,7 +19,7 @@ import java.util.Map;
 
 
 public class IMClient {
-    public static boolean isMessageValid(Message message) {
+/*    public static boolean isMessageValid(Message message) {
         Response response = post("/Message/Valid", message);
 
         return (Boolean)response.getEntity();
@@ -88,5 +88,5 @@ public class IMClient {
         );
 
         return KeycloakClient.instance().getAuthorizationHeader();
-    }
+    }*/
 }

@@ -15,6 +15,7 @@ export class ConceptPickerComponent implements OnInit {
   allowAddNew: boolean = false;
   result: ConceptSummary[] = [];
   selection: ConceptSummary;
+  activeOnly: boolean = true;
 
   public static open(modalService: NgbModal, allowAddNew: boolean) {
     const modalRef = modalService.open(ConceptPickerComponent, { backdrop: 'static'});
@@ -29,7 +30,7 @@ export class ConceptPickerComponent implements OnInit {
 
   search() {
     this.result = null;
-    this.conceptService.search(this.criteria)
+    this.conceptService.search(this.criteria, this.activeOnly)
       .subscribe(
         (result) => this.result = result.concepts,
         (error) => this.logger.error(error)

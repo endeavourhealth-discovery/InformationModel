@@ -16,17 +16,21 @@ export class ConceptService {
 
   constructor(private http: Http) { }
 
-  getMRU(): Observable<ConceptSummaryList> {
-    return this.http.get('api/Concept/MRU')
+  getMRU(activeOnly: boolean): Observable<ConceptSummaryList> {
+    const params = new URLSearchParams();
+    params.append('activeOnly', activeOnly.toString());
+
+    return this.http.get('api/Concept/MRU', {search: params})
       .map((result) => result.json());
   }
 
-  search(searchTerm: string) {
-      const params = new URLSearchParams();
-      params.append('searchTerm', searchTerm.toString());
+  search(searchTerm: string, activeOnly: boolean) {
+    const params = new URLSearchParams();
+    params.append('searchTerm', searchTerm.toString());
+    params.append('activeOnly', activeOnly.toString());
 
-      return this.http.get('api/Concept/Search', {search: params})
-        .map((result) => result.json());
+    return this.http.get('api/Concept/Search', {search: params})
+      .map((result) => result.json());
   }
 
   getConcept(conceptId: number): Observable<Concept> {

@@ -5,11 +5,18 @@
 <div class="modal-body">
   <div class="container-fluid">
     <div class="row">
-      <div class="form-group col-md-12">
+      <div class="form-group col-md-8">
         <label class="control-label">Search criteria</label>
         <div class="input-group">
           <input class="form-control" type="text" [(ngModel)]="criteria" name="filter" autofocus (keyup.enter)="search()">
           <button class="btn input-group-addon" (click)="search()"><i class="fa fa-search"></i></button>
+        </div>
+      </div>
+      <div class="form-group col-md-4">
+        <label class="control-label">Search options</label>
+        <div class="input-group" (click)="activeOnly = !activeOnly">
+          <button type="button" class="btn input-group-addon"><i class="fa fa-fw" [ngClass]="{'fa-check': activeOnly, 'fa-blank': !activeOnly}"></i></button>
+          <input class="form-control" type="text" value="Active only" readonly>
         </div>
       </div>
     </div>
@@ -26,7 +33,7 @@
                 </tr>
               </thead>
               <tbody>
-              <tr *ngFor="let item of result" (click)="selection=item" [class.selection]="selection==item">
+              <tr *ngFor="let item of result" (click)="selection=item" [class.selection]="selection==item" [class.text-warning]="item.status == 'Deprecated'">
                 <td>{{item.context}}</td>
                 <td>{{item.version}}</td>
                 <td>{{item.status}}</td>
@@ -41,6 +48,6 @@
 </div>
 <div class="modal-footer">
   <button *ngIf="allowAddNew" type="button" class="btn btn-success" (click)="new()" name="create">Create new</button>
-  <button type="button" class="btn" (click)="cancel()" name="cancel">Cancel</button>
-  <button type="button" class="btn btn-primary" (click)="ok();" name="Ok" [disabled]="selection==null">OK</button>
+  <button type="button" class="btn btn-success" (click)="ok();" name="Ok" [disabled]="selection==null">Select existing</button>
+  <button type="button" class="btn btn-danger" (click)="cancel()" name="cancel">Cancel</button>
 </div>

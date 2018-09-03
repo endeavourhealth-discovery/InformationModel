@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import {LoggerService} from 'eds-angular4';
+import {InputBoxDialog, LoggerService} from 'eds-angular4';
 import {ConceptSummary} from '../models/ConceptSummary';
 import {Router} from '@angular/router';
 import {ConceptService} from './concept.service';
 import {ConceptSummaryList} from '../models/ConceptSummaryList';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConceptSelectorComponent} from '../concept-selector/concept-selector/concept-selector.component';
 
 @Component({
   selector: 'app-concept-library',
@@ -14,8 +16,10 @@ export class ConceptLibraryComponent implements OnInit {
   listTitle: string = 'Most recently used';
   summaryList: ConceptSummaryList
   searchTerm: string;
+  activeOnly: boolean = true;
 
   constructor(private router: Router,
+              private modal: NgbModal,
               private conceptService: ConceptService,
               private log: LoggerService
   ) { }
@@ -25,7 +29,7 @@ export class ConceptLibraryComponent implements OnInit {
   }
 
   getMRU() {
-    this.conceptService.getMRU()
+    this.conceptService.getMRU(this.activeOnly)
       .subscribe(
         (result) => this.summaryList = result,
         (error) => this.log.error(error)
@@ -38,7 +42,8 @@ export class ConceptLibraryComponent implements OnInit {
 
   search() {
     this.listTitle = 'Search results for "' + this.searchTerm + '"';
-    this.conceptService.search(this.searchTerm)
+    this.summaryList = null;
+    this.conceptService.search(this.searchTerm, this.activeOnly)
       .subscribe(
         (result) => this.summaryList = result,
         (error) => this.log.error(error)
@@ -52,6 +57,16 @@ export class ConceptLibraryComponent implements OnInit {
   }
 
   addConcept() {
-    this.router.navigate(['concept', 'add']);
+      InputBoxDialog.open(this.modal, 'Add concept', 'Enter context name for the new concept', '', 'OK', 'Cancel')
+        .result.then(
+        (result) => this.router.navigate(['concept', 'add', result])
+      );
+  }
+
+  showConceptPicker() {
+    ConceptSelectorComponent.open(this.modal)
+      .result.then(
+      (result) => console.log(result)
+    );
   }
 }

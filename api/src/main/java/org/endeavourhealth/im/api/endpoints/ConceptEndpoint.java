@@ -29,10 +29,11 @@ public class ConceptEndpoint {
     @Produces(MediaType.APPLICATION_JSON)
     @Timed(absolute = true, name = "InformationModel.ConceptEndpoint.MRU.GET")
     @ApiOperation(value = "Returns summary of most recently used concepts")
-    public Response mru(@Context SecurityContext sc) throws Exception {
+    public Response mru(@Context SecurityContext sc,
+                        @ApiParam(value = "Active only") @QueryParam("activeOnly") Boolean activeOnly) throws Exception {
         LOG.debug("Get concept MRU");
 
-        ConceptSummaryList result = new ConceptLogic().getMRU();
+        ConceptSummaryList result = new ConceptLogic().getMRU(activeOnly);
 
         return Response
             .ok()
@@ -47,10 +48,11 @@ public class ConceptEndpoint {
     @Timed(absolute = true, name = "InformationModel.ConceptEndpoint.Search.GET")
     @ApiOperation(value = "Returns summary of most recently used concepts")
     public Response search(@Context SecurityContext sc,
-                           @ApiParam(value = "Search term") @QueryParam("searchTerm") String searchTerm) throws Exception {
+                           @ApiParam(value = "Search term") @QueryParam("searchTerm") String searchTerm,
+                           @ApiParam(value = "Active only") @QueryParam("activeOnly") Boolean activeOnly) throws Exception {
         LOG.debug("Search concepts");
 
-        ConceptSummaryList result = new ConceptLogic().search(searchTerm);
+        ConceptSummaryList result = new ConceptLogic().search(searchTerm, activeOnly);
 
         return Response
             .ok()
@@ -202,27 +204,6 @@ public class ConceptEndpoint {
 
         return Response
             .ok()
-            .build();
-    }
-
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    @Path("/Rules/Execute")
-    @Timed(absolute = true, name = "InformationModel.ConceptEndpoint.Calculate.GET")
-    @ApiOperation(value = "Returns Concept by JSON")
-    public Response calculate(@Context SecurityContext sc,
-                        @ApiParam(value = "Root Concept Id") @QueryParam("conceptId") Long conceptId,
-                        @ApiParam(value = "Create task") @QueryParam("createTask") Boolean createTask,
-                        @ApiParam(value = "JSON") String json
-    ) throws Exception {
-        LOG.debug("Get execute rules for concept");
-
-        CalculationResult result = new ConceptLogic().calculate(json, conceptId, createTask == null ? false : createTask);
-
-        return Response
-            .ok()
-            .entity(result)
             .build();
     }
 }
