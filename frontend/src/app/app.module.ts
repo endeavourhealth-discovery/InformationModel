@@ -7,7 +7,7 @@ import {AppMenuService} from './app-menu.service';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {KeycloakService} from 'eds-angular4/dist/keycloak/keycloak.service';
 import {keycloakHttpFactory} from 'eds-angular4/dist/keycloak/keycloak.http';
-import {AbstractMenuProvider, DialogsModule, LayoutModule, LoggerModule} from 'eds-angular4';
+import {AbstractMenuProvider, DialogsModule, LayoutModule, LoggerModule, UserManagerNotificationService} from 'eds-angular4';
 import {LayoutComponent} from 'eds-angular4/dist/layout/layout.component';
 import {ToastModule} from 'ng2-toastr/ng2-toastr';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
@@ -33,8 +33,8 @@ import {ModuleStateService} from 'eds-angular4/dist/common';
   providers: [
     KeycloakService,
     ModuleStateService,
-    { provide: Http, useFactory: keycloakHttpFactory, deps: [XHRBackend, RequestOptions, KeycloakService] },
-    { provide: AbstractMenuProvider, useClass : AppMenuService }
+    { provide: AbstractMenuProvider, useClass : AppMenuService },
+    { provide: Http, useFactory: keycloakHttpFactory, deps: [XHRBackend, RequestOptions, KeycloakService, AbstractMenuProvider, UserManagerNotificationService] }
   ],
   bootstrap: [LayoutComponent]
 })

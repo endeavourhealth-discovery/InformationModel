@@ -113,7 +113,7 @@ export class ConceptEditorComponent implements AfterViewInit {
       this.graph.assignColours([1, 2, 3, 0]);
       this.graph.addNodeData(this.concept.id, this.concept.fullName, 1, this.concept);
 
-      this.graph.addNodeData(this.concept.superclass.id, this.concept.superclass.name, 0, this.concept.superclass);
+      this.graph.addNodeData(this.concept.superclass.id, this.concept.superclass.name, 0, this.concept.superclass, '<i>Hello world!</i><br>Lets go!');
       this.graph.addEdgeData(this.concept.id, this.concept.superclass.id, 'inherits from', this.concept.superclass);
 
       this.updateDiagram(this.concept.id, this.related, this.attributes);
@@ -231,7 +231,9 @@ export class ConceptEditorComponent implements AfterViewInit {
 
   addRelated() {
     const rel: RelatedConcept = {
-      source: {id: this.concept.id, name: this.concept.fullName}
+      source: {id: this.concept.id, name: this.concept.fullName},
+      mandatory: false,
+      limit: 1
     } as RelatedConcept;
 
     this.editRelated(rel);

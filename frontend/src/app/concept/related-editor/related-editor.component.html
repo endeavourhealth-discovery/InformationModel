@@ -10,7 +10,7 @@
         <div class="input-group">
           <input type="text" class="form-control" [ngModel]="result.source?.name" readonly name="source">
           <div class="input-group-append">
-            <button type="button" class="btn" [hidden]="conceptId === result.source?.id"><i class="fa fa-fw fa-search"></i></button>
+            <button (click)="selectSource()" type="button" class="btn" [hidden]="conceptId === result.source?.id"><i class="fa fa-fw fa-search"></i></button>
           </div>
         </div>
       </div>

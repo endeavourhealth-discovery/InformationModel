@@ -35,10 +35,26 @@ export class RelatedEditorComponent implements OnInit {
     this.result.target = tmp;
   }
 
+  selectSource() {
+    ConceptSelectorComponent.open(this.modal, false)
+      .result.then(
+      (result: Concept) => {this.result.source = {id: result.id, name: result.fullName}},
+      (error) => {}
+    );
+  }
+
   selectRelationship() {
     ConceptSelectorComponent.open(this.modal, false, 5)
       .result.then(
       (result: Concept) => {this.result.relationship = {id: result.id, name: result.fullName}},
+      (error) => {}
+    );
+  }
+
+  selectTarget() {
+    ConceptSelectorComponent.open(this.modal, false)
+      .result.then(
+      (result: Concept) => {this.result.target = {id: result.id, name: result.fullName}},
       (error) => {}
     );
   }
