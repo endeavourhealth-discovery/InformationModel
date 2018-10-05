@@ -67,7 +67,7 @@ public class Importer {
                 .sorted()
                 .findFirst();
 
-            return res.isPresent() ? res.get() : null;
+            return res.orElse(null);
         }
     }
 }

@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {NgbActiveModal, NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {LoggerService} from 'eds-angular4';
-import {ConceptSummary} from '../../models/ConceptSummary';
+import {InputBoxDialog, LoggerService} from 'eds-angular4';
 import {ConceptSelectorService} from '../concept-selector.service';
-import {IdText} from '../../models/IdText';
+import {Concept} from '../../models/Concept';
+import {ConceptStatus, ConceptStatusHelper} from '../../models/ConceptStatus';
+import {ConceptSummary} from '../../models/ConceptSummary';
 
 @Component({
   selector: 'app-concept-selector',
@@ -11,51 +12,72 @@ import {IdText} from '../../models/IdText';
   styleUrls: ['./concept-selector.component.css']
 })
 export class ConceptSelectorComponent implements OnInit {
-  systems: IdText[];
-  selectedSystems: number[];
+  hide: boolean;
   criteria: string;
-  activeOnly: boolean = true;
-  selection: ConceptSummary;
+  includeDeprecated = false;
+  selection: Concept;
   result: ConceptSummary[] = [];
+  showAdd: boolean = false;
+  superclass: number;
 
-  public static open(modalService: NgbModal) {
-    const modalRef = modalService.open(ConceptSelectorComponent, { backdrop: 'static'});
+  getConceptStatusName = ConceptStatusHelper.getName;
+
+  public static open(modalService: NgbModal, showAdd: boolean = false, superclass: number = null) {
+    const modalRef = modalService.open(ConceptSelectorComponent, { backdrop: 'static', size: 'lg'});
+    modalRef.componentInstance.showAdd = showAdd;
+    modalRef.componentInstance.superclass = superclass;
     return modalRef;
   }
 
-  constructor(public activeModal: NgbActiveModal, private logger: LoggerService, private conceptService: ConceptSelectorService) { }
+  constructor(public modal: NgbModal, public activeModal: NgbActiveModal, private logger: LoggerService, private conceptService: ConceptSelectorService) { }
 
   ngOnInit() {
-    this.loadSystems();
-  }
-
-  loadSystems() {
-    this.conceptService.getCodeSystems().subscribe(
-      (result) => {
-        this.systems = result;
-        this.selectedSystems = this.systems.map(s => s.id);
-      },
-      (error) => this.logger.error(error)
-    );
   }
 
   search() {
     this.result = null;
-    const codeSystems = (this.selectedSystems.length === this.systems.length) ? null : this.selectedSystems;
 
-    this.conceptService.search(this.criteria, this.activeOnly, codeSystems)
+    this.conceptService.search(this.criteria, this.includeDeprecated, this.superclass)
       .subscribe(
-        (result) => this.result = result.concepts,
+        (result) => this.result = result,
         (error) => this.logger.error(error)
       );
   }
 
+  add() {
+    this.hide = true;
+    InputBoxDialog.open(this.modal, 'New concept', 'Enter name for new concept', '', 'Create', 'Cancel')
+      .result.then(
+      (result) => this.createAndClose(result),
+      (cancel) => this.activeModal.close(null)
+    );
+  }
+
+  createAndClose(name: string) {
+    const result: Concept = {
+      id: null,
+      superclass: {id: 1, name: 'Concept'},
+      fullName: name,
+      context: name.replace(' ',''),
+      description: name,
+      shortName: name,
+      useCount: 0,
+      version: 0.1,
+      status: ConceptStatus.DRAFT,
+      url: ''
+    };
+
+    this.activeModal.close(result);
+  }
+
   ok() {
-    this.conceptService.getConcept(this.selection.id)
-      .subscribe(
-        (result) => this.activeModal.close(result),
-        (error) => this.logger.error(error)
-      );
+    if (this.selection) {
+      this.conceptService.getConcept(this.selection.id)
+        .subscribe(
+          (result) => this.activeModal.close(result),
+          (error) => this.logger.error(error)
+        );
+    }
   }
 
   cancel() {

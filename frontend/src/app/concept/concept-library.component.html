@@ -1,11 +1,7 @@
 <div class="module">
   <div class="container-fluid">
     <div class="module-heading">
-      <h2>Concept Library
-        <div class="pull-right">
-          <button type="button" class="btn btn-info" (click)="showConceptPicker()">Test</button>
-        </div>
-      </h2>
+      <h2>Concept Library</h2>
     </div>
     <div class="module-body">
       <form>
@@ -13,27 +9,28 @@
           <div class="col-md-12">
             <div class="card" id="taskCard">
               <div class="card-header"><h4>Concepts <small> - {{listTitle}}</small><button type="button" (click)="addConcept()" class="btn btn-success pull-right">Add</button></h4></div>
-              <div class="card-block">
+              <div class="card-body">
                 <div class="row">
                   <div class="col-md-4">
                     <div class="form-group">
                       <label class="label" for="search">Search</label>
                       <div class="input-group">
                         <input class="form-control" type="text" id="search" name="search" autofocus [(ngModel)]="searchTerm" (keyup.enter)="search()">
-                        <div class="input-group-addon" (click)="search()">
-                          <i class="fa fa-search"></i>
+                        <div class="input-group-append" (click)="search()">
+                          <span class="input-group-text"><i class="fa fa-search"></i></span>
                         </div>
-                        <div class="input-group-addon" (click)="clear()">
-                          <i class="fa fa-times"></i>
+                        <div class="input-group-append" (click)="clear()">
+                          <span class="input-group-text"><i class="fa fa-times"></i></span>
                         </div>
                       </div>
                     </div>
                   </div>
                   <div class="form-group col-md-4">
                     <label class="control-label">Search options</label>
-                    <div class="input-group" (click)="activeOnly = !activeOnly">
-                      <button type="button" class="btn input-group-addon"><i class="fa fa-fw" [ngClass]="{'fa-check': activeOnly, 'fa-blank': !activeOnly}"></i></button>
-                      <input class="form-control" type="text" value="Active only" readonly>
+
+                    <div class="custom-control custom-checkbox form-control-plaintext">
+                      <input type="checkbox" class="custom-control-input" [(ngModel)]="includeDeprecated" (change)="toggleDeprecated()" id="chkIncDep" name="incDep">
+                      <label class="custom-control-label" for="chkIncDep">Include deprecated</label>
                     </div>
                   </div>
                 </div>
@@ -42,19 +39,19 @@
                     <loadingIndicator [done]="summaryList">
                       <table class="table table-striped table-sm table-hover text">
                         <thead>
-                          <tr>
-                            <th>Context</th>
-                            <th>Name</th>
-                            <th>Status</th>
-                            <th>Version</th>
+                          <tr class="d-flex">
+                            <th class="col-2">Context</th>
+                            <th class="col-8">Name</th>
+                            <th class="col-1">Status</th>
+                            <th class="col-1">Version</th>
                           </tr>
                         </thead>
                         <tbody>
-                          <tr *ngFor="let item of summaryList?.concepts" (click)="editConcept(item)" [class.text-warning]="item.status == 'Deprecated'">
-                            <td>{{item.context}}</td>
-                            <td>{{item.fullName}}</td>
-                            <td>{{item.status}}</td>
-                            <td>{{item.version}}</td>
+                          <tr class="d-flex" *ngFor="let item of summaryList" (click)="editConcept(item)" [class.text-warning]="item.status == 2">
+                            <td class="col-2">{{item.context}}</td>
+                            <td class="col-8">{{item.name}} <span *ngIf="item.description && item.fullName != item.description" class="badge badge-info" data-toggle="tooltip" title="{{item.description}}">Synonym</span></td>
+                            <td class="col-1">{{getStatusName(item.status)}}</td>
+                            <td class="col-1">{{item.version}}</td>
                           </tr>
                         </tbody>
                       </table>

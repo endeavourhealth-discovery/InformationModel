@@ -1,63 +1,36 @@
 package org.endeavourhealth.im.common.models;
 
 public class RelatedConcept extends DbEntity<RelatedConcept> {
-    private Long sourceId;
-    private ConceptSummary source;
-    private Long targetId;
-    private ConceptSummary target;
-    private ConceptReference relationship;
+    private Reference source;
+    private Reference target;
+    private Reference relationship;
     private Integer order;
     private Boolean mandatory;
     private Integer limit;
-    private Integer weighting;
 
-    public Long getSourceId() {
-        return (source == null) ? sourceId : source.getId();
-    }
-
-    public RelatedConcept setSourceId(Long sourceId) {
-        this.sourceId = sourceId;
-
-        if (source != null)
-            this.source.setId(sourceId);
-
-        return this;
-    }
-
-    public ConceptSummary getSource() {
+    public Reference getSource() {
         return source;
     }
 
-    public RelatedConcept setSource(ConceptSummary source) {
+    public RelatedConcept setSource(Reference source) {
         this.source = source;
         return this;
     }
 
-    public Long getTargetId() {
-        return targetId;
-    }
-
-    public RelatedConcept setTargetId(Long targetId) {
-        this.targetId = targetId;
-        if (target != null)
-            this.target.setId(targetId);
-        return this;
-    }
-
-    public ConceptSummary getTarget() {
+    public Reference getTarget() {
         return target;
     }
 
-    public RelatedConcept setTarget(ConceptSummary target) {
+    public RelatedConcept setTarget(Reference target) {
         this.target = target;
         return this;
     }
 
-    public ConceptReference getRelationship() {
+    public Reference getRelationship() {
         return relationship;
     }
 
-    public RelatedConcept setRelationship(ConceptReference relationship) {
+    public RelatedConcept setRelationship(Reference relationship) {
         this.relationship = relationship;
         return this;
     }
@@ -86,15 +59,6 @@ public class RelatedConcept extends DbEntity<RelatedConcept> {
 
     public RelatedConcept setLimit(Integer limit) {
         this.limit = limit;
-        return this;
-    }
-
-    public Integer getWeighting() {
-        return weighting;
-    }
-
-    public RelatedConcept setWeighting(Integer weighting) {
-        this.weighting = weighting;
         return this;
     }
 }

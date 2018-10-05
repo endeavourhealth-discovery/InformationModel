@@ -6,6 +6,16 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class TableIdHelper {
+    public static Long getNextId(Long conceptType) throws SQLException {
+        if (conceptType == 1L) return getNextId("BaseConcept", 1L);
+        if (conceptType == 2L) return getNextId("CodeableConcept", 1L);
+
+        return getNextId("RecordType", 1L);
+    }
+
+    public static Long getNextId(String name) throws SQLException {
+        return getNextId(name, 1L);
+    }
     public static Long getNextId(String name, Long size) throws SQLException {
         Long nextId = null;
 

@@ -1,10 +1,20 @@
 package org.endeavourhealth.im.common.models;
 
 public class ConceptSummary extends DbEntity<ConceptSummary> {
+    private String name;
     private String context;
-    private String fullName;
-    private String status;
-    private String version;
+    private ConceptStatus status;
+    private Float version;
+    private Boolean synonym;
+
+    public String getName() {
+        return name;
+    }
+
+    public ConceptSummary setName(String name) {
+        this.name = name;
+        return this;
+    }
 
     public String getContext() {
         return context;
@@ -15,30 +25,30 @@ public class ConceptSummary extends DbEntity<ConceptSummary> {
         return this;
     }
 
-    public String getFullName() {
-        return fullName;
-    }
-
-    public ConceptSummary setFullName(String fullName) {
-        this.fullName = fullName;
-        return this;
-    }
-
-    public String getStatus() {
+    public ConceptStatus getStatus() {
         return status;
     }
 
-    public ConceptSummary setStatus(String status) {
+    public ConceptSummary setStatus(ConceptStatus status) {
         this.status = status;
         return this;
     }
 
-    public String getVersion() {
+    public Float getVersion() {
         return version;
     }
 
-    public ConceptSummary setVersion(String version) {
+    public ConceptSummary setVersion(Float version) {
         this.version = version;
+        return this;
+    }
+
+    public Boolean getSynonym() {
+        return synonym;
+    }
+
+    public ConceptSummary setSynonym(Boolean synonym) {
+        this.synonym = synonym;
         return this;
     }
 }

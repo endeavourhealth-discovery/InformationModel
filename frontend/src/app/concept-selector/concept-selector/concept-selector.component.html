@@ -1,3 +1,4 @@
+<div [hidden]="hide">
 <div class="modal-header">
   <h4 class="modal-title">Select concept</h4>
   <button type="button" class="close" (click)="cancel()" aria-hidden="true">&times;</button>
@@ -5,23 +6,21 @@
 <div class="modal-body">
   <div class="container-fluid">
     <div class="row">
-      <div class="form-group col-md-6">
+      <div class="form-group col-md-9">
         <label class="control-label">Search criteria</label>
         <div class="input-group">
           <input class="form-control" type="text" [(ngModel)]="criteria" name="filter" autofocus (keyup.enter)="search()">
-          <button type="button" class="btn input-group-addon" (click)="search()"><i class="fa fa-search"></i></button>
+          <div class="input-group-append">
+            <span class="input-group-text" (click)="search()"><i class="fa fa-search"></i></span>
+          </div>
         </div>
       </div>
       <div class="form-group col-md-3">
-        <label class="control-label">Code status</label>
-        <div class="input-group" (click)="activeOnly = !activeOnly">
-          <button type="button" class="btn input-group-addon"><i class="fa fa-fw" [ngClass]="{'fa-check': activeOnly, 'fa-blank': !activeOnly}"></i></button>
-          <input class="form-control" type="text" value="Active only" readonly>
+        <label class="control-label">Search options</label>
+        <div class="custom-control custom-checkbox form-control-plaintext">
+          <input type="checkbox" class="custom-control-input" [(ngModel)]="includeDeprecated" id="chkIncDep">
+          <label class="custom-control-label" for="chkIncDep">Include deprecated</label>
         </div>
-      </div>
-      <div class="form-group col-md-3">
-        <label class="control-label">Code system</label>
-        <multiSelectDropdown [data]="systems" [(ngModel)]="selectedSystems" [nameField]="'text'"></multiSelectDropdown>
       </div>
     </div>
     <div class="row">
@@ -30,17 +29,17 @@
           <div class="scroll-box-350">
             <table class="table table-striped table-hover table-sm">
               <thead>
-                <tr>
-                  <th>(System) Term</th>
-                  <th>Concept</th>
-                  <th>Status</th>
+                <tr class="d-flex">
+                  <th class="col-8">Term</th>
+                  <th class="col-3">Context</th>
+                  <th class="col-1">Status</th>
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let item of result" (click)="selection=item" [class.selection]="selection==item" [class.text-warning]="item.status == 'Deprecated'">
-                  <td>{{item.fullName}}</td>
-                  <td>{{item.context}}</td>
-                  <td>{{item.status}}</td>
+                <tr class="d-flex" *ngFor="let item of result" (click)="selection=item" (dblclick)="ok()" [class.selection]="selection==item" [class.text-warning]="item.status == 2">
+                  <td class="col-8">{{item.name}} <span *ngIf="item.synonym" class="badge badge-info">Synonym</span></td>
+                  <td class="col-3">{{item.context}}</td>
+                  <td class="col-1">{{getConceptStatusName(item.status)}}</td>
                 </tr>
               </tbody>
             </table>
@@ -51,6 +50,8 @@
   </div>
 </div>
 <div class="modal-footer">
-  <button type="button" class="btn btn-success" (click)="ok();" name="Ok" [disabled]="selection==null">Select</button>
+  <button type="button" class="btn btn-success" (click)="add()" name="add" *ngIf="showAdd">Add new</button>
+  <button type="button" class="btn btn-success" (click)="ok()" name="Ok" [disabled]="selection==null">Select</button>
   <button type="button" class="btn btn-danger" (click)="cancel()" name="cancel">Cancel</button>
+</div>
 </div>

@@ -1,11 +1,12 @@
-// import {ConceptSummary} from './ConceptSummary';
-// import {DbEntity} from './DbEntity';
-//
-// export class Attribute extends DbEntity {
-//   conceptId: number;
-//   attributeId: number;
-//   attribute: ConceptSummary;
-//   order: number;
-//   mandatory: boolean;
-//   limit: number;
-// }
+import {Reference} from './Reference';
+import {DbEntity} from './DbEntity';
+import {AttributeValue} from './AttributeValue';
+
+export class Attribute extends DbEntity {
+  public concept: Reference;
+  public attribute: Reference;
+  public type: Reference;
+  public value: AttributeValue;
+  public minimum: number;
+  public maximum: number;
+}

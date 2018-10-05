@@ -1,13 +1,10 @@
-import {ConceptSummary} from './ConceptSummary';
-import {ConceptReference} from './ConceptReference';
+import {Reference} from './Reference';
 import {DbEntity} from './DbEntity';
 
 export class RelatedConcept extends DbEntity {
-  sourceId: number;
-  source: ConceptSummary;
-  targetId: number;
-  target: ConceptSummary;
-  relationship: ConceptReference;
+  source: Reference;
+  target: Reference;
+  relationship: Reference;
   order: number;
   mandatory: boolean;
   limit: number;

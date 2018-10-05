@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import {InputBoxDialog, LoggerService} from 'eds-angular4';
-import {ConceptSummary} from '../models/ConceptSummary';
 import {Router} from '@angular/router';
 import {ConceptService} from './concept.service';
-import {ConceptSummaryList} from '../models/ConceptSummaryList';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConceptSelectorComponent} from '../concept-selector/concept-selector/concept-selector.component';
+import {Concept} from '../models/Concept';
+import {ConceptStatusHelper} from '../models/ConceptStatus';
+import {ConceptSummary} from '../models/ConceptSummary';
 
 @Component({
   selector: 'app-concept-library',
@@ -13,10 +14,12 @@ import {ConceptSelectorComponent} from '../concept-selector/concept-selector/con
   styleUrls: ['./concept-library.component.css']
 })
 export class ConceptLibraryComponent implements OnInit {
-  listTitle: string = 'Most recently used';
-  summaryList: ConceptSummaryList
+  getStatusName = ConceptStatusHelper.getName;
+
+  listTitle = 'Most recently used';
+  summaryList: ConceptSummary[];
   searchTerm: string;
-  activeOnly: boolean = true;
+  includeDeprecated = false;
 
   constructor(private router: Router,
               private modal: NgbModal,
@@ -29,31 +32,39 @@ export class ConceptLibraryComponent implements OnInit {
   }
 
   getMRU() {
-    this.conceptService.getMRU(this.activeOnly)
+    this.conceptService.getMRU(this.includeDeprecated)
       .subscribe(
         (result) => this.summaryList = result,
         (error) => this.log.error(error)
       );
-  }
-
-  editConcept(concept: ConceptSummary) {
-    this.router.navigate(['concept', concept.id]);
   }
 
   search() {
     this.listTitle = 'Search results for "' + this.searchTerm + '"';
     this.summaryList = null;
-    this.conceptService.search(this.searchTerm, this.activeOnly)
+    this.conceptService.search(this.searchTerm, this.includeDeprecated)
       .subscribe(
         (result) => this.summaryList = result,
         (error) => this.log.error(error)
       );
+  }
+
+  toggleDeprecated() {
+    // this.includeDeprecated = !this.includeDeprecated;
+    if (this.searchTerm)
+      this.search();
+    else
+      this.getMRU();
   }
 
   clear() {
     this.listTitle = 'Most recently used';
     this.searchTerm = '';
     this.getMRU();
+  }
+
+  editConcept(concept: Concept) {
+    this.router.navigate(['concept', concept.id])
   }
 
   addConcept() {

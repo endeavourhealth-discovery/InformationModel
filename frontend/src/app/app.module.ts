@@ -11,9 +11,8 @@ import {AbstractMenuProvider, DialogsModule, LayoutModule, LoggerModule} from 'e
 import {LayoutComponent} from 'eds-angular4/dist/layout/layout.component';
 import {ToastModule} from 'ng2-toastr/ng2-toastr';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import {WorkflowManagerModule} from './workflow-manager/workflow-manager.module';
 import {ConceptModule} from './concept/concept.module';
-import {TermMappingsModule} from './term-mappings/term-mappings.module';
+import {ModuleStateService} from 'eds-angular4/dist/common';
 
 @NgModule({
   imports: [
@@ -25,9 +24,7 @@ import {TermMappingsModule} from './term-mappings/term-mappings.module';
     LoggerModule,
     DialogsModule,
 
-    WorkflowManagerModule,
     ConceptModule,
-    TermMappingsModule,
 
     RouterModule.forRoot(AppMenuService.getRoutes(), {useHash: true}),
     NgbModule.forRoot(),
@@ -35,6 +32,7 @@ import {TermMappingsModule} from './term-mappings/term-mappings.module';
   ],
   providers: [
     KeycloakService,
+    ModuleStateService,
     { provide: Http, useFactory: keycloakHttpFactory, deps: [XHRBackend, RequestOptions, KeycloakService] },
     { provide: AbstractMenuProvider, useClass : AppMenuService }
   ],

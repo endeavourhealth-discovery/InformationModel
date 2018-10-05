@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ViewChild} from '@angular/core';
 import {NgbActiveModal, NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {GraphNode} from 'eds-angular4/dist/node-graph/GraphNode';
 import {GraphEdge} from 'eds-angular4/dist/node-graph/GraphEdge';
@@ -10,6 +10,13 @@ import {NodeGraphComponent} from 'eds-angular4/dist/node-graph/node-graph.compon
   styleUrls: ['./node-graph-dialog.component.css']
 })
 export class NodeGraphDialogComponent implements AfterViewInit {
+  @ViewChild('nodeGraphDlg') graph: NodeGraphComponent;
+  @ViewChild('graphContainer') graphContainer: any;
+
+  title: string;
+  nodeData: GraphNode[];
+  edgeData: GraphEdge[];
+
   public static open(modalService: NgbModal, title: string, nodeData: GraphNode[], edgeData: GraphEdge[]) {
     const modalRef = modalService.open(NodeGraphDialogComponent, { backdrop: 'static', size: 'lg'});
     modalRef.componentInstance.title = title;
@@ -18,22 +25,18 @@ export class NodeGraphDialogComponent implements AfterViewInit {
     return modalRef;
   }
 
-  title: string;
-  nodeData: GraphNode[];
-  edgeData: GraphEdge[];
-
-  @ViewChild('nodeGraphDlg') graph: NodeGraphComponent;
-  @ViewChild('graphContainer') graphContainer: any;
-
-
   constructor(public activeModal: NgbActiveModal) { }
 
   ngAfterViewInit() {
-    for(let n of this.nodeData)
-      this.graph.addNodeData(n.id, n.label, n.group, n.data);
+    this.graph.assignColours([1, 2, 3, 0]);
 
-    for(let e of this.edgeData)
+    for (const n of this.nodeData) {
+      this.graph.addNodeData(n.id, n.label, n.group, n.data);
+    }
+
+    for (const e of this.edgeData) {
       this.graph.addEdgeData(e.source.id, e.target.id, e.label, e.data);
+    }
 
     this.graph.start();
 

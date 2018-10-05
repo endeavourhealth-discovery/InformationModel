@@ -36,7 +36,7 @@ export class ConceptDetailsComponent implements ControlValueAccessor {
   }
 
   setStatus(status: ConceptStatus) {
-    this.model.status = ConceptStatusHelper.getName(status);
+    this.model.status = status;
   }
 
   touch() {

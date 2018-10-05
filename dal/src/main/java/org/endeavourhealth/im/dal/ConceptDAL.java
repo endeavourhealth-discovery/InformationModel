@@ -1,47 +1,18 @@
 package org.endeavourhealth.im.dal;
 
-//import org.endeavourhealth.im.common.models.ConceptRuleSet;
 import org.endeavourhealth.im.common.models.*;
 
 import java.util.List;
 
 public interface ConceptDAL {
-    ConceptSummaryList getMRU(Boolean activeOnly) throws Exception;
-    ConceptSummaryList search(String searchTerm, Boolean activeOnly) throws Exception;
     Concept get(Long id) throws Exception;
     Concept getConceptByContext(String name) throws Exception;
-//    List<Attribute> getAttributes(Long id) throws Exception;
-    List<RelatedConcept> getRelatedTargets(Long id) throws Exception;
-    List<RelatedConcept> getRelatedSources(Long id) throws Exception;
-    List<ConceptReference> getRelationships() throws Exception;
-    Long save(Concept concept) throws Exception;
-    Long save(RelatedConcept relatedConcept) throws Exception;
+    List<ConceptSummary> getMRU(Boolean includeDeprecated) throws Exception;
+    List<ConceptSummary> search(String term, Boolean includeDeprecated, Long superclass) throws Exception;
+    List<RelatedConcept> getRelated(Long id, Boolean includeDeprecated) throws Exception;
+    List<Attribute> getAttributes(Long id, Long attributeConceptId, Boolean includeDeprecated) throws Exception;
 
-//    void deleteAttribute(Long attributeId) throws Exception;
+    void saveConceptBundle(Bundle bundle) throws Exception;
 
-    void deleteRelationship(Long relId) throws Exception;
-/*
-
-
-
-
-
-
-
-    Long createDraftConcept(String context) throws Exception;
-    List<ConceptSummary> getSummaries(Integer page) throws SQLException;
-    Concept get(Long id) throws SQLException;
-
-    Long saveAttribute(Long conceptId, Long attributeId) throws Exception;
-    Long saveRelationship(Long sourceId, Long targetId, Long relationshipId) throws Exception;
-
-    List<ConceptSummary> search(String criteria) throws Exception;
-
-
-
-    List<ConceptSummary> getAttributeOf(Long id) throws SQLException;
-
-    */
-
-
+    List<Synonym> getSynonyms(Long id) throws Exception;
 }

@@ -1,25 +1,24 @@
 import {AfterViewInit, Component, ViewChild} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
-import {InputBoxDialog, LoggerService, MessageBoxDialog} from 'eds-angular4';
+import {LoggerService, MessageBoxDialog} from 'eds-angular4';
 import {Concept} from '../../models/Concept';
 import {ConceptStatus, ConceptStatusHelper} from '../../models/ConceptStatus';
-import {ConceptPickerComponent} from '../concept-picker/concept-picker.component';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConceptService} from '../concept.service';
 import {Location} from '@angular/common';
-import {RelatedConcept} from '../../models/RelatedConcept';
-import {EditRelatedComponent} from '../edit-related/edit-related.component';
-// import {Attribute} from '../../models/Attribute';
-import {ConceptBundle} from '../../models/ConceptBundle';
-import {ConceptReference} from '../../models/ConceptReference';
-import {ConceptSummary} from '../../models/ConceptSummary';
 import {NodeGraphComponent} from 'eds-angular4/dist/node-graph/node-graph.component';
 import {NodeGraphDialogComponent} from '../node-graph-dialog/node-graph-dialog.component';
-import {ConceptRuleset} from '../../models/ConceptRuleset';
 import {ModuleStateService} from 'eds-angular4/dist/common';
-import {TestResultDialogComponent} from '../test-result-dialog/test-result-dialog.component';
-import {RulesetEditorDialogComponent} from '../rule-editor-dialog/ruleset-editor-dialog.component';
-import {InputBoxMultiLineDialog} from 'eds-angular4/dist/dialogs/inputBox/inputBoxMultiLine.dialog';
+import {RelatedConcept} from '../../models/RelatedConcept';
+import {Attribute} from '../../models/Attribute';
+import {Observable} from 'rxjs/Observable';
+import {ConceptSelectorComponent} from '../../concept-selector/concept-selector/concept-selector.component';
+import {ConceptEdits} from '../../models/ConceptEdits';
+import {AttributeEditorComponent} from '../attribute-editor/attribute-editor.component';
+import {RelatedEditorComponent} from '../related-editor/related-editor.component';
+import {Reference} from '../../models/Reference';
+import {SynonymEditorComponent} from '../synonym-editor/synonym-editor.component';
+import {Synonym} from '../../models/Synonym';
 
 @Component({
   selector: 'app-concept-editor',
@@ -29,7 +28,11 @@ import {InputBoxMultiLineDialog} from 'eds-angular4/dist/dialogs/inputBox/inputB
   ]
 })
 export class ConceptEditorComponent implements AfterViewInit {
-  conceptBundle: ConceptBundle;
+  concept: Concept;
+  related: RelatedConcept[];
+  attributes: Attribute[];
+  edits: ConceptEdits = new ConceptEdits();
+  synonyms: Synonym[];
 
   data: any;
   selectedNode: any;
@@ -39,6 +42,7 @@ export class ConceptEditorComponent implements AfterViewInit {
 
   // Local enum instance
   ConceptStatus = ConceptStatus;
+  getConceptStatusName = ConceptStatusHelper.getName;
 
   constructor(private router: Router,
               private route: ActivatedRoute,
@@ -51,65 +55,36 @@ export class ConceptEditorComponent implements AfterViewInit {
   ngAfterViewInit() {
     this.testJson = this.stateService.getState('ConceptEditor');
     this.route.params.subscribe(
-      params => {
-        this.loadConcept(params['id'], params['context']);
-      });
+      (params) => this.loadConcept(params['id'], params['context'])
+      );
   }
 
   loadConcept(id: any, context: string) {
     if (id === 'add') {
       setTimeout(() => this.newConcept(context));
     } else {
-      this.conceptService.getConceptBundle(id)
+      Observable.forkJoin(
+        this.conceptService.getConcept(id),
+        this.conceptService.getAttributes(id, false),
+        this.conceptService.getRelated(id, false),
+        this.conceptService.getSynonyms(id)
+      )
         .subscribe(
-          (result) => this.setConcept(result),
+          (result) => this.setData(result[0], result[1], result[2], result[3]),
           (error) => this.logger.error(error)
         );
     }
   }
 
-  testRuleset() {
-    MessageBoxDialog.open(this.modal, 'Test ruleset', 'Save concept before running the test?', 'Yes', 'No')
-      .result.then(
-      (yes) => this.saveAndPromptTestData(),
-      (no) => this.promptTestData()
-    )
-  }
-
-  saveAndPromptTestData() {
-    this.conceptService.saveBundle(this.conceptBundle)
-      .subscribe(
-        () => this.promptTestData(),
-        (error) => this.logger.error('Error during save', error, 'Save')
-      );
-  }
-
-  promptTestData() {
-    const testData = (this.testJson) ? this.testJson : '';
-    InputBoxMultiLineDialog.open(this.modal, 'Test ruleset', 'Enter FHIR (JSON) data to test', testData, 'OK', 'Cancel', 15)
-      .result.then(
-      (result) => this.runTest(result)
-    );
-  }
-
-  runTest(testJson: string) {
-    this.conceptService.executeRules(testJson, this.conceptBundle.concept.id)
-      .subscribe(
-      (result) => this.displayTestResult(result)
-    );
-  }
-
-  displayTestResult(result: any) {
-    TestResultDialogComponent.open(this.modal, result)
-      .result.then(
-      () => {}
-    );
-  }
-
   newConcept(context: string) {
-    const concept = new Concept();
-    concept.type = 1; // Default to a concept
-    concept.context = context;
+    const concept = {
+      superclass: {id: 1, name: 'Type'},
+      context: context,
+      status: ConceptStatus.DRAFT,
+      version: 0.1,
+      useCount: 0
+    } as Concept;
+
     // Set full name to last part of context name as a default
     const dot = context.lastIndexOf('.');
     if (dot > 0) {
@@ -117,132 +92,183 @@ export class ConceptEditorComponent implements AfterViewInit {
     } else {
       concept.fullName = context;
     }
-    this.setConcept({
-      concept: concept,
-      related: [],
-      // attributes: [],
-      ruleSets: [],
-      deletedRelatedIds: [],
-      // deletedAttributeIds: [],
-      deletedRuleSetIds: []
-    });
+    this.concept = concept;
+    this.attributes = [];
+    this.related = [];
+    this.refreshDiagram();
   }
 
-  setConcept(conceptBundle: ConceptBundle) {
-    this.conceptBundle = conceptBundle;
-    this.refresh();
-    const testJson = this.stateService.getState('ConceptEditor');
-    if (testJson) {
-      this.runTest(testJson);
+  setData(concept: Concept, attributes: Attribute[], related: RelatedConcept[], synonyms: Synonym[]) {
+    this.concept = concept;
+    this.attributes = attributes;
+    this.related = related;
+    this.synonyms = synonyms;
+    this.refreshDiagram();
+  }
+
+  refreshDiagram() {
+    if (this.concept && this.related && this.attributes) {
+      this.data = null;
+      this.graph.clear();
+      this.graph.assignColours([1, 2, 3, 0]);
+      this.graph.addNodeData(this.concept.id, this.concept.fullName, 1, this.concept);
+
+      this.graph.addNodeData(this.concept.superclass.id, this.concept.superclass.name, 0, this.concept.superclass);
+      this.graph.addEdgeData(this.concept.id, this.concept.superclass.id, 'inherits from', this.concept.superclass);
+
+      this.updateDiagram(this.concept.id, this.related, this.attributes);
     }
   }
 
-  nameChanged(newName: string) {
-    this.refresh();
-  }
-
-  refresh() {
-    this.data = null;
-    this.graph.clear();
-    this.graph.assignColours([1, 2, 3, 0]);
-    this.graph.addNodeData(this.conceptBundle.concept.id, this.conceptBundle.concept.fullName, 1, this.conceptBundle.concept);
-
-    this.updateDiagram(this.conceptBundle.concept, /*this.conceptBundle.attributes, */this.conceptBundle.related);
-  }
-
-  loadDetails(conceptId: number) {
-    this.conceptService.getConceptBundle(conceptId)
+  expandNode(conceptId: number) {
+    Observable.forkJoin([this.conceptService.getRelated(conceptId, false), this.conceptService.getAttributes(conceptId, false)])
       .subscribe(
-        (result) => this.updateDiagram(result.concept, /*result.attributes, */result.related),
+        (result) => this.updateDiagram(conceptId, result[0], result[1]),
         (error) => this.logger.error(error)
       );
   }
 
-  updateDiagram(concept: Concept, /*attributes: Attribute[],*/ related: RelatedConcept[]) {
-/*
-    for (let attribute of attributes) {
-      this.graph.addNodeData(attribute.attributeId, attribute.attribute.context, 3, attribute);
-      this.graph.addEdgeData(concept.id, attribute.attributeId, 'Has attribute', attribute);
-    }
-*/
-
+  updateDiagram(conceptId: number, related: RelatedConcept[], attributes: Attribute[]) {
     for (const item of related) {
-      if (item.sourceId === concept.id) {
-        this.graph.addNodeData(item.targetId, item.target.fullName, 2, item);
-        this.graph.addEdgeData(concept.id, item.targetId, item.relationship.text, item);
+      if (item.source.id === conceptId) {
+        this.graph.addNodeData(item.target.id, item.target.name, 2, item);
+        this.graph.addEdgeData(conceptId, item.target.id, this.getRelationshipLabel(item), item);
       } else {
-        this.graph.addNodeData(item.sourceId, item.source.fullName, 2, item);
-        this.graph.addEdgeData(item.sourceId, concept.id, item.relationship.text, item);
+        this.graph.addNodeData(item.source.id, item.source.name, 2, item);
+        this.graph.addEdgeData(item.source.id, conceptId, this.getRelationshipLabel(item), item);
       }
     }
 
-    this.graph.start();
-  }
+    for (const item of attributes) {
+      this.graph.addNodeData(item.attribute.id, item.attribute.name, 3, item);
+      this.graph.addEdgeData(conceptId, item.attribute.id, 'has attribute', item);
+    }
 
-  decLimit(item: any) {
-    if (item.limit > 0) {
-      item.limit--;
+    // Ensure graph isnt too big!
+    if (this.graph.nodeData.length < 50) {
+      this.graph.start();
+    } else {
+      this.graph.clear();
     }
   }
 
-  incLimit(item: any) {
-    item.limit++;
+  getRelationshipLabel(related: RelatedConcept) : string {
+    var result = related.relationship.name + ' (';
+    result += this.getCardinality(related) + ')';
+    return result;
   }
 
-  getConceptStatusName(status: ConceptStatus): string {
-    return ConceptStatusHelper.getName(status);
+  getCardinality(related: RelatedConcept) : string {
+    var result = related.mandatory ? '1..' : '0..';
+    result += related.limit === 0 ? '*' : related.limit.toString();
+
+    return result;
   }
 
-  setStatus(status: ConceptStatus) {
-    this.conceptBundle.concept.status = ConceptStatusHelper.getName(status);
-  }
-
-  addConcept() {
-    ConceptPickerComponent.open(this.modal, true).result
-      .then(
-        (result) => this.editLinkedConcept(result)
-      );
-  }
-
-  editLinkedConcept(target: Concept) {
-    EditRelatedComponent.open(this.modal, this.conceptBundle.concept, target)
+  promptSuperclass() {
+    ConceptSelectorComponent.open(this.modal)
       .result.then(
-      (result) => this.saveLinkedConcept(result, target),
-      (error) => this.logger.error(error)
-    )
+      (result) => this.setSuperclass(result)
+    );
   }
 
-  saveLinkedConcept(linkage: ConceptReference, target: Concept) {
-    // TODO : Logic for checking and removing from DELETED lists
-/*
-    if (linkage.id == 0) { // Its an attribute
-      let attribute: Attribute = {
-        id: null,
-        conceptId: this.conceptBundle.concept.id,
-        attributeId: target.id,
-        attribute: new ConceptSummary(target),
-        mandatory: false,
-        limit: 0,
-        order: this.conceptBundle.attributes.length + 1
-      };
-      this.conceptBundle.attributes.push(attribute);
-      this.updateDiagram(this.conceptBundle.concept, [attribute], []);
-    } else {
-*/
-      const related: RelatedConcept = {
-        id: null,
-        sourceId: this.conceptBundle.concept.id,
-        source: null,
-        targetId: target.id,
-        target: new ConceptSummary(target),
-        relationship: linkage,
-        mandatory: false,
-        limit: 0,
-        order: this.conceptBundle.related.length + 1
-      };
-      this.conceptBundle.related.push(related);
-      this.updateDiagram(this.conceptBundle.concept, /*[], */[related]);
-//    }
+  setSuperclass(concept: Concept) {
+    this.concept.superclass = {id: concept.id, name: concept.fullName};
+    this.refreshDiagram();
+  }
+
+  addAttribute() {
+    ConceptSelectorComponent.open(this.modal, true)
+      .result.then(
+      (result) => {
+        const att: Attribute = {
+          concept: {id: this.concept.id, name: this.concept.fullName},
+          attribute: {id: result.id, name: result.fullName},
+          type: result.superclass,
+          minimum: 0,
+          maximum: 1,
+        } as Attribute;
+
+        this.editAttribute(att);
+      }
+    );
+  }
+
+  editAttribute(att: Attribute) {
+    AttributeEditorComponent.open(this.modal, this.concept.id, att)
+      .result.then(
+      (result) => {
+        if (result) {
+          if (!this.attributes.includes(att)) {
+            this.attributes.push(att);
+            this.updateDiagram(this.concept.id, [], [att]);
+          }
+          if (!this.edits.editedAttributes.includes(result)) {
+            this.edits.editedAttributes.push(result);
+          }
+        }
+      }
+    );
+  }
+
+  deleteAttribute(att: Attribute) {
+    if (att.concept.id === this.concept.id) {
+      let idx = this.attributes.indexOf(att);
+      this.attributes.splice(idx, 1);
+
+      idx = this.edits.editedAttributes.indexOf(att);
+      if (idx > -1) {
+        this.edits.editedAttributes.splice(idx, 1);
+      }
+
+      if (att.id !== 0) {
+        this.edits.deletedAttributes.push(att);
+      }
+    }
+    this.refreshDiagram()
+  }
+
+
+  addRelated() {
+    const rel: RelatedConcept = {
+      source: {id: this.concept.id, name: this.concept.fullName}
+    } as RelatedConcept;
+
+    this.editRelated(rel);
+  }
+
+  editRelated(rel: RelatedConcept) {
+    RelatedEditorComponent.open(this.modal, this.concept.id, rel)
+      .result.then(
+      (result) => {
+        if (result) {
+          if (!this.related.includes(rel)) {
+            this.related.push(rel);
+            this.updateDiagram(this.concept.id, [rel], []);
+          }
+          if (!this.edits.editedRelated.includes(result)) {
+            this.edits.editedRelated.push(result);
+          }
+        }
+      },
+      (error) => {}
+    );
+  }
+
+  deleteRelated(rel: RelatedConcept) {
+    let idx = this.related.indexOf(rel);
+    this.related.splice(idx, 1);
+
+    idx = this.edits.editedRelated.indexOf(rel);
+    if (idx > -1) {
+      this.edits.editedRelated.splice(idx, 1);
+    }
+
+    if (rel.id !== 0) {
+      this.edits.deletedRelated.push(rel);
+    }
+
+    this.refreshDiagram();
   }
 
   nodeClick(node) {
@@ -252,104 +278,47 @@ export class ConceptEditorComponent implements AfterViewInit {
   nodeDblClick(node) {
     if (!node.data.loaded) {
       node.data.loaded = true;
-      this.loadDetails(node.id);
+      this.expandNode(node.id);
     }
-  }
-
-  gotoConcept(conceptId: number) {
-    this.router.navigate(['concept', conceptId]);
-  }
-
-/*  confirmDeleteAttribute(attribute: Attribute) {
-    MessageBoxDialog.open(this.modal, 'Concept editor', 'Are you sure that you want to delete the attribute "' + attribute.attribute.context + '"?', 'Delete attribute', 'Cancel')
-      .result.then(
-      (ok) => this.deleteAttribute(attribute),
-      (error) => this.logger.error(error)
-    );
-  }
-
-  deleteAttribute(attribute: Attribute) {
-    let idx = this.conceptBundle.attributes.indexOf(attribute);
-    if (idx > -1) {
-      this.conceptBundle.attributes.splice(idx, 1);
-      if (attribute.id != 0)
-        this.conceptBundle.deletedAttributeIds.push(attribute.id);
-    }
-  }*/
-
-  confirmDeleteRelationship(relatedConcept: RelatedConcept) {
-    const context = relatedConcept.target ? relatedConcept.target.context : relatedConcept.source.context;
-    MessageBoxDialog.open(this.modal, 'Concept editor',
-      'Are you sure that you want to delete the relationship with "' + context + '"?',
-      'Delete relationship', 'Cancel')
-      .result.then(
-      (ok) => this.deleteRelationship(relatedConcept)
-    );
-  }
-
-  deleteRelationship(relatedConcept: RelatedConcept) {
-    const idx = this.conceptBundle.related.indexOf(relatedConcept);
-    if (idx > -1) {
-      this.conceptBundle.related.splice(idx, 1);
-      if (relatedConcept.id > 0) {
-        this.conceptBundle.deletedRelatedIds.push(relatedConcept.id);
-      }
-    }
-  }
-
-  confirmDeleteRuleset(ruleset: ConceptRuleset) {
-    MessageBoxDialog.open(this.modal, 'Concept editor',
-      'Are you sure that you want to delete the selected rule set?', 'Delete rule set', 'Cancel')
-      .result.then(
-      (ok) => this.deleteRuleset(ruleset)
-    );
-  }
-
-  deleteRuleset(ruleset: ConceptRuleset) {
-    let idx = this.conceptBundle.ruleSets.indexOf(ruleset);
-    if (idx > -1) {
-      this.conceptBundle.ruleSets.splice(idx, 1);
-      if (ruleset.id > 0)
-        this.conceptBundle.deletedRuleSetIds.push(ruleset.id);
-    }
-  }
-
-  editRuleset(item: ConceptRuleset) {
-    RulesetEditorDialogComponent.open(this.modal, item)
-      .result.then();
-  }
-
-  getRulesetText(item: ConceptRuleset) {
-    let ruleText: string = '';
-    for(let i in item.rules) {
-      if (i !== '0')
-        ruleText += ' AND ';
-      ruleText += item.rules[i].property + " " + item.rules[i].comparator + " " + item.rules[i].value;
-    }
-
-    if (ruleText.length > 50)
-      return ruleText.substring(0, 50) + "...(more)";
-    else
-      return ruleText;
   }
 
   zoom() {
     NodeGraphDialogComponent.open(this.modal, 'Concept graph', this.graph.nodeData, this.graph.edgeData)
       .result.then(
+      () => {},
       () => {}
     );
   }
 
+  editSynonyms() {
+    SynonymEditorComponent.open(this.modal, this.synonyms)
+      .result.then(
+      (ok) => {},
+      (cancel) => {}
+    )
+  }
 
-  save() {
-    this.conceptService.saveBundle(this.conceptBundle)
-      .subscribe(
-        () => this.close(false),
-        (error) => this.logger.error('Error during save', error, 'Save')
-      );
+  save(close: boolean) {
+     this.conceptService.save(this.concept, this.edits)
+       .subscribe(
+         (result) => {
+           this.concept = result.concept;
+           this.edits = result.edits;
+           this.logger.success('Concept saved', this.concept, 'Saved');
+           if (close)
+             this.close(false)
+         },
+         (error) => this.logger.error('Error during save', error, 'Save')
+       );
   }
 
   close(withConfirm: boolean) {
-    this.location.back();
+    if (!withConfirm)
+      this.location.back();
+    else
+      MessageBoxDialog.open(this.modal, 'Close concept editor', 'Unsaved changes will be lost.  Do you want to close the editor?', 'Close editor', 'Cancel')
+        .result.then(
+        (result) => this.location.back()
+      )
   }
 }

@@ -1,14 +1,27 @@
 package org.endeavourhealth.im.common.models;
 
+import java.util.Date;
+
 public class Concept extends DbEntity<Concept> {
+    private Reference superclass;
     private String url;
     private String fullName;
+    private String shortName;
     private String context;
     private ConceptStatus status;
-    private String version;
+    private Float version;
     private String description;
     private Long useCount;
-    private String template;
+    private Date lastUpdate;
+
+    public Reference getSuperclass() {
+        return superclass;
+    }
+
+    public Concept setSuperclass(Reference superclass) {
+        this.superclass = superclass;
+        return this;
+    }
 
     public String getUrl() {
         return url;
@@ -25,6 +38,15 @@ public class Concept extends DbEntity<Concept> {
 
     public Concept setFullName(String fullName) {
         this.fullName = fullName;
+        return this;
+    }
+
+    public String getShortName() {
+        return shortName;
+    }
+
+    public Concept setShortName(String shortName) {
+        this.shortName = shortName;
         return this;
     }
 
@@ -46,11 +68,11 @@ public class Concept extends DbEntity<Concept> {
         return this;
     }
 
-    public String getVersion() {
+    public Float getVersion() {
         return version;
     }
 
-    public Concept setVersion(String version) {
+    public Concept setVersion(Float version) {
         this.version = version;
         return this;
     }
@@ -73,16 +95,16 @@ public class Concept extends DbEntity<Concept> {
         return this;
     }
 
-    public String getTemplate() {
-        return template;
-    }
-
-    public Concept setTemplate(String template) {
-        this.template = template;
-        return this;
-    }
-
     public void incUseCount() {
         this.useCount++;
+    }
+
+    public Date getLastUpdate() {
+        return lastUpdate;
+    }
+
+    public Concept setLastUpdate(Date lastUpdate) {
+        this.lastUpdate = lastUpdate;
+        return this;
     }
 }
