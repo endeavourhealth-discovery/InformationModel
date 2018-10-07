@@ -3,6 +3,7 @@ package org.endeavourhealth.im.api.logic;
 import org.endeavourhealth.im.dal.ConceptDAL;
 import org.endeavourhealth.im.dal.ConceptJDBCDAL;
 import org.endeavourhealth.im.common.models.*;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,8 +64,16 @@ public class ConceptLogic {
         return result;
     }
 
+    public Long saveConcept(Concept concept) throws Exception {
+        return this.dal.saveConcept(concept);
+    }
+
     public void saveConceptBundle(Bundle bundle) throws Exception {
         this.dal.saveConceptBundle(bundle);
+    }
+
+    public void saveRelationship(RelatedConcept relatedConcept) throws Exception {
+        throw new NotImplementedException();
     }
 
     public List<Synonym> getSynonyms(Long id) throws Exception {

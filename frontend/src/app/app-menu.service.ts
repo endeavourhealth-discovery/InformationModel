@@ -2,7 +2,10 @@ import {Injectable} from '@angular/core';
 import {AbstractMenuProvider} from 'eds-angular4';
 import {MenuOption} from 'eds-angular4/dist/layout/models/MenuOption';
 import {Routes} from '@angular/router';
+import {WorkflowManagerComponent} from './workflow-manager/workflow-manager.component';
 import {ConceptLibraryComponent} from './concept/concept-library.component';
+import {TermMappingsComponent} from './term-mappings/term-mappings.component';
+import {TermMappingsEditorComponent} from './term-mappings/term-mappings-editor/term-mappings-editor.component';
 import {ConceptEditorComponent} from './concept/concept-editor/concept-editor.component';
 
 export class DummyComponent {}
@@ -15,6 +18,9 @@ export class AppMenuService implements  AbstractMenuProvider {
       { path: 'conceptLibrary', component: ConceptLibraryComponent },
       { path: 'concept/:id', component: ConceptEditorComponent },
       { path: 'concept/:id/:context', component: ConceptEditorComponent },
+      { path: 'workflowManager', component: WorkflowManagerComponent },
+      { path: 'termMappings', component: TermMappingsComponent },
+      { path: 'termMappings/:id', component: TermMappingsEditorComponent },
 
       { path: 'eds-user-manager', component: DummyComponent },
 
@@ -32,6 +38,8 @@ export class AppMenuService implements  AbstractMenuProvider {
   getMenuOptions(): MenuOption[] {
     return [
       {caption: 'Concept library', state: 'conceptLibrary', icon: 'fa fa-lightbulb-o', role: 'eds-info-manager:conceptLibrary'},
+      {caption: 'Workflow manager', state: 'workflowManager', icon: 'fa fa-code-fork', role: 'eds-info-manager:workflow'},
+      {caption: 'Term mappings', state: 'termMappings', icon: 'fa fa-code', role: 'eds-info-manager:termMappings'}
     ];
   }
 

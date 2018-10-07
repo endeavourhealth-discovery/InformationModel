@@ -55,7 +55,7 @@ public class ConceptJDBCDAL implements ConceptDAL {
         String sql = "SELECT c.id, c.context, c.full_name, c.status, c.version, false as synonym " +
             "FROM concept c ";
 
-        if (!includeDeprecated)
+        if (includeDeprecated == null || !includeDeprecated)
             sql += "WHERE c.status <> 2 ";
 
         sql += "ORDER BY last_update DESC " +
@@ -243,6 +243,17 @@ public class ConceptJDBCDAL implements ConceptDAL {
             ConnectionPool.InformationModel.push(conn);
         }
         return result;
+    }
+
+    @Override
+    public Long saveConcept(Concept concept) throws SQLException {
+        Connection conn = ConnectionPool.InformationModel.pop();
+        try {
+            saveConcept(conn, concept);
+            return concept.getId();
+        } finally {
+            ConnectionPool.InformationModel.push(conn);
+        }
     }
 
     private void saveConcept(Connection conn, Concept concept) throws SQLException {

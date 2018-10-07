@@ -7,8 +7,8 @@ WHERE id > 1000000;
 
 -- IMPORT SYNONYMS
 INSERT INTO im2.concept_synonym
-  (concept, term, preferred, status)
-SELECT c.concept_id as concept, t.term, t.preferred, t.status
+  (concept, term, status)
+SELECT c.concept_id as concept, t.term, t.status
 FROM im.code c
 JOIN im.code_term t ON t.code_id = c.code_id and t.system = c.system;
 

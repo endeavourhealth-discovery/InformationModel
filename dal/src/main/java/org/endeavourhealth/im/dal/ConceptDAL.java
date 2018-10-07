@@ -12,6 +12,7 @@ public interface ConceptDAL {
     List<RelatedConcept> getRelated(Long id, Boolean includeDeprecated) throws Exception;
     List<Attribute> getAttributes(Long id, Long attributeConceptId, Boolean includeDeprecated) throws Exception;
 
+    Long saveConcept(Concept concept) throws Exception;
     void saveConceptBundle(Bundle bundle) throws Exception;
 
     List<Synonym> getSynonyms(Long id) throws Exception;

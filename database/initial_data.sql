@@ -322,26 +322,26 @@ SELECT
 FROM concept;
 
 INSERT INTO concept_attribute
-    (concept, attribute, `order`, fixed_concept, fixed_value, minimum, maximum)
+    (concept, attribute, `order`, minimum, maximum)
 VALUES
-    (1029, 5009, 1, null, null, 0, 1), -- Name -> Title (0:1)
-    (1029, 5010, 2, null, null, 1, 1), -- Name -> First name (1:1)
-    (1029, 5011, 3, null, null, 0, 4), -- Name -> Middle names (0:4)
-    (1029, 5012, 4, null, null, 1, 1), -- Name -> Last name (1:1)
+    (1029, 5009, 1, 0, 1), -- Name -> Title (0:1)
+    (1029, 5010, 2, 1, 1), -- Name -> First name (1:1)
+    (1029, 5011, 3, 0, 4), -- Name -> Middle names (0:4)
+    (1029, 5012, 4, 1, 1), -- Name -> Last name (1:1)
 
-    (1030, 5023, 1, null, null, 1, 1), -- Address -> Type (1:1)
-    (1030, 5024, 1, null, null, 1, 1), -- Address -> Line 1 (1:1)
-    (1030, 5025, 1, null, null, 0, 1), -- Address -> Line 2 (0:1)
-    (1030, 5026, 1, null, null, 0, 1), -- Address -> Locality (0:1)
-    (1030, 5027, 1, null, null, 0, 1), -- Address -> City (0:1)
-    (1030, 5028, 1, null, null, 0, 1), -- Address -> Line 5 (0:1)
-    (1030, 5029, 1, null, null, 1, 1), -- Address -> Post Code (1:1)
+    (1030, 5023, 1, 1, 1), -- Address -> Type (1:1)
+    (1030, 5024, 1, 1, 1), -- Address -> Line 1 (1:1)
+    (1030, 5025, 1, 0, 1), -- Address -> Line 2 (0:1)
+    (1030, 5026, 1, 0, 1), -- Address -> Locality (0:1)
+    (1030, 5027, 1, 0, 1), -- Address -> City (0:1)
+    (1030, 5028, 1, 0, 1), -- Address -> Line 5 (0:1)
+    (1030, 5029, 1, 1, 1), -- Address -> Post Code (1:1)
 
-    (1001, 1029, 1, null, null, 0, 1), -- Demographics -> Person name (1:1)
-    (1001, 1030, 2, null, null, 0, 4), -- Demographics -> Address (0:4)
-    (1001, 5007, 3, null, null, 1, 1), -- Demographics -> NHS Number (1:1)
-    (1001, 5013, 4, null, null, 0, 1), -- Demographics -> Gender (0:1)
-    (1001, 5014, 5, null, null, 0, 1); -- Demographics -> Birth date (0:1)
+    (1001, 1029, 1, 0, 1), -- Demographics -> Person name (1:1)
+    (1001, 1030, 2, 0, 4), -- Demographics -> Address (0:4)
+    (1001, 5007, 3, 1, 1), -- Demographics -> NHS Number (1:1)
+    (1001, 5013, 4, 0, 1), -- Demographics -> Gender (0:1)
+    (1001, 5014, 5, 0, 1); -- Demographics -> Birth date (0:1)
 
 INSERT INTO concept_relationship
   (source, relationship, target)
@@ -400,3 +400,11 @@ INSERT INTO code_scheme
   (id, identifier)
 VALUES
   (5031, 'SNOMED-CT');
+
+INSERT INTO task_type
+    (id, name)
+VALUES
+   (0, 'Attribute model'),
+   (1, 'Value model'),
+   (2, 'Message mappings'),
+   (3, 'Term mappings');

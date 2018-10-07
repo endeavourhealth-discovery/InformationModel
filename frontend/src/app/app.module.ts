@@ -13,6 +13,8 @@ import {ToastModule} from 'ng2-toastr/ng2-toastr';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {ConceptModule} from './concept/concept.module';
 import {ModuleStateService} from 'eds-angular4/dist/common';
+import {WorkflowManagerModule} from './workflow-manager/workflow-manager.module';
+import {TermMappingsModule} from './term-mappings/term-mappings.module';
 
 @NgModule({
   imports: [
@@ -25,6 +27,8 @@ import {ModuleStateService} from 'eds-angular4/dist/common';
     DialogsModule,
 
     ConceptModule,
+    WorkflowManagerModule,
+    TermMappingsModule,
 
     RouterModule.forRoot(AppMenuService.getRoutes(), {useHash: true}),
     NgbModule.forRoot(),
