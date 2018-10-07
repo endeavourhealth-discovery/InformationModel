@@ -315,12 +315,6 @@ VALUES
 UPDATE concept
 SET status = 1;
 
-INSERT INTO concept_synonym
-    (concept, term, status)
-SELECT
-    id, full_name, status
-FROM concept;
-
 INSERT INTO concept_attribute
     (concept, attribute, `order`, minimum, maximum)
 VALUES

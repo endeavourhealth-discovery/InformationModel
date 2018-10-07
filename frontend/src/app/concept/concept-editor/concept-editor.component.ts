@@ -19,6 +19,7 @@ import {RelatedEditorComponent} from '../related-editor/related-editor.component
 import {Reference} from '../../models/Reference';
 import {SynonymEditorComponent} from '../synonym-editor/synonym-editor.component';
 import {Synonym} from '../../models/Synonym';
+import {GraphNode} from 'eds-angular4/dist/node-graph/GraphNode';
 
 @Component({
   selector: 'app-concept-editor',
@@ -111,19 +112,32 @@ export class ConceptEditorComponent implements AfterViewInit {
       this.data = null;
       this.graph.clear();
       this.graph.assignColours([1, 2, 3, 0]);
-      this.graph.addNodeData(this.concept.id, this.concept.fullName, 1, this.concept);
+      this.graph.addNodeData(this.concept.id, this.concept.fullName, 1, this.concept, this.getAttributeTable(this.attributes));
 
-      this.graph.addNodeData(this.concept.superclass.id, this.concept.superclass.name, 0, this.concept.superclass, '<i>Hello world!</i><br>Lets go!');
-      this.graph.addEdgeData(this.concept.id, this.concept.superclass.id, 'inherits from', this.concept.superclass);
+      // this.graph.addNodeData(this.concept.superclass.id, this.concept.superclass.name, 0, this.concept.superclass);
+      // this.graph.addEdgeData(this.concept.id, this.concept.superclass.id, 'inherits from', this.concept.superclass);
 
       this.updateDiagram(this.concept.id, this.related, this.attributes);
     }
   }
 
-  expandNode(conceptId: number) {
-    Observable.forkJoin([this.conceptService.getRelated(conceptId, false), this.conceptService.getAttributes(conceptId, false)])
+  getAttributeTable(attributes: Attribute[]) : string {
+    let html : string = '';
+
+    for(let att of attributes) {
+      html += att.attribute.name + '<br>';
+    }
+
+    return html;
+  }
+
+  expandNode(node: GraphNode) {
+    Observable.forkJoin([this.conceptService.getRelated(node.id, false), this.conceptService.getAttributes(node.id, false)])
       .subscribe(
-        (result) => this.updateDiagram(conceptId, result[0], result[1]),
+        (result) => {
+          node.tooltip = this.getAttributeTable(result[1]);
+          this.updateDiagram(node.id, result[0], result[1]);
+        },
         (error) => this.logger.error(error)
       );
   }
@@ -280,7 +294,7 @@ export class ConceptEditorComponent implements AfterViewInit {
   nodeDblClick(node) {
     if (!node.data.loaded) {
       node.data.loaded = true;
-      this.expandNode(node.id);
+      this.expandNode(node);
     }
   }
 
