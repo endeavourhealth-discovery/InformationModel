@@ -65,7 +65,8 @@ import {ConceptSummary} from '../../models/ConceptSummary';
       <button type="button" class="btn btn-danger" (click)="cancel()" name="cancel">Cancel</button>
     </div>
   </div>
-  `
+  `,
+    providers: [LoggerService]
 })
 export class ConceptSelectorComponent implements OnInit {
   hide: boolean;
