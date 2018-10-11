@@ -3,7 +3,7 @@ package org.endeavourhealth.im.dal;
 import org.endeavourhealth.im.dal.filer.IMFilerDAL;
 import org.endeavourhealth.im.dal.filer.IMFilerJDBCDAL;
 import org.endeavourhealth.im.api.models.*;
-import org.endeavourhealth.im.common.models.Term;
+import org.endeavourhealth.im.models.Term;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

@@ -24,3 +24,7 @@ INSERT INTO im2.mapping_code
     (scheme, code_id, concept)
 SELECT 5031 as scheme, code_id, concept_id as concept
 FROM im.code;
+
+UPDATE table_id 
+SET id = (SELECT MAX(id)+1 FROM concept)
+WHERE name = 'Concept';

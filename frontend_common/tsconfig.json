@@ -20,6 +20,7 @@
 		"aot",
 		"node_modules",
 		"typings",
-		"dist"
+		"dist",
+    "tslint.json"
 	]
 }

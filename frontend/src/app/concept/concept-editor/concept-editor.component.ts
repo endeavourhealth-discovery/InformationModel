@@ -12,14 +12,13 @@ import {ModuleStateService} from 'eds-angular4/dist/common';
 import {RelatedConcept} from '../../models/RelatedConcept';
 import {Attribute} from '../../models/Attribute';
 import {Observable} from 'rxjs/Observable';
-import {ConceptSelectorComponent} from '../../concept-selector/concept-selector/concept-selector.component';
 import {ConceptEdits} from '../../models/ConceptEdits';
 import {AttributeEditorComponent} from '../attribute-editor/attribute-editor.component';
 import {RelatedEditorComponent} from '../related-editor/related-editor.component';
-import {Reference} from '../../models/Reference';
 import {SynonymEditorComponent} from '../synonym-editor/synonym-editor.component';
 import {Synonym} from '../../models/Synonym';
 import {GraphNode} from 'eds-angular4/dist/node-graph/GraphNode';
+import {ConceptSelectorComponent} from 'im-common/dist/concept-selector/concept-selector/concept-selector.component';
 
 @Component({
   selector: 'app-concept-editor',

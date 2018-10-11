@@ -1,22 +1,5 @@
 package org.endeavourhealth.im.client;
 
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import org.apache.http.Header;
-import org.endeavourhealth.common.security.keycloak.client.KeycloakClient;
-import org.endeavourhealth.im.common.models.*;
-import org.endeavourhealth.common.config.ConfigManager;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
 
 public class IMClient {
 /*    public static boolean isMessageValid(Message message) {

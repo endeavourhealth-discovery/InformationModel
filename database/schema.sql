@@ -15,7 +15,7 @@ CREATE TABLE concept(
   id BIGINT AUTO_INCREMENT                      COMMENT 'Main concept id, common across all tables',
   superclass BIGINT                             COMMENT 'The superclass concept that this concept inherits from',
   url VARCHAR(250)                              COMMENT 'URL for where documentation for this concept is published',
-  full_name VARCHAR(255)                        COMMENT 'Full, clear, unambiguous name for the concept',
+  full_name VARCHAR(500)                        COMMENT 'Full, clear, unambiguous name for the concept',
   short_name VARCHAR(125)                       COMMENT 'Short name for use when context is known',
   context VARCHAR(250) NOT NULL                 COMMENT 'Unique, computable (immutable) name for the concept',
   status TINYINT NOT NULL DEFAULT 0             COMMENT 'Concept status - 0=Draft, 1=Active, 2=Deprecated, 3=Temporary',

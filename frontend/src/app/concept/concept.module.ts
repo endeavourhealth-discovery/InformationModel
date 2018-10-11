@@ -10,10 +10,10 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {NvD3Module} from 'ng2-nvd3';
 import { ConceptDetailsComponent } from './concept-details/concept-details.component';
 import { NodeGraphDialogComponent } from './node-graph-dialog/node-graph-dialog.component';
-import {ConceptSelectorModule} from '../concept-selector/concept-selector.module';
 import {AttributeEditorComponent} from './attribute-editor/attribute-editor.component';
 import {RelatedEditorComponent} from './related-editor/related-editor.component';
 import {SynonymEditorComponent} from './synonym-editor/synonym-editor.component';
+import {ConceptSelectorModule} from 'im-common';
 
 @NgModule({
   imports: [

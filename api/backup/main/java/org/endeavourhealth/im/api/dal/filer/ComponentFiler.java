@@ -2,7 +2,7 @@ package org.endeavourhealth.im.dal.filer;
 
 import org.endeavourhealth.common.cache.ObjectMapperPool;
 import org.endeavourhealth.im.api.models.TransactionComponent;
-import org.endeavourhealth.im.common.models.DbEntity;
+import org.endeavourhealth.im.models.DbEntity;
 
 import java.util.Collections;
 import java.util.List;

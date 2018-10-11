@@ -8,7 +8,7 @@ import org.endeavourhealth.im.dal.filer.IMFilerJDBCDAL;
 //import org.endeavourhealth.im.common.models.ConceptRuleSet;
 import org.endeavourhealth.im.api.models.TransactionAction;
 import org.endeavourhealth.im.api.models.TransactionTable;
-import org.endeavourhealth.im.common.models.*;
+import org.endeavourhealth.im.models.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

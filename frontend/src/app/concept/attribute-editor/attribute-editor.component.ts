@@ -4,8 +4,8 @@ import {LoggerService} from 'eds-angular4';
 import {ConceptService} from '../concept.service';
 import {ConceptStatusHelper} from '../../models/ConceptStatus';
 import {Attribute} from '../../models/Attribute';
-import {ConceptSelectorComponent} from '../../concept-selector/concept-selector/concept-selector.component';
 import {Concept} from '../../models/Concept';
+import {ConceptSelectorComponent} from 'im-common/dist/concept-selector/concept-selector/concept-selector.component';
 
 @Component({
   selector: 'app-attribute-editor',

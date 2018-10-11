@@ -1,7 +1,7 @@
 package org.endeavourhealth.im.dal;
 
 //import org.endeavourhealth.im.common.models.ConceptRuleSet;
-import org.endeavourhealth.im.common.models.*;
+import org.endeavourhealth.im.models.*;
 
 import java.util.List;
 

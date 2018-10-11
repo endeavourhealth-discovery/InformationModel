@@ -1,7 +1,7 @@
 package org.endeavourhealth.im.dal;
 
 import org.endeavourhealth.im.api.models.TermMapping;
-import org.endeavourhealth.im.common.models.Term;
+import org.endeavourhealth.im.models.Term;
 
 import java.sql.SQLException;
 import java.util.List;

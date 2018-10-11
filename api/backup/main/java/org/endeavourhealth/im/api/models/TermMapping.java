@@ -1,6 +1,6 @@
 package org.endeavourhealth.im.api.models;
 
-import org.endeavourhealth.im.common.models.DbEntity;
+import org.endeavourhealth.im.models.DbEntity;
 
 public class TermMapping extends DbEntity<TermMapping> {
     private String organisation;

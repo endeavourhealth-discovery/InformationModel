@@ -3,7 +3,7 @@ package org.endeavourhealth.im.dal.filer;
 import org.endeavourhealth.common.cache.ObjectMapperPool;
 import org.endeavourhealth.im.dal.ConnectionPool;
 import org.endeavourhealth.im.api.models.TransactionComponent;
-import org.endeavourhealth.im.common.models.Task;
+import org.endeavourhealth.im.models.Task;
 
 import java.sql.*;
 import java.util.ArrayList;

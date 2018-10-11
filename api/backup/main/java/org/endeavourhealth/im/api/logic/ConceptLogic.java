@@ -1,8 +1,8 @@
-package org.endeavourhealth.im.api.logic;
+package org.endeavourhealth.im.logic;
 
 import org.endeavourhealth.im.dal.ConceptDAL;
 import org.endeavourhealth.im.dal.ConceptJDBCDAL;
-import org.endeavourhealth.im.common.models.*;
+import org.endeavourhealth.im.models.*;
 
 import java.util.ArrayList;
 import java.util.List;

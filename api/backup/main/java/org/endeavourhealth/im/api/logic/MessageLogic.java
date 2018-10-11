@@ -1,4 +1,4 @@
-package org.endeavourhealth.im.api.logic;
+package org.endeavourhealth.im.logic;
 
 //import org.endeavourhealth.im.api.dal.MessageDAL;
 //import org.endeavourhealth.im.api.dal.MessageJDBCDAL;

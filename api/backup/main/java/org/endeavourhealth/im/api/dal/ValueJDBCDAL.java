@@ -1,6 +1,6 @@
 package org.endeavourhealth.im.dal;
 
-import org.endeavourhealth.im.common.models.*;
+import org.endeavourhealth.im.models.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

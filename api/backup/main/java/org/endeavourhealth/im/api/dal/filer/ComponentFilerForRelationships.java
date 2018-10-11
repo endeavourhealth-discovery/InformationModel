@@ -3,8 +3,8 @@ package org.endeavourhealth.im.dal.filer;
 import org.endeavourhealth.common.cache.ObjectMapperPool;
 import org.endeavourhealth.im.dal.ConnectionPool;
 import org.endeavourhealth.im.api.models.TransactionComponent;
-import org.endeavourhealth.im.common.models.DbEntity;
-import org.endeavourhealth.im.common.models.RelatedConcept;
+import org.endeavourhealth.im.models.DbEntity;
+import org.endeavourhealth.im.models.RelatedConcept;
 
 import java.sql.*;
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package org.endeavourhealth.im.api.logic;
+package org.endeavourhealth.im.logic;
 
 //import java.util.HashMap;
 //import java.util.Map;

@@ -4,6 +4,7 @@ USE im2;
 INSERT INTO concept
   (id,  superclass, context, full_name, description)
 VALUES
+-- ************************************** CORE IM DATA **************************************
 -- BASE (PRIMITIVE) TYPES (super = 1)
   ( 1, 1, 'Concept',                    'Concept',          'Abstract base concept to which all concept types belong'),
   ( 2, 1, 'Concept.Codeable concept',   'Codeable concept', 'Any concept that can be identified as part of a taxonomy or classification'),
@@ -42,7 +43,7 @@ VALUES
   (515, 3, 'Folder.Relationships',                 'Relationships',                                    'List of relationship types in the core model'),
   (516, 3, 'Folder.Attribute types',               'Attribute types',                                  'A list of attribute types used in the core model'),
 
--- RECORD & ATTRIBUTE TYPES
+-- ************************************** IM MODEL DATA **************************************
   (5009, 12,    'Text attribute.Title',  'Title',  'Title or prefix to name'),
   (5010, 12,    'Text attribute.First name(s)',  'First name(s)',  'Forenames or first names or given names'),
   (5011, 12,    'Text attribute.Middle names',  'Middle names',  'After the first and before the last'),
@@ -88,7 +89,10 @@ VALUES
   (5048, 1, 'DM+D.RI', 'Reimbursement info', ''),
   (5049, 1, 'DM+D.MPP', 'Medicinal product price', ''),
   (5050, 1, 'DM+D.ACPC', 'Actual combination pack content', ''),
-  (5051, 1, 'DM+D.AMPP', 'Actual medicinal product pack', '')
+  (5051, 1, 'DM+D.AMPP', 'Actual medicinal product pack', ''),
+  (105, 5, 'Relationship.IsBranded', 'is branded type of', ''),
+  (106, 5, 'Relationship.PackOf', 'is pack of', ''),
+  (107, 5, 'Relationship.ActiveIngredient', 'has active ingredient', '')
 ;
 
 /*

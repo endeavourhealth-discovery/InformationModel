@@ -5,8 +5,8 @@ import io.astefanutti.metrics.aspectj.Metrics;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.endeavourhealth.im.api.logic.ValueLogic;
-import org.endeavourhealth.im.common.models.*;
+import org.endeavourhealth.im.logic.ValueLogic;
+import org.endeavourhealth.im.models.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -3,10 +3,10 @@ import {InputBoxDialog, LoggerService} from 'eds-angular4';
 import {Router} from '@angular/router';
 import {ConceptService} from './concept.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {ConceptSelectorComponent} from '../concept-selector/concept-selector/concept-selector.component';
 import {Concept} from '../models/Concept';
 import {ConceptStatusHelper} from '../models/ConceptStatus';
 import {ConceptSummary} from '../models/ConceptSummary';
+import {ConceptSelectorComponent} from 'im-common/dist/concept-selector/concept-selector/concept-selector.component';
 
 @Component({
   selector: 'app-concept-library',

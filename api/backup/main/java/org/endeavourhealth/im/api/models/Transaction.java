@@ -1,6 +1,6 @@
 package org.endeavourhealth.im.api.models;
 
-import org.endeavourhealth.im.common.models.DbEntity;
+import org.endeavourhealth.im.models.DbEntity;
 
 import java.util.ArrayList;
 import java.util.Date;

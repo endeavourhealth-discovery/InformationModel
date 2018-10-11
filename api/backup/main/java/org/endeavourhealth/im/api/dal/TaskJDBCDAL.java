@@ -4,8 +4,8 @@ import org.endeavourhealth.im.dal.filer.IMFilerDAL;
 import org.endeavourhealth.im.dal.filer.IMFilerJDBCDAL;
 import org.endeavourhealth.im.api.models.TransactionAction;
 import org.endeavourhealth.im.api.models.TransactionTable;
-import org.endeavourhealth.im.common.models.Task;
-import org.endeavourhealth.im.common.models.TaskType;
+import org.endeavourhealth.im.models.Task;
+import org.endeavourhealth.im.models.TaskType;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

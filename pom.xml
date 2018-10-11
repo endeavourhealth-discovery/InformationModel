@@ -11,7 +11,6 @@
 
     <modules>
         <module>common</module>
-        <module>dal</module>
         <module>client</module>
         <module>api</module>
         <module>frontend</module>
@@ -28,10 +27,10 @@
         <node.version>v6.10.1</node.version>
         <swagger.version>1.5.15</swagger.version>
 
-        <eds-api.version>1.12-SNAPSHOT</eds-api.version>
+        <eds-api.version>1.28-SNAPSHOT</eds-api.version>
         <eds-cache.version>1.2-SNAPSHOT</eds-cache.version>
         <eds-core.version>1.156-SNAPSHOT</eds-core.version>
-        <eds-config-manager.version>1.20-SNAPSHOT</eds-config-manager.version>
+        <eds-config-manager.version>1.21-SNAPSHOT</eds-config-manager.version>
         <eds-security.version>1.8-SNAPSHOT</eds-security.version>
 
         <aspectj.version>1.8.9</aspectj.version>

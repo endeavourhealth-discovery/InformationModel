@@ -1,8 +1,8 @@
-package org.endeavourhealth.im.api.logic;
+package org.endeavourhealth.im.logic;
 
 import org.endeavourhealth.im.dal.ValueDAL;
 import org.endeavourhealth.im.dal.ValueJDBCDAL;
-import org.endeavourhealth.im.common.models.*;
+import org.endeavourhealth.im.models.*;
 
 public class ValueLogic {
     private ValueDAL dal;

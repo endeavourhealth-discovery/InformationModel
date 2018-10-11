@@ -5,9 +5,9 @@ import io.astefanutti.metrics.aspectj.Metrics;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.endeavourhealth.im.api.logic.TaskLogic;
-import org.endeavourhealth.im.common.models.Task;
-import org.endeavourhealth.im.common.models.TaskType;
+import org.endeavourhealth.im.logic.TaskLogic;
+import org.endeavourhealth.im.models.Task;
+import org.endeavourhealth.im.models.TaskType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

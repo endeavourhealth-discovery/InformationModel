@@ -1,9 +1,9 @@
-package org.endeavourhealth.im.api.logic;
+package org.endeavourhealth.im.logic;
 
 import org.endeavourhealth.im.dal.TermDAL;
 import org.endeavourhealth.im.dal.TermJDBCDAL;
 import org.endeavourhealth.im.api.models.TermMapping;
-import org.endeavourhealth.im.common.models.*;
+import org.endeavourhealth.im.models.*;
 
 import java.util.List;
 

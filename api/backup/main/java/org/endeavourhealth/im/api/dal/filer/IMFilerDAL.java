@@ -3,7 +3,7 @@ package org.endeavourhealth.im.dal.filer;
 import org.endeavourhealth.im.api.models.Transaction;
 import org.endeavourhealth.im.api.models.TransactionAction;
 import org.endeavourhealth.im.api.models.TransactionTable;
-import org.endeavourhealth.im.common.models.DbEntity;
+import org.endeavourhealth.im.models.DbEntity;
 
 import java.util.List;
 import java.util.Map;
