@@ -4,7 +4,7 @@ import {InputBoxDialog, LoggerService} from 'eds-angular4';
 import {ConceptSelectorService} from '../concept-selector.service';
 import {Concept} from '../../models/Concept';
 import {ConceptStatus, ConceptStatusHelper} from '../../models/ConceptStatus';
-import {ConceptSummary} from '../../models/ConceptSummary';
+import {SearchResult} from '../../models/SearchResult';
 
 @Component({
   selector: 'app-concept-selector',
@@ -46,7 +46,7 @@ import {ConceptSummary} from '../../models/ConceptSummary';
                     </tr>
                   </thead>
                   <tbody>
-                    <tr class="d-flex" *ngFor="let item of result" (click)="selection=item" (dblclick)="ok()" [class.selection]="selection==item" [class.text-warning]="item.status == 2">
+                    <tr class="d-flex" *ngFor="let item of result?.results" (click)="selection=item" (dblclick)="ok()" [class.selection]="selection==item" [class.text-warning]="item.status == 2">
                       <td class="col-8">{{item.name}} <span *ngIf="item.synonym" class="badge badge-info">Synonym</span></td>
                       <td class="col-3">{{item.context}}</td>
                       <td class="col-1">{{getConceptStatusName(item.status)}}</td>
@@ -73,7 +73,7 @@ export class ConceptSelectorComponent implements OnInit {
   criteria: string;
   includeDeprecated = false;
   selection: Concept;
-  result: ConceptSummary[] = [];
+  result: SearchResult;
   showAdd: boolean = false;
   superclass: number;
 

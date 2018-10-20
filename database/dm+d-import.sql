@@ -192,9 +192,9 @@ SET m.conceptId = x.conceptId, new = true;
 
 -- Create concepts
 INSERT INTO concept
-    (id, superclass, short_name, full_name, context, status, version, last_update)
+    (id, superclass, short_name, full_name, description, context, status, version, last_update)
 SELECT
-       m.conceptId, 2, v.abbrevnm, v.nm, concat('DM+D.',m.ampId), ifnull(v.invalid, 0) + 1, 1.0, now()
+       m.conceptId, 2, v.abbrevnm, v.nm, v.`desc`, concat('DM+D.',m.ampId), ifnull(v.invalid, 0) + 1, 1.0, now()
 FROM dmd_amp_concept_map m
          JOIN dmd_amp v on v.apid = m.ampId
 WHERE m.new = true;
@@ -278,6 +278,14 @@ SELECT
 FROM
      dmd_vmpp_concept_map;
 */
+
+-- ********************* VIRTUAL PRODUCT INGREDIENT *********************
+INSERT INTO concept_relationship
+    (source, relationship, target)
+SELECT p.conceptId as source, 108 as relationship, i.concept_id as target
+FROM dmd_vmp_vpi m
+         JOIN dmd_vmp_concept_map p ON p.vmpId = m.vpid
+         JOIN im.code i ON i.code_id = m.isid AND i.system = 1;
 
 -- ********************* GENERAL SNOMED <--> CONCEPT MAP *********************
 REPLACE INTO mapping_code

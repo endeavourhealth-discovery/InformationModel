@@ -47,7 +47,7 @@
                           </tr>
                         </thead>
                         <tbody>
-                          <tr class="d-flex" *ngFor="let item of summaryList" (click)="editConcept(item)" [class.text-warning]="item.status == 2">
+                          <tr class="d-flex" *ngFor="let item of summaryList?.results" (click)="editConcept(item)" [class.text-warning]="item.status == 2">
                             <td class="col-2">{{item.context}}</td>
                             <td class="col-8">{{item.name}} <span *ngIf="item.description && item.fullName != item.description" class="badge badge-info" data-toggle="tooltip" title="{{item.description}}">Synonym</span></td>
                             <td class="col-1">{{getStatusName(item.status)}}</td>
@@ -56,6 +56,9 @@
                         </tbody>
                       </table>
                     </loadingIndicator>
+                  </div>
+                  <div class="col-md-12" *ngIf="summaryList && summaryList.count > 15">
+                    <ngb-pagination [collectionSize]="summaryList.count" [(page)]="summaryList.page" [pageSize]="15" aria-label="Default pagination" (pageChange)="gotoPage($event)"></ngb-pagination>
                   </div>
                 </div>
               </div>

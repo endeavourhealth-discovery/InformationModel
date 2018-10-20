@@ -1,7 +1,11 @@
 package org.endeavourhealth.im.models;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
 import java.util.Date;
 
+@ApiModel(value = "Information model concept")
 public class Concept extends DbEntity<Concept> {
     private Reference superclass;
     private String url;
@@ -59,6 +63,7 @@ public class Concept extends DbEntity<Concept> {
         return this;
     }
 
+    @ApiModelProperty(value = "Status of the concept", allowableValues = "0 = Draft, 1 = Active, 2 = Deprecated, 3 = Temporary")
     public ConceptStatus getStatus() {
         return status;
     }

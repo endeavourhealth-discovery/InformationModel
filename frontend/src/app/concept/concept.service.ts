@@ -8,13 +8,14 @@ import {ConceptEdits} from '../models/ConceptEdits';
 import {Bundle} from '../models/Bundle';
 import {Synonym} from '../models/Synonym';
 import {ConceptSummary} from '../models/ConceptSummary';
+import {SearchResult} from 'im-common/dist/models/SearchResult';
 
 @Injectable()
 export class ConceptService {
 
   constructor(private http: Http) { }
 
-  getMRU(includeDeprecated: boolean): Observable<ConceptSummary[]> {
+  getMRU(includeDeprecated: boolean): Observable<SearchResult> {
     const params = new URLSearchParams();
     params.append('includeDeprecated', includeDeprecated.toString());
 
@@ -22,10 +23,11 @@ export class ConceptService {
       .map((result) => result.json());
   }
 
-  search(searchTerm: string, includeDeprecated: boolean): Observable<ConceptSummary[]> {
+  search(searchTerm: string, includeDeprecated: boolean, page:number = 1): Observable<SearchResult> {
     const params = new URLSearchParams();
     params.append('searchTerm', searchTerm.toString());
     params.append('includeDeprecated', includeDeprecated.toString());
+    params.append('page', page.toString());
 
     return this.http.get('api/Concept/Search', {search: params})
       .map((result) => result.json());

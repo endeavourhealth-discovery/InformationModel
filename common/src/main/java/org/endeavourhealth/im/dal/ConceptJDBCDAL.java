@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.sql.Types.*;
+import static org.endeavourhealth.im.dal.DALHelper.*;
 
 public class ConceptJDBCDAL implements ConceptDAL {
     private static final Logger LOG = LoggerFactory.getLogger(ConceptJDBCDAL.class);
@@ -48,8 +49,10 @@ public class ConceptJDBCDAL implements ConceptDAL {
     }
 
     @Override
-    public List<ConceptSummary> getMRU(Boolean includeDeprecated) throws SQLException {
+    public SearchResult getMRU(Boolean includeDeprecated) throws SQLException {
         Connection conn = ConnectionPool.InformationModel.pop();
+
+        SearchResult result = new SearchResult().setPage(1);
 
         String sql = "SELECT c.id, c.context, c.full_name, c.status, c.version, false as synonym " +
             "FROM concept c ";
@@ -62,18 +65,24 @@ public class ConceptJDBCDAL implements ConceptDAL {
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, PAGE_SIZE);
-            return getConceptSummaryListFromStatment(stmt);
+            result.setResults(getConceptSummaryListFromStatment(stmt));
+            result.setCount(result.getResults().size());
+
+            return result;
         } finally {
             ConnectionPool.InformationModel.push(conn);
         }
     }
 
     @Override
-    public List<ConceptSummary> search(String term, Boolean includeDeprecated, Long superclass) throws SQLException {
+    public SearchResult search(String term, Integer page, Boolean includeDeprecated, Long superclass) throws SQLException {
         Connection conn = ConnectionPool.InformationModel.pop();
+        if (page == null)
+            page = 1;
+        SearchResult result = new SearchResult().setPage(page);
 
         // Select the SYNONYM as the full name and the PREFERRED as description
-        String sql = "SELECT * FROM (\n" +
+        String sql = "SELECT SQL_CALC_FOUND_ROWS * FROM (\n" +
             "SELECT id, full_name, context, status, version, false as synonym\n" +
             "FROM concept\n" +
             "WHERE full_name LIKE ?\n";
@@ -95,8 +104,8 @@ public class ConceptJDBCDAL implements ConceptDAL {
             sql += "AND c.superclass = ? ";
 
         sql += ") x\n" +
-            "ORDER BY (x.status=2), LENGTH(full_name) " +
-            "LIMIT ? ";
+            "ORDER BY (x.status=2), LENGTH(full_name), full_name " +
+            "LIMIT ?,? ";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             int i = 1;
@@ -106,11 +115,25 @@ public class ConceptJDBCDAL implements ConceptDAL {
             stmt.setString(i++, "%" + term + "%");
             if (superclass != null)
                 stmt.setLong(i++, superclass);
+            stmt.setInt(i++, (page-1) * PAGE_SIZE);
             stmt.setInt(i++, PAGE_SIZE);
 
-            return getConceptSummaryListFromStatment(stmt);
+            result.setResults(getConceptSummaryListFromStatment(stmt));
+            result.setCount(getFoundRows(conn));
+
+            return result;
         } finally {
             ConnectionPool.InformationModel.push(conn);
+        }
+    }
+
+    private Integer getFoundRows(Connection conn) throws SQLException {
+        try (PreparedStatement stmt = conn.prepareStatement("SELECT FOUND_ROWS()")) {
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next())
+                return rs.getInt(1);
+            else
+                return 0;
         }
     }
 
@@ -333,13 +356,6 @@ public class ConceptJDBCDAL implements ConceptDAL {
         }
     }
 
-    private Long getGeneratedKey(PreparedStatement stmt) throws SQLException {
-        ResultSet rs = stmt.getGeneratedKeys();
-        rs.next();
-        Long result = rs.getLong(1);
-        rs.close();
-        return result;
-    }
 
     private void createDraftConcept(Connection conn, Reference reference) throws SQLException {
         Concept concept = new Concept()
@@ -403,129 +419,5 @@ public class ConceptJDBCDAL implements ConceptDAL {
                 delRel.executeUpdate();
             }
         }
-    }
-
-    private Concept getConceptFromStatement(PreparedStatement stmt) throws SQLException {
-        try (ResultSet rs = stmt.executeQuery()) {
-            if (rs.next())
-                return getConceptFromResultSet(rs, getColumnList(rs));
-            else
-                return null;
-        }
-    }
-
-    private Concept getConceptFromResultSet(ResultSet rs, List<String> fields) throws SQLException {
-        int idx;
-        Concept concept = new Concept();
-        if ((idx = fields.indexOf("id")) > 0) concept.setId(rs.getLong(idx));
-        if ((idx = fields.indexOf("superclass")) > 0) concept.setSuperclass(new Reference(rs.getLong(idx), rs.getString("superclass_name")));
-        if ((idx = fields.indexOf("url")) > 0) concept.setUrl(rs.getString(idx));
-        if ((idx = fields.indexOf("full_name")) > 0) concept.setFullName(rs.getString(idx));
-        if ((idx = fields.indexOf("short_name")) > 0) concept.setShortName(rs.getString(idx));
-        if ((idx = fields.indexOf("context")) > 0) concept.setContext(rs.getString(idx));
-        if ((idx = fields.indexOf("status")) > 0) concept.setStatus(ConceptStatus.byValue(rs.getByte(idx)));
-        if ((idx = fields.indexOf("version")) > 0) concept.setVersion(rs.getFloat(idx));
-        if ((idx = fields.indexOf("description")) > 0) concept.setDescription(rs.getString(idx));
-        if ((idx = fields.indexOf("use_count")) > 0) concept.setUseCount(rs.getLong(idx));
-        if ((idx = fields.indexOf("last_update")) > 0) concept.setLastUpdate(rs.getDate(idx));
-
-        return concept;
-    }
-
-    private List<String> getColumnList(ResultSet rs) throws SQLException {
-        List<String> result = new ArrayList<>();
-
-        ResultSetMetaData metaData = rs.getMetaData();
-        result.add(""); // Dummy column as field indexes start at 1
-
-        for (int i = 1; i <= metaData.getColumnCount(); i++) {
-            result.add(metaData.getColumnLabel(i));
-        }
-
-        return result;
-    }
-
-    private List<RelatedConcept> getRelatedListFromStatement(PreparedStatement stmt) throws SQLException {
-        List<RelatedConcept> result = new ArrayList<>();
-        try (ResultSet rs = stmt.executeQuery()) {
-            while(rs.next()) {
-                result.add(getRelatedConceptFromResultSet(rs));
-            }
-        }
-        return result;
-    }
-
-    private RelatedConcept getRelatedConceptFromResultSet(ResultSet rs) throws SQLException {
-        return new RelatedConcept()
-            .setId(rs.getLong("id"))
-            .setSource(
-                new Reference()
-                    .setId(rs.getLong("source"))
-                    .setName(rs.getString("source_name"))
-            )
-            .setTarget(
-                new Reference()
-                    .setId(rs.getLong("target"))
-                    .setName(rs.getString("target_name"))
-            )
-            .setRelationship(
-                new Reference()
-                    .setId(rs.getLong("relationship"))
-                    .setName(rs.getString("relationship_name"))
-            )
-            .setOrder(rs.getInt("order"))
-            .setMandatory(rs.getBoolean("mandatory"))
-            .setLimit(rs.getInt("limit"));
-    }
-
-    private List<Attribute> getAttributeListFromStatement(PreparedStatement stmt) throws SQLException {
-        List<Attribute> result = new ArrayList<>();
-        try (ResultSet rs = stmt.executeQuery()) {
-            while(rs.next()) {
-                result.add(getAttributeFromResultSet(rs));
-            }
-        }
-        return result;
-    }
-
-    private Attribute getAttributeFromResultSet(ResultSet rs) throws SQLException {
-        Attribute result = new Attribute()
-            .setId(rs.getLong("id"))
-            .setConcept(
-                new Reference()
-                .setId(rs.getLong("concept"))
-                .setName(rs.getString("concept_name"))
-            )
-            .setAttribute(
-                new Reference()
-                .setId(rs.getLong("attribute"))
-                .setName(rs.getString("attribute_name"))
-            )
-            .setType(
-                new Reference()
-                .setId(rs.getLong("type"))
-                .setName(rs.getString("type_name"))
-            )
-            .setMinimum(rs.getInt("minimum"))
-            .setMaximum(rs.getInt("maximum"));
-
-        Long avid = rs.getLong("avid");
-        if (rs.wasNull()) avid = null;
-
-        AttributeValue value = new AttributeValue()
-            .setId(avid)
-            .setFixedValue(rs.getString("fixed_value"));
-
-        Reference fixedConcept = new Reference()
-            .setId(rs.getLong("fixed_concept"))
-            .setName(rs.getString("fixed_name"));
-
-        if (!rs.wasNull()) {
-            value.setFixedConcept(fixedConcept);
-        }
-
-        result.setValue(value);
-
-        return result;
     }
 }

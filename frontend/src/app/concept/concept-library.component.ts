@@ -5,8 +5,8 @@ import {ConceptService} from './concept.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {Concept} from '../models/Concept';
 import {ConceptStatusHelper} from '../models/ConceptStatus';
-import {ConceptSummary} from '../models/ConceptSummary';
 import {ConceptSelectorComponent} from 'im-common/dist/concept-selector/concept-selector/concept-selector.component';
+import {SearchResult} from 'im-common/dist/models/SearchResult';
 
 @Component({
   selector: 'app-concept-library',
@@ -17,7 +17,7 @@ export class ConceptLibraryComponent implements OnInit {
   getStatusName = ConceptStatusHelper.getName;
 
   listTitle = 'Most recently used';
-  summaryList: ConceptSummary[];
+  summaryList: SearchResult;
   searchTerm: string;
   includeDeprecated = false;
 
@@ -32,6 +32,7 @@ export class ConceptLibraryComponent implements OnInit {
   }
 
   getMRU() {
+    this.summaryList = null;
     this.conceptService.getMRU(this.includeDeprecated)
       .subscribe(
         (result) => this.summaryList = result,
@@ -74,10 +75,13 @@ export class ConceptLibraryComponent implements OnInit {
       );
   }
 
-  showConceptPicker() {
-    ConceptSelectorComponent.open(this.modal)
-      .result.then(
-      (result) => console.log(result)
-    );
+  gotoPage(page) {
+    this.listTitle = 'Search results for "' + this.searchTerm + '"';
+    this.summaryList = null;
+    this.conceptService.search(this.searchTerm, this.includeDeprecated, page)
+      .subscribe(
+        (result) => this.summaryList = result,
+        (error) => this.log.error(error)
+      );
   }
 }

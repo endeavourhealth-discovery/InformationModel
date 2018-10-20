@@ -26,12 +26,12 @@ public class ConceptLogic {
         return this.dal.getConceptByContext(context);
     }
 
-    public List<ConceptSummary> getMRU(Boolean includeDeprecated) throws Exception {
+    public SearchResult getMRU(Boolean includeDeprecated) throws Exception {
         return this.dal.getMRU(includeDeprecated);
     }
 
-    public List<ConceptSummary> search(String term, Boolean includeDeprecated, Long superclass) throws Exception {
-        return this.dal.search(term, includeDeprecated, superclass);
+    public SearchResult search(String term, Integer page, Boolean includeDeprecated, Long superclass) throws Exception {
+        return this.dal.search(term, page, includeDeprecated, superclass);
     }
 
     public List<RelatedConcept> getRelated(Long id, Boolean includeDeprecated) throws Exception {
