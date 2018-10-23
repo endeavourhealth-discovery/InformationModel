@@ -21,4 +21,10 @@ public class IMClientTest {
         Long conceptId = IMClient.getConceptId(CodeScheme.SNOMED.getValue(), "195967001");
         assertEquals(1187044L, conceptId.longValue());
     }
+
+    @Test
+    public void getConceptByContext() throws IOException {
+        Long conceptId = IMClient.getConceptId("DM+D.VMP");
+        assertEquals(5308L, conceptId.longValue());
+    }
 }

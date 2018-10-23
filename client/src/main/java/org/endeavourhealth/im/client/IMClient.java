@@ -41,6 +41,19 @@ public class IMClient {
         else
             throw new IOException(response.readEntity(String.class));
     }
+
+    public static Long getConceptId(String context) throws IOException {
+        Map<String, String> params = new HashMap<>();
+        params.put("context", context);
+
+        Response response = get("/api/Concept/Context", params);
+
+        if (response.getStatus() == 200)
+            return (response.readEntity(Concept.class)).getId();
+        else
+            throw new IOException(response.readEntity(String.class));
+    }
+
 /*    public static boolean isMessageValid(Message message) {
         Response response = post("/Message/Valid", message);
 

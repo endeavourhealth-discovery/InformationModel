@@ -1486,12 +1486,12 @@ VALUES
     -- (5458, 102, 5626, 13, 0, 0), -- Patient -- Has (0:*) --> Hospital admission TODO: Inferred from episode -> encounter?
     -- (5458, 102, 5641, 14, 0, 0), -- Patient -- Has (0:*) --> Ward transfer TODO: Implied by encounter ?
     -- (5458, 102, 5655, 15, 0, 0), -- Patient -- Has (0:*) --> Discharge   TODO: Inferred from encounter?
-       (5458, 102, 5655, 16, 0, 0), -- Patient -- Has (0:*) --> Observation
+       (5458, 102, 5674, 16, 0, 0), -- Patient -- Has (0:*) --> Observation
        (5458, 102, 5686, 17, 0, 0), -- Patient -- Has (0:*) --> Flag
     -- (5458, 102, 5694, 18, 0, 0), -- Patient -- Has (0:*) --> Problem TODO: Inferred from observation?
        (5458, 102, 5711, 19, 0, 0), -- Patient -- Has (0:*) --> Procedure request
        (5458, 102, 5726, 20, 0, 0), -- Patient -- Has (0:*) --> Procedure TODO: If this is only ever from request then can be inferred by request?
-       (5458, 102, 5766, 21, 0, 0), -- Patient -- Has (0:*) --> Immunisation
+       (5458, 102, 5767, 21, 0, 0), -- Patient -- Has (0:*) --> Immunisation
        (5458, 102, 5782, 22, 0, 0), -- Patient -- Has (0:*) --> Allergy
        (5458, 102, 5800, 23, 0, 0), -- Patient -- Has (0:*) --> Referral
        (5458, 102, 5830, 24, 0, 0), -- Patient -- Has (0:*) --> Medication
@@ -1617,8 +1617,8 @@ VALUES
 
 INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
 VALUES
-       (5766, 102, 5434, 0, 0, 0),  -- Immunisation -- Has (0:*) --> Practitioner (qualifier = effective/entered)
-       (5766, 102, 5414, 1, 0, 1);  -- Immunisation -- Has (0:1) --> Organisation (qualifier = owning)
+       (5767, 102, 5434, 0, 0, 0),  -- Immunisation -- Has (0:*) --> Practitioner (qualifier = effective/entered)
+       (5767, 102, 5414, 1, 0, 1);  -- Immunisation -- Has (0:1) --> Organisation (qualifier = owning)
 
 INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
 VALUES
