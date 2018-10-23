@@ -1,5 +1,6 @@
 package org.endeavourhealth.im.client;
 
+import org.endeavourhealth.im.models.CodeScheme;
 import org.endeavourhealth.im.models.Concept;
 import org.junit.Test;
 
@@ -11,7 +12,7 @@ public class IMClientTest {
 
     @Test
     public void getConcept() throws IOException {
-        Concept concept = IMClient.getConcept(5301L, "195967001");
+        Concept concept = IMClient.getConcept(CodeScheme.SNOMED.getValue(), "195967001");
         assertEquals("Asthma (disorder)", concept.getFullName());
     }
 }
