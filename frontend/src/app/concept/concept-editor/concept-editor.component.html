@@ -11,7 +11,7 @@
     <div class="module-body">
       <form>
         <div class="row">
-          <div class="col-md-8 mb-4">
+          <div class="col-md-6 mb-4">
                 <div class="card h-100" id="detailCard" *ngIf="concept">
                   <div class="card-header"><h4>Concept details : {{concept?.context}}</h4></div>
                   <div class="card-body">
@@ -61,57 +61,48 @@
                       </div>
                       <div class="col-md-12 col-lg-12 form-group">
                         <label for="conceptDescription">Description</label>
-                        <textarea rows="5" class="form-control" id="conceptDescription" type="text" [(ngModel)]="concept.description" name="conceptDescription"></textarea>
+                        <textarea rows="1" class="form-control" id="conceptDescription" type="text" [(ngModel)]="concept.description" name="conceptDescription"></textarea>
                       </div>
                     </div>
                   </div>
                 </div>
           </div>
-          <div class="col-md-4 mb-4">
-            <div class="card h-100" id="relatedGraph">
-              <div class="card-header"><h4>Diagram<small> (double-click to expand)</small><button class="btn btn-info pull-right" (click)="zoom()">Visualize</button></h4></div>
-              <div class="card-body">
-                <nodeGraph #nodeGraph (nodeClick)="nodeClick($event)" (nodeDblClick)="nodeDblClick($event)" ></nodeGraph>
-              </div>
-            </div>
-          </div>
           <div class="col-md-6 mb-4">
             <div class="card h-100" id="attributeCard" *ngIf="attributes">
-              <div class="card-header"><h4>Attributes <button class="btn btn-success pull-right" (click)="addAttribute()">Add</button></h4> </div>
+              <div class="card-header"><h4>Attributes<button class="btn btn-success pull-right" (click)="addAttribute()">Add</button></h4> </div>
               <div class="card-body">
                 <div class="row">
                   <div class="col-md-12">
-                    <div class="scroll-box-250">
+                    <div>
                       <table class="table table-striped table-sm table-hover">
-                      <thead>
-                        <tr class="d-flex">
-                          <th class="col-4">Attribute</th>
-                          <th class="col-3">Type</th>
-                          <th class="col-2">Fixed value</th>
-                          <th class="col-1">Min</th>
-                          <th class="col-1">Max</th>
-                          <th class="col-1"></th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr class="d-flex show-child-on-hover" *ngFor="let item of attributes" [ngClass]="{'selection': selectedNode == item}" (click)="selectedNode = item">
-                          <td class="col-4"><a href="#/concept/{{item.attribute.id}}">{{item.attribute.name}}</a> <span *ngIf="item.concept.id != concept.id" class="info-icon" ngbTooltip="Inherited from: {{item.concept.name}}"></span></td>
-                          <td class="col-3">{{item.type.name}}</td>
-                          <td class="col-2">
-                            <span *ngIf="item.value.fixedConcept">{{item.value.fixedConcept.name}}</span>
-                            <span *ngIf="!item.value.fixedConcept">{{item.value.fixedValue}}</span>
-                          </td>
-                          <td class="col-1">{{item.minimum}}</td>
-                          <td class="col-1">{{item.maximum}}</td>
-                          <td class="col-1">
+                        <thead>
+                          <tr class="d-flex">
+                            <th class="col-4">Attribute</th>
+                            <th class="col-3">Type</th>
+                            <th class="col-3">Fixed value</th>
+                            <th class="col-1"></th>
+                            <th class="col-1"></th>
+                          </tr>
+                        </thead>
+                        <tbody class="d-block scroll-box-250">
+                          <tr class="d-flex show-child-on-hover" *ngFor="let item of attributes" [ngClass]="{'selection': selectedNode == item}" (click)="selectedNode = item">
+                            <td class="col-4"><a href="#/concept/{{item.attribute.id}}">{{item.attribute.name}}</a> <span *ngIf="item.concept.id != concept.id" class="info-icon" ngbTooltip="Inherited from: {{item.concept.name}}"></span></td>
+                            <td class="col-3">{{item.type.name}}</td>
+                            <td class="col-3">
+                              <span *ngIf="item.value.fixedConcept">{{item.value.fixedConcept.name}}</span>
+                              <span *ngIf="!item.value.fixedConcept">{{item.value.fixedValue}}</span>
+                            </td>
+                            <td class="col-1">
+                              {{item.minimum === 1 ? 1 : 0}} : {{item.maximum === 0 ? '*' : item.maximum}}
+                            </td>                          <td class="col-1">
                             <div class="pull-right child-to-show">
                               <button class="btn btn-xs btn-success" (click)="editAttribute(item)"><i class="fa fa-fw fa-pencil"></i></button>
                               <button class="btn btn-xs btn-danger" (click)="deleteAttribute(item)" [disabled]="item.concept.id != concept.id"><i class="fa fa-fw fa-trash"></i></button>
                             </div>
                           </td>
-                        </tr>
-                      </tbody>
-                    </table>
+                          </tr>
+                        </tbody>
+                      </table>
                     </div>
                   </div>
                 </div>
@@ -130,8 +121,8 @@
                           <tr class="d-flex">
                             <th class="col-4">Relationship</th>
                             <th class="col-2"></th>
-                            <th class="col-4"></th>
                             <th class="col-1"></th>
+                            <th class="col-4"></th>
                             <th class="col-1"></th>
                           </tr>
                         </thead>
@@ -142,12 +133,12 @@
                               <span *ngIf="item.source.id == concept.id">{{item.source.name}}</span>
                             </td>
                             <td class="col-2">{{item.relationship.name}}</td>
+                            <td class="col-1">
+                              {{item.mandatory ? 1 : 0}} : {{item.limit === 0 ? '*' : item.limit}}
+                            </td>
                             <td class="col-4">
                               <a href="#/concept/{{item.target.id}}" *ngIf="item.target.id != concept.id">{{item.target.name}}</a>
                               <span *ngIf="item.target.id == concept.id">{{item.target.name}}</span>
-                            </td>
-                            <td class="col-1">
-                              {{item.mandatory ? 1 : 0}} : {{item.limit === 0 ? '*' : item.limit}}
                             </td>
                             <td class="col-1">
                               <div class="pull-right child-to-show">
@@ -161,6 +152,14 @@
                     </div>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 mb-4">
+            <div class="card h-100" id="relatedGraph">
+              <div class="card-header"><h4>Diagram<small> (double-click to expand)</small><button class="btn btn-info pull-right" (click)="zoom()">Visualize</button></h4></div>
+              <div class="card-body">
+                <nodeGraph #nodeGraph (nodeClick)="nodeClick($event)" (nodeDblClick)="nodeDblClick($event)" ></nodeGraph>
               </div>
             </div>
           </div>

@@ -1,7 +1,34 @@
 package org.endeavourhealth.im.client;
 
 
+import com.fasterxml.jackson.databind.JsonNode;
+import org.apache.http.Header;
+import org.endeavourhealth.common.config.ConfigManager;
+import org.endeavourhealth.common.security.keycloak.client.KeycloakClient;
+import org.endeavourhealth.im.models.Concept;
+
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Response;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 public class IMClient {
+    public static Concept getConcept(Long scheme, String code) throws IOException {
+        Map<String, String> params = new HashMap<>();
+        params.put("scheme", scheme.toString());
+        params.put("code", code);
+
+        Response response = get("/api/Map", params);
+
+        if (response.getStatus() == 200)
+            return response.readEntity(Concept.class);
+        else
+            throw new IOException(response.readEntity(String.class));
+    }
+
 /*    public static boolean isMessageValid(Message message) {
         Response response = post("/Message/Valid", message);
 
@@ -38,9 +65,9 @@ public class IMClient {
     private static Response get(String path) throws IOException {
         return get(path, null);
     }
-
+*/
     private static Response get(String path, Map<String, String> params) throws IOException {
-        String address = ConfigManager.getConfiguration("information-model-address");
+        String address = ConfigManager.getConfiguration("api", "information-model");
 
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target(address).path(path);
@@ -71,5 +98,5 @@ public class IMClient {
         );
 
         return KeycloakClient.instance().getAuthorizationHeader();
-    }*/
+    }
 }

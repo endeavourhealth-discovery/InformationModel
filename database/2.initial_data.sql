@@ -1137,7 +1137,7 @@ VALUES
        (5757, 5757, 7,  1, 1),  -- Immunisation (1:1) --> Confidential
        (5767, 5758, 8,  0, 1),  -- Immunisation (0:1) --> Dose
        (5767, 5759, 9,  0, 1),  -- Immunisation (0:1) --> Body location
-       (5767, 5760, 10,  0, 1),  -- Immunisation (0:1) --> Method
+       (5767, 5760, 10, 0, 1),  -- Immunisation (0:1) --> Method
        (5767, 5761, 11, 0, 1),  -- Immunisation (0:1) --> Batch
        (5767, 5762, 12, 0, 1),  -- Immunisation (0:1) --> Expiry
        (5767, 5763, 13, 0, 1),  -- Immunisation (0:1) --> Manufacturer
@@ -1483,7 +1483,7 @@ VALUES
        (5458, 102, 5580, 10, 0, 0), -- Patient -- Has (0:*) --> Hospital encounter
     -- (5458, 102, 5598, 11, 0, 0), -- Patient -- Has (0:*) --> A&E Attendance  TODO: Inferred via hospital encounter?
        (5458, 102, 5613, 12, 0, 0), -- Patient -- Has (0:*) --> Outpatient attendance
-    -- (5458, 102, 5625, 13, 0, 0), -- Patient -- Has (0:*) --> Hospital admission TODO: Inferred from episode -> encounter?
+    -- (5458, 102, 5626, 13, 0, 0), -- Patient -- Has (0:*) --> Hospital admission TODO: Inferred from episode -> encounter?
     -- (5458, 102, 5641, 14, 0, 0), -- Patient -- Has (0:*) --> Ward transfer TODO: Implied by encounter ?
     -- (5458, 102, 5655, 15, 0, 0), -- Patient -- Has (0:*) --> Discharge   TODO: Inferred from encounter?
        (5458, 102, 5655, 16, 0, 0), -- Patient -- Has (0:*) --> Observation
@@ -1528,7 +1528,7 @@ VALUES
        (5545, 102, 5434, 0, 0, 0),  -- Care episode -- Has a (1:*) --> Practitioner (qualifier - Effective/Entered)
        (5545, 102, 5553, 1, 0, 0),  -- Care episode -- Has a (0:*) --> Care episode status
        (5545, 102, 5580, 2, 0, 0);  -- Care episode -- Has (0:*) --> Hospital encounter
--- (5545, 102, 5625, 3, 0, 0),  -- Care episode -- Has (0:*) --> Hospital admission TODO: Inferred from encounter?
+-- (5545, 102, 5626, 3, 0, 0),  -- Care episode -- Has (0:*) --> Hospital admission TODO: Inferred from encounter?
 -- (5545, 102, 5641, 4, 0, 0),  -- Care episode -- Has (0:*) --> Ward transfer TODO: Implied by encounter?
 -- (5545, 102, 5655, 5, 0, 0);  -- Care episode -- Has (0:*) --> Discharge   TODO: Inferred from encounter?
 
@@ -1548,7 +1548,7 @@ VALUES
        (5580, 102, 5434, 3, 0, 0),  -- Hospital encounter -- Has (0:*) --> Practitioner
        (5580, 102, 5598, 4, 0, 0),  -- Hospital encounter -- Has (0:*) --> A&E Attendance
        (5580, 102, 5613, 5, 0, 0),  -- Hospital encounter -- Has (0:*) --> Outpatient attendance
-       (5580, 102, 5625, 6, 0, 0),  -- Hospital Encounter -- Has (0:*) --> Hospital admission
+       (5580, 102, 5626, 6, 0, 0),  -- Hospital Encounter -- Has (0:*) --> Hospital admission
        (5580, 102, 5641, 7, 0, 0),  -- Hospital Encounter -- Has (0:*) --> Ward transfer
        (5580, 102, 5655, 8, 0, 0);  -- Hospital Encounter -- Has (0:*) --> Discharge
 
@@ -1566,9 +1566,9 @@ VALUES
 
 INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
 VALUES
-       (5625, 102, 5434, 0, 0, 0),  -- Admission -- Has (0:*) --> Practitioner (qualifier = effective/entered)
-    -- (5625, 102, 5414, 1, 0, 1),  -- Admission -- Has (0:1) --> Organisation (qualifier = owning) TODO: Inferred by location?
-       (5625, 102, 5420, 2, 0, 1);  -- Admission -- Has (0:1) --> Location
+       (5626, 102, 5434, 0, 0, 0),  -- Admission -- Has (0:*) --> Practitioner (qualifier = effective/entered)
+    -- (5626, 102, 5414, 1, 0, 1),  -- Admission -- Has (0:1) --> Organisation (qualifier = owning) TODO: Inferred by location?
+       (5626, 102, 5420, 2, 0, 1);  -- Admission -- Has (0:1) --> Location
 
 INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
 VALUES
