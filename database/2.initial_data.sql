@@ -29,7 +29,7 @@ INSERT INTO concept (id, superclass, context, full_name, description)
 VALUES
        (100, 5, 'Relationship.is a', 'is a', 'source concept inherits the semantic meaning of the more generalised target - source is more specialised - (T2 is a Diabetes)'),
        (101, 5, 'Relationship.Related to', 'is related to', 'The source is related to the target in an unsepecified way'),
-       -- (102, 5, 'Relationship.has a', 'has a', 'Source has an attribute type of the target'),        -- Attribute replaces
+       (102, 5, 'Relationship.has a', 'has a', 'Source has an attribute type of the target'),        -- Attribute replaces
        (103, 5, 'Relationship.Qualifier', 'has qualifier', 'The source has a qualifier in relation to the concept it is related to'),
        -- (104, 5, 'Relationship.extends', 'extends', 'The source extends (inherits attributes of) the target'),       -- Superclass replaces
        (105, 5, 'Relationship.Delivers', 'Delivers', 'The source delivers the target (e.g. Organisation delivers Service)'),    -- TODO: "Provides"?
@@ -37,7 +37,9 @@ VALUES
        (107, 5, 'Relationship.Parent', 'has parent', 'Source concept has parent of target'),
        (108, 5, 'Relationship.Primary', 'is primary', ''), -- TODO: Should remodel, is a flag
        (109, 5, 'Relationship.Belongs', 'belongs to', 'Source belongs to target'),  -- TODO: Inverse & replace with "Has"??
-       (110, 5, 'Relationship.EnteredBy', 'entered by', 'Source data entered by target');   -- TODO: Dont like
+       (110, 5, 'Relationship.EnteredBy', 'entered by', 'Source data entered by target'),   -- TODO: Dont like
+       (111, 5, 'Relationship.IsBranded', 'is branded type of', ''),
+       (112, 5, 'Relationship.PackOf', 'is pack of', '');
 
 -- FOLDERS (super = 3)
 -- TO BE REPLACED BY "VIEWS"????
@@ -317,7 +319,7 @@ VALUES
        (5301, 1, 'Code Scheme.SNOMED', 'SNOMED CT', 'The SNOMED CT coding scheme');
 INSERT INTO concept_relationship (source, relationship, target)
 VALUES
-       (5031, 100, 5030); -- SNOMED                  -- is a --> Code scheme
+       (5301, 100, 5300); -- SNOMED                  -- is a --> Code scheme
 
 -- ********** DM+D **********
 INSERT INTO concept (id, superclass, context, full_name, description)
@@ -341,9 +343,7 @@ VALUES
        (5318, 4, 'DM+D.RI', 'Reimbursement info', ''),
        (5319, 4, 'DM+D.MPP', 'Medicinal product price', ''),
        (5320, 4, 'DM+D.ACPC', 'Actual combination pack content', ''),
-       (5321, 4, 'DM+D.AMPP', 'Actual medicinal product pack', ''),
-       (105, 5, 'Relationship.IsBranded', 'is branded type of', ''),
-       (106, 5, 'Relationship.PackOf', 'is pack of', '');
+       (5321, 4, 'DM+D.AMPP', 'Actual medicinal product pack', '');
 INSERT INTO concept_attribute (concept, attribute, `order`, minimum, maximum)
 VALUES
        (5308, 5302, 0, 0, 1),   -- VMP -- (0:1) --> VTM
@@ -368,10 +368,10 @@ VALUES
 INSERT INTO concept_relationship (source, relationship, target, mandatory, `limit`)
 VALUES
     -- DM+D data model relationships
-       (5312, 105, 5308, 1, 1),     -- AMP  -- (1:1) Branded --> VMP
-       (5315, 106, 5308, 1, 1),     -- VMPP -- (1:1) Pack of --> VMP
-       (5321, 105, 5315, 1, 1),     -- AMPP -- (1:1) Branded --> VMPP
-       (5321, 106, 5312, 1, 1);     -- AMPP -- (1:1) Pack of --> AMP
+       (5312, 111, 5308, 1, 1),     -- AMP  -- (1:1) Branded --> VMP
+       (5315, 112, 5308, 1, 1),     -- VMPP -- (1:1) Pack of --> VMP
+       (5321, 111, 5315, 1, 1),     -- AMPP -- (1:1) Branded --> VMPP
+       (5321, 112, 5312, 1, 1);     -- AMPP -- (1:1) Pack of --> AMP
 
 -- ********** PCR v2 Schema/Relational model **********
 
@@ -418,15 +418,6 @@ VALUES
        (5414, 5411, 1, 1, 1),   -- Org -- (1:1) --> Name
        (5414, 5412, 2, 1, 1),   -- Org -- (1:1) --> Active flag
        (5414, 5413, 3, 1, 1);   -- Org -- (1:1) --> Type
-INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
-VALUES
-       (5414, 105, 5350, 0, 1, 0),  -- Org -- Delivers (1:*) --> Service
-       (5414, 106, 5351, 1, 1, 0),  -- Org -- Uses (1:*) --> System
-       (5414, 107, 5414, 2, 0, 1),  -- Org -- Has parent (0:1) --> Parent org
-       (5414, 102, 5420, 3, 0, 0),  -- Org -- Has (0:*) --> Location (qualifier = Main/None)
-       (5414, 102, 5486, 4, 0, 0),  -- Org -- Has (0:*) --> Prompt
-       (5414, 102, 5434, 5, 0, 0),  -- Org -- Has (0:*) --> Practitioner
-       (5414, 102, 5458, 6, 0, 0);  -- Org -- Has (0:*) --> Patient
 
 -- Location
 INSERT INTO concept (id, superclass, context, full_name, description)
@@ -444,12 +435,6 @@ VALUES
        (5420, 5417, 2, 1, 1),   -- Location -- (1:1) --> Start date
        (5420, 5418, 3, 0, 1),   -- Location -- (0:1) --> End date
        (5420, 5419, 4, 1, 1);   -- Location -- (1:1) --> Active flag
-INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
-VALUES
-       (5420, 102, 5408, 0, 1, 1),  -- Loc -- Has a (1:1) --> Address
-       (5420, 107, 5420, 1, 0, 1),  -- Loc -- Has parent (0:1) --> Location
-       (5420, 102, 5423, 2, 0, 0),  -- Loc -- Has (0:*) --> Location contact
-       (5420, 102, 5500, 3, 0, 0);  -- Loc -- Has (0:*) --> Appointment schedule
 
 -- Location contact
 INSERT INTO concept (id, superclass, context, full_name, description)
@@ -486,10 +471,6 @@ VALUES
        (5434, 5431, 6, 1, 1),   -- Practitioner -- (1:1) --> Active flag
        (5434, 5432, 7, 0, 1),   -- Practitioner -- (0:1) --> Role
        (5434, 5433, 8, 0, 1);   -- Practitioner -- (0:1) --> Speciality
-INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
-VALUES
-       (5434, 102, 5437, 0, 0, 0),  -- Practitioner -- Has (0:*) --> Practitioner contact
-       (5434, 102, 5440, 1, 0, 0);  -- Practitioner -- Has (0:*) --> Practitioner identifier
 
 -- Practitioner contact
 INSERT INTO concept (id, superclass, context, full_name, description)
@@ -501,7 +482,6 @@ INSERT INTO concept_attribute (concept, attribute, `order`, minimum, maximum)
 VALUES
        (5437, 5435, 0, 1, 1),   -- Practitioner contact -- (1:1) --> Type
        (5437, 5436, 1, 1, 1);   -- Practitioner contact -- (1:1) --> Details
-
 
 -- Practitioner identifier
 INSERT INTO concept (id, superclass, context, full_name, description)
@@ -546,35 +526,6 @@ VALUES
        (5458, 5455, 9,  1, 1),  -- Patient -- (1:1) --> Is spine sensitive
        (5458, 5456, 10, 1, 1),  -- Patient -- (1:1) --> Date added
        (5458, 5457, 11, 1, 1);  -- Patient -- (1:1) --> Date entered
-INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
-VALUES
-       (5458, 102, 5434, 1,  0, 1), -- Patient -- Has (0:1) --> Practitioner (qualifier = Main/Entered by)
-       (5458, 102, 5463, 2,  0, 0), -- Patient -- Has (0:*) --> Patient address (qualifier = home/previous)
-       (5458, 102, 5467, 3,  0, 0), -- Patient -- Has (0:*) --> Patient contact
-       (5458, 102, 5472, 4,  0, 0), -- Patient -- Has (0:*) --> Patient Identifier
-       (5458, 102, 5565, 5,  0, 0), -- Patient -- Has (0:*) --> GP consultation
-       (5458, 102, 5545, 6,  0, 0), -- Patient -- Has (0:*) --> Care episode
-       (5458, 102, 5518, 7,  0, 0), -- Patient -- Has (0:*) --> Booking
-       (5458, 102, 5523, 8,  0, 0), -- Patient -- Has (0:*) --> Attendance
-       (5458, 102, 5538, 9,  1, 0), -- Patient -- Has (1:*) --> Registration status
-       (5458, 102, 5580, 10, 0, 0), -- Patient -- Has (0:*) --> Hospital encounter
-       -- (5458, 102, 5598, 11, 0, 0), -- Patient -- Has (0:*) --> A&E Attendance  TODO: Inferred via hospital encounter?
-       (5458, 102, 5613, 12, 0, 0), -- Patient -- Has (0:*) --> Outpatient attendance
-       -- (5458, 102, 5625, 13, 0, 0), -- Patient -- Has (0:*) --> Hospital admission TODO: Inferred from episode -> encounter?
-       -- (5458, 102, 5641, 14, 0, 0), -- Patient -- Has (0:*) --> Ward transfer TODO: Implied by encounter ?
-       -- (5458, 102, 5655, 15, 0, 0), -- Patient -- Has (0:*) --> Discharge   TODO: Inferred from encounter?
-       (5458, 102, 5655, 16, 0, 0), -- Patient -- Has (0:*) --> Observation
-       (5458, 102, 5686, 17, 0, 0), -- Patient -- Has (0:*) --> Flag
-       -- (5458, 102, 5694, 18, 0, 0), -- Patient -- Has (0:*) --> Problem TODO: Inferred from observation?
-       (5458, 102, 5711, 19, 0, 0), -- Patient -- Has (0:*) --> Procedure request
-       (5458, 102, 5726, 20, 0, 0), -- Patient -- Has (0:*) --> Procedure TODO: If this is only ever from request then can be inferred by request?
-       (5458, 102, 5766, 21, 0, 0), -- Patient -- Has (0:*) --> Immunisation
-       (5458, 102, 5782, 22, 0, 0), -- Patient -- Has (0:*) --> Allergy
-       (5458, 102, 5800, 23, 0, 0), -- Patient -- Has (0:*) --> Referral
-       (5458, 102, 5830, 24, 0, 0), -- Patient -- Has (0:*) --> Medication
-       -- (5458, 102, 5849, 25, 0, 0), -- Patient -- Has (0:*) --> Medication order TODO: inferred from medication statement?
-       (5458, 102, 5860, 26, 0, 0), -- Patient -- Has (0:*) --> Related person
-       (5458, 102, 5883, 27, 0, 0); -- Patient -- Has (0:*) --> Care plan
 
 -- Patient address
 INSERT INTO concept (id, superclass, context, full_name, description)
@@ -588,9 +539,6 @@ VALUES
        (5463, 5460, 0, 1, 1),    -- Patient address -- (1:1) --> Address type
        (5463, 5461, 1, 1, 1),    -- Patient address -- (1:1) --> Start date
        (5463, 5462, 2, 0, 1);    -- Patient address -- (0:1) --> End date
-INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
-VALUES
-       (5463, 102, 5408, 0, 0, 1);  -- Patient address -- Has (0:1) --> Address
 
 -- Patient contact
 INSERT INTO concept (id, superclass, context, full_name, description)
@@ -633,9 +581,6 @@ VALUES
        (5481, 5478, 3, 0, 1),   -- Attribute (0:1) --> Text value
        (5481, 5479, 4, 0, 1),   -- Attribute (0:1) --> Concept value
        (5481, 5480, 5, 1, 1);   -- Attribute (1:1) --> Consent
-INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
-VALUES
-       (5418, 101, 4, 0, 1, 1);  -- Attribute -- Related to (1:1) --> Record type
 
 -- TODO: Additional relationship?!?!?
 
@@ -664,10 +609,7 @@ VALUES
        (5500, 5497, 2, 0, 1),   -- Appointment schedule (0:1) --> Speciality
        (5500, 5498, 3, 0, 1),   -- Appointment schedule (0:1) --> Start
        (5500, 5499, 4, 0, 1);   -- Appointment schedule (0:1) --> End
-INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
-VALUES
-       (5500, 102, 5434, 0, 0, 0),  -- Appointment schedule -- Has (0:*) --> Practitioner     TODO: "Main" flag?
-       (5500, 102, 5510, 1, 0, 0);  -- Appointment schedule -- Has (0:*) --> Appointment slot
+
 -- Appointment slot
 INSERT INTO concept (id, superclass, context, full_name, description)
 VALUES
@@ -684,12 +626,6 @@ VALUES
        (5510, 5507, 2, 0, 1),   -- Appointment slot (0:1) --> Duration
        (5510, 5508, 3, 0, 1),   -- Appointment slot (0:1) --> Type
        (5510, 5509, 4, 0, 1);   -- Appointment slot (0:1) --> Interaction
-INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
-VALUES
-       (5510, 102, 5518, 0, 0, 0),  -- Appointment slot -- Has (0:*) --> Booking
-       (5510, 102, 5523, 1, 0, 1),  -- Appointment slot -- Has (0:1) --> Attendance
-       (5510, 102, 5527, 2, 0, 0),  -- Appointment slot -- Has (0:*) --> Attendance event TODO: Should this be on attendance not slot?
-       (5510, 102, 5613, 3, 0, 1);  -- Appointment slot -- Has (0:1) --> Outpatient
 
 -- Appointment booking
 INSERT INTO concept (id, superclass, context, full_name, description)
@@ -752,10 +688,6 @@ VALUES
        (5539, 5536, 6, 1, 1),   -- Status (1:1) --> Status
        (5539, 5537, 7, 0, 1),   -- Status (0:1) --> Sub status
        (5539, 5538, 8, 1, 1);   -- Status (1:1) --> Is current
-INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
-VALUES
-       (5539, 111, 5434, 1, 0, 0);  -- Registration status -- Has a (1:*) --> Practitioner (qualifier - Effective/Entered)
-
 
 -- Care episode
 INSERT INTO concept (id, superclass, context, full_name, description)
@@ -773,14 +705,6 @@ VALUES
        (5545, 5542, 2, 1, 1),   -- Episode (1:1) --> Insert date
        (5545, 5543, 3, 1, 1),   -- Episode (1:1) --> Entered date
        (5545, 5544, 4, 0, 1);   -- Episode (0:1) --> End date
-INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
-VALUES
-       (5545, 102, 5434, 0, 0, 0),  -- Care episode -- Has a (1:*) --> Practitioner (qualifier - Effective/Entered)
-       (5545, 102, 5553, 1, 0, 0),  -- Care episode -- Has a (0:*) --> Care episode status
-       (5545, 102, 5580, 2, 0, 0);  -- Care episode -- Has (0:*) --> Hospital encounter
-       -- (5545, 102, 5625, 3, 0, 0),  -- Care episode -- Has (0:*) --> Hospital admission TODO: Inferred from encounter?
-       -- (5545, 102, 5641, 4, 0, 0),  -- Care episode -- Has (0:*) --> Ward transfer TODO: Implied by encounter?
-       -- (5545, 102, 5655, 5, 0, 0);  -- Care episode -- Has (0:*) --> Discharge   TODO: Inferred from encounter?
 
 -- Care episode status
 INSERT INTO concept (id, superclass, context, full_name, description)
@@ -821,13 +745,6 @@ VALUES
        (5565, 5562, 7, 0, 1),   -- Consultation (0:1) --> Reason
        (5565, 5563, 8, 0, 1),   -- Consultation (0:1) --> Purpose
        (5565, 5564, 9, 1, 1);   -- Consultation (1:1) --> Consent
-INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
-VALUES
-       (5565, 102, 5434, 1, 0, 0),  -- GP consultation -- Has a (1:*) --> Practitioner (qualifier - Effective/Entered)
-       (5565, 102, 5414, 2, 0, 1),  -- GP consultation -- Has a (0:1) --> Organisation (qualifier - Owning)
-       (5565, 102, 5420, 3, 0, 1),  -- GP consultation -- Has a (0:1) --> Location
-       (5565, 102, 5510, 4, 0, 1),  -- GP consultation -- Has a (0:1) --> Appointment slot
-       (5565, 102, 5800, 5, 0, 1);  -- GP consultation -- Has a (0:1) --> Referral
 
 -- Hospital encounter
 INSERT INTO concept (id, superclass, context, full_name, description)
@@ -855,17 +772,6 @@ VALUES
        (5580, 5577, 7, 0, 1),   -- Encounter (0:1) Reason
        (5580, 5578, 8, 0, 1),   -- Encounter (0:1) Type
        (5580, 5579, 9, 1, 1);   -- Encounter (1:1) Consent
-INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
-VALUES
-       (5580, 102, 5414, 0, 0, 1),  -- Hospital encounter -- Has (0:1) --> Organisation (qualifier = owning)
-       (5580, 102, 5420, 1, 0, 1),  -- Hospital encounter -- Has (0:1) --> Location
-       (5580, 102, 5800, 2, 0, 1),  -- Hospital encounter -- Has (0:1) --> Referral request     TODO: Is this the other way around?
-       (5580, 102, 5434, 3, 0, 0),  -- Hospital encounter -- Has (0:*) --> Practitioner
-       (5580, 102, 5598, 4, 0, 0),  -- Hospital encounter -- Has (0:*) --> A&E Attendance
-       (5580, 102, 5613, 5, 0, 0),  -- Hospital encounter -- Has (0:*) --> Outpatient attendance
-       (5580, 102, 5625, 6, 0, 0),  -- Hospital Encounter -- Has (0:*) --> Hospital admission
-       (5580, 102, 5641, 7, 0, 0),  -- Hospital Encounter -- Has (0:*) --> Ward transfer
-       (5580, 102, 5655, 8, 0, 0);  -- Hospital Encounter -- Has (0:*) --> Discharge
 
 -- A&E attendance
 INSERT INTO concept (id, superclass, context, full_name, description)
@@ -899,11 +805,6 @@ VALUES
        (5598, 5595, 10, 0, 1),   -- A&E (0:1) --> Description
        (5598, 5596, 11, 0, 1),   -- A&E (0:1) --> Ambulance
        (5598, 5597, 12, 1, 1);   -- A&E (1:1) --> Consent
-INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
-VALUES
-       (5598, 102, 5434, 0, 0, 0),  -- A&E Attendance -- Has (0:*) --> Practitioner (qual = Effective/Triage/Entered)
-       -- (5598, 102, 5414, 1, 0, 1),  -- A&E Attendance -- Has (0:1) --> Organisation (qual = owning) TODO: Inferred from loc?
-       (5598, 102, 5420, 2, 0, 1);  -- A&E Attendance -- Has (0:1) --> Location
 
 -- Outpatient attendance
 INSERT INTO concept (id, superclass, context, full_name, description)
@@ -937,11 +838,6 @@ VALUES
        (5613, 5610, 10, 0, 1),   -- Outpatient (0:1) --> Purpose
        (5613, 5611, 11, 0, 1),   -- Outpatient (0:1) --> Outcome
        (5613, 5612, 12, 1, 1);   -- Outpatient (1:1) --> Consent
-INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
-VALUES
-       (5613, 102, 5434, 0, 0, 0),  -- Outpatient -- Has (0:*) --> Practitioner (qualifier = effective/entered/usual)
-       -- (5613, 102, 5414, 1, 0, 1),  -- Outpatient -- Has (0:1) --> Organisation (qualifier = owning) TODO: Inferred by location?
-       (5613, 102, 5420, 2, 0, 1);  -- Outpatient -- Has (0:1) --> Location
 
 -- Hospital admission
 INSERT INTO concept (id, superclass, context, full_name, description)
@@ -955,26 +851,22 @@ VALUES
        (5621, 13, 'Admission.IsConfidential', 'Is confidential', ''),
        (5622, 7,  'Admission.Reason', 'Reason', ''),
        (5623, 12, 'Admission.Description', 'Reason description', ''),
-       (5623, 7,  'Admission.Purpose', 'Purpose', ''),
-       (5624, 13, 'Admission.IsConsent', 'Is consent', ''),
-       (5625, 4,  'Admission', 'Hospital admission', '');
+       (5624, 7,  'Admission.Purpose', 'Purpose', ''),
+       (5625, 13, 'Admission.IsConsent', 'Is consent', ''),
+       (5626, 4,  'Admission', 'Hospital admission', '');
 INSERT INTO concept_attribute (concept, attribute, `order`, minimum, maximum)
 VALUES
-       (5625, 5615, 0, 1, 1),   -- Admission (1:1) --> Effective date
-       (5625, 5616, 1, 1, 1),   -- Admission (1:1) --> Effective date precision
-       (5625, 5617, 2, 0, 1),   -- Admission (0:1) --> End date
-       (5625, 5618, 3, 1, 1),   -- Admission (1:1) --> Insert date
-       (5625, 5619, 4, 1, 1),   -- Admission (1:1) --> Entered date
-       (5625, 5620, 5, 1, 1),   -- Admission (1:1) --> Status
-       (5625, 5621, 6, 1, 1),   -- Admission (1:1) --> Confidential
-       (5625, 5622, 7, 0, 1),   -- Admission (0:1) --> Reason
-       (5625, 5623, 8, 0, 1),   -- Admission (0:1) --> Description
-       (5625, 5624, 9, 1, 1);   -- Admission (1:1) --> Consent
-INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
-VALUES
-       (5625, 102, 5434, 0, 0, 0),  -- Admission -- Has (0:*) --> Practitioner (qualifier = effective/entered)
-       -- (5625, 102, 5414, 1, 0, 1),  -- Admission -- Has (0:1) --> Organisation (qualifier = owning) TODO: Inferred by location?
-       (5625, 102, 5420, 2, 0, 1);  -- Admission -- Has (0:1) --> Location
+       (5626, 5615, 0,  1, 1),  -- Admission (1:1) --> Effective date
+       (5626, 5616, 1,  1, 1),  -- Admission (1:1) --> Effective date precision
+       (5626, 5617, 2,  0, 1),  -- Admission (0:1) --> End date
+       (5626, 5618, 3,  1, 1),  -- Admission (1:1) --> Insert date
+       (5626, 5619, 4,  1, 1),  -- Admission (1:1) --> Entered date
+       (5626, 5620, 5,  1, 1),  -- Admission (1:1) --> Status
+       (5626, 5621, 6,  1, 1),  -- Admission (1:1) --> Confidential
+       (5626, 5622, 7,  0, 1),  -- Admission (0:1) --> Reason
+       (5626, 5623, 8,  0, 1),  -- Admission (0:1) --> Description
+       (5626, 5624, 9,  0, 1),  -- Admission (0:1) --> Purpose
+       (5626, 5625, 10, 1, 1);  -- Admission (1:1) --> Consent
 
 -- Hospital ward transfer
 INSERT INTO concept (id, superclass, context, full_name, description)
@@ -1004,11 +896,6 @@ VALUES
        (5641, 5638, 8,  0, 1),  -- Ward transfer (0:1) --> Reason description
        (5641, 5639, 9,  0, 1),  -- Ward transfer (0:1) --> Purpose
        (5641, 5640, 10, 1, 1);  -- Ward transfer (1:1) --> Consent
-INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
-VALUES
-       (5641, 102, 5434, 0, 0, 0),  -- Ward transfer -- Has (0:*) --> Practitioner (qualifier = effective/entered)
-       -- (5641, 102, 5414, 1, 0, 1),  -- Ward transfer -- Has (0:1) --> Organisation (qualifier = owning) TODO: Inferred by location?
-       (5641, 102, 5420, 2, 0, 1);  -- Ward transfer -- Has (0:1) --> Location
 
 -- Hospital discharge
 INSERT INTO concept (id, superclass, context, full_name, description)
@@ -1036,11 +923,6 @@ VALUES
        (5655, 5652, 7, 0, 1),   -- Discharge (0:1) --> Reason
        (5655, 5653, 8, 0, 1),   -- Discharge (0:1) --> Reason description
        (5655, 5654, 9, 1, 1);   -- Discharge (1:1) --> Consent
-INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
-VALUES
-       (5655, 102, 5434, 0, 0, 0),  -- Discharge -- Has (0:*) --> Practitioner (qualifier = effective/entered)
-       -- (5655, 102, 5414, 1, 0, 1),  -- Discharge -- Has (0:1) --> Organisation (qualifier = owning) TODO: Inferred by location?
-       (5655, 102, 5420, 2, 0, 1);  -- Discharge -- Has (0:1) --> Location
 
 -- Event relationship is standard "Related to" relationship
 
@@ -1078,11 +960,6 @@ VALUES
        (5674, 5671, 11, 0, 1),  -- Observation (0:1) --> Comments
        (5674, 5672, 12, 0, 1),  -- Observation (0:1) --> Significance
        (5674, 5673, 13, 1, 1);  -- Observation (1:1) --> Consent
-INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
-VALUES
-       (5674, 102, 5434, 0, 0, 0),  -- Observation -- Has (0:*) --> Practitioner (qualifier = effective/entered)
-       (5674, 102, 5414, 1, 0, 1),  -- Observation -- Has (0:1) --> Organisation (qualifier = owning)
-       (5674, 102, 5486, 2, 0, 1);  -- Observation -- Has (0:1) --> Prompt
 
 -- Flag
 INSERT INTO concept (id, superclass, context, full_name, description)
@@ -1112,10 +989,6 @@ VALUES
        (5686, 5683, 8,  1, 1),  -- Flag (1:1) --> Confidential
        (5686, 5684, 9,  0, 1),  -- Flag (0:1) --> Description
        (5686, 5685, 10, 1, 1);  -- Flag (1:1) --> Consent
-INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
-VALUES
-       (5686, 102, 5434, 0, 0, 0),  -- Flag -- Has (0:*) --> Practitioner (qualifier = effective/entered)
-       (5686, 102, 5414, 1, 0, 1);  -- Flag -- Has (0:1) --> Organisation (qualifier = owning)
 
 -- Problem
 INSERT INTO concept (id, superclass, context, full_name, description)
@@ -1131,10 +1004,6 @@ VALUES
        (5694, 5691, 1, 0, 1),   -- Problem (0:1) --> Significance
        (5694, 5692, 2, 0, 1),   -- Problem (0:1) --> Duration
        (5694, 5693, 3, 0, 1);   -- Problem (0:1) --> Last review date
-INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
-VALUES
-       (5694, 102, 5434, 0, 0, 0),  -- Problem -- Has (0:*) --> Practitioner (qualifier = last review)
-       (5694, 102, 5674, 1, 1, 1);  -- Problem -- Has (1:1) --> Observation (qualifier = owning)    TODO: Should this be reversed?
 
 -- Procedure request
 INSERT INTO concept (id, superclass, context, full_name, description)
@@ -1164,10 +1033,6 @@ VALUES
        (5711, 5708, 8,  0, 1),  -- Procedure request (0:1) --> Priority
        (5711, 5709, 9,  0, 1),  -- Procedure request (0:1) --> Identifier
        (5711, 5710, 10, 1, 1);  -- Procedure request (1:1) --> Consent
-INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
-VALUES
-       (5711, 102, 5434, 0, 0, 0),  -- Procedure request -- Has (0:*) --> Practitioner (qualifier = effective/entered)
-       (5711, 102, 5414, 1, 0, 1);  -- Procedure request -- Has (0:1) --> Organisation (qualifier = owning/recipient)
 
 -- Procedure TODO: Does it have link to procedure request?
 INSERT INTO concept (id, superclass, context, full_name, description)
@@ -1197,12 +1062,6 @@ VALUES
        (5726, 5723, 8,  1, 1),  -- Procedure (1:1) --> Confidential
        (5726, 5724, 9,  0, 1),  -- Procedure (0:1) --> Outcome
        (5726, 5725, 10, 1, 1);  -- Procedure (1:1) --> Consent
-INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
-VALUES
-       (5726, 102, 5434, 0, 0, 0),  -- Procedure -- Has (0:*) --> Practitioner (qualifier = effective/entered/usual)
-       (5726, 102, 5414, 1, 0, 1),  -- Procedure -- Has (0:1) --> Organisation (qualifier = owning)
-       (5726, 102, 5486, 2, 0, 1),  -- Procedure -- Has (0:1) --> Prompt
-       (5726, 102, 5737, 3, 0, 0);  -- Procedure -- Has (0:*) --> Device
 
 -- Device
 INSERT INTO concept (id, superclass, context, full_name, description)
@@ -1224,9 +1083,6 @@ VALUES
        (5737, 5734, 4, 0, 1),   -- Device (0:1) --> Human ID
        (5737, 5735, 5, 0, 1),   -- Device (0:1) --> Machine ID
        (5737, 5736, 6, 0, 1);   -- Device (0:1) --> Version
-INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
-VALUES
-       (5737, 102, 5414, 0, 0, 1);  -- Device -- Has (0:1) --> Organisation TODO: Probably should be other way around?
 
 -- Observation value
 INSERT INTO concept (id, superclass, context, full_name, description)
@@ -1255,42 +1111,39 @@ VALUES
        (5751, 11, 'Immunisation.EffectiveDate', 'Effective date', ''),
        (5752, 8,  'Immunisation.EffectiveDatePrecision', 'Effective date precision', ''),
        (5753, 11, 'Immunisation.InsertDate', 'Insert date', ''),
-       (5753, 11, 'Immunisation.EnteredDate', 'Entered date', ''),
-       (5754, 7,  'Immunisation.CareActivityHeading', 'Care activity heading', ''),
-       (5755, 7,  'Immunisation.Status', 'Status', ''),
-       (5756, 13, 'Immunisation.IsConfidential', 'Is confidential', ''),
-       (5757, 12, 'Immunisation.Dose', 'Dose', ''),
-       (5758, 7,  'Immunisation.BodyLocation', 'Body location', ''),
-       (5759, 7,  'Immunisation.Method', 'Method', ''),
-       (5760, 12, 'Immunisation.BatchNo', 'Batch number', ''),
-       (5761, 11, 'Immunisation.ExpiryDate', 'Expiry date', ''),
-       (5762, 12, 'Immunisation.Manufacturer', 'Manufacturer', ''),
-       (5763, 8,  'Immunisation.DoseNumber', 'Dose number', ''),
-       (5764, 8,  'Immunisation.DosesRequired', 'Doses required', ''),
-       (5765, 13, 'Immunisation.IsConsent', 'Is consent', ''),
-       (5766, 4,  'Immunisation', 'Immunisation', '');
+       (5754, 11, 'Immunisation.EnteredDate', 'Entered date', ''),
+       (5755, 7,  'Immunisation.CareActivityHeading', 'Care activity heading', ''),
+       (5756, 7,  'Immunisation.Status', 'Status', ''),
+       (5757, 13, 'Immunisation.IsConfidential', 'Is confidential', ''),
+       (5758, 12, 'Immunisation.Dose', 'Dose', ''),
+       (5759, 7,  'Immunisation.BodyLocation', 'Body location', ''),
+       (5760, 7,  'Immunisation.Method', 'Method', ''),
+       (5761, 12, 'Immunisation.BatchNo', 'Batch number', ''),
+       (5762, 11, 'Immunisation.ExpiryDate', 'Expiry date', ''),
+       (5763, 12, 'Immunisation.Manufacturer', 'Manufacturer', ''),
+       (5764, 8,  'Immunisation.DoseNumber', 'Dose number', ''),
+       (5765, 8,  'Immunisation.DosesRequired', 'Doses required', ''),
+       (5766, 13, 'Immunisation.IsConsent', 'Is consent', ''),
+       (5767, 4,  'Immunisation', 'Immunisation', '');
 INSERT INTO concept_attribute (concept, attribute, `order`, minimum, maximum)
 VALUES
-       (5766, 5750, 0,  1, 1),  -- Immunisation (1:1) --> Concept
-       (5766, 5751, 1,  1, 1),  -- Immunisation (1:1) --> Effective date
-       (5766, 5752, 2,  1, 1),  -- Immunisation (1:1) --> Effective date precision
-       (5766, 5753, 3,  1, 1),  -- Immunisation (1:1) --> Insert date
-       (5766, 5754, 4,  1, 1),  -- Immunisation (1:1) --> Entered date
-       (5766, 5755, 5,  1, 1),  -- Immunisation (1:1) --> Care activity heading
-       (5766, 5756, 6,  1, 1),  -- Immunisation (1:1) --> Status
-       (5766, 5757, 7,  0, 1),  -- Immunisation (0:1) --> Dose
-       (5766, 5758, 8,  0, 1),  -- Immunisation (0:1) --> Body location
-       (5766, 5759, 9,  0, 1),  -- Immunisation (0:1) --> Method
-       (5766, 5760, 10, 0, 1),  -- Immunisation (0:1) --> Batch
-       (5766, 5761, 11, 0, 1),  -- Immunisation (0:1) --> Expiry
-       (5766, 5762, 12, 0, 1),  -- Immunisation (0:1) --> Manufacturer
-       (5766, 5763, 13, 0, 1),  -- Immunisation (0:1) --> Dose number
-       (5766, 5764, 14, 0, 1),  -- Immunisation (0:1) --> Dose count
-       (5766, 5765, 15, 1, 1);  -- Immunisation (1:1) --> Consent
-INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
-VALUES
-       (5766, 102, 5434, 0, 0, 0),  -- Immunisation -- Has (0:*) --> Practitioner (qualifier = effective/entered)
-       (5766, 102, 5414, 1, 0, 1);  -- Immunisation -- Has (0:1) --> Organisation (qualifier = owning)
+       (5767, 5750, 0,  1, 1),  -- Immunisation (1:1) --> Concept
+       (5767, 5751, 1,  1, 1),  -- Immunisation (1:1) --> Effective date
+       (5767, 5752, 2,  1, 1),  -- Immunisation (1:1) --> Effective date precision
+       (5767, 5753, 3,  1, 1),  -- Immunisation (1:1) --> Insert date
+       (5767, 5754, 4,  1, 1),  -- Immunisation (1:1) --> Entered date
+       (5767, 5755, 5,  1, 1),  -- Immunisation (1:1) --> Care activity heading
+       (5767, 5756, 6,  1, 1),  -- Immunisation (1:1) --> Status
+       (5757, 5757, 7,  1, 1),  -- Immunisation (1:1) --> Confidential
+       (5767, 5758, 8,  0, 1),  -- Immunisation (0:1) --> Dose
+       (5767, 5759, 9,  0, 1),  -- Immunisation (0:1) --> Body location
+       (5767, 5760, 10,  0, 1),  -- Immunisation (0:1) --> Method
+       (5767, 5761, 11, 0, 1),  -- Immunisation (0:1) --> Batch
+       (5767, 5762, 12, 0, 1),  -- Immunisation (0:1) --> Expiry
+       (5767, 5763, 13, 0, 1),  -- Immunisation (0:1) --> Manufacturer
+       (5767, 5764, 14, 0, 1),  -- Immunisation (0:1) --> Dose number
+       (5767, 5765, 15, 0, 1),  -- Immunisation (0:1) --> Dose count
+       (5767, 5766, 16, 1, 1);  -- Immunisation (1:1) --> Consent
 
 -- Allergy
 INSERT INTO concept (id, superclass, context, full_name, description)
@@ -1322,10 +1175,6 @@ VALUES
        (5782, 5779, 9,  0, 1),  -- Allergy (0:1) --> Manifestation
        (5782, 5780, 10, 0, 1),  -- Allergy (0:1) --> Description
        (5782, 5781, 11, 1, 1);  -- Allergy (1:1) --> Consent
-INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
-VALUES
-       (5782, 102, 5434, 0, 0, 0),  -- Allergy -- Has (0:*) --> Practitioner (qualifier = effective/entered)
-       (5782, 102, 5414, 1, 0, 1);  -- Allergy -- Has (0:1) --> Organisation (qualifier = owning)
 
 -- Referral
 INSERT INTO concept (id, superclass, context, full_name, description)
@@ -1337,7 +1186,7 @@ VALUES
        (5789, 11, 'Referral.EnteredDate', 'Entered date', ''),
        (5790, 7,  'Referral.CareActivityHeading', 'Care activity heading', ''),
        (5791, 7,  'Referral.Status', 'Status', ''),
-       (5972, 13, 'Referral.IsConfidential', 'Is confidential', ''),
+       (5792, 13, 'Referral.IsConfidential', 'Is confidential', ''),
        (5793, 12, 'Referral.UBRN', 'UBRN', ''),
        (5794, 7,  'Referral.Priority', 'Priority', ''),
        (5795, 7,  'Referral.Mode', 'Mode', ''),
@@ -1363,11 +1212,6 @@ VALUES
        (5800, 5797, 12, 0, 1),  -- Referral (0:1) --> Service
        (5800, 5798, 13, 0, 1),  -- Referral (0:1) --> Reason
        (5800, 5799, 14, 1, 1);  -- Referral (1:1) --> Consent
-INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
-VALUES
-       (5800, 102, 5434, 0, 0, 0),  -- Referral -- Has (0:*) --> Practitioner (qualifier = effective/entered)
-       (5800, 102, 5414, 1, 0, 0),  -- Referral -- Has (0:*) --> Organisation (qualifier = owning/sender/recipient)
-       (5800, 102, 5613, 2, 0, 1);  -- Referral -- Has (0:1) --> Outpatient
 
 -- Medication amount
 INSERT INTO concept (id, superclass, context, full_name, description)
@@ -1428,12 +1272,6 @@ VALUES
        (5830, 5827, 17, 0, 1),   -- Medication statement (0:1) --> End description
        (5830, 5828, 18, 0, 1),   -- Medication statement (0:1) --> Issues
        (5830, 5829, 19, 1, 1);   -- Medication statement (1:1) --> Consent
-INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
-VALUES
-       (5830, 102, 5434, 0, 0, 0),  -- Medication statement -- Has (0:*) --> Practitioner (qualifier = effective/entered)
-       (5830, 102, 5414, 1, 0, 1),  -- Medication statement -- Has (0:1) --> Organisation (qualifier = owning)
-       (5830, 102, 5808, 2, 0, 1),  -- Medication statement -- Has (0:1) --> Medication amount
-       (5830, 102, 5849, 3, 0, 0);  -- Medication statement -- Has (0:*) --> Medication order
 
 -- Medication order
 INSERT INTO concept (id, superclass, context, full_name, description)
@@ -1469,11 +1307,6 @@ VALUES
        (5849, 5846, 11, 1, 1),   -- Medication order (1:1) --> Active
        (5849, 5847, 12, 0, 1),   -- Medication order (0:1) --> Duration
        (5849, 5848, 13, 1, 1);   -- Medication order (1:1) --> Consent
-INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
-VALUES
-       (5849, 102, 5434, 0, 0, 0),  -- Medication order -- Has (0:*) --> Practitioner (qualifier = effective/entered)
-       (5849, 102, 5414, 1, 0, 1);  -- Medication order -- Has (0:1) --> Organisation (qualifier = owning)
-       -- (5849, 102, 5808, 2, 0, 1);  -- Medication order -- Has (0:1) --> Medication amount TODO: inferred from statement?
 
 -- Related person
 INSERT INTO concept (id, superclass, context, full_name, description)
@@ -1501,10 +1334,6 @@ VALUES
        (5860, 5857, 7, 0, 1),   -- Related person (0:1) --> Start date
        (5860, 5858, 8, 0, 1),   -- Related person (0:1) --> End date
        (5860, 5859, 0, 0, 0);   -- Related person (0:*) --> Relationship type
-INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
-VALUES
-       (5860, 102, 5463, 0, 0, 0),  -- Related person -- Has (0:1) --> Address
-       (5860, 102, 5867, 1, 0, 0);  -- Related person -- Has (0:*) --> Contact (method)
 
 -- Related person contact
 INSERT INTO concept (id, superclass, context, full_name, description)
@@ -1550,11 +1379,6 @@ VALUES
        (5883, 5880, 10, 0, 1),  -- Care plan (0:1) --> Performance frequency units
        (5883, 5881, 11, 0, 1),  -- Care plan (0:1) --> Location type
        (5883, 5882, 12, 1, 1);  -- Care plan (1:1) --> Consent
-INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
-VALUES
-       (5883, 102, 5434, 0, 0, 0),  -- Care plan -- Has (0:*) --> Practitioner (qualifier = effective/entered)
-       (5883, 102, 5414, 1, 0, 1),  -- Care plan -- Has (0:1) --> Organisation (qualifier = owning)
-       (5883, 102, 5897, 2, 0, 0);  -- Care plan -- Has (0:*) --> Care plan activity
 
 -- Care plan activity
 INSERT INTO concept (id, superclass, context, full_name, description)
@@ -1586,11 +1410,6 @@ VALUES
        (5897, 5894, 9,  0, 1),  -- Care plan activity (0:1) --> Outcome
        (5897, 5895, 10, 0, 1),  -- Care plan activity (0:1) --> Outcome date
        (5897, 5896, 11, 1, 1);  -- Care plan activity (1:1) --> Consent
-INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
-VALUES
-       (5897, 102, 5434, 0, 0, 0),  -- Care plan activity -- Has (0:*) --> Practitioner (qualifier = effective/entered)
-       (5897, 102, 5414, 1, 0, 1),  -- Care plan activity -- Has (0:1) --> Organisation (qualifier = owning)
-       (5897, 102, 5914, 2, 0, 0);  -- Care plan activity -- Has (0:*) --> Care plan activity target
 
 -- Care plan activity target
 INSERT INTO concept (id, superclass, context, full_name, description)
@@ -1625,6 +1444,223 @@ VALUES
        (5914, 5910, 10, 0, 1),  -- Care plan activity target (0:1) --> Outcome
        (5914, 5911, 11, 0, 1),  -- Care plan activity target (0:1) --> Outcome date
        (5914, 5912, 12, 1, 1);  -- Care plan activity target (1:1) --> Consent
+
+-- Concept relationships
+INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
+VALUES
+       (5414, 105, 5350, 0, 1, 0),  -- Org -- Delivers (1:*) --> Service
+       (5414, 106, 5351, 1, 1, 0),  -- Org -- Uses (1:*) --> System
+       (5414, 107, 5414, 2, 0, 1),  -- Org -- Has parent (0:1) --> Parent org
+       (5414, 102, 5420, 3, 0, 0),  -- Org -- Has (0:*) --> Location (qualifier = Main/None)
+       (5414, 102, 5486, 4, 0, 0),  -- Org -- Has (0:*) --> Prompt
+       (5414, 102, 5434, 5, 0, 0),  -- Org -- Has (0:*) --> Practitioner
+       (5414, 102, 5458, 6, 0, 0);  -- Org -- Has (0:*) --> Patient
+
+
+INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
+VALUES
+       (5420, 102, 5408, 0, 1, 1),  -- Loc -- Has a (1:1) --> Address
+       (5420, 107, 5420, 1, 0, 1),  -- Loc -- Has parent (0:1) --> Location
+       (5420, 102, 5423, 2, 0, 0),  -- Loc -- Has (0:*) --> Location contact
+       (5420, 102, 5500, 3, 0, 0);  -- Loc -- Has (0:*) --> Appointment schedule
+
+INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
+VALUES
+       (5434, 102, 5437, 0, 0, 0),  -- Practitioner -- Has (0:*) --> Practitioner contact
+       (5434, 102, 5440, 1, 0, 0);  -- Practitioner -- Has (0:*) --> Practitioner identifier
+
+INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
+VALUES
+       (5458, 102, 5434, 1,  0, 1), -- Patient -- Has (0:1) --> Practitioner (qualifier = Main/Entered by)
+       (5458, 102, 5463, 2,  0, 0), -- Patient -- Has (0:*) --> Patient address (qualifier = home/previous)
+       (5458, 102, 5467, 3,  0, 0), -- Patient -- Has (0:*) --> Patient contact
+       (5458, 102, 5472, 4,  0, 0), -- Patient -- Has (0:*) --> Patient Identifier
+       (5458, 102, 5565, 5,  0, 0), -- Patient -- Has (0:*) --> GP consultation
+       (5458, 102, 5545, 6,  0, 0), -- Patient -- Has (0:*) --> Care episode
+       (5458, 102, 5518, 7,  0, 0), -- Patient -- Has (0:*) --> Booking
+       (5458, 102, 5523, 8,  0, 0), -- Patient -- Has (0:*) --> Attendance
+       (5458, 102, 5538, 9,  1, 0), -- Patient -- Has (1:*) --> Registration status
+       (5458, 102, 5580, 10, 0, 0), -- Patient -- Has (0:*) --> Hospital encounter
+    -- (5458, 102, 5598, 11, 0, 0), -- Patient -- Has (0:*) --> A&E Attendance  TODO: Inferred via hospital encounter?
+       (5458, 102, 5613, 12, 0, 0), -- Patient -- Has (0:*) --> Outpatient attendance
+    -- (5458, 102, 5625, 13, 0, 0), -- Patient -- Has (0:*) --> Hospital admission TODO: Inferred from episode -> encounter?
+    -- (5458, 102, 5641, 14, 0, 0), -- Patient -- Has (0:*) --> Ward transfer TODO: Implied by encounter ?
+    -- (5458, 102, 5655, 15, 0, 0), -- Patient -- Has (0:*) --> Discharge   TODO: Inferred from encounter?
+       (5458, 102, 5655, 16, 0, 0), -- Patient -- Has (0:*) --> Observation
+       (5458, 102, 5686, 17, 0, 0), -- Patient -- Has (0:*) --> Flag
+    -- (5458, 102, 5694, 18, 0, 0), -- Patient -- Has (0:*) --> Problem TODO: Inferred from observation?
+       (5458, 102, 5711, 19, 0, 0), -- Patient -- Has (0:*) --> Procedure request
+       (5458, 102, 5726, 20, 0, 0), -- Patient -- Has (0:*) --> Procedure TODO: If this is only ever from request then can be inferred by request?
+       (5458, 102, 5766, 21, 0, 0), -- Patient -- Has (0:*) --> Immunisation
+       (5458, 102, 5782, 22, 0, 0), -- Patient -- Has (0:*) --> Allergy
+       (5458, 102, 5800, 23, 0, 0), -- Patient -- Has (0:*) --> Referral
+       (5458, 102, 5830, 24, 0, 0), -- Patient -- Has (0:*) --> Medication
+    -- (5458, 102, 5849, 25, 0, 0), -- Patient -- Has (0:*) --> Medication order TODO: inferred from medication statement?
+       (5458, 102, 5860, 26, 0, 0), -- Patient -- Has (0:*) --> Related person
+       (5458, 102, 5883, 27, 0, 0); -- Patient -- Has (0:*) --> Care plan
+
+INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
+VALUES
+       (5463, 102, 5408, 0, 0, 1);  -- Patient address -- Has (0:1) --> Address
+
+INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
+VALUES
+       (5418, 101, 4, 0, 1, 1);  -- Attribute -- Related to (1:1) --> Record type
+
+INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
+VALUES
+       (5500, 102, 5434, 0, 0, 0),  -- Appointment schedule -- Has (0:*) --> Practitioner     TODO: "Main" flag?
+       (5500, 102, 5510, 1, 0, 0);  -- Appointment schedule -- Has (0:*) --> Appointment slot
+
+INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
+VALUES
+       (5510, 102, 5518, 0, 0, 0),  -- Appointment slot -- Has (0:*) --> Booking
+       (5510, 102, 5523, 1, 0, 1),  -- Appointment slot -- Has (0:1) --> Attendance
+       (5510, 102, 5527, 2, 0, 0),  -- Appointment slot -- Has (0:*) --> Attendance event TODO: Should this be on attendance not slot?
+       (5510, 102, 5613, 3, 0, 1);  -- Appointment slot -- Has (0:1) --> Outpatient
+
+INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
+VALUES
+       (5539, 111, 5434, 1, 0, 0);  -- Registration status -- Has a (1:*) --> Practitioner (qualifier - Effective/Entered)
+
+INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
+VALUES
+       (5545, 102, 5434, 0, 0, 0),  -- Care episode -- Has a (1:*) --> Practitioner (qualifier - Effective/Entered)
+       (5545, 102, 5553, 1, 0, 0),  -- Care episode -- Has a (0:*) --> Care episode status
+       (5545, 102, 5580, 2, 0, 0);  -- Care episode -- Has (0:*) --> Hospital encounter
+-- (5545, 102, 5625, 3, 0, 0),  -- Care episode -- Has (0:*) --> Hospital admission TODO: Inferred from encounter?
+-- (5545, 102, 5641, 4, 0, 0),  -- Care episode -- Has (0:*) --> Ward transfer TODO: Implied by encounter?
+-- (5545, 102, 5655, 5, 0, 0);  -- Care episode -- Has (0:*) --> Discharge   TODO: Inferred from encounter?
+
+INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
+VALUES
+       (5565, 102, 5434, 1, 0, 0),  -- GP consultation -- Has a (1:*) --> Practitioner (qualifier - Effective/Entered)
+       (5565, 102, 5414, 2, 0, 1),  -- GP consultation -- Has a (0:1) --> Organisation (qualifier - Owning)
+       (5565, 102, 5420, 3, 0, 1),  -- GP consultation -- Has a (0:1) --> Location
+       (5565, 102, 5510, 4, 0, 1),  -- GP consultation -- Has a (0:1) --> Appointment slot
+       (5565, 102, 5800, 5, 0, 1);  -- GP consultation -- Has a (0:1) --> Referral
+
+INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
+VALUES
+       (5580, 102, 5414, 0, 0, 1),  -- Hospital encounter -- Has (0:1) --> Organisation (qualifier = owning)
+       (5580, 102, 5420, 1, 0, 1),  -- Hospital encounter -- Has (0:1) --> Location
+       (5580, 102, 5800, 2, 0, 1),  -- Hospital encounter -- Has (0:1) --> Referral request     TODO: Is this the other way around?
+       (5580, 102, 5434, 3, 0, 0),  -- Hospital encounter -- Has (0:*) --> Practitioner
+       (5580, 102, 5598, 4, 0, 0),  -- Hospital encounter -- Has (0:*) --> A&E Attendance
+       (5580, 102, 5613, 5, 0, 0),  -- Hospital encounter -- Has (0:*) --> Outpatient attendance
+       (5580, 102, 5625, 6, 0, 0),  -- Hospital Encounter -- Has (0:*) --> Hospital admission
+       (5580, 102, 5641, 7, 0, 0),  -- Hospital Encounter -- Has (0:*) --> Ward transfer
+       (5580, 102, 5655, 8, 0, 0);  -- Hospital Encounter -- Has (0:*) --> Discharge
+
+INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
+VALUES
+       (5598, 102, 5434, 0, 0, 0),  -- A&E Attendance -- Has (0:*) --> Practitioner (qual = Effective/Triage/Entered)
+    -- (5598, 102, 5414, 1, 0, 1),  -- A&E Attendance -- Has (0:1) --> Organisation (qual = owning) TODO: Inferred from loc?
+       (5598, 102, 5420, 2, 0, 1);  -- A&E Attendance -- Has (0:1) --> Location
+
+INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
+VALUES
+       (5613, 102, 5434, 0, 0, 0),  -- Outpatient -- Has (0:*) --> Practitioner (qualifier = effective/entered/usual)
+    -- (5613, 102, 5414, 1, 0, 1),  -- Outpatient -- Has (0:1) --> Organisation (qualifier = owning) TODO: Inferred by location?
+       (5613, 102, 5420, 2, 0, 1);  -- Outpatient -- Has (0:1) --> Location
+
+INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
+VALUES
+       (5625, 102, 5434, 0, 0, 0),  -- Admission -- Has (0:*) --> Practitioner (qualifier = effective/entered)
+    -- (5625, 102, 5414, 1, 0, 1),  -- Admission -- Has (0:1) --> Organisation (qualifier = owning) TODO: Inferred by location?
+       (5625, 102, 5420, 2, 0, 1);  -- Admission -- Has (0:1) --> Location
+
+INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
+VALUES
+       (5641, 102, 5434, 0, 0, 0),  -- Ward transfer -- Has (0:*) --> Practitioner (qualifier = effective/entered)
+    -- (5641, 102, 5414, 1, 0, 1),  -- Ward transfer -- Has (0:1) --> Organisation (qualifier = owning) TODO: Inferred by location?
+       (5641, 102, 5420, 2, 0, 1);  -- Ward transfer -- Has (0:1) --> Location
+
+INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
+VALUES
+       (5655, 102, 5434, 0, 0, 0),  -- Discharge -- Has (0:*) --> Practitioner (qualifier = effective/entered)
+    -- (5655, 102, 5414, 1, 0, 1),  -- Discharge -- Has (0:1) --> Organisation (qualifier = owning) TODO: Inferred by location?
+       (5655, 102, 5420, 2, 0, 1);  -- Discharge -- Has (0:1) --> Location
+
+INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
+VALUES
+       (5674, 102, 5434, 0, 0, 0),  -- Observation -- Has (0:*) --> Practitioner (qualifier = effective/entered)
+       (5674, 102, 5414, 1, 0, 1),  -- Observation -- Has (0:1) --> Organisation (qualifier = owning)
+       (5674, 102, 5486, 2, 0, 1);  -- Observation -- Has (0:1) --> Prompt
+
+INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
+VALUES
+       (5686, 102, 5434, 0, 0, 0),  -- Flag -- Has (0:*) --> Practitioner (qualifier = effective/entered)
+       (5686, 102, 5414, 1, 0, 1);  -- Flag -- Has (0:1) --> Organisation (qualifier = owning)
+
+
+INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
+VALUES
+       (5694, 102, 5434, 0, 0, 0),  -- Problem -- Has (0:*) --> Practitioner (qualifier = last review)
+       (5694, 102, 5674, 1, 1, 1);  -- Problem -- Has (1:1) --> Observation (qualifier = owning)    TODO: Should this be reversed?
+
+INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
+VALUES
+       (5711, 102, 5434, 0, 0, 0),  -- Procedure request -- Has (0:*) --> Practitioner (qualifier = effective/entered)
+       (5711, 102, 5414, 1, 0, 1);  -- Procedure request -- Has (0:1) --> Organisation (qualifier = owning/recipient)
+
+INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
+VALUES
+       (5726, 102, 5434, 0, 0, 0),  -- Procedure -- Has (0:*) --> Practitioner (qualifier = effective/entered/usual)
+       (5726, 102, 5414, 1, 0, 1),  -- Procedure -- Has (0:1) --> Organisation (qualifier = owning)
+       (5726, 102, 5486, 2, 0, 1),  -- Procedure -- Has (0:1) --> Prompt
+       (5726, 102, 5737, 3, 0, 0);  -- Procedure -- Has (0:*) --> Device
+
+INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
+VALUES
+       (5737, 102, 5414, 0, 0, 1);  -- Device -- Has (0:1) --> Organisation TODO: Probably should be other way around?
+
+INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
+VALUES
+       (5766, 102, 5434, 0, 0, 0),  -- Immunisation -- Has (0:*) --> Practitioner (qualifier = effective/entered)
+       (5766, 102, 5414, 1, 0, 1);  -- Immunisation -- Has (0:1) --> Organisation (qualifier = owning)
+
+INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
+VALUES
+       (5782, 102, 5434, 0, 0, 0),  -- Allergy -- Has (0:*) --> Practitioner (qualifier = effective/entered)
+       (5782, 102, 5414, 1, 0, 1);  -- Allergy -- Has (0:1) --> Organisation (qualifier = owning)
+
+INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
+VALUES
+       (5800, 102, 5434, 0, 0, 0),  -- Referral -- Has (0:*) --> Practitioner (qualifier = effective/entered)
+       (5800, 102, 5414, 1, 0, 0),  -- Referral -- Has (0:*) --> Organisation (qualifier = owning/sender/recipient)
+       (5800, 102, 5613, 2, 0, 1);  -- Referral -- Has (0:1) --> Outpatient
+
+INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
+VALUES
+       (5830, 102, 5434, 0, 0, 0),  -- Medication statement -- Has (0:*) --> Practitioner (qualifier = effective/entered)
+       (5830, 102, 5414, 1, 0, 1),  -- Medication statement -- Has (0:1) --> Organisation (qualifier = owning)
+       (5830, 102, 5808, 2, 0, 1),  -- Medication statement -- Has (0:1) --> Medication amount
+       (5830, 102, 5849, 3, 0, 0);  -- Medication statement -- Has (0:*) --> Medication order
+
+INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
+VALUES
+       (5849, 102, 5434, 0, 0, 0),  -- Medication order -- Has (0:*) --> Practitioner (qualifier = effective/entered)
+       (5849, 102, 5414, 1, 0, 1);  -- Medication order -- Has (0:1) --> Organisation (qualifier = owning)
+-- (5849, 102, 5808, 2, 0, 1);  -- Medication order -- Has (0:1) --> Medication amount TODO: inferred from statement?
+
+INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
+VALUES
+       (5860, 102, 5463, 0, 0, 0),  -- Related person -- Has (0:1) --> Address
+       (5860, 102, 5867, 1, 0, 0);  -- Related person -- Has (0:*) --> Contact (method)
+
+INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
+VALUES
+       (5883, 102, 5434, 0, 0, 0),  -- Care plan -- Has (0:*) --> Practitioner (qualifier = effective/entered)
+       (5883, 102, 5414, 1, 0, 1),  -- Care plan -- Has (0:1) --> Organisation (qualifier = owning)
+       (5883, 102, 5897, 2, 0, 0);  -- Care plan -- Has (0:*) --> Care plan activity
+
+INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
+VALUES
+       (5897, 102, 5434, 0, 0, 0),  -- Care plan activity -- Has (0:*) --> Practitioner (qualifier = effective/entered)
+       (5897, 102, 5414, 1, 0, 1),  -- Care plan activity -- Has (0:1) --> Organisation (qualifier = owning)
+       (5897, 102, 5914, 2, 0, 0);  -- Care plan activity -- Has (0:*) --> Care plan activity target
+
 INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
 VALUES
        (5914, 102, 5434, 0, 0, 0),  -- Care plan activity target -- Has (0:*) --> Practitioner (qualifier = effective/entered)
@@ -1678,7 +1714,7 @@ SELECT 'Concept', MAX(id) + 1
 FROM concept;
 
 INSERT INTO code_scheme (id, identifier)
-VALUES (5031, 'SNOMED-CT');
+VALUES (5301, 'SNOMED-CT');
 
 INSERT INTO task_type (id, name)
 VALUES (0, 'Attribute model'),

@@ -290,25 +290,25 @@ FROM dmd_vmp_vpi m
 -- ********************* GENERAL SNOMED <--> CONCEPT MAP *********************
 REPLACE INTO mapping_code
     (scheme, code_id, concept)
-SELECT (5031, vtmId, conceptId)
+SELECT 5301, vtmId, conceptId
 FROM dmd_vtm_concept_map;
 
 REPLACE INTO mapping_code
     (scheme, code_id, concept)
-SELECT (5031, vmpId, conceptId)
+SELECT 5301, vmpId, conceptId
 FROM dmd_vmp_concept_map;
 
 REPLACE INTO mapping_code
     (scheme, code_id, concept)
-SELECT (5031, vmppId, conceptId)
+SELECT 5301, vmppId, conceptId
 FROM dmd_vmpp_concept_map;
 
 REPLACE INTO mapping_code
     (scheme, code_id, concept)
-SELECT (5031, ampId, conceptId)
+SELECT 5301, ampId, conceptId
 FROM dmd_amp_concept_map;
 
 REPLACE INTO mapping_code
     (scheme, code_id, concept)
-SELECT (5031, amppId, conceptId)
+SELECT 5301, amppId, conceptId
 FROM dmd_ampp_concept_map;
