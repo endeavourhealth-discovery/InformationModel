@@ -15,4 +15,10 @@ public class IMClientTest {
         Concept concept = IMClient.getConcept(CodeScheme.SNOMED.getValue(), "195967001");
         assertEquals("Asthma (disorder)", concept.getFullName());
     }
+
+    @Test
+    public void getConceptId() throws IOException {
+        Long conceptId = IMClient.getConceptId(CodeScheme.SNOMED.getValue(), "195967001");
+        assertEquals(1187044L, conceptId.longValue());
+    }
 }

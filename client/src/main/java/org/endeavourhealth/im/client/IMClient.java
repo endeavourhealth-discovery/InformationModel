@@ -29,6 +29,18 @@ public class IMClient {
             throw new IOException(response.readEntity(String.class));
     }
 
+    public static Long getConceptId(Long scheme, String code) throws IOException {
+        Map<String, String> params = new HashMap<>();
+        params.put("scheme", scheme.toString());
+        params.put("code", code);
+
+        Response response = get("/api/Map", params);
+
+        if (response.getStatus() == 200)
+            return (response.readEntity(Concept.class)).getId();
+        else
+            throw new IOException(response.readEntity(String.class));
+    }
 /*    public static boolean isMessageValid(Message message) {
         Response response = post("/Message/Valid", message);
 
@@ -85,6 +97,7 @@ public class IMClient {
             .header(keycloakAuth.getName(), keycloakAuth.getValue())
             .get();
     }
+
 
     private static Header getKeycloakAuthorization() throws IOException {
         JsonNode keycloakConfig = ConfigManager.getConfigurationAsJson("information-model-keycloak");
