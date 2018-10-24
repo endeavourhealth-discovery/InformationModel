@@ -22,7 +22,9 @@ public class ConceptLogic {
         return this.dal.get(id);
     }
 
-    public Concept get(String context) throws Exception {
+    public Concept get(String context, String value) throws Exception {
+        if (value != null)
+            context = context + "." + value;
         return this.dal.getConceptByContext(context);
     }
 

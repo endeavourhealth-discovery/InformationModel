@@ -38,14 +38,14 @@ public class TermLogic {
             this.conceptLogic.saveConcept(concept);
         } else {
             // Try to find based on context
-            String termConceptContext = "Term." + system + "." + code;
-            concept = this.conceptLogic.get(termConceptContext);
+            concept = this.conceptLogic.get("Term." + system, code);
 
             if (concept != null) {
                 conceptId = concept.getId();
             } else {
                 // Try to find an official term based on code/system
                 String officialTerm = getOfficialTermForCode(system, code);
+                String termConceptContext = "Term." + system + "." + code;
                 concept = new Concept()
                     .setContext(termConceptContext);
 
@@ -102,12 +102,11 @@ public class TermLogic {
     private void importSnomedParentHierarchy(Long conceptId, String code) throws Exception {
         Term parent = this.dal.getSnomedParent(code);
         if (parent != null) {
-            String context = "Term.Snomed." + parent.getId().toString();
-            Concept concept = this.conceptLogic.get(context);
+            Concept concept = this.conceptLogic.get("Term.Snomed", parent.getId().toString());
 
             if (concept == null) {
                 concept = new Concept()
-                    .setContext(context)
+                    .setContext("Term.Snomed." + parent.getId().toString())
                     // TODO: Replace with relationship
                     // .setType(new ConceptReference().setText("Class.Code"))
                     .setStatus(ConceptStatus.ACTIVE)

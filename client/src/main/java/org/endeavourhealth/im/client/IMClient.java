@@ -42,9 +42,10 @@ public class IMClient {
             throw new IOException(response.readEntity(String.class));
     }
 
-    public static Long getConceptId(String context) throws IOException {
+    public static Long getConceptId(String context, String value) throws IOException {
         Map<String, String> params = new HashMap<>();
         params.put("context", context);
+        params.put("value", value);
 
         Response response = get("/api/Concept/Context", params);
 

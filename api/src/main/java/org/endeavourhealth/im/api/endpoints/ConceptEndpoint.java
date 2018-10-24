@@ -67,10 +67,11 @@ public class ConceptEndpoint {
     @Timed(absolute = true, name = "InformationModel.ConceptEndpoint.Context.GET")
     @ApiOperation(value = "Returns concept by context", response = Concept.class)
     public Response getByContext(@Context SecurityContext sc,
-                                 @ApiParam(value = "Concept context", required = true) @QueryParam("context") String context) throws Exception {
+                                 @ApiParam(value = "Concept context", required = true) @QueryParam("context") String context,
+                                 @ApiParam(value = "Concept value", required = true) @QueryParam("value") String value) throws Exception {
         LOG.debug("Get concept by ID");
 
-        Concept result = new ConceptLogic().get(context);
+        Concept result = new ConceptLogic().get(context, value);
 
         return Response
             .ok()
