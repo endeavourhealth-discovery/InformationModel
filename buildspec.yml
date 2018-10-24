@@ -19,5 +19,5 @@ artifacts:
   files:
     - appspec.yml
     - aws_scripts/**/*
-    - api/target/api-1.0-SNAPSHOT/**/*
+    - api/target/api/**/*
     - frontend/dist/**/*
