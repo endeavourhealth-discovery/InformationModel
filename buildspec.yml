@@ -7,8 +7,8 @@ phases:
       - echo $IP of CodeBuild Instance
   build:
     commands:
-      - echo Build started on `date`
       - chmod +x aws_scripts/build.sh
+      - echo IM Build started on `date`
       - aws_scripts/build.sh mvn -B deploy
   post_build:
     commands:
