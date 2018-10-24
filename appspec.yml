@@ -3,7 +3,7 @@ os: linux
 files:
   - source: /frontend/dist
     destination: //opt/tomcat/webapps/information-model
-  - source: /api/target/api-1.0-SNAPSHOT
+  - source: /api/target/api
     destination: //opt/tomcat/webapps/information-model
 hooks:
   BeforeInstall:
