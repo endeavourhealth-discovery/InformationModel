@@ -10,6 +10,11 @@
   <artifactId>common</artifactId>
   <dependencies>
     <dependency>
+      <groupId>org.endeavourhealth.im</groupId>
+      <artifactId>models</artifactId>
+      <version>${version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.endeavourhealth.common</groupId>
       <artifactId>cache</artifactId>
       <version>${eds-cache.version}</version>
@@ -18,21 +23,6 @@
       <groupId>org.endeavourhealth.configmanager</groupId>
       <artifactId>configmanager</artifactId>
       <version>${eds-config-manager.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-annotations</artifactId>
-      <version>${jackson.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-core</artifactId>
-      <version>${jackson.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.swagger</groupId>
-      <artifactId>swagger-annotations</artifactId>
-      <version>${swagger.version}</version>
     </dependency>
   </dependencies>
 
@@ -58,7 +48,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-deploy-plugin</artifactId>
-        <version>2.4</version>
+        <version>${maven-deploy-plugin.version}</version>
         <configuration>
           <skip>false</skip>
         </configuration>

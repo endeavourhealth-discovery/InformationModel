@@ -10,6 +10,7 @@
     <java.version>1.8</java.version>
     <junit.version>4.12</junit.version>
     <maven-compiler-plugin.version>3.1</maven-compiler-plugin.version>
+    <maven-deploy-plugin.version>2.4</maven-deploy-plugin.version>
     <maven-surefire-plugin.version>2.12.4</maven-surefire-plugin.version>
 
     <eds-security.version>1.8-SNAPSHOT</eds-security.version>
@@ -22,7 +23,7 @@
     <dependencies>
         <dependency>
             <groupId>org.endeavourhealth.im</groupId>
-            <artifactId>common</artifactId>
+            <artifactId>models</artifactId>
             <version>${version}</version>
         </dependency>
 
@@ -38,11 +39,6 @@
             <version>${javax-ws-rs.version}</version>
         </dependency>
 
-        <!--<dependency>-->
-            <!--<groupId>me.fhir</groupId>-->
-            <!--<artifactId>fhir-dstu2</artifactId>-->
-            <!--<version>${fhir-dstu2.version}</version>-->
-        <!--</dependency>-->
         <!-- Jersey -->
         <dependency>
             <groupId>org.glassfish.jersey.core</groupId>
@@ -150,7 +146,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-deploy-plugin</artifactId>
-                <version>2.4</version>
+                <version>${maven-deploy-plugin.version}</version>
                 <configuration>
                     <skip>false</skip>
                 </configuration>
