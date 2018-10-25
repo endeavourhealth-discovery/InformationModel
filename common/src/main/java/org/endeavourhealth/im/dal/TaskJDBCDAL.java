@@ -3,12 +3,11 @@ package org.endeavourhealth.im.dal;
 import org.endeavourhealth.im.models.Task;
 import org.endeavourhealth.im.models.TaskType;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.endeavourhealth.im.dal.DALHelper.getGeneratedKey;
 
 public class TaskJDBCDAL implements TaskDAL {
     @Override
@@ -19,7 +18,7 @@ public class TaskJDBCDAL implements TaskDAL {
                 .setType(taskType)
                 .setIdentifier(conceptId);
 
-        return null;
+        return this.save(task);
         // return this.filer.storeAndApply("Endeavour Health", TransactionAction.CREATE, TransactionTable.TASK, task);
     }
 
@@ -58,6 +57,38 @@ public class TaskJDBCDAL implements TaskDAL {
 
         return tasks;
     }
+
+    private Long save(Task task) throws SQLException {
+        Connection conn = ConnectionPool.InformationModel.pop();
+        String sql = (task.getId() == null)
+            ? "INSERT INTO task (title, description, type, created, identifier) VALUES (?, ?, ?, ?, ?)"
+            : "UPDATE task SET title = ?, description = ?, type = ?, created = ?, identifier = ? WHERE id = ?";
+
+        if (task.getCreated() == null)
+            task.setCreated(new java.util.Date());
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            int i = 1;
+            if (task.getName() == null) stmt.setNull(i++, Types.VARCHAR); else stmt.setString(i++, task.getName());
+            if (task.getDescription() == null) stmt.setNull(i++, Types.VARCHAR); else stmt.setString(i++, task.getDescription());
+            if (task.getType() == null) stmt.setNull(i++, Types.TINYINT); else stmt.setByte(i++, task.getType().getValue());
+            stmt.setDate(i++, new Date(task.getCreated().getTime()));
+            if (task.getIdentifier() == null) stmt.setNull(i++, Types.BIGINT); else stmt.setLong(i++, task.getIdentifier());
+            if (task.getId() != null) stmt.setLong(i++, task.getId());
+
+            stmt.executeUpdate();
+
+            if (task.getId() == null)
+                task.setId(getGeneratedKey(stmt));
+
+        } finally {
+            ConnectionPool.InformationModel.push(conn);
+        }
+
+        return task.getId();
+    }
+
+
     /*
 
     @Override

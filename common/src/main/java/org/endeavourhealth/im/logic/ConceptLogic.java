@@ -33,9 +33,12 @@ public class ConceptLogic {
 
             concept = new Concept()
                 .setSuperclass(new Reference().setId(1L).setName("Concept"))
-                .setContext(context);
+                .setContext(context)
+                .setFullName(context.replace(".", " "));
             Long newId = this.dal.saveConcept(concept);
             concept.setId(newId);
+
+            new TaskLogic().createTask("Auto concept: "+context, TaskType.ATTRIBUTE_MODEL, newId);
         }
 
         return concept;

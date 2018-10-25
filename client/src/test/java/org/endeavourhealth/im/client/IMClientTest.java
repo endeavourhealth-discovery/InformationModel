@@ -30,7 +30,7 @@ public class IMClientTest {
 
     @Test
     public void getMissingConceptByContext() throws IOException {
-        Long conceptId = IMClient.getOrCreateConceptId("MadeUpStatus.Active");
+        Long conceptId = IMClient.getOrCreateConceptId("MadeUpStatus.Temporary");
         assertNotNull(conceptId);
     }
 }
