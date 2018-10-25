@@ -42,10 +42,18 @@ public class IMClient {
             throw new IOException(response.readEntity(String.class));
     }
 
-    public static Long getConceptId(String context, String value) throws IOException {
+    public static Long getConceptId(String context) throws IOException {
+        return getOrCreateConcept(context, false);
+    }
+
+    public static Long getOrCreateConceptId(String context) throws IOException {
+        return getOrCreateConcept(context, true);
+    }
+
+    private static Long getOrCreateConcept(String context, Boolean createMissing) throws IOException {
         Map<String, String> params = new HashMap<>();
         params.put("context", context);
-        params.put("value", value);
+        params.put("createMissing", createMissing.toString());
 
         Response response = get("/api/Concept/Context", params);
 

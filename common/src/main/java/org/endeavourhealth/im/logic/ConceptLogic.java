@@ -22,10 +22,23 @@ public class ConceptLogic {
         return this.dal.get(id);
     }
 
-    public Concept get(String context, String value) throws Exception {
-        if (value != null)
-            context = context + "." + value;
-        return this.dal.getConceptByContext(context);
+    public Concept get(String context) throws Exception {
+        return get(context, false);
+    }
+
+    public Concept get(String context, Boolean createMissing) throws Exception {
+        Concept concept = this.dal.getConceptByContext(context);
+
+        if (concept == null && createMissing) {
+
+            concept = new Concept()
+                .setSuperclass(new Reference().setId(1L).setName("Concept"))
+                .setContext(context);
+            Long newId = this.dal.saveConcept(concept);
+            concept.setId(newId);
+        }
+
+        return concept;
     }
 
     public SearchResult getMRU(Boolean includeDeprecated) throws Exception {

@@ -12,10 +12,10 @@ public class Concept extends DbEntity<Concept> {
     private String fullName;
     private String shortName;
     private String context;
-    private ConceptStatus status;
-    private Float version;
+    private ConceptStatus status = ConceptStatus.DRAFT;
+    private Float version = 0.1F;
     private String description;
-    private Long useCount;
+    private Long useCount = 0L;
     private Date lastUpdate;
 
     public Reference getSuperclass() {

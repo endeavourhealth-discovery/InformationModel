@@ -3,7 +3,7 @@
     <parent>
         <artifactId>informationmodel</artifactId>
         <groupId>org.endeavourhealth.im</groupId>
-        <version>1.1-SNAPSHOT</version>
+        <version>1.2-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>TrudImport</artifactId>
@@ -27,7 +27,7 @@
         <dependency>
             <groupId>org.endeavourhealth.im</groupId>
             <artifactId>common</artifactId>
-            <version>1.1-SNAPSHOT</version>
+            <version>${version}</version>
         </dependency>
     </dependencies>
 

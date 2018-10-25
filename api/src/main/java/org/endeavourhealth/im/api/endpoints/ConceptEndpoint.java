@@ -68,10 +68,10 @@ public class ConceptEndpoint {
     @ApiOperation(value = "Returns concept by context", response = Concept.class)
     public Response getByContext(@Context SecurityContext sc,
                                  @ApiParam(value = "Concept context", required = true) @QueryParam("context") String context,
-                                 @ApiParam(value = "Concept value", required = true) @QueryParam("value") String value) throws Exception {
+                                 @ApiParam(value = "Create missing") @QueryParam("createMissing") Boolean createMissing) throws Exception {
         LOG.debug("Get concept by ID");
 
-        Concept result = new ConceptLogic().get(context, value);
+        Concept result = new ConceptLogic().get(context, createMissing);
 
         return Response
             .ok()

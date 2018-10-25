@@ -24,7 +24,13 @@ public class IMClientTest {
 
     @Test
     public void getConceptByContext() throws IOException {
-        Long conceptId = IMClient.getConceptId("DM+D", "VMP");
+        Long conceptId = IMClient.getConceptId("DM+D.VMP");
         assertEquals(5308L, conceptId.longValue());
+    }
+
+    @Test
+    public void getMissingConceptByContext() throws IOException {
+        Long conceptId = IMClient.getOrCreateConceptId("MadeUpStatus.Active");
+        assertNotNull(conceptId);
     }
 }
