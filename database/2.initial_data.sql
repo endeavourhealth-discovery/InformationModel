@@ -64,7 +64,7 @@ VALUES
        (506, 100, 500),    -- Care proc. folder       -- is a --> IM folder
        (507, 100, 500),    -- Other ents folder       -- is a --> IM folder
        (510, 100, 500),    -- Rec. structs folder     -- is a --> IM folder
-       (512, 100, 510),    -- Spec. rec. types folder -- is a --> IM folder
+       (512, 100, 510),    -- Spec. rec. types folder -- is a --> Rec. structs folder
        (513, 100, 500),    -- Supp. structs folder    -- is a --> IM folder
        (514, 100, 513),    -- Types folder            -- is a --> Supp. structs folder
        (502, 100, 513),    -- Atts & rels folder      -- is a --> Supp. structs folder
@@ -316,70 +316,110 @@ VALUES
 INSERT INTO concept (id, superclass, context, full_name, description)
 VALUES
        (5300, 1, 'Code Scheme', 'Coding scheme', 'A coding scheme'),
-       (5301, 1, 'Code Scheme.SNOMED', 'SNOMED CT', 'The SNOMED CT coding scheme');
+       (5301, 1, 'Code Scheme.SNOMED', 'SNOMED CT', 'The SNOMED CT coding scheme'),
+       (5302, 1, 'Code Scheme.READ2', 'READ V2', 'Version 2 READ coding scheme'),
+       (5303, 1, 'Code Scheme.CTV3', 'READ V3', 'Version 3 READ coding scheme'),
+       (5304, 1, 'Code Scheme.OPCS', 'OPCS', 'OPCS coding scheme'),
+       (5305, 1, 'Code Scheme.ICD10', 'ICD10', 'ICD10 coding scheme');
 INSERT INTO concept_relationship (source, relationship, target)
 VALUES
-       (5301, 100, 5300); -- SNOMED                  -- is a --> Code scheme
+       (5301, 100, 5300), -- SNOMED                  -- is a --> Code scheme
+       (5302, 100, 5300), -- READ2                   -- is a --> Code scheme
+       (5303, 100, 5300), -- CTV3                    -- is a --> Code scheme
+       (5304, 100, 5300), -- OPCS                    -- is a --> Code scheme
+       (5305, 100, 5300); -- ICD10                  -- is a --> Code scheme
 
 -- ********** DM+D **********
 INSERT INTO concept (id, superclass, context, full_name, description)
 VALUES
-       (5302, 4, 'DM+D.VTM', 'Virtual therapeutic moiety', ''),
-       (5303, 4, 'DM+D.VPI', 'Virtual product ingredient', ''),
-       (5304, 4, 'DM+D.CDPI', 'Controlled drug prescribing information', ''),
-       (5305, 4, 'DM+D.DRI', 'Drug route information', ''),
-       (5306, 4, 'DM+D.ODRI', 'Ontology drug form & route info', ''),
-       (5307, 4, 'DM+D.DFI', 'Dose form information', ''),
-       (5308, 4, 'DM+D.VMP', 'Virtual medicinal product', ''),
-       (5309, 4, 'DM+D.APE', 'Actual product excipient', ''),
-       (5310, 4, 'DM+D.APrI', 'Appliance product information', ''),
-       (5311, 4, 'DM+D.LR', 'Licensed route', ''),
-       (5312, 4, 'DM+D.AMP', 'Actual medicinal product', ''),
-       (5313, 4, 'DM+D.VCPC', 'Virtual combination pack content', ''),
-       (5314, 4, 'DM+D.DTCI', 'Drug tariff category info', ''),
-       (5315, 4, 'DM+D.VMPP', 'Virtual medicinal product pack', ''),
-       (5316, 4, 'DM+D.PPI', 'Product prescribing info', ''),
-       (5317, 4, 'DM+D.APkI', 'Appliance pack info', ''),
-       (5318, 4, 'DM+D.RI', 'Reimbursement info', ''),
-       (5319, 4, 'DM+D.MPP', 'Medicinal product price', ''),
-       (5320, 4, 'DM+D.ACPC', 'Actual combination pack content', ''),
-       (5321, 4, 'DM+D.AMPP', 'Actual medicinal product pack', '');
+       (5320, 4, 'DM+D.VTM', 'Virtual therapeutic moiety', ''),
+       (5321, 4, 'DM+D.VPI', 'Virtual product ingredient', ''),
+       (5322, 4, 'DM+D.CDPI', 'Controlled drug prescribing information', ''),
+       (5323, 4, 'DM+D.DRI', 'Drug route information', ''),
+       (5324, 4, 'DM+D.ODRI', 'Ontology drug form & route info', ''),
+       (5325, 4, 'DM+D.DFI', 'Dose form information', ''),
+       (5326, 4, 'DM+D.VMP', 'Virtual medicinal product', ''),
+       (5327, 4, 'DM+D.APE', 'Actual product excipient', ''),
+       (5328, 4, 'DM+D.APrI', 'Appliance product information', ''),
+       (5329, 4, 'DM+D.LR', 'Licensed route', ''),
+       (5330, 4, 'DM+D.AMP', 'Actual medicinal product', ''),
+       (5331, 4, 'DM+D.VCPC', 'Virtual combination pack content', ''),
+       (5332, 4, 'DM+D.DTCI', 'Drug tariff category info', ''),
+       (5333, 4, 'DM+D.VMPP', 'Virtual medicinal product pack', ''),
+       (5334, 4, 'DM+D.PPI', 'Product prescribing info', ''),
+       (5335, 4, 'DM+D.APkI', 'Appliance pack info', ''),
+       (5336, 4, 'DM+D.RI', 'Reimbursement info', ''),
+       (5337, 4, 'DM+D.MPP', 'Medicinal product price', ''),
+       (5338, 4, 'DM+D.ACPC', 'Actual combination pack content', ''),
+       (5339, 4, 'DM+D.AMPP', 'Actual medicinal product pack', '');
 INSERT INTO concept_attribute (concept, attribute, `order`, minimum, maximum)
 VALUES
-       (5308, 5302, 0, 0, 1),   -- VMP -- (0:1) --> VTM
-       (5308, 5303, 1, 0, 0),   -- VMP -- (0:*) --> VPI
-       (5308, 5304, 2, 0, 1),   -- VMP -- (0:1) --> CDPI
-       (5308, 5305, 3, 0, 0),   -- VMP -- (0:*) --> DRI
-       (5308, 5306, 4, 0, 0),   -- VMP -- (0:*) --> ODRI
-       (5308, 5307, 5, 0, 1),   -- VMP -- (0:1) --> DFI
+       (5326, 5320, 0, 0, 1),   -- VMP -- (0:1) --> VTM
+       (5326, 5321, 1, 0, 0),   -- VMP -- (0:*) --> VPI
+       (5326, 5322, 2, 0, 1),   -- VMP -- (0:1) --> CDPI
+       (5326, 5323, 3, 0, 0),   -- VMP -- (0:*) --> DRI
+       (5326, 5324, 4, 0, 0),   -- VMP -- (0:*) --> ODRI
+       (5326, 5325, 5, 0, 1),   -- VMP -- (0:1) --> DFI
 
-       (5312, 5309, 0, 0, 0),   -- AMP -- (0:*) --> APE
-       (5312, 5310, 1, 0, 1),   -- AMP -- (0:1) --> APrI
-       (5312, 5311, 2, 0, 0),   -- AMP -- (0:*) --> LR
+       (5330, 5327, 0, 0, 0),   -- AMP -- (0:*) --> APE
+       (5330, 5328, 1, 0, 1),   -- AMP -- (0:1) --> APrI
+       (5330, 5329, 2, 0, 0),   -- AMP -- (0:*) --> LR
 
-       (5315, 5313, 0, 0, 0),   -- VMPP -- (0:*) --> VCPC
-       (5315, 5314, 1, 0, 1),   -- VMPP -- (0:1) --> DTCI
+       (5333, 5331, 0, 0, 0),   -- VMPP -- (0:*) --> VCPC
+       (5333, 5332, 1, 0, 1),   -- VMPP -- (0:1) --> DTCI
 
-       (5321, 5316, 0, 0, 1),   -- AMPP -- (0:1) --> PPI
-       (5321, 5317, 1, 0, 1),   -- AMPP -- (0:1) --> APkI
-       (5321, 5318, 2, 0, 1),   -- AMPP -- (0:1) --> RI
-       (5321, 5319, 3, 0, 1),   -- AMPP -- (0:1) --> MPP
-       (5321, 5320, 4, 0, 0);   -- AMPP -- (0:*) --> ACPC
+       (5339, 5334, 0, 0, 1),   -- AMPP -- (0:1) --> PPI
+       (5339, 5335, 1, 0, 1),   -- AMPP -- (0:1) --> APkI
+       (5339, 5336, 2, 0, 1),   -- AMPP -- (0:1) --> RI
+       (5339, 5337, 3, 0, 1),   -- AMPP -- (0:1) --> MPP
+       (5339, 5338, 4, 0, 0);   -- AMPP -- (0:*) --> ACPC
 INSERT INTO concept_relationship (source, relationship, target, mandatory, `limit`)
 VALUES
     -- DM+D data model relationships
-       (5312, 111, 5308, 1, 1),     -- AMP  -- (1:1) Branded --> VMP
-       (5315, 112, 5308, 1, 1),     -- VMPP -- (1:1) Pack of --> VMP
-       (5321, 111, 5315, 1, 1),     -- AMPP -- (1:1) Branded --> VMPP
-       (5321, 112, 5312, 1, 1);     -- AMPP -- (1:1) Pack of --> AMP
+       (5330, 111, 5326, 1, 1),     -- AMP  -- (1:1) Branded --> VMP
+       (5333, 112, 5326, 1, 1),     -- VMPP -- (1:1) Pack of --> VMP
+       (5339, 111, 5333, 1, 1),     -- AMPP -- (1:1) Branded --> VMPP
+       (5339, 112, 5330, 1, 1);     -- AMPP -- (1:1) Pack of --> AMP
 
 -- ********** PCR v2 Schema/Relational model **********
 
 -- Base concepts
 INSERT INTO concept (id, superclass, context, full_name, description)
 VALUES
-       (5350, 1, 'Service', 'Service', ''),
-       (5351, 1, 'System', 'System', '');
+       (5349, 1, 'Entity', 'Entity', ''),
+       (5350, 5349, 'Service', 'Service', ''),
+       (5351, 1, 'System', 'System', ''),
+       (5352, 5349, 'Department', 'Department', ''),
+       (5353, 5349, 'Person', 'Person', ''),
+       (5354, 5349, 'OrgSvcDept', 'Organisation, service or department',''),
+       (5355, 5353, 'PersonInRole', 'Person in role', ''),
+       (5356, 5349, 'Device', 'Device', ''),
+       (5357, 7, 'EditMode', 'Edit mode', '');
+
+-- Transaction
+INSERT INTO concept (id, superclass, context, full_name, description)
+VALUES
+       (5360, 4, 'Transaction', 'Transaction', ''),
+       (5361, 11, 'EntryDateTime', 'Date and time of entry', ''),
+       (5362, 7, 'OwningOrganisation', 'Owning organisation', ''),
+       (5363, 7, 'EnteredByPerson', 'Entered by person', ''),
+       (5364, 7, 'EnteredByDevice', 'Entered by device', ''),
+       (5365, 7, 'TransactionMode', 'Transaction mode', ''),
+       (5366, 7, 'EntryType', 'Entry type', ''),
+       (5367, 7, 'EntryAttribute', 'Entry attribute', ''),
+       (5368, 12, 'ReplacedEntry', 'Replaced entry', '');
+
+
+INSERT INTO concept_attribute (concept, attribute, `order`, minimum, maximum, is_constraint, value_concept, value_expression)
+VALUES
+       (5360, 5361, 0, 1, 1, false, null, null),
+       (5360, 5362, 1, 1, 1, false, 5354, 0),
+       (5360, 5363, 2, 0, 1, false, 5355, 0),
+       (5360, 5364, 3, 0, 1, false, 5356, 0),
+       (5360, 5365, 4, 1, 1, false, 5357, 1),
+       (5360, 5366, 5, 1, 1, false, 4,    1),
+       (5360, 5367, 6, 0, 1, false, 6,    1),
+       (5360, 5368, 7, 0, 1, false, null, null);
 
 -- Address
 INSERT INTO concept (id, superclass, context, full_name, description)
@@ -411,7 +451,7 @@ VALUES
        (5411, 12, 'Organisation.Name', 'Name', ''),
        (5412, 13, 'Organisation.Active', 'Is active', ''),
        (5413, 7,  'Organisation.Type', 'Organisation type', ''),
-       (5414, 4,  'Organisation', 'Organisation', '');
+       (5414, 5349,  'Organisation', 'Organisation', '');
 INSERT INTO concept_attribute (concept, attribute, `order`, minimum, maximum)
 VALUES
        (5414, 5410, 0, 1, 1),   -- Org -- (1:1) --> ODS Code
@@ -1714,7 +1754,11 @@ SELECT 'Concept', MAX(id) + 1
 FROM concept;
 
 INSERT INTO code_scheme (id, identifier)
-VALUES (5301, 'SNOMED-CT');
+VALUES (5301, 'SNOMED-CT'),
+       (5302, 'READ 2'),
+       (5303, 'CTV3'),
+       (5304, 'OPCS'),
+       (5305, 'ICD10');
 
 INSERT INTO task_type (id, name)
 VALUES (0, 'Attribute model'),

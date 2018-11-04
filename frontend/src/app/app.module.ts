@@ -15,6 +15,7 @@ import {ConceptModule} from './concept/concept.module';
 import {ModuleStateService} from 'eds-angular4/dist/common';
 import {WorkflowManagerModule} from './workflow-manager/workflow-manager.module';
 import {TermMappingsModule} from './term-mappings/term-mappings.module';
+import {ViewsModule} from './views/views.module';
 
 @NgModule({
   imports: [
@@ -27,6 +28,7 @@ import {TermMappingsModule} from './term-mappings/term-mappings.module';
     DialogsModule,
 
     ConceptModule,
+    ViewsModule,
     WorkflowManagerModule,
     TermMappingsModule,
 

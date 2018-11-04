@@ -62,7 +62,7 @@ public class ConceptLogic {
         Long attConcept = id;
 
         while (attConcept != null) {
-            result.addAll(this.dal.getAttributes(id, attConcept, includeDeprecated));
+            result.addAll(this.dal.getAttributes(attConcept, includeDeprecated));
 
             // Get superclass attributes
             Concept concept = this.dal.get(attConcept);

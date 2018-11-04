@@ -58,6 +58,48 @@ public class DALHelper {
         return concept;
     }
 
+    public static List<ConceptSummary> getConceptSummaryListFromStatement(PreparedStatement stmt) throws SQLException {
+        try (ResultSet rs = stmt.executeQuery()) {
+            List<ConceptSummary> result = new ArrayList<>();
+            while (rs.next()) {
+                result.add(getConceptSummaryFromResultSet(rs));
+            }
+
+            return result;
+        }
+    }
+
+    public static  ConceptSummary getConceptSummaryFromResultSet(ResultSet rs) throws SQLException {
+        ConceptSummary result = new ConceptSummary()
+            .setId(rs.getLong("id"))
+            .setName(rs.getString("full_name"))
+            .setContext(rs.getString("context"))
+            .setStatus(ConceptStatus.byValue(rs.getByte("status")))
+            .setVersion(rs.getFloat("version"))
+            .setSynonym(rs.getBoolean("synonym"));
+
+        return result;
+    }
+
+    public static List<View> getViewListFromStatement(PreparedStatement stmt) throws SQLException {
+        List<View> result = new ArrayList<>();
+        try (ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                result.add(getViewFromResultSet(rs));
+            }
+        }
+        return result;
+    }
+
+    public static View getViewFromResultSet(ResultSet rs) throws SQLException {
+        View view = new View()
+            .setId(rs.getLong("id"))
+            .setName(rs.getString("full_name"))
+            .setDescription(rs.getString("description"))
+            .setLastUpdated(rs.getDate("last_update"));
+
+        return view;
+    }
 
     public static List<RelatedConcept> getRelatedListFromStatement(PreparedStatement stmt) throws SQLException {
         List<RelatedConcept> result = new ArrayList<>();
@@ -121,24 +163,39 @@ public class DALHelper {
                     .setName(rs.getString("type_name"))
             )
             .setMinimum(rs.getInt("minimum"))
-            .setMaximum(rs.getInt("maximum"));
+            .setMaximum(rs.getInt("maximum"))
+            .setConstraint(rs.getBoolean("is_constraint"));
 
-        Long avid = rs.getLong("avid");
-        if (rs.wasNull()) avid = null;
+        Long vcid = rs.getLong("value_concept");
+        if (!rs.wasNull())
+            result.setValueConcept(new Reference().setId(vcid).setName(rs.getString("value_type_name")));
 
-        AttributeValue value = new AttributeValue()
-            .setId(avid)
-            .setFixedValue(rs.getString("fixed_value"));
+        Byte vexp = rs.getByte("value_expression");
+        if (!rs.wasNull())
+            result.setValueExpression(ValueExpression.byValue(vexp));
 
-        Reference fixedConcept = new Reference()
-            .setId(rs.getLong("fixed_concept"))
-            .setName(rs.getString("fixed_name"));
+        Long fcid = rs.getLong("fixed_concept");
+        if (!rs.wasNull())
+            result.setFixedConcept(new Reference().setId(fcid).setName("fixed_value_name"));
 
-        if (!rs.wasNull()) {
-            value.setFixedConcept(fixedConcept);
-        }
+        result.setFixedValue(rs.getString("fixed_value"));
 
-        result.setValue(value);
+//        Long avid = rs.getLong("avid");
+//        if (rs.wasNull()) avid = null;
+//
+//        AttributeValue value = new AttributeValue()
+//            .setId(avid)
+//            .setFixedValue(rs.getString("fixed_value"));
+//
+//        Reference fixedConcept = new Reference()
+//            .setId(rs.getLong("fixed_concept"))
+//            .setName(rs.getString("fixed_name"));
+//
+//        if (!rs.wasNull()) {
+//            value.setFixedConcept(fixedConcept);
+//        }
+//
+//        result.setValue(value);
 
         return result;
     }

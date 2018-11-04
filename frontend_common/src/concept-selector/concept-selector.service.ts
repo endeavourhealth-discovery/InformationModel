@@ -8,10 +8,11 @@ import {SearchResult} from '../models/SearchResult';
 export class ConceptSelectorService {
     constructor(private http: Http) {}
 
-    search(searchTerm: string, includeDeprecated: boolean, superclass: number = null): Observable<SearchResult> {
+    search(searchTerm: string, includeDeprecated: boolean, page: number = 1, superclass: number = null): Observable<SearchResult> {
         const params = new URLSearchParams();
         params.append('searchTerm', searchTerm.toString());
         params.append('includeDeprecated', includeDeprecated.toString());
+        params.append('page', page.toString());
         if (superclass)
             params.append('superclass', superclass.toString());
 

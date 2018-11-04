@@ -65,7 +65,7 @@ public class ConceptJDBCDAL implements ConceptDAL {
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, PAGE_SIZE);
-            result.setResults(getConceptSummaryListFromStatment(stmt));
+            result.setResults(getConceptSummaryListFromStatement(stmt));
             result.setCount(result.getResults().size());
 
             return result;
@@ -118,7 +118,7 @@ public class ConceptJDBCDAL implements ConceptDAL {
             stmt.setInt(i++, (page-1) * PAGE_SIZE);
             stmt.setInt(i++, PAGE_SIZE);
 
-            result.setResults(getConceptSummaryListFromStatment(stmt));
+            result.setResults(getConceptSummaryListFromStatement(stmt));
             result.setCount(getFoundRows(conn));
 
             return result;
@@ -137,28 +137,6 @@ public class ConceptJDBCDAL implements ConceptDAL {
         }
     }
 
-    private List<ConceptSummary> getConceptSummaryListFromStatment(PreparedStatement stmt) throws SQLException {
-        try (ResultSet rs = stmt.executeQuery()) {
-            List<ConceptSummary> result = new ArrayList<>();
-            while (rs.next()) {
-                result.add(getConceptSummaryFromResultSet(rs));
-            }
-
-            return result;
-        }
-    }
-
-    private ConceptSummary getConceptSummaryFromResultSet(ResultSet rs) throws SQLException {
-        ConceptSummary result = new ConceptSummary()
-            .setId(rs.getLong("id"))
-            .setName(rs.getString("full_name"))
-            .setContext(rs.getString("context"))
-            .setStatus(ConceptStatus.byValue(rs.getByte("status")))
-            .setVersion(rs.getFloat("version"))
-            .setSynonym(rs.getBoolean("synonym"));
-
-        return result;
-    }
 
     @Override
     public List<RelatedConcept> getRelated(Long id, Boolean includeDeprecated) throws SQLException {
@@ -188,21 +166,22 @@ public class ConceptJDBCDAL implements ConceptDAL {
     }
 
     @Override
-    public List<Attribute> getAttributes(Long id, Long attributeConceptId, Boolean includeDeprecated) throws Exception {
+    public List<Attribute> getAttributes(Long id, Boolean includeDeprecated) throws Exception {
         Connection conn = ConnectionPool.InformationModel.pop();
 
-        String sql = "SELECT ca.*, cav.id as avid, cav.fixed_value, cav.fixed_concept, " +
+        String sql = "SELECT ca.*, " + // cav.id as avid, cav.fixed_value, cav.fixed_concept, " +
             "c.full_name as concept_name, " +
             "a.full_name as attribute_name, " +
             "t.id as type, " +
             "t.full_name as type_name, " +
-            "f.full_name as fixed_name " +
+            "vc.full_name as value_type_name, " +
+            "fc.full_name as fixed_value_name " +
             "FROM concept_attribute ca " +
             "JOIN concept c ON c.id = ca.concept " +
             "JOIN concept a ON a.id = ca.attribute " +
             "JOIN concept t ON t.id = a.superclass " +
-            "LEFT OUTER JOIN concept_attribute_value cav ON cav.concept = ? AND cav.concept_attribute = ca.id " +
-            "LEFT OUTER JOIN concept f ON f.id = cav.fixed_concept " +
+            "LEFT OUTER JOIN concept vc ON vc.id = ca.value_concept " +
+            "LEFT OUTER JOIN concept fc ON fc.id = ca.fixed_concept " +
             "WHERE ca.concept = ? ";
 
         if (!includeDeprecated)
@@ -213,7 +192,6 @@ public class ConceptJDBCDAL implements ConceptDAL {
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setLong(1, id);
-            stmt.setLong(2, attributeConceptId);
             return getAttributeListFromStatement(stmt);
         } finally {
             ConnectionPool.InformationModel.push(conn);
@@ -339,21 +317,21 @@ public class ConceptJDBCDAL implements ConceptDAL {
     }
 
     private void setFixedAttributeValue(Connection conn, Long conceptId, Attribute attribute) throws SQLException {
-        try (PreparedStatement insert = conn.prepareStatement("INSERT INTO concept_attribute_value (fixed_concept, fixed_value, concept, concept_attribute) VALUES (?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
-             PreparedStatement update = conn.prepareStatement("UPDATE concept_attribute_value SET fixed_concept = ?, fixed_value = ? WHERE concept = ? AND concept_attribute = ?")) {
-
-            PreparedStatement stmt = attribute.getValue().getId() == null ? insert : update;
-
-            int i = 1;
-            if (attribute.getValue().getFixedConcept().getId() == null) stmt.setNull(i++, BIGINT); else stmt.setLong(i++, attribute.getValue().getFixedConcept().getId());
-            if (attribute.getValue().getFixedValue() == null) stmt.setNull(i++, VARCHAR); else stmt.setString(i++, attribute.getValue().getFixedValue());
-            stmt.setLong(i++, conceptId); // Concept the value belongs to (not necessarily the attribute which could be from a parent)
-            stmt.setLong(i++, attribute.getId());
-
-            stmt.executeUpdate();
-            if (stmt == insert)
-                attribute.getValue().setId(getGeneratedKey(stmt));
-        }
+//        try (PreparedStatement insert = conn.prepareStatement("INSERT INTO concept_attribute_value (fixed_concept, fixed_value, concept, concept_attribute) VALUES (?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+//             PreparedStatement update = conn.prepareStatement("UPDATE concept_attribute_value SET fixed_concept = ?, fixed_value = ? WHERE concept = ? AND concept_attribute = ?")) {
+//
+//            PreparedStatement stmt = attribute.getValue().getId() == null ? insert : update;
+//
+//            int i = 1;
+//            if (attribute.getValue().getFixedConcept().getId() == null) stmt.setNull(i++, BIGINT); else stmt.setLong(i++, attribute.getValue().getFixedConcept().getId());
+//            if (attribute.getValue().getFixedValue() == null) stmt.setNull(i++, VARCHAR); else stmt.setString(i++, attribute.getValue().getFixedValue());
+//            stmt.setLong(i++, conceptId); // Concept the value belongs to (not necessarily the attribute which could be from a parent)
+//            stmt.setLong(i++, attribute.getId());
+//
+//            stmt.executeUpdate();
+//            if (stmt == insert)
+//                attribute.getValue().setId(getGeneratedKey(stmt));
+//        }
     }
 
 

@@ -57,17 +57,24 @@ CREATE TABLE concept_attribute (                -- Links attribute to concepts
   `order` INTEGER NOT NULL DEFAULT 0            COMMENT 'Display order',
   minimum INTEGER DEFAULT 0                     COMMENT 'Minimum value where type is an Integer',
   maximum INTEGER DEFAULT 1                     COMMENT 'Maximum value where type is an Integer',
-  status TINYINT NOT NULL DEFAULT 0             COMMENT 'Concept status - 0=Draft, 1=Active, 2=Deprecated, 3=Temporary',
+  is_constraint BOOLEAN DEFAULT FALSE           COMMENT 'If the attribute is an extension (false) or a constraint (true)',
+  value_concept BIGINT                          COMMENT 'The allowed values for the attribute (based on the expression)',
+  value_expression TINYINT                      COMMENT 'The expression for the attribute value (0=Of type, 1=Child)',
+  fixed_concept BIGINT                          COMMENT 'The fixed value concept (in the case of a constraint attribute)',
+  fixed_value TEXT                              COMMENT 'The fixed value when not a concept (in the case of a constraint attribute)',
+  -- status TINYINT NOT NULL DEFAULT 0             COMMENT 'Concept status - 0=Draft, 1=Active, 2=Deprecated, 3=Temporary',
 
   PRIMARY KEY concept_attribute_id_pk (id),
   KEY concept_attribute_concept_idx (concept),
 
   CONSTRAINT concept_attribute_concept_fk       FOREIGN KEY (concept) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT concept_attribute_attribute_fk     FOREIGN KEY (attribute) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT concept_attribute_attribute_fk     FOREIGN KEY (attribute) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT concept_attribute_value_concept_fk FOREIGN KEY (value_concept) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT concept_attribute_fixed_concept_fk FOREIGN KEY (fixed_concept) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS concept_attribute_value;
-CREATE TABLE concept_attribute_value (
+/*CREATE TABLE concept_attribute_value (
     id BIGINT NOT NULL AUTO_INCREMENT           COMMENT 'Concept attribute value ID',
     concept BIGINT NOT NULL                     COMMENT 'The concept this attribute value relates to',
     concept_attribute BIGINT NOT NULL           COMMENT 'The concept attribute ID.  NOTE: This may be an attribute belonging to an inherited concept!',
@@ -80,7 +87,7 @@ CREATE TABLE concept_attribute_value (
     CONSTRAINT concept_attribute_value_concept_fk           FOREIGN KEY (concept) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
     CONSTRAINT concept_attribute_value_concept_attribute_fk FOREIGN KEY (concept_attribute) REFERENCES concept_attribute(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
     CONSTRAINT concept_attribute_value_fixed_concept_fk     FOREIGN KEY (fixed_concept) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;*/
 
 DROP TABLE IF EXISTS concept_synonym;
 CREATE TABLE concept_synonym (
@@ -96,6 +103,73 @@ CREATE TABLE concept_synonym (
   CONSTRAINT concept_synonym_concept_fk         FOREIGN KEY (concept) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS concept_tct;
+CREATE TABLE concept_tct (
+    concept BIGINT NOT NULL                     COMMENT 'The base concept of interest',
+    ancestor BIGINT NOT NULL                    COMMENT 'The parent, grandparent, etc',
+    level INTEGER NOT NULL                      COMMENT 'The inheritance depth (Top down)',
+
+    KEY concept_tct_concept_idx (concept),
+    CONSTRAINT concept_tct_concept_fk           FOREIGN KEY (concept) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
+    CONSTRAINT concept_tct_ancestor_fk          FOREIGN KEY (ancestor) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DELIMITER //
+
+DROP PROCEDURE IF EXISTS proc_build_tct//
+
+CREATE PROCEDURE proc_build_tct()
+    BEGIN
+        DECLARE lvl INT;
+        DECLARE inserted INT;
+        SELECT @lvl := 0;
+
+        DELETE FROM concept_tct;
+
+        INSERT INTO concept_tct
+            (concept, ancestor, level)
+        SELECT id, superclass, 0
+        FROM concept
+        WHERE id > 1;
+
+        SELECT @inserted := ROW_COUNT();
+
+        WHILE @inserted > 0 DO
+            SELECT @lvl := @lvl + 1;
+            SELECT 'Processing level ' + @lvl;
+
+            INSERT INTO concept_tct
+                (concept, ancestor, level)
+            SELECT t.concept, a.superclass, @lvl
+            FROM concept_tct t
+                     JOIN concept a ON a.id = t.ancestor
+            WHERE t.ancestor > 1
+              AND t.level = @lvl - 1;
+
+            SELECT @inserted := ROW_COUNT();
+        END WHILE;
+    END; //
+
+DELIMITER ;
+
+-- ********** VIEW/CONTENT TABLES **********
+
+DROP TABLE IF EXISTS concept_view;
+CREATE TABLE concept_view (
+    id BIGINT AUTO_INCREMENT                    COMMENT 'Unique view id',
+    parent BIGINT                               COMMENT 'Parent view (nested/folder)',
+    name VARCHAR(50)                            COMMENT 'View name',
+    description VARCHAR(4096)                   COMMENT 'Textual description of the view, purpose, content',
+    last_update DATETIME NOT NULL DEFAULT now() COMMENT 'Date/time the view was last updated',
+
+    PRIMARY KEY concept_view_id_pk (id),
+    KEY concept_view_parent (parent),
+
+    CONSTRAINT concept_view_parent_fk FOREIGN KEY (parent) REFERENCES concept_view(id) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
 -- ********** TERM/MAPPING TABLES **********
 
 DROP TABLE IF EXISTS code_scheme;
@@ -110,7 +184,7 @@ DROP TABLE IF EXISTS mapping_code;
 CREATE TABLE mapping_code (
   id BIGINT AUTO_INCREMENT                      COMMENT 'Mapping code identifier',
   scheme INTEGER NOT NULL                       COMMENT 'Code scheme id',
-  code_id VARCHAR(20) NOT NULL                  COMMENT 'Code id',
+  code_id VARCHAR(20) COLLATE utf8_bin NOT NULL COMMENT 'Code id',
   concept BIGINT                                COMMENT 'Code concept identifier',
 
   PRIMARY KEY mapping_code_id_pk (id),
@@ -128,7 +202,7 @@ CREATE TABLE publisher_map (
   provider VARCHAR(50)                          COMMENT 'The body providing the data from the system',
   `table` VARCHAR(50)                           COMMENT 'The table the data is coming from',
   fields VARCHAR(250)                           COMMENT 'The list of fields the data is coming from',
-  `values` VARCHAR(250)                         COMMENT 'The list of data itself',
+  `values` VARCHAR(250) COLLATE utf8_bin        COMMENT 'The list of data itself',
   concept BIGINT NOT NULL                       COMMENT 'The concept it maps to',
 
   PRIMARY KEY publisher_map_id_pk (id),

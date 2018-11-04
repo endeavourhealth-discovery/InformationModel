@@ -19,6 +19,7 @@ import {SynonymEditorComponent} from '../synonym-editor/synonym-editor.component
 import {Synonym} from '../../models/Synonym';
 import {GraphNode} from 'eds-angular4/dist/node-graph/GraphNode';
 import {ConceptSelectorComponent} from 'im-common/dist/concept-selector/concept-selector/concept-selector.component';
+import {ValueExpressionHelper} from '../../models/ValueExpression';
 
 @Component({
   selector: 'app-concept-editor',
@@ -43,6 +44,8 @@ export class ConceptEditorComponent implements AfterViewInit {
   // Local enum instance
   ConceptStatus = ConceptStatus;
   getConceptStatusName = ConceptStatusHelper.getName;
+  getValueExpressionPrefix = ValueExpressionHelper.getPrefix;
+  getValueExpressionSuffix = ValueExpressionHelper.getSuffix;
 
   constructor(private router: Router,
               private route: ActivatedRoute,

@@ -96,7 +96,7 @@ WHERE v.vtmid IS NOT NULL;
 /*REPLACE INTO concept_relationship
     (source, relationship, target)
 SELECT
-    conceptId, 100, 5038
+    conceptId, 100, 5326
 FROM
      dmd_vmp_concept_map;*/
 
@@ -152,7 +152,7 @@ FROM dmd_vmpp a
 /*REPLACE INTO concept_relationship
     (source, relationship, target)
 SELECT
-       conceptId, 100, 5045
+       conceptId, 100, 5333
 FROM
      dmd_vmpp_concept_map;*/
 
@@ -210,7 +210,7 @@ FROM dmd_amp a
 /*REPLACE INTO concept_relationship
     (source, relationship, target)
 SELECT
-       conceptId, 100, 5038
+       conceptId, 100, 5330
 FROM
      dmd_vmp_concept_map;
 */
@@ -274,7 +274,7 @@ FROM dmd_ampp a
 /*REPLACE INTO concept_relationship
     (source, relationship, target)
 SELECT
-       conceptId, 100, 5045
+       conceptId, 100, 5339
 FROM
      dmd_vmpp_concept_map;
 */

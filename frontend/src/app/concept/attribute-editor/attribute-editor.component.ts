@@ -35,7 +35,7 @@ export class AttributeEditorComponent implements OnInit {
     const superclass = (this.result.type.id == 7) ? 2 : this.result.type.id;
     ConceptSelectorComponent.open(this.modal, false, superclass)
       .result.then(
-      (result: Concept) => this.result.value.fixedConcept = {id: result.id, name: result.fullName},
+      (result: Concept) => this.result.fixedConcept = {id: result.id, name: result.fullName},
       () => {}
     );
   }

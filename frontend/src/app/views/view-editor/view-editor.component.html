@@ -1,0 +1,62 @@
+<div class="module">
+  <div class="container-fluid">
+    <div class="module-heading">
+      View editor
+      <div class="pull-right">
+        <button class="btn btn-success" (click)="save(false)">Save</button>
+        <button class="btn btn-warning" (click)="save(true)">Save & close</button>
+        <button class="btn btn-danger" (click)="close(true)">Cancel</button>
+      </div>
+    </div>
+    <div class="module-body">
+      <form>
+        <div class="row" *ngIf="viewFolder?.view">
+          <div class="col-md-12">
+            <div class="card h-100" id="detailCard">
+              <div class="card-header"><h4>View details</h4></div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-3 form-group">
+                    <label class="control-label" for="viewName">Name</label>
+                    <input class="form-control" id="viewName" type="text" [(ngModel)]="viewFolder.view.name" name="viewName">
+                  </div>
+                  <div class="col-md-9 form-group">
+                    <label class="control-label" for="viewDescription">Description</label>
+                    <textarea rows="1" class="form-control" id="viewDescription" type="text" [(ngModel)]="viewFolder.view.description" name="viewDescription"></textarea>
+                  </div>
+                  <div class="col-md-3 form-group">
+                    <label class="control-label" for="viewFolders">Sub views</label>
+                    <textarea rows="5" class="form-control" id="viewFolders" type="text" [(ngModel)]="folders" name="viewFolders"></textarea>
+                  </div>
+                  <div class="col-md-9 form-group">
+                    <label class="control-label" for="viewContent">Concepts <button type="button" class="btn btn-xs btn-success" (click)="addConcept()">Add (Include?)</button></label>
+                    <div class="scroll-box-250" id="viewContent">
+                      <table class="table table-sm table-striped table-hover show-child-on-hover">
+                        <thead>
+                          <tr>
+                            <th>Context</th>
+                            <th>Name</th>
+                            <th>Status</th>
+                            <th></th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr *ngFor="let item of concepts">
+                            <td>{{item.context}}</td>
+                            <td>{{item.name}}</td>
+                            <td>{{item.status}}</td>
+                            <td><span class="child-to-show"><button type="button" class="btn btn-xs btn-danger"><i class="fa fa-fw fa-trash"></i></button> </span></td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

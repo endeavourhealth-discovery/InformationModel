@@ -5,7 +5,6 @@ import {ConceptService} from './concept.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {Concept} from '../models/Concept';
 import {ConceptStatusHelper} from '../models/ConceptStatus';
-import {ConceptSelectorComponent} from 'im-common/dist/concept-selector/concept-selector/concept-selector.component';
 import {SearchResult} from 'im-common/dist/models/SearchResult';
 
 @Component({

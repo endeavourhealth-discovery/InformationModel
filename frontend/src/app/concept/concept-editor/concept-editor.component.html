@@ -17,18 +17,18 @@
                   <div class="card-body">
                     <div class="row" *ngIf="concept">
                       <div class="col-md-6 col-lg-3 form-group">
-                        <label for="conceptShortName">Short name</label>
+                        <label class="control-label" for="conceptShortName">Short name</label>
                         <input class="form-control" id="conceptShortName" type="text" [(ngModel)]="concept.shortName" name="conceptShortName">
                       </div>
                       <div class="col-md-6 col-lg-3 form-group">
-                        <label for="conceptSuperclass"><a href="#/concept/{{concept.superclass.id}}">Superclass</a></label>
+                        <label class="control-label" for="conceptSuperclass"><a href="#/concept/{{concept.superclass.id}}">Superclass</a></label>
                         <div class="input-group">
                           <input class="form-control" id="conceptSuperclass" type="text" value="{{concept.superclass.name}}" name="conceptSuperclass">
                           <div class="input-group-append" (click)="promptSuperclass()"><span class="input-group-text"><i class="fa fa-fw fa-search"></i></span></div>
                         </div>
                       </div>
                       <div class="col-md-6 col-lg-2 form-group">
-                        <label for="conceptStatus">Status</label>
+                        <label class="control-label" for="conceptStatus">Status</label>
                         <div class="dropdown" id="conceptStatus">
                           <button class="dropdown-toggle btn-block text-left form-control" id="statusDropdown" type="button" data-toggle="dropdown">{{getConceptStatusName(concept.status)}}<i class="fa fa-caret-down pull-right"></i> </button>
                           <div class="dropdown-menu"  aria-labelledby="statusDropdown">
@@ -40,27 +40,27 @@
                         </div>
                       </div>
                       <div class="col-md-3 col-lg-2 form-group">
-                        <label for="conceptVersion">Version</label>
+                        <label class="control-label" for="conceptVersion">Version</label>
                         <input class="form-control" id="conceptVersion" type="text" value="{{concept.version}}" name="conceptVersion" readonly>
                       </div>
                       <div class="col-md-3 col-lg-2 form-group">
-                        <label for="conceptUses">Use count</label>
+                        <label class="control-label" for="conceptUses">Use count</label>
                         <input class="form-control" id="conceptUses" type="text" value="{{concept.useCount}}" name="conceptUses" readonly>
                       </div>
                       <div class="col-md-12 col-lg-10 form-group">
-                        <label for="conceptName">Full name</label>
+                        <label class="control-label" for="conceptName">Full name</label>
                         <input class="form-control" id="conceptName" type="text" [(ngModel)]="concept.fullName" name="conceptName">
                       </div>
                       <div class="col-md-3 col-lg-2 form-group">
-                        <label for="conceptSynonyms">{{synonyms?.length}} Synonyms</label>
+                        <label class="control-label" for="conceptSynonyms">{{synonyms?.length}} Synonyms</label>
                         <span class="form-control btn-success" id="conceptSynonyms" name="conceptSynonyms" (click)="editSynonyms()">View / Edit...</span>
                       </div>
                       <div class="col-md-12 col-lg-12 form-group">
-                        <label for="conceptUrl">URL</label>
+                        <label class="control-label" for="conceptUrl">URL</label>
                         <input class="form-control" id="conceptUrl" type="text" [(ngModel)]="concept.url" name="conceptUrl" >
                       </div>
                       <div class="col-md-12 col-lg-12 form-group">
-                        <label for="conceptDescription">Description</label>
+                        <label class="control-label" for="conceptDescription">Description</label>
                         <textarea rows="1" class="form-control" id="conceptDescription" type="text" [(ngModel)]="concept.description" name="conceptDescription"></textarea>
                       </div>
                     </div>
@@ -79,27 +79,34 @@
                           <tr class="d-flex">
                             <th class="col-4">Attribute</th>
                             <th class="col-3">Type</th>
-                            <th class="col-3">Fixed value</th>
-                            <th class="col-1"></th>
+                            <th class="col-4">Value</th>
                             <th class="col-1"></th>
                           </tr>
                         </thead>
                         <tbody class="d-block scroll-box-250">
                           <tr class="d-flex show-child-on-hover" *ngFor="let item of attributes" [ngClass]="{'selection': selectedNode == item}" (click)="selectedNode = item">
-                            <td class="col-4"><a href="#/concept/{{item.attribute.id}}">{{item.attribute.name}}</a> <span *ngIf="item.concept.id != concept.id" class="info-icon" ngbTooltip="Inherited from: {{item.concept.name}}"></span></td>
-                            <td class="col-3">{{item.type.name}}</td>
+                            <td class="col-4">
+                              ({{item.minimum === 1 ? 1 : 0}} : {{item.maximum === 0 ? '*' : item.maximum}})
+                              <a href="#/concept/{{item.attribute.id}}">{{item.attribute.name}}</a> <span *ngIf="item.concept.id != concept.id" class="info-icon" ngbTooltip="Inherited from: {{item.concept.name}}"></span>
+                            </td>
                             <td class="col-3">
-                              <span *ngIf="item.value.fixedConcept">{{item.value.fixedConcept.name}}</span>
-                              <span *ngIf="!item.value.fixedConcept">{{item.value.fixedValue}}</span>
+                              <a href="#/concept/{{item.type.id}}">{{item.type.name}}</a>
+                            </td>
+                            <td class="col-4">
+                              <span *ngIf="item.fixedConcept">{{item.fixedConcept.name}}</span>
+                              <span *ngIf="!item.fixedConcept">{{item.fixedValue}}</span>
+                              <div *ngIf="!item.fixedConcept && !item.fixedValue">
+                                <span *ngIf="item.valueExpression != null">{{getValueExpressionPrefix(item.valueExpression)}}</span>
+                                <a href="#/concept/{{item.valueConcept.id}}" *ngIf="item.valueConcept">{{item.valueConcept.name}}</a>
+                                <span *ngIf="item.valueExpression != null">{{getValueExpressionSuffix(item.valueExpression)}}</span>
+                              </div>
                             </td>
                             <td class="col-1">
-                              {{item.minimum === 1 ? 1 : 0}} : {{item.maximum === 0 ? '*' : item.maximum}}
-                            </td>                          <td class="col-1">
-                            <div class="pull-right child-to-show">
-                              <button class="btn btn-xs btn-success" (click)="editAttribute(item)"><i class="fa fa-fw fa-pencil"></i></button>
-                              <button class="btn btn-xs btn-danger" (click)="deleteAttribute(item)" [disabled]="item.concept.id != concept.id"><i class="fa fa-fw fa-trash"></i></button>
-                            </div>
-                          </td>
+                              <div class="pull-right child-to-show">
+                                <button class="btn btn-xs btn-success" (click)="editAttribute(item)"><i class="fa fa-fw fa-pencil"></i></button>
+                                <button class="btn btn-xs btn-danger" (click)="deleteAttribute(item)" [disabled]="item.concept.id != concept.id"><i class="fa fa-fw fa-trash"></i></button>
+                              </div>
+                            </td>
                           </tr>
                         </tbody>
                       </table>

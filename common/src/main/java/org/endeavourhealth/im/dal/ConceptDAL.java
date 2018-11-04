@@ -10,7 +10,7 @@ public interface ConceptDAL {
     SearchResult getMRU(Boolean includeDeprecated) throws Exception;
     SearchResult search(String term, Integer page, Boolean includeDeprecated, Long superclass) throws Exception;
     List<RelatedConcept> getRelated(Long id, Boolean includeDeprecated) throws Exception;
-    List<Attribute> getAttributes(Long id, Long attributeConceptId, Boolean includeDeprecated) throws Exception;
+    List<Attribute> getAttributes(Long id, Boolean includeDeprecated) throws Exception;
 
     Long saveConcept(Concept concept) throws Exception;
     void saveConceptBundle(Bundle bundle) throws Exception;
