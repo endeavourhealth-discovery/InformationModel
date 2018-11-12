@@ -3,15 +3,15 @@ package org.endeavourhealth.im.models;
 public class Attribute extends DbEntity<Attribute> {
     private Reference concept;
     private Reference attribute;
-    private Reference type;
-//    private AttributeValue value;
-    private Integer minimum;
-    private Integer maximum;
-    private Boolean isConstraint;
+    private Integer order;
+    private Boolean mandatory;
+    private Integer limit;
+    private Byte inheritance;
     private Reference valueConcept;
     private ValueExpression valueExpression;
     private Reference fixedConcept;
     private String fixedValue;
+    private ConceptStatus status;
 
     public Reference getConcept() {
         return concept;
@@ -31,48 +31,39 @@ public class Attribute extends DbEntity<Attribute> {
         return this;
     }
 
-    public Reference getType() {
-        return type;
+    public Integer getOrder() {
+        return order;
     }
 
-    public Attribute setType(Reference type) {
-        this.type = type;
+    public Attribute setOrder(Integer order) {
+        this.order = order;
         return this;
     }
 
-//    public AttributeValue getValue() {
-//        return value;
-//    }
-//
-//    public Attribute setValue(AttributeValue value) {
-//        this.value = value;
-//        return this;
-//    }
-
-    public Integer getMinimum() {
-        return minimum;
+    public Boolean getMandatory() {
+        return mandatory;
     }
 
-    public Attribute setMinimum(Integer minimum) {
-        this.minimum = minimum;
+    public Attribute setMandatory(Boolean mandatory) {
+        this.mandatory = mandatory;
         return this;
     }
 
-    public Integer getMaximum() {
-        return maximum;
+    public Integer getLimit() {
+        return limit;
     }
 
-    public Attribute setMaximum(Integer maximum) {
-        this.maximum = maximum;
+    public Attribute setLimit(Integer limit) {
+        this.limit = limit;
         return this;
     }
 
-    public Boolean getConstraint() {
-        return isConstraint;
+    public Byte getInheritance() {
+        return inheritance;
     }
 
-    public Attribute setConstraint(Boolean constraint) {
-        isConstraint = constraint;
+    public Attribute setInheritance(Byte inheritance) {
+        this.inheritance = inheritance;
         return this;
     }
 
@@ -109,6 +100,15 @@ public class Attribute extends DbEntity<Attribute> {
 
     public Attribute setFixedValue(String fixedValue) {
         this.fixedValue = fixedValue;
+        return this;
+    }
+
+    public ConceptStatus getStatus() {
+        return status;
+    }
+
+    public Attribute setStatus(ConceptStatus status) {
+        this.status = status;
         return this;
     }
 }

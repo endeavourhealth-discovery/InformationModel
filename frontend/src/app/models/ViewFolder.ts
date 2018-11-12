@@ -1,6 +1,9 @@
-import {View} from './View';
-
 export class ViewFolder {
-  view: View;
+  id: number;
+  name: string;
+  description: string;
+  loading: boolean;
+  hasChildren: boolean;
+  isExpanded: boolean;
   children: ViewFolder[];
 }

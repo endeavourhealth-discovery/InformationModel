@@ -107,10 +107,11 @@ public class ConceptEndpoint {
                            @ApiParam(value = "Term", required = true) @QueryParam("searchTerm") String term,
                            @ApiParam(value = "Page") @QueryParam("page") Integer page,
                            @ApiParam(value = "Include deprecated") @QueryParam("includeDeprecated") Boolean includeDeprecated,
-                           @ApiParam(value = "Optional superclass restriction") @QueryParam("superclass") Long superclass) throws Exception {
+                           @ApiParam(value = "Optional concept restriction") @QueryParam("relatedConcept") Long relatedConcept,
+                           @ApiParam(value = "Optional relationship expression ID") @QueryParam("expression") Byte expression) throws Exception {
         LOG.debug("Search by term");
 
-        SearchResult result = new ConceptLogic().search(term, page, includeDeprecated, superclass);
+        SearchResult result = new ConceptLogic().search(term, page, includeDeprecated, relatedConcept, ValueExpression.byValue(expression));
 
         return Response
             .ok()

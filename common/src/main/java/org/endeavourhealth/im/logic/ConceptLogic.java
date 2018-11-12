@@ -3,10 +3,13 @@ package org.endeavourhealth.im.logic;
 import org.endeavourhealth.im.dal.ConceptDAL;
 import org.endeavourhealth.im.dal.ConceptJDBCDAL;
 import org.endeavourhealth.im.models.*;
+import org.w3c.dom.Attr;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ConceptLogic {
     private ConceptDAL dal;
@@ -48,8 +51,8 @@ public class ConceptLogic {
         return this.dal.getMRU(includeDeprecated);
     }
 
-    public SearchResult search(String term, Integer page, Boolean includeDeprecated, Long superclass) throws Exception {
-        return this.dal.search(term, page, includeDeprecated, superclass);
+    public SearchResult search(String term, Integer page, Boolean includeDeprecated, Long relatedConcept, ValueExpression expression) throws Exception {
+        return this.dal.search(term, page, includeDeprecated, relatedConcept, expression);
     }
 
     public List<RelatedConcept> getRelated(Long id, Boolean includeDeprecated) throws Exception {
@@ -57,12 +60,30 @@ public class ConceptLogic {
     }
 
     public List<Attribute> getAttributes(Long id, Boolean includeDeprecated) throws Exception {
-        List<Long> ids = new ArrayList<>();
         List<Attribute> result = new ArrayList<>();
+        List<Long> attIds = new ArrayList<>();
+        List<Long> ancestors = new ArrayList<>();
         Long attConcept = id;
 
         while (attConcept != null) {
-            result.addAll(this.dal.getAttributes(attConcept, includeDeprecated));
+            List<Attribute> atts = this.dal.getAttributes(attConcept, includeDeprecated);
+
+            for (Attribute att : atts) {
+                int idx = attIds.indexOf(att.getAttribute().getId());
+                if (idx < 0) {
+                    att.setInheritance(att.getConcept().getId().equals(id) ? (byte)1 : (byte)0);
+                } else {
+                    // It's been overridden (constrained)
+                    Attribute existing = result.get(idx);
+                    existing.setInheritance(existing.getConcept().getId().equals(id) ? (byte)2 : (byte)0);
+                    existing.setConcept(att.getConcept());
+                    attIds.remove(idx);
+                    result.remove(existing);
+                    att = existing;
+                }
+                result.add(att);
+                attIds.add(att.getAttribute().getId());
+            }
 
             // Get superclass attributes
             Concept concept = this.dal.get(attConcept);
@@ -72,10 +93,10 @@ public class ConceptLogic {
             attConcept = concept.getSuperclass().getId();
 
             // Cyclic protection
-            if (attConcept == 1 || ids.contains(attConcept))
+            if (attConcept == 1 || ancestors.contains(attConcept))
                 attConcept = null;
             else
-                ids.add(attConcept);
+                ancestors.add(attConcept);
 
         }
 

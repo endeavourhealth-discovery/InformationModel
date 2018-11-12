@@ -5,26 +5,43 @@
 <div class="modal-body">
   <div class="container-fluid">
     <div class="row">
-      <div class="form-group col-md-4">
-        <label class="control-label">Type</label>
-        <input type="text" class="form-control" value="{{result.type.name}}" readonly>
+      <div class="form-group col-md-2">
+        <label class="control-label">Mandatory</label>
+        <div class="custom-control custom-checkbox form-control-plaintext">
+          <input type="checkbox" class="custom-control-input" [checked]="result.mandatory" (change)="result.mandatory = !result.mandatory" id="chkMandatory" name="min">
+          <label class="custom-control-label" for="chkMandatory">Mandatory</label>
+        </div>
+      </div>
+      <div class="form-group col-md-2">
+        <label class="control-label">Limit</label>
+        <input type="number" class="form-control" [(ngModel)]="result.limit" [readonly]="result.concept.id != conceptId">
       </div>
       <div class="form-group col-md-4">
-        <label class="control-label">Minimum</label>
-        <input type="text" class="form-control" [(ngModel)]="result.minimum" [readonly]="result.concept.id != conceptId">
+        <label class="control-label">Value expression</label>
+        <div class="dropdown" id="conceptStatus">
+          <button class="dropdown-toggle dropdown-toggle-custom btn-block text-left form-control" id="statusDropdown" type="button" data-toggle="dropdown">{{getValueExpressionPrefix(result.valueExpression)}}<i class="fa fa-caret-down pull-right"></i> </button>
+          <div class="dropdown-menu"  aria-labelledby="statusDropdown">
+            <button *ngFor="let option of expressionOptions" class="dropdown-item" (click)="result.valueExpression = option">{{getValueExpressionPrefix(option)}}</button>
+          </div>
+        </div>
       </div>
       <div class="form-group col-md-4">
-        <label class="control-label">Maximum</label>
-        <input type="text" class="form-control" [(ngModel)]="result.maximum" [readonly]="result.concept.id != conceptId">
+        <label class="control-label">Value type</label>
+        <div class="input-group">
+          <input type="text" class="form-control" value="{{result.valueConcept.name}}" readonly>
+          <div class="input-group-append">
+            <span class="input-group-text" (click)="selectValueConcept()"><i class="fa fa-search"></i></span>
+          </div>
+        </div>
       </div>
       <div class="form-group col-md-12" *ngIf="isLiteral()">
         <label class="control-label">Fixed Value</label>
-        <input type="text" class="form-control" [(ngModel)]="result.value.fixedValue" name="fixedValue">
+        <input type="text" class="form-control" [(ngModel)]="result.fixedValue" name="fixedValue">
       </div>
       <div class="form-group col-md-12" *ngIf="!isLiteral()">
         <label class="control-label">Fixed Concept</label>
         <div class="input-group">
-          <input type="text" class="form-control" value="{{result.value.fixedConcept?.name}}" readonly (keyup.enter)="search()">
+          <input type="text" class="form-control" value="{{result.fixedConcept?.name}}" readonly (keyup.enter)="search()">
           <div class="input-group-append">
             <span class="input-group-text" (click)="search()"><i class="fa fa-search"></i></span>
           </div>

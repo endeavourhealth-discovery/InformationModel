@@ -10,7 +10,7 @@
     </div>
     <div class="module-body">
       <form>
-        <div class="row" *ngIf="viewFolder?.view">
+        <div class="row">
           <div class="col-md-12">
             <div class="card h-100" id="detailCard">
               <div class="card-header"><h4>View details</h4></div>
@@ -18,15 +18,21 @@
                 <div class="row">
                   <div class="col-md-3 form-group">
                     <label class="control-label" for="viewName">Name</label>
-                    <input class="form-control" id="viewName" type="text" [(ngModel)]="viewFolder.view.name" name="viewName">
+                    <input class="form-control" id="viewName" type="text" [(ngModel)]="view.name" name="viewName">
                   </div>
                   <div class="col-md-9 form-group">
                     <label class="control-label" for="viewDescription">Description</label>
-                    <textarea rows="1" class="form-control" id="viewDescription" type="text" [(ngModel)]="viewFolder.view.description" name="viewDescription"></textarea>
+                    <textarea rows="1" class="form-control" id="viewDescription" type="text" [(ngModel)]="view.description" name="viewDescription"></textarea>
                   </div>
                   <div class="col-md-3 form-group">
-                    <label class="control-label" for="viewFolders">Sub views</label>
-                    <textarea rows="5" class="form-control" id="viewFolders" type="text" [(ngModel)]="folders" name="viewFolders"></textarea>
+                    <label class="control-label">Sub views</label>
+                    <tree-root #tree [nodes]="folders" [options]="options">
+                      <ng-template #treeNodeTemplate let-node>
+                        <div class="folder-item">
+                          {{ node.data.name }}<i ngbTooltip="{{node.data.description}}" class="info-icon"></i>
+                        </div>
+                      </ng-template>
+                    </tree-root>
                   </div>
                   <div class="col-md-9 form-group">
                     <label class="control-label" for="viewContent">Concepts <button type="button" class="btn btn-xs btn-success" (click)="addConcept()">Add (Include?)</button></label>

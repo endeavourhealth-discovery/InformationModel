@@ -7,6 +7,7 @@ public class RelatedConcept extends DbEntity<RelatedConcept> {
     private Integer order;
     private Boolean mandatory;
     private Integer limit;
+    private ConceptStatus status;
 
     public Reference getSource() {
         return source;
@@ -59,6 +60,15 @@ public class RelatedConcept extends DbEntity<RelatedConcept> {
 
     public RelatedConcept setLimit(Integer limit) {
         this.limit = limit;
+        return this;
+    }
+
+    public ConceptStatus getStatus() {
+        return status;
+    }
+
+    public RelatedConcept setStatus(ConceptStatus status) {
+        this.status = status;
         return this;
     }
 }

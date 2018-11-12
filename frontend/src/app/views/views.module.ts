@@ -6,6 +6,7 @@ import {FormsModule} from '@angular/forms';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {ViewService} from './view.service';
 import { ViewEditorComponent } from './view-editor/view-editor.component';
+import {TreeModule} from 'angular-tree-component';
 
 @NgModule({
   imports: [
@@ -13,6 +14,7 @@ import { ViewEditorComponent } from './view-editor/view-editor.component';
     FormsModule,
     ControlsModule,
     NgbModule,
+    TreeModule
   ],
   declarations: [ViewLibraryComponent, ViewEditorComponent],
   providers: [ViewService]

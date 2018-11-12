@@ -1,4 +1,4 @@
-import {AfterViewInit, Component} from '@angular/core';
+import {AfterViewInit, Component, ViewChild} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {LoggerService, MessageBoxDialog} from 'eds-angular4';
 import {View} from '../../models/View';
@@ -9,6 +9,7 @@ import {ViewFolder} from '../../models/ViewFolder';
 import {ConceptSummary} from '../../models/ConceptSummary';
 import {ConceptSelectorComponent} from 'im-common/dist/concept-selector/concept-selector/concept-selector.component';
 import {Concept} from '../../models/Concept';
+import {ITreeOptions, TreeComponent} from 'angular-tree-component';
 
 @Component({
   selector: 'app-view-editor',
@@ -16,14 +17,26 @@ import {Concept} from '../../models/Concept';
   styleUrls: ['./view-editor.component.css']
 })
 export class ViewEditorComponent implements AfterViewInit {
-  viewFolder: ViewFolder = {} as ViewFolder;
+  view: View = {} as View;
+  folders: ViewFolder[];
   concepts: ConceptSummary[];
+  options : ITreeOptions;
+  @ViewChild('tree') tree: TreeComponent;
 
   constructor(private route: ActivatedRoute,
               private location: Location,
               private modal: NgbModal,
               private log: LoggerService,
-              private viewService: ViewService) { }
+              private viewService: ViewService) {
+    this.options = {
+      displayField : 'name',
+      childrenField: 'children',
+      hasChildrenField : 'hasChildren',
+      idField : 'id',
+      isExpandedField : 'isExpanded',
+      getChildren : (node) => { this.loadChildViews(node.data)}
+    }
+  }
 
   ngAfterViewInit() {
     this.route.params.subscribe(
@@ -42,28 +55,55 @@ export class ViewEditorComponent implements AfterViewInit {
     this.viewService.get(id)
       .subscribe(
         (result) => {
-          this.viewFolder.view = result;
-          this.loadChildViews(this.viewFolder);
-          this.loadChildConcepts(this.viewFolder);
+          this.view = result;
+          this.folders = [
+            {
+              id: result.id,
+              name: result.name,
+              description: result.description,
+              hasChildren: true,
+              children: null,
+              isExpanded: false,
+              loading: false
+            }
+          ];
+          this.tree.treeModel.update();
+          // this.loadChildViews(this.viewFolder[0]);
+          this.loadViewConcepts(this.view);
         },
         (error) => this.log.error(error)
       );
   }
 
   newView(name: string) {
-    this.viewFolder.view = {name: name} as View;
+    this.view = {name: name} as View;
   }
 
   loadChildViews(folder: ViewFolder) {
-    this.viewService.getViews(folder.view.id)
+    this.viewService.getViews(folder.id)
       .subscribe(
-        (result) => folder.children = result.map((v) => ({view: v} as ViewFolder)),
+        (result) => this.addChildViews(folder, result.map((v) => ({
+          id: v.id,
+          name: v.name,
+          description: v.description,
+          hasChildren: true,
+          children: null,
+          isExpanded: false,
+          loading: false
+        } as ViewFolder))),
         (error) => this.log.error(error)
       );
   }
 
-  loadChildConcepts(folder: ViewFolder) {
-    this.viewService.getConcepts(folder.view.id)
+  addChildViews(folder: ViewFolder, children: ViewFolder[]) {
+    folder.children = children;
+    if (children == null || children.length == 0)
+      folder.hasChildren = false;
+    this.tree.treeModel.update();
+  }
+
+  loadViewConcepts(view: View) {
+    this.viewService.getConcepts(view.id)
       .subscribe(
         (result) => this.concepts = result,
         (error) => this.log.error(error)
@@ -93,11 +133,11 @@ export class ViewEditorComponent implements AfterViewInit {
   }
 
   save(close: boolean) {
-    this.viewService.save(this.viewFolder.view)
+    this.viewService.save(this.view)
       .subscribe(
         (result) => {
-          this.viewFolder.view = result
-          this.log.success('View saved', this.viewFolder.view, 'Saved');
+          this.view = result
+          this.log.success('View saved', this.view, 'Saved');
           if (close)
             this.close(false)
         },

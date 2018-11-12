@@ -19,7 +19,9 @@ import {SynonymEditorComponent} from '../synonym-editor/synonym-editor.component
 import {Synonym} from '../../models/Synonym';
 import {GraphNode} from 'eds-angular4/dist/node-graph/GraphNode';
 import {ConceptSelectorComponent} from 'im-common/dist/concept-selector/concept-selector/concept-selector.component';
-import {ValueExpressionHelper} from '../../models/ValueExpression';
+import {ValueExpression, ValueExpressionHelper} from '../../models/ValueExpression';
+import {InheritanceHelper} from '../../models/Inheritance';
+import {CardinalityHelper} from '../../models/CardinalityHelper';
 
 @Component({
   selector: 'app-concept-editor',
@@ -45,7 +47,8 @@ export class ConceptEditorComponent implements AfterViewInit {
   ConceptStatus = ConceptStatus;
   getConceptStatusName = ConceptStatusHelper.getName;
   getValueExpressionPrefix = ValueExpressionHelper.getPrefix;
-  getValueExpressionSuffix = ValueExpressionHelper.getSuffix;
+  getInheritanceIcon = InheritanceHelper.getIcon;
+  getCardinality = CardinalityHelper.asNumeric;
 
   constructor(private router: Router,
               private route: ActivatedRoute,
@@ -169,15 +172,8 @@ export class ConceptEditorComponent implements AfterViewInit {
   }
 
   getRelationshipLabel(related: RelatedConcept) : string {
-    var result = related.relationship.name + ' (';
-    result += this.getCardinality(related) + ')';
-    return result;
-  }
-
-  getCardinality(related: RelatedConcept) : string {
-    var result = related.mandatory ? '1..' : '0..';
-    result += related.limit === 0 ? '*' : related.limit.toString();
-
+    var result = related.relationship.name;
+    result += this.getCardinality(related.mandatory, related.limit);
     return result;
   }
 
@@ -194,15 +190,14 @@ export class ConceptEditorComponent implements AfterViewInit {
   }
 
   addAttribute() {
-    ConceptSelectorComponent.open(this.modal, true)
+    ConceptSelectorComponent.open(this.modal, true, 6, ValueExpression.OF_CLASS)
       .result.then(
       (result) => {
         const att: Attribute = {
           concept: {id: this.concept.id, name: this.concept.fullName},
           attribute: {id: result.id, name: result.fullName},
-          type: result.superclass,
-          minimum: 0,
-          maximum: 1,
+          mandatory: false,
+          limit: 1,
         } as Attribute;
 
         this.editAttribute(att);
@@ -217,7 +212,9 @@ export class ConceptEditorComponent implements AfterViewInit {
         if (result) {
           if (!this.attributes.includes(att)) {
             this.attributes.push(att);
-            this.updateDiagram(this.concept.id, [], [att]);
+            // this.updateDiagram(this.concept.id, [], [att]);
+          } else {
+            Object.assign(att, result);
           }
           if (!this.edits.editedAttributes.includes(result)) {
             this.edits.editedAttributes.push(result);

@@ -6,6 +6,7 @@ import {ConceptStatusHelper} from '../../models/ConceptStatus';
 import {Attribute} from '../../models/Attribute';
 import {Concept} from '../../models/Concept';
 import {ConceptSelectorComponent} from 'im-common/dist/concept-selector/concept-selector/concept-selector.component';
+import {ValueExpressionHelper} from '../../models/ValueExpression';
 
 @Component({
   selector: 'app-attribute-editor',
@@ -16,24 +17,33 @@ export class AttributeEditorComponent implements OnInit {
   conceptId: number;
   result: Attribute;
 
-  getConceptStatusName = ConceptStatusHelper.getName;
+  getValueExpressionPrefix = ValueExpressionHelper.getPrefix;
+  expressionOptions = ValueExpressionHelper.getOptions();
 
   public static open(modalService: NgbModal, conceptId: number, attribute: Attribute) {
     const modalRef = modalService.open(AttributeEditorComponent, { backdrop: 'static'});
     modalRef.componentInstance.conceptId = conceptId;
-    modalRef.componentInstance.result = attribute;
+    modalRef.componentInstance.result = Object.assign({}, attribute);
     return modalRef;
   }
 
   constructor(private modal: NgbModal, public activeModal: NgbActiveModal, private logger: LoggerService, private conceptService: ConceptService) { }
 
   isLiteral() {
-    return this.result.type.id >= 8 && this.result.type.id <= 13;
+    return this.result.valueConcept.id >= 8 && this.result.valueConcept.id <= 13;
   }
 
   search() {
-    const superclass = (this.result.type.id == 7) ? 2 : this.result.type.id;
-    ConceptSelectorComponent.open(this.modal, false, superclass)
+    const concept = (this.result.valueConcept.id == 7) ? 2 : this.result.valueConcept.id;
+    ConceptSelectorComponent.open(this.modal, false, concept, this.result.valueExpression)
+      .result.then(
+      (result: Concept) => this.result.fixedConcept = {id: result.id, name: result.fullName},
+      () => {}
+    );
+  }
+
+  selectValueConcept() {
+    ConceptSelectorComponent.open(this.modal, false)
       .result.then(
       (result: Concept) => this.result.fixedConcept = {id: result.id, name: result.fullName},
       () => {}

@@ -75,46 +75,45 @@ public class ConceptJDBCDAL implements ConceptDAL {
     }
 
     @Override
-    public SearchResult search(String term, Integer page, Boolean includeDeprecated, Long superclass) throws SQLException {
+    public SearchResult search(String term, Integer page, Boolean includeDeprecated, Long relatedConcept, ValueExpression expression) throws SQLException {
         Connection conn = ConnectionPool.InformationModel.pop();
         if (page == null)
             page = 1;
         SearchResult result = new SearchResult().setPage(page);
 
-        // Select the SYNONYM as the full name and the PREFERRED as description
-        String sql = "SELECT SQL_CALC_FOUND_ROWS * FROM (\n" +
-            "SELECT id, full_name, context, status, version, false as synonym\n" +
-            "FROM concept\n" +
-            "WHERE full_name LIKE ?\n";
+        String sql = "SELECT SQL_CALC_FOUND_ROWS * FROM (\n";
+        sql += "SELECT c.id, c.full_name, c.context, c.status, c.version, false as synonym\n" ;
+        sql += "FROM concept c\n";
+        if (expression == ValueExpression.CHILD_OF) sql += "JOIN concept_relationship r ON c.id = r.source AND r.relationship = 100 AND r.target = ?\n";
+        sql += "WHERE c.full_name LIKE ?\n";
+        if (expression == ValueExpression.OF_TYPE) sql += "AND c.superclass = ?\n";
+        if (!includeDeprecated) sql += "AND c.status <> 2\n";
 
-        if (!includeDeprecated)
-            sql += "AND status <> 2 ";
-        if (superclass != null)
-            sql += "AND superclass = ? ";
+        sql += "UNION\n";
 
-        sql += "UNION\n" +
-            "SELECT s.concept as id, s.term as full_name, c.context, s.status, c.version, true as synonym \n" +
-            "FROM concept_synonym s\n" +
-            "JOIN concept c on c.id = s.concept\n" +
-            "WHERE s.term LIKE ?\n";
-
-        if (!includeDeprecated)
-            sql += "AND s.status <> 2 ";
-        if (superclass != null)
-            sql += "AND c.superclass = ? ";
+        sql += "SELECT s.concept as id, s.term as full_name, c.context, s.status, c.version, true as synonym \n";
+        sql += "FROM concept_synonym s\n";
+        sql += "JOIN concept c on c.id = s.concept\n";
+        if (expression == ValueExpression.CHILD_OF) sql += "JOIN concept_relationship r ON c.id = r.source AND r.relationship = 100 AND r.target = ?\n";
+        sql += "WHERE s.term LIKE ?\n";
+        if (expression == ValueExpression.OF_TYPE) sql += "AND c.superclass = ?\n";
+        if (!includeDeprecated) sql += "AND s.status <> 2 ";
 
         sql += ") x\n" +
-            "ORDER BY (x.status=2), LENGTH(full_name), full_name " +
-            "LIMIT ?,? ";
+            "ORDER BY (x.status=2), LENGTH(full_name), full_name\n" +
+            "LIMIT ?,?\n";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             int i = 1;
+
+            if (expression == ValueExpression.CHILD_OF) stmt.setLong(i++, relatedConcept);
             stmt.setString(i++, "%" + term + "%");
-            if (superclass != null)
-                stmt.setLong(i++, superclass);
+            if (expression == ValueExpression.OF_TYPE) stmt.setLong(i++, relatedConcept);
+
+            if (expression == ValueExpression.CHILD_OF) stmt.setLong(i++, relatedConcept);
             stmt.setString(i++, "%" + term + "%");
-            if (superclass != null)
-                stmt.setLong(i++, superclass);
+            if (expression == ValueExpression.OF_TYPE) stmt.setLong(i++, relatedConcept);
+
             stmt.setInt(i++, (page-1) * PAGE_SIZE);
             stmt.setInt(i++, PAGE_SIZE);
 
@@ -169,17 +168,14 @@ public class ConceptJDBCDAL implements ConceptDAL {
     public List<Attribute> getAttributes(Long id, Boolean includeDeprecated) throws Exception {
         Connection conn = ConnectionPool.InformationModel.pop();
 
-        String sql = "SELECT ca.*, " + // cav.id as avid, cav.fixed_value, cav.fixed_concept, " +
+        String sql = "SELECT ca.*, " +
             "c.full_name as concept_name, " +
             "a.full_name as attribute_name, " +
-            "t.id as type, " +
-            "t.full_name as type_name, " +
             "vc.full_name as value_type_name, " +
             "fc.full_name as fixed_value_name " +
             "FROM concept_attribute ca " +
             "JOIN concept c ON c.id = ca.concept " +
             "JOIN concept a ON a.id = ca.attribute " +
-            "JOIN concept t ON t.id = a.superclass " +
             "LEFT OUTER JOIN concept vc ON vc.id = ca.value_concept " +
             "LEFT OUTER JOIN concept fc ON fc.id = ca.fixed_concept " +
             "WHERE ca.concept = ? ";
@@ -291,8 +287,8 @@ public class ConceptJDBCDAL implements ConceptDAL {
     }
 
     private void editAttributes(Connection conn, Long conceptId, List<Attribute> attributes) throws SQLException {
-        try (PreparedStatement insert = conn.prepareStatement("INSERT INTO concept_attribute (minimum, maximum, concept, attribute) VALUES (?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
-             PreparedStatement update = conn.prepareStatement("UPDATE concept_attribute SET minimum = ?, maximum = ? WHERE concept = ? AND attribute = ?")) {
+        try (PreparedStatement insert = conn.prepareStatement("INSERT INTO concept_attribute (mandatory, `limit`, concept, attribute) VALUES (?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+             PreparedStatement update = conn.prepareStatement("UPDATE concept_attribute SET mandatory = ?, `limit` = ? WHERE concept = ? AND attribute = ?")) {
 
             for (Attribute attribute : attributes) {
                 if (attribute.getConcept().getId() == null) // Its a new attribute added to this concept
@@ -303,10 +299,13 @@ public class ConceptJDBCDAL implements ConceptDAL {
 
                 PreparedStatement stmt = (attribute.getId() == null) ? insert : update;
                 int i = 1;
-                stmt.setInt(i++, attribute.getMinimum());
-                stmt.setInt(i++, attribute.getMaximum());
+                stmt.setBoolean(i++, attribute.getMandatory());
+                stmt.setInt(i++, attribute.getLimit());
                 stmt.setLong(i++, attribute.getConcept().getId());
                 stmt.setLong(i++, attribute.getAttribute().getId());
+
+                // TODO: Order, inheritance, status, etc
+
                 stmt.executeUpdate();
                 if (stmt == insert)
                     attribute.setId(getGeneratedKey(stmt));

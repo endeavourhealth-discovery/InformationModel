@@ -79,14 +79,16 @@ export class ConceptSelectorComponent implements OnInit {
     selection: Concept;
     result: SearchResult = {count: 0, page: 1, results: []};
     showAdd: boolean = false;
-    superclass: number;
+    relatedConcept: number;
+    expression: number;
 
     getConceptStatusName = ConceptStatusHelper.getName;
 
-    public static open(modalService: NgbModal, showAdd: boolean = false, superclass: number = null): NgbModalRef {
+    public static open(modalService: NgbModal, showAdd: boolean = false, relatedConcept: number = null, expression: number = 0): NgbModalRef {
         const modalRef = modalService.open(ConceptSelectorComponent, {backdrop: 'static', size: 'lg'});
         modalRef.componentInstance.showAdd = showAdd;
-        modalRef.componentInstance.superclass = superclass;
+        modalRef.componentInstance.relatedConcept = relatedConcept;
+        modalRef.componentInstance.expression = expression;
         return modalRef;
     }
 
@@ -99,7 +101,7 @@ export class ConceptSelectorComponent implements OnInit {
     search() {
         this.result = null;
 
-        this.conceptService.search(this.criteria, this.includeDeprecated, 1, this.superclass)
+        this.conceptService.search(this.criteria, this.includeDeprecated, 1, this.relatedConcept, this.expression)
             .subscribe(
                 (result) => this.result = result,
                 (error) => this.logger.error(error)
@@ -108,7 +110,7 @@ export class ConceptSelectorComponent implements OnInit {
 
     gotoPage(page) {
         this.result = null;
-        this.conceptService.search(this.criteria, this.includeDeprecated, page, this.superclass)
+        this.conceptService.search(this.criteria, this.includeDeprecated, page, this.relatedConcept, this.expression)
             .subscribe(
                 (result) => this.result = result,
                 (error) => this.logger.error(error)

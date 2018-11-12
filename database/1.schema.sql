@@ -36,8 +36,8 @@ CREATE TABLE concept_relationship (             -- Extends concept table for rel
   relationship BIGINT NOT NULL                  COMMENT 'The relationship source -> (rel) -> target',
   target BIGINT NOT NULL                        COMMENT 'The target concept',
   `order` INTEGER DEFAULT 0                     COMMENT 'Display order',
-  mandatory BOOLEAN DEFAULT 0                   COMMENT 'Is this relationship optional (0:??) or mandatory (1:??)',
-  `limit` INTEGER DEFAULT 0                     COMMENT 'Is this relationship limited (??:n) or unlimited (??:0)',
+  mandatory BOOLEAN DEFAULT 1                   COMMENT 'Is this relationship optional (0:??) or mandatory (1:??)',
+  `limit` INTEGER DEFAULT 1                     COMMENT 'Is this relationship limited (??:n) or unlimited (??:*)',
   status TINYINT NOT NULL DEFAULT 0             COMMENT 'Relationship status - 0=Draft, 1=Active, 2=Deprecated, 3=Temporary',
 
   PRIMARY KEY concept_relationship_id_pk (id),
@@ -53,16 +53,16 @@ DROP TABLE IF EXISTS concept_attribute;
 CREATE TABLE concept_attribute (                -- Links attribute to concepts
   id BIGINT NOT NULL AUTO_INCREMENT             COMMENT 'Concept Attribute ID',
   concept BIGINT NOT NULL                       COMMENT 'The concept the attribute is part of',
-  attribute BIGINT NOT NULL                     COMMENT 'The attribute',
+  attribute BIGINT NOT NULL                     COMMENT 'The attribute/relationship',
   `order` INTEGER NOT NULL DEFAULT 0            COMMENT 'Display order',
-  minimum INTEGER DEFAULT 0                     COMMENT 'Minimum value where type is an Integer',
-  maximum INTEGER DEFAULT 1                     COMMENT 'Maximum value where type is an Integer',
-  is_constraint BOOLEAN DEFAULT FALSE           COMMENT 'If the attribute is an extension (false) or a constraint (true)',
-  value_concept BIGINT                          COMMENT 'The allowed values for the attribute (based on the expression)',
-  value_expression TINYINT                      COMMENT 'The expression for the attribute value (0=Of type, 1=Child)',
+  mandatory BOOLEAN DEFAULT 0                   COMMENT 'Is this attribute optional (0:??) or mandatory (1:??)',
+  `limit` INTEGER DEFAULT 1                     COMMENT 'Is this attribute limited (??:n) or unlimited (??:*)',
+  inheritance TINYINT DEFAULT 1                 COMMENT 'Inheritance type (0 - unchanged ("Is a"), 1 - Extends, 2 - Constrains) ',  -- TODO: Can be calculated?
+  value_concept BIGINT                          COMMENT 'The allowed values for the attribute (based on the expression)/relationship target',
+  value_expression TINYINT                      COMMENT 'The expression for the attribute value (0 - Of type(=), 1 - Child (<), 2 - Type or child (<<))',
   fixed_concept BIGINT                          COMMENT 'The fixed value concept (in the case of a constraint attribute)',
   fixed_value TEXT                              COMMENT 'The fixed value when not a concept (in the case of a constraint attribute)',
-  -- status TINYINT NOT NULL DEFAULT 0             COMMENT 'Concept status - 0=Draft, 1=Active, 2=Deprecated, 3=Temporary',
+  status TINYINT NOT NULL DEFAULT 0             COMMENT 'Concept status - 0=Draft, 1=Active, 2=Deprecated, 3=Temporary',
 
   PRIMARY KEY concept_attribute_id_pk (id),
   KEY concept_attribute_concept_idx (concept),
@@ -72,22 +72,6 @@ CREATE TABLE concept_attribute (                -- Links attribute to concepts
   CONSTRAINT concept_attribute_value_concept_fk FOREIGN KEY (value_concept) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT concept_attribute_fixed_concept_fk FOREIGN KEY (fixed_concept) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS concept_attribute_value;
-/*CREATE TABLE concept_attribute_value (
-    id BIGINT NOT NULL AUTO_INCREMENT           COMMENT 'Concept attribute value ID',
-    concept BIGINT NOT NULL                     COMMENT 'The concept this attribute value relates to',
-    concept_attribute BIGINT NOT NULL           COMMENT 'The concept attribute ID.  NOTE: This may be an attribute belonging to an inherited concept!',
-    fixed_concept BIGINT                        COMMENT 'Fixed (constant) value where the type is a concept (AdministrativeGender.Male)',
-    fixed_value VARCHAR(45)                     COMMENT 'Fixed (constant) value where the type is not a concept',
-
-    PRIMARY KEY concept_attribute_value_id_pk (id),
-    KEY concept_attribute_concept_idx (concept),
-
-    CONSTRAINT concept_attribute_value_concept_fk           FOREIGN KEY (concept) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
-    CONSTRAINT concept_attribute_value_concept_attribute_fk FOREIGN KEY (concept_attribute) REFERENCES concept_attribute(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
-    CONSTRAINT concept_attribute_value_fixed_concept_fk     FOREIGN KEY (fixed_concept) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;*/
 
 DROP TABLE IF EXISTS concept_synonym;
 CREATE TABLE concept_synonym (

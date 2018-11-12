@@ -157,14 +157,11 @@ public class DALHelper {
                     .setId(rs.getLong("attribute"))
                     .setName(rs.getString("attribute_name"))
             )
-            .setType(
-                new Reference()
-                    .setId(rs.getLong("type"))
-                    .setName(rs.getString("type_name"))
-            )
-            .setMinimum(rs.getInt("minimum"))
-            .setMaximum(rs.getInt("maximum"))
-            .setConstraint(rs.getBoolean("is_constraint"));
+            .setOrder(rs.getInt("order"))
+            .setMandatory(rs.getBoolean("mandatory"))
+            .setLimit(rs.getInt("limit"))
+            .setInheritance(rs.getByte("inheritance"))
+            .setStatus(ConceptStatus.byValue(rs.getByte("status")));
 
         Long vcid = rs.getLong("value_concept");
         if (!rs.wasNull())
@@ -176,26 +173,9 @@ public class DALHelper {
 
         Long fcid = rs.getLong("fixed_concept");
         if (!rs.wasNull())
-            result.setFixedConcept(new Reference().setId(fcid).setName("fixed_value_name"));
+            result.setFixedConcept(new Reference().setId(fcid).setName(rs.getString("fixed_value_name")));
 
         result.setFixedValue(rs.getString("fixed_value"));
-
-//        Long avid = rs.getLong("avid");
-//        if (rs.wasNull()) avid = null;
-//
-//        AttributeValue value = new AttributeValue()
-//            .setId(avid)
-//            .setFixedValue(rs.getString("fixed_value"));
-//
-//        Reference fixedConcept = new Reference()
-//            .setId(rs.getLong("fixed_concept"))
-//            .setName(rs.getString("fixed_name"));
-//
-//        if (!rs.wasNull()) {
-//            value.setFixedConcept(fixedConcept);
-//        }
-//
-//        result.setValue(value);
 
         return result;
     }
