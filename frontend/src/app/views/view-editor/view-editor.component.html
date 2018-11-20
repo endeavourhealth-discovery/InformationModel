@@ -28,7 +28,12 @@
           </div>
           <div class="col-md-6">
             <div class="card h-100" id="contentCard">
-              <div class="card-header"><h4>Content <button type="button" class="btn btn-sm btn-success pull-right" (click)="addConcept()">Include</button></h4></div>
+              <div class="card-header"><h4>Content
+                <div class="pull-right">
+                  <button type="button" class="btn btn-sm btn-success" (click)="addItem()">Include</button>
+                  <button type="button" class="btn btn-sm btn-danger" (click)="removeItem()" [disabled]="selectedFolder == null || selectedFolder.conceptId == null">Remove</button>
+                </div>
+              </h4></div>
               <div class="card-body">
                 <div class="row">
                   <div class="col-md-12" *ngIf="items.length === 0">[Empty]</div>
@@ -41,6 +46,16 @@
                       </ng-template>
                     </tree-root>
                   </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card h-100" id="conceptsCard">
+              <div class="card-header"><h4>Available concepts</h4></div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-12"><b>TODO:</b> Search & View navigator of existing concepts for Drag/drop into content panel opposite</div>
                 </div>
               </div>
             </div>

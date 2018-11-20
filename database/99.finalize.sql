@@ -1542,12 +1542,5 @@ INSERT INTO table_id (name, id)
 SELECT 'Concept', MAX(id) + 1
 FROM concept;
 
-INSERT INTO code_scheme (id, identifier)
-VALUES (5301, 'SNOMED-CT'),
-       (5302, 'READ 2'),
-       (5303, 'CTV3'),
-       (5304, 'OPCS'),
-       (5305, 'ICD10');
-
 -- Build the transitive closure table for concept inheritance hierarchy
 CALL proc_build_tct();

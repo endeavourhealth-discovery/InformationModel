@@ -82,7 +82,7 @@ public class ViewEndpoint {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Timed(absolute = true, name = "InformationModel.ViewEndpoint.{viewId}.DELETE")
-    @ApiOperation(value = "Returns a view")
+    @ApiOperation(value = "Deletes a view")
     public Response deleteView(@Context SecurityContext sc,
                                @ApiParam(value = "View id") @PathParam("viewId") Long viewId
     ) throws Exception {
@@ -133,6 +133,24 @@ public class ViewEndpoint {
         LOG.debug("Add to view");
 
         new ViewLogic().addItem(viewId, ViewItemAddStyle.fromInt(addStyle), conceptId, attributeIds, parentId);
+
+        return Response
+            .ok()
+            .build();
+    }
+
+    @DELETE
+    @Path("ViewItem/{viewItemId}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Timed(absolute = true, name = "InformationModel.ViewEndpoint.{viewId}.DELETE")
+    @ApiOperation(value = "Delete a view item")
+    public Response deleteViewItem(@Context SecurityContext sc,
+                                   @ApiParam(value = "View item id") @PathParam("viewItemId") Long viewItemId
+    ) throws Exception {
+        LOG.debug("Delete view item");
+
+        new ViewLogic().deleteViewItem(viewItemId);
 
         return Response
             .ok()

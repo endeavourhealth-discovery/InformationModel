@@ -162,6 +162,19 @@ public class ViewJDBCDAL implements ViewDAL {
         }
     }
 
+    @Override
+    public void deleteViewItem(Long viewItemId) throws SQLException {
+        Connection conn = ConnectionPool.InformationModel.pop();
+        String sql = "DELETE FROM view_item WHERE id = ?";
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, viewItemId);
+            stmt.executeUpdate();
+        } finally {
+            ConnectionPool.InformationModel.push(conn);
+        }
+    }
+
     private Long saveViewItem(Connection conn, Long viewId, Long conceptId, Long contextId, Long parentId) throws SQLException {
         try (PreparedStatement stmt = conn.prepareStatement("INSERT INTO view_item (view, concept, context, parent) VALUES (?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS)) {
             stmt.setLong(1, viewId);

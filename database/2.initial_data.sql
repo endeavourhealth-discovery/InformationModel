@@ -27,7 +27,11 @@ INSERT INTO concept (id, superclass, context, full_name, description)
 INSERT INTO concept (id, superclass, context, full_name, description)
 VALUES
        (100, 6, 'Relationship.Is', 'is', 'source concept inherits the semantic meaning of the more generalised target - source is more specialised - (T2 is a Diabetes)'),
-       (107, 6, 'Relationship.Parent', 'has parent', 'Source concept has parent of target');
+       (107, 6, 'Relationship.Parent', 'has parent', 'Source concept has parent of target'),
+       (110, 6, 'Relationship.Moiety', 'has moiety', ''),
+       (111, 6, 'Relationship.IsBranded', 'is branded type of', ''),
+       (112, 6, 'Relationship.PackOf', 'is pack of', ''),
+       (113, 6, 'Relationship.Has ingredient', 'has ingredient', '');
 
 -- RELATIONSHIPS (super = 5)
 /*INSERT INTO concept (id, superclass, context, full_name, description)
@@ -118,3 +122,14 @@ VALUES (0, 'Attribute model'),
        (1, 'Value model'),
        (2, 'Message mappings'),
        (3, 'Term mappings');
+
+INSERT INTO code_scheme (id, identifier)
+VALUES (5301, 'SNOMED-CT'),
+       (5302, 'READ 2'),
+       (5303, 'CTV3'),
+       (5304, 'OPCS'),
+       (5305, 'ICD10');
+
+INSERT INTO table_id (name, id)
+SELECT 'Concept', MAX(id) + 1
+FROM concept;

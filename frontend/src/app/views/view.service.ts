@@ -40,8 +40,11 @@ export class ViewService {
     return this.http.post('api/View/' + viewId + '/Item/' + conceptId, attributeIds, {search: params});
   }
 
-
   delete(viewId: number): Observable<any> {
     return this.http.delete('api/View/' + viewId);
+  }
+
+  removeViewItem(viewItemId: number): Observable<any> {
+    return this.http.delete('api/View/ViewItem/'+viewItemId.toString());
   }
 }

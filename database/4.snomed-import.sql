@@ -13,8 +13,8 @@ FROM im.code c
          JOIN im.code_term t ON t.code_id = c.code_id and t.system = c.system AND t.preferred = 0;
 
 -- IMPORT RELATIONSHIPS
-INSERT INTO im2.concept_relationship
-    (source, relationship, target, status)
+INSERT INTO im2.concept_attribute
+    (concept, attribute, value_concept, status)
 SELECT source, relationship, target, status
 FROM im.concept_relationship
 WHERE source > 1000000;

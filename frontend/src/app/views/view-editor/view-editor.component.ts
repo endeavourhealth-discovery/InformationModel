@@ -113,17 +113,15 @@ export class ViewEditorComponent implements AfterViewInit {
     this.tree.treeModel.update();
   }
 
-  addConcept() {
+  addItem() {
     ConceptSelectorComponent.open(this.modal)
       .result.then(
-      (result) => this.addConceptSummary(result)
-    );
-  }
-
-  addConceptSummary(concept: Concept) {
-    ViewItemEditorComponent.open(this.modal, this.selectedFolder, concept)
-      .result.then(
-      (result) => this.addToView(result.addStyle, concept, result.attributes)
+      (concept) => {
+        ViewItemEditorComponent.open(this.modal, this.selectedFolder, concept)
+          .result.then(
+          (result) => this.addToView(result.addStyle, concept, result.attributes)
+        );
+      }
     );
   }
 
@@ -135,14 +133,34 @@ export class ViewEditorComponent implements AfterViewInit {
           this.selectedFolder.children = null;
           this.selectedFolder.hasChildren = true;
           this.tree.treeModel.update();
+          this.log.success('Successfully added the item to this view.', null, 'Add to view');
         },
         (error) => this.log.error(error)
       );
   }
 
+  removeItem() {
+    MessageBoxDialog.open(this.modal, 'Remove item from view', 'Do you want to remove <b><i>'+this.selectedFolder.conceptName+'</i></b> from the view?', 'Remove', 'Cancel')
+      .result.then(
+      (confirm) => {
+        this.viewService.removeViewItem(this.selectedFolder.id)
+          .subscribe(
+            (result) => this.removeFromView(),
+            (error) => this.log.error(error)
+          );
+      }
+    );
+  }
 
-  added(view: ViewItem) {
-    this.log.success('Added!!! :)', view);
+  removeFromView() {
+    // Go to parent node
+    let parent = this.tree.treeModel.getActiveNode().parent;
+    this.selectedFolder = parent.data;
+    this.selectedFolder.isExpanded = false;
+    this.selectedFolder.children = null;
+    this.selectedFolder.hasChildren = true;
+    this.tree.treeModel.update();
+    this.log.success('Successfully removed '+this.selectedFolder.conceptName+' from this view', this.selectedFolder, 'Remove from view');
   }
 
   close(withConfirm: boolean) {

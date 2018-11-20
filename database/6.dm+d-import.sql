@@ -85,9 +85,9 @@ FROM dmd_vmp_concept_map m
 WHERE m.new = true;
 
 -- Reset relationships
-INSERT INTO concept_relationship
-    (source, relationship, target)
-SELECT s.conceptId AS source, 107 AS relationship, t.conceptId AS target
+INSERT INTO im2.concept_attribute
+    (concept, attribute, value_concept)
+SELECT s.conceptId AS source, 100 AS relationship, t.conceptId AS target
 FROM dmd_vmp v
          JOIN dmd_vmp_concept_map s ON s.vmpId = v.vpid
          JOIN dmd_vtm_concept_map t ON t.vtmId = v.vtmid
@@ -143,9 +143,9 @@ FROM dmd_vmpp_concept_map m
 WHERE m.new = true;
 
 -- Reset relationships
-INSERT INTO concept_relationship
-    (source, relationship, target)
-SELECT s.conceptId, 106, t.conceptId
+INSERT INTO im2.concept_attribute
+    (concept, attribute, value_concept)
+SELECT s.conceptId, 112, t.conceptId
 FROM dmd_vmpp a
          JOIN dmd_vmpp_concept_map s ON s.vmppId = a.vppid
          JOIN dmd_vmp_concept_map t ON t.vmpId = a.vpid;
@@ -200,9 +200,9 @@ FROM dmd_amp_concept_map m
 WHERE m.new = true;
 
 -- Reset relationships
-INSERT INTO concept_relationship
-    (source, relationship, target)
-SELECT s.conceptId, 105, t.conceptId
+INSERT INTO im2.concept_attribute
+    (concept, attribute, value_concept)
+SELECT s.conceptId, 111, t.conceptId
 FROM dmd_amp a
          JOIN dmd_amp_concept_map s ON s.ampId = a.apid
          JOIN dmd_vmp_concept_map t ON t.vmpId = a.vpid;
@@ -257,16 +257,16 @@ FROM dmd_ampp_concept_map m
 WHERE m.new = true;
 
 -- Reset relationships
-INSERT INTO concept_relationship
-    (source, relationship, target)
-SELECT s.conceptId, 105, t.conceptId
+INSERT INTO im2.concept_attribute
+    (concept, attribute, value_concept)
+SELECT s.conceptId, 111, t.conceptId
 FROM dmd_ampp a
          JOIN dmd_ampp_concept_map s ON s.amppId = a.appid
          JOIN dmd_vmpp_concept_map t ON t.vmppId = a.vppid;
 
-INSERT INTO concept_relationship
-    (source, relationship, target)
-SELECT s.conceptId, 106, t.conceptId
+INSERT INTO im2.concept_attribute
+    (concept, attribute, value_concept)
+SELECT s.conceptId, 112, t.conceptId
 FROM dmd_ampp a
          JOIN dmd_ampp_concept_map s ON s.amppId = a.appid
          JOIN dmd_amp_concept_map t ON t.ampId = a.apid;
@@ -280,9 +280,9 @@ FROM
 */
 
 -- ********************* VIRTUAL PRODUCT INGREDIENT *********************
-INSERT INTO concept_relationship
-    (source, relationship, target)
-SELECT p.conceptId as source, 108 as relationship, i.concept_id as target
+INSERT INTO im2.concept_attribute
+    (concept, attribute, value_concept)
+SELECT p.conceptId as source, 113 as relationship, i.concept_id as target
 FROM dmd_vmp_vpi m
          JOIN dmd_vmp_concept_map p ON p.vmpId = m.vpid
          JOIN im.code i ON i.code_id = m.isid AND i.system = 1;

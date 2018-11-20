@@ -39,4 +39,8 @@ public class ViewLogic {
     public void delete(Long viewId) throws Exception {
         this.dal.delete(viewId);
     }
+
+    public void deleteViewItem(Long viewItemId) throws Exception {
+        this.dal.deleteViewItem(viewItemId);
+    }
 }

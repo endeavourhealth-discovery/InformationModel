@@ -17,4 +17,5 @@ public interface ViewDAL {
 
     void addItem(Long viewId, ViewItemAddStyle addStyle, Long conceptId, List<Long> attributeIds, Long parentId) throws Exception;
 
+    void deleteViewItem(Long viewItemId) throws Exception;
 }
