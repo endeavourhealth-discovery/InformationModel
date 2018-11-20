@@ -22,7 +22,7 @@ export class AppMenuService implements  AbstractMenuProvider {
       { path: 'concept/:id/:context', component: ConceptEditorComponent },
       { path: 'viewLibrary', component: ViewLibraryComponent },
       { path: 'view/:id', component: ViewEditorComponent },
-      { path: 'view/:id/:name', component: ViewEditorComponent },
+      // { path: 'view/:id/:name', component: ViewEditorComponent },
       { path: 'workflowManager', component: WorkflowManagerComponent },
       { path: 'termMappings', component: TermMappingsComponent },
       { path: 'termMappings/:id', component: TermMappingsEditorComponent },

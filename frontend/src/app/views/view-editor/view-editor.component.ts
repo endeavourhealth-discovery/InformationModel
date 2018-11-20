@@ -1,15 +1,17 @@
 import {AfterViewInit, Component, ViewChild} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {LoggerService, MessageBoxDialog} from 'eds-angular4';
-import {View} from '../../models/View';
+import {ViewItem} from '../../models/ViewItem';
 import {ViewService} from '../view.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {Location} from '@angular/common';
-import {ViewFolder} from '../../models/ViewFolder';
 import {ConceptSummary} from '../../models/ConceptSummary';
 import {ConceptSelectorComponent} from 'im-common/dist/concept-selector/concept-selector/concept-selector.component';
 import {Concept} from '../../models/Concept';
 import {ITreeOptions, TreeComponent} from 'angular-tree-component';
+import {ViewItemEditorComponent} from '../view-item-editor/view-item-editor.component';
+import {Attribute} from '../../models/Attribute';
+import {View} from '../../models/View';
 
 @Component({
   selector: 'app-view-editor',
@@ -18,9 +20,10 @@ import {ITreeOptions, TreeComponent} from 'angular-tree-component';
 })
 export class ViewEditorComponent implements AfterViewInit {
   view: View = {} as View;
-  folders: ViewFolder[];
+  items: ViewItem[] = [];
   concepts: ConceptSummary[];
   options : ITreeOptions;
+  selectedFolder: ViewItem;
   @ViewChild('tree') tree: TreeComponent;
 
   constructor(private route: ActivatedRoute,
@@ -29,7 +32,6 @@ export class ViewEditorComponent implements AfterViewInit {
               private log: LoggerService,
               private viewService: ViewService) {
     this.options = {
-      displayField : 'name',
       childrenField: 'children',
       hasChildrenField : 'hasChildren',
       idField : 'id',
@@ -40,74 +42,75 @@ export class ViewEditorComponent implements AfterViewInit {
 
   ngAfterViewInit() {
     this.route.params.subscribe(
-      (params) => this.init(params['id'], params['name'])
+      (params) => this.loadView(params['id'])
     );
   }
 
-  init(id: any, name: string) {
-    if (id === 'add')
-      setTimeout(() => this.newView(name));
-    else
-      this.loadView(id);
+  loadView(id: any) {
+    this.viewService.getView(id)
+      .subscribe(
+        (result) => this.setView(result),
+        (error) => this.log.error(error)
+      );
   }
 
-  loadView(id: number) {
-    this.viewService.get(id)
+  setView(view: View) {
+    this.view = view;
+    this.items.push({
+      conceptId: null,        // To denote root node
+      conceptName: 'View items',
+      hasChildren: true
+      } as ViewItem
+    );
+    this.tree.treeModel.update();
+  }
+
+  updated() {
+    // Expand root if not already done
+    const firstRoot = this.tree.treeModel.getFirstRoot();
+    if (!firstRoot)
+      return;
+    else {
+      if (this.tree.treeModel.getActiveNode() == null) {
+        firstRoot.expand();
+        firstRoot.setIsActive(true);
+      }
+    }
+  }
+
+  selectNode(node : ViewItem) {
+    if (node === this.selectedFolder) { return; }
+    this.selectedFolder = node;
+  }
+
+
+  loadChildViews(viewItem: ViewItem) {
+    this.viewService.getViewContents(this.view.id, viewItem.conceptId)
+      .subscribe(
+        (result) => {
+          result.forEach((r) => r.hasChildren = true);
+          this.addChildViews(viewItem, result);
+          },
+        (error) => this.log.error(error)
+      );
+  }
+
+  save() {
+    this.viewService.save(this.view)
       .subscribe(
         (result) => {
           this.view = result;
-          this.folders = [
-            {
-              id: result.id,
-              name: result.name,
-              description: result.description,
-              hasChildren: true,
-              children: null,
-              isExpanded: false,
-              loading: false
-            }
-          ];
-          this.tree.treeModel.update();
-          // this.loadChildViews(this.viewFolder[0]);
-          this.loadViewConcepts(this.view);
+          this.log.success('Save successful', result, 'Save view')
         },
         (error) => this.log.error(error)
       );
   }
 
-  newView(name: string) {
-    this.view = {name: name} as View;
-  }
-
-  loadChildViews(folder: ViewFolder) {
-    this.viewService.getViews(folder.id)
-      .subscribe(
-        (result) => this.addChildViews(folder, result.map((v) => ({
-          id: v.id,
-          name: v.name,
-          description: v.description,
-          hasChildren: true,
-          children: null,
-          isExpanded: false,
-          loading: false
-        } as ViewFolder))),
-        (error) => this.log.error(error)
-      );
-  }
-
-  addChildViews(folder: ViewFolder, children: ViewFolder[]) {
+  addChildViews(folder: ViewItem, children: ViewItem[]) {
     folder.children = children;
     if (children == null || children.length == 0)
       folder.hasChildren = false;
     this.tree.treeModel.update();
-  }
-
-  loadViewConcepts(view: View) {
-    this.viewService.getConcepts(view.id)
-      .subscribe(
-        (result) => this.concepts = result,
-        (error) => this.log.error(error)
-      );
   }
 
   addConcept() {
@@ -118,31 +121,28 @@ export class ViewEditorComponent implements AfterViewInit {
   }
 
   addConceptSummary(concept: Concept) {
-    let i = this.concepts.find((c) => c.id === concept.id);
-    if (i == null) {
-      this.concepts.push(
-        {
-          id: concept.id,
-          name: concept.fullName,
-          context: concept.context,
-          status: concept.status,
-          synonym: false
-        }
-      );
-    }
+    ViewItemEditorComponent.open(this.modal, this.selectedFolder, concept)
+      .result.then(
+      (result) => this.addToView(result.addStyle, concept, result.attributes)
+    );
   }
 
-  save(close: boolean) {
-    this.viewService.save(this.view)
+  addToView(addStyle: string, concept: Concept, attributes: Attribute[]) {
+    this.viewService.addViewItem(this.view.id, addStyle, concept.id, attributes.map(a => a.attribute.id), this.selectedFolder.conceptId)
       .subscribe(
         (result) => {
-          this.view = result
-          this.log.success('View saved', this.view, 'Saved');
-          if (close)
-            this.close(false)
+          this.selectedFolder.isExpanded = false;
+          this.selectedFolder.children = null;
+          this.selectedFolder.hasChildren = true;
+          this.tree.treeModel.update();
         },
-        (error) => this.log.error('Error during save', error, 'Save')
+        (error) => this.log.error(error)
       );
+  }
+
+
+  added(view: ViewItem) {
+    this.log.success('Added!!! :)', view);
   }
 
   close(withConfirm: boolean) {

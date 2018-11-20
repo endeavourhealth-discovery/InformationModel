@@ -12,9 +12,7 @@ import {ModuleStateService} from 'eds-angular4/dist/common';
 import {RelatedConcept} from '../../models/RelatedConcept';
 import {Attribute} from '../../models/Attribute';
 import {Observable} from 'rxjs/Observable';
-import {ConceptEdits} from '../../models/ConceptEdits';
 import {AttributeEditorComponent} from '../attribute-editor/attribute-editor.component';
-import {RelatedEditorComponent} from '../related-editor/related-editor.component';
 import {SynonymEditorComponent} from '../synonym-editor/synonym-editor.component';
 import {Synonym} from '../../models/Synonym';
 import {GraphNode} from 'eds-angular4/dist/node-graph/GraphNode';
@@ -22,6 +20,7 @@ import {ConceptSelectorComponent} from 'im-common/dist/concept-selector/concept-
 import {ValueExpression, ValueExpressionHelper} from '../../models/ValueExpression';
 import {InheritanceHelper} from '../../models/Inheritance';
 import {CardinalityHelper} from '../../models/CardinalityHelper';
+import {ConceptCreateComponent} from '../concept-create/concept-create.component';
 
 @Component({
   selector: 'app-concept-editor',
@@ -34,7 +33,6 @@ export class ConceptEditorComponent implements AfterViewInit {
   concept: Concept;
   related: RelatedConcept[];
   attributes: Attribute[];
-  edits: ConceptEdits = new ConceptEdits();
   synonyms: Synonym[];
 
   data: any;
@@ -72,11 +70,11 @@ export class ConceptEditorComponent implements AfterViewInit {
       Observable.forkJoin(
         this.conceptService.getConcept(id),
         this.conceptService.getAttributes(id, false),
-        this.conceptService.getRelated(id, false),
+        // this.conceptService.getRelated(id, false),
         this.conceptService.getSynonyms(id)
       )
         .subscribe(
-          (result) => this.setData(result[0], result[1], result[2], result[3]),
+          (result) => this.setData(result[0], result[1], [], result[2]),
           (error) => this.logger.error(error)
         );
     }
@@ -137,14 +135,14 @@ export class ConceptEditorComponent implements AfterViewInit {
   }
 
   expandNode(node: GraphNode) {
-    Observable.forkJoin([this.conceptService.getRelated(node.id, false), this.conceptService.getAttributes(node.id, false)])
-      .subscribe(
-        (result) => {
-          node.tooltip = this.getAttributeTable(result[1]);
-          this.updateDiagram(node.id, result[0], result[1]);
-        },
-        (error) => this.logger.error(error)
-      );
+    // Observable.forkJoin([this.conceptService.getRelated(node.id, false), this.conceptService.getAttributes(node.id, false)])
+    //   .subscribe(
+    //     (result) => {
+    //       node.tooltip = this.getAttributeTable(result[1]);
+    //       this.updateDiagram(node.id, result[0], result[1]);
+    //     },
+    //     (error) => this.logger.error(error)
+    //   );
   }
 
   updateDiagram(conceptId: number, related: RelatedConcept[], attributes: Attribute[]) {
@@ -193,16 +191,35 @@ export class ConceptEditorComponent implements AfterViewInit {
     ConceptSelectorComponent.open(this.modal, true, 6, ValueExpression.OF_CLASS)
       .result.then(
       (result) => {
-        const att: Attribute = {
-          concept: {id: this.concept.id, name: this.concept.fullName},
-          attribute: {id: result.id, name: result.fullName},
-          mandatory: false,
-          limit: 1,
-        } as Attribute;
-
-        this.editAttribute(att);
+        if (result.id == null)
+          this.createAttributeConcept();
+        else
+          this.createAttribute(result);
       }
     );
+  }
+
+  createAttributeConcept() {
+    ConceptCreateComponent.open(this.modal)
+      .result.then(
+      (result) => this.createAttribute(result),
+      (error) => this.logger.error(error)
+    );
+  }
+
+  createAttribute(attConcept: Concept) {
+    const att: Attribute = {
+      concept: {id: this.concept.id, name: this.concept.fullName},
+      attribute: {id: attConcept.id, name: attConcept.fullName},
+      mandatory: false,
+      limit: 1,
+      order: 0,
+      inheritance: 1,
+      status: ConceptStatus.DRAFT,
+      valueExpression: 0
+    } as Attribute;
+
+    this.editAttribute(att);
   }
 
   editAttribute(att: Attribute) {
@@ -211,79 +228,34 @@ export class ConceptEditorComponent implements AfterViewInit {
       (result) => {
         if (result) {
           if (!this.attributes.includes(att)) {
-            this.attributes.push(att);
-            // this.updateDiagram(this.concept.id, [], [att]);
+            this.attributes.push(result);
           } else {
             Object.assign(att, result);
           }
-          if (!this.edits.editedAttributes.includes(result)) {
-            this.edits.editedAttributes.push(result);
-          }
         }
       }
+    );
+  }
+
+  promptDeleteAttribute(att: Attribute) {
+    MessageBoxDialog.open(this.modal, 'Delete attribute', 'Delete the attribute from this concept?', 'Delete', 'Cancel')
+      .result.then(
+      (result) => this.deleteAttribute(att)
     );
   }
 
   deleteAttribute(att: Attribute) {
-    if (att.concept.id === this.concept.id) {
-      let idx = this.attributes.indexOf(att);
-      this.attributes.splice(idx, 1);
-
-      idx = this.edits.editedAttributes.indexOf(att);
-      if (idx > -1) {
-        this.edits.editedAttributes.splice(idx, 1);
-      }
-
-      if (att.id !== 0) {
-        this.edits.deletedAttributes.push(att);
-      }
-    }
-    this.refreshDiagram()
-  }
-
-
-  addRelated() {
-    const rel: RelatedConcept = {
-      source: {id: this.concept.id, name: this.concept.fullName},
-      mandatory: false,
-      limit: 1
-    } as RelatedConcept;
-
-    this.editRelated(rel);
-  }
-
-  editRelated(rel: RelatedConcept) {
-    RelatedEditorComponent.open(this.modal, this.concept.id, rel)
-      .result.then(
-      (result) => {
-        if (result) {
-          if (!this.related.includes(rel)) {
-            this.related.push(rel);
-            this.updateDiagram(this.concept.id, [rel], []);
+    this.conceptService.deleteAttribute(att.id)
+      .subscribe(
+        (result) => {
+          if (att.concept.id === this.concept.id) {
+            let idx = this.attributes.indexOf(att);
+            this.attributes.splice(idx, 1);
           }
-          if (!this.edits.editedRelated.includes(result)) {
-            this.edits.editedRelated.push(result);
-          }
-        }
-      },
-      (error) => {}
-    );
-  }
-
-  deleteRelated(rel: RelatedConcept) {
-    let idx = this.related.indexOf(rel);
-    this.related.splice(idx, 1);
-
-    idx = this.edits.editedRelated.indexOf(rel);
-    if (idx > -1) {
-      this.edits.editedRelated.splice(idx, 1);
-    }
-
-    if (rel.id !== 0) {
-      this.edits.deletedRelated.push(rel);
-    }
-
-    this.refreshDiagram();
+          this.refreshDiagram()
+        },
+        (error) => this.logger.error(error)
+      );
   }
 
   nodeClick(node) {
@@ -313,18 +285,32 @@ export class ConceptEditorComponent implements AfterViewInit {
     )
   }
 
-  save(close: boolean) {
-     this.conceptService.save(this.concept, this.edits)
+  saveConcept(close: boolean) {
+     this.conceptService.save(this.concept)
        .subscribe(
          (result) => {
-           this.concept = result.concept;
-           this.edits = result.edits;
+           this.concept = result;
            this.logger.success('Concept saved', this.concept, 'Saved');
            if (close)
              this.close(false)
          },
          (error) => this.logger.error('Error during save', error, 'Save')
        );
+  }
+
+  promptDeleteConcept() {
+    MessageBoxDialog.open(this.modal, 'Delete concept', 'Delete the <b><i>' + this.concept.context + '</i></b> concept?<br><br><b>NOTE:</b> The concept attributes will also be deleted!', 'Delete', 'Cancel')
+      .result.then(
+      (result) => this.deleteConcept()
+    );
+  }
+
+  deleteConcept() {
+    this.conceptService.deleteConcept(this.concept.id)
+      .subscribe(
+        (result) => this.close(false),
+        (error) => this.logger.error(error)
+      );
   }
 
   close(withConfirm: boolean) {

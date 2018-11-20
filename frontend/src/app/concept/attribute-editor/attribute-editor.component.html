@@ -28,9 +28,9 @@
       <div class="form-group col-md-4">
         <label class="control-label">Value type</label>
         <div class="input-group">
-          <input type="text" class="form-control" value="{{result.valueConcept.name}}" readonly>
+          <input type="text" class="form-control" value="{{result.valueConcept?.name}}" readonly>
           <div class="input-group-append">
-            <span class="input-group-text" (click)="selectValueConcept()"><i class="fa fa-search"></i></span>
+            <span class="input-group-text" (click)="selectValueType()"><i class="fa fa-search"></i></span>
           </div>
         </div>
       </div>
@@ -43,7 +43,7 @@
         <div class="input-group">
           <input type="text" class="form-control" value="{{result.fixedConcept?.name}}" readonly (keyup.enter)="search()">
           <div class="input-group-append">
-            <span class="input-group-text" (click)="search()"><i class="fa fa-search"></i></span>
+            <span class="input-group-text" (click)="selectFixedConcept()"><i class="fa fa-search"></i></span>
           </div>
         </div>
       </div>
@@ -51,6 +51,6 @@
   </div>
 </div>
 <div class="modal-footer">
-  <button type="button" class="btn btn-success" (click)="ok()" name="Ok">OK</button>
+  <button type="button" class="btn btn-success" (click)="ok()" name="Ok">Save</button>
   <button type="button" class="btn btn-danger" (click)="cancel()" name="cancel">Cancel</button>
 </div>

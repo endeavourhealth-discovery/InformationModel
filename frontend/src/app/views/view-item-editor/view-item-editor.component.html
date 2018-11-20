@@ -1,0 +1,62 @@
+<div class="modal-header">
+  <h4 class="modal-title">Add to view: {{viewFolder?.conceptName}}</h4>
+  <button type="button" class="close" (click)="cancel()" aria-hidden="true">&times;</button>
+</div>
+<div class="modal-body">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-4 form-group">
+        <!--<label class="control-label">Add to view:</label>-->
+        <div class="custom-control custom-radio form-control-plaintext">
+          <input type="radio" class="custom-control-input" [(ngModel)]="addStyle" id="rdoAddConcept" name="rdoAddConcept" [value]="AddStyle.CONCEPT_ONLY">
+          <label class="custom-control-label" for="rdoAddConcept">Concept only <i class="info-icon" ngbTooltip="Add only the concept"></i></label>
+        </div>
+      </div>
+      <div class="col-md-4 form-group">
+        <!--<label class="control-label">&nbsp;</label>-->
+        <div class="custom-control custom-radio form-control-plaintext">
+          <input type="radio" class="custom-control-input" [(ngModel)]="addStyle" id="rdoAddAtts" name="rdoAddAtts" [value]="AddStyle.ATTRIBUTES_ONLY">
+          <label class="custom-control-label" for="rdoAddAtts">Attributes only <i class="info-icon" ngbTooltip="Add only the attributes"></i></label>
+        </div>
+      </div>
+      <div class="col-md-4 form-group">
+        <!--<label class="control-label">&nbsp;</label>-->
+        <div class="custom-control custom-radio form-control-plaintext">
+          <input type="radio" class="custom-control-input" [(ngModel)]="addStyle" id="rdoAddBoth" name="rdoAddBoth" [value]="AddStyle.BOTH">
+          <label class="custom-control-label" for="rdoAddBoth">Both <i class="info-icon" ngbTooltip="Add the concept as a folder and its attributes as sub-items"></i></label>
+        </div>
+      </div>
+
+      <div class="col-md-12 form-group" *ngIf="addStyle!=AddStyle.ATTRIBUTES_ONLY">
+        <div class="control-label">Concept</div>
+        <input type="text" class="form-control" readonly value="{{concept?.fullName}}">
+      </div>
+
+      <div class="col-md-12 form-group" *ngIf="addStyle!=AddStyle.CONCEPT_ONLY">
+        <div class="control-label">Attributes</div>
+        <div class="scroll-box-400 bordered-box">
+          <loadingIndicator [done]="attributes" [text]="'Loading attributes...'">
+            <table class="table table-sm table-striped">
+              <thead>
+                <tr>
+                  <th>Add</th>
+                  <th>Name</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of attributes" (click)="item.excluded = !item.excluded">
+                  <td><i [ngClass]="item.excluded ? 'fa fa-fw fa-times text-danger' : 'fa fa-fw fa-check text-success'"></i></td>
+                  <td>{{item.attribute.name}}</td>
+                </tr>
+              </tbody>
+            </table>
+          </loadingIndicator>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-success" (click)="ok()" name="Ok">Add</button>
+  <button type="button" class="btn btn-danger" (click)="cancel()" name="cancel">Cancel</button>
+</div>

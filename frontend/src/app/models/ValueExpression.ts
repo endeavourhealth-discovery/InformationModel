@@ -10,7 +10,7 @@ export class ValueExpressionHelper {
       case ValueExpression.OF_CLASS: return 'A';
       case ValueExpression.CHILD_OF: return 'A child of';
       case ValueExpression.CLASS_OR_CHILD: return 'A type, or sub type of';
-      default: return '';
+      default: return 'Unknown ['+valueExpression+']';
     }
   }
 

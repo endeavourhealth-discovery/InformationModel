@@ -1,61 +1,45 @@
 <div class="module">
   <div class="container-fluid">
     <div class="module-heading">
-      View editor
+      Edit view
       <div class="pull-right">
-        <button class="btn btn-success" (click)="save(false)">Save</button>
-        <button class="btn btn-warning" (click)="save(true)">Save & close</button>
-        <button class="btn btn-danger" (click)="close(true)">Cancel</button>
+        <button class="btn btn-danger" (click)="close(true)">Close</button>
       </div>
     </div>
     <div class="module-body">
       <form>
         <div class="row">
-          <div class="col-md-12">
+          <div class="col-md-12 mb-4">
             <div class="card h-100" id="detailCard">
-              <div class="card-header"><h4>View details</h4></div>
+              <div class="card-header"><h4>Details <button type="button" class="btn btn-sm btn-success pull-right" (click)="save()">Save</button></h4></div>
               <div class="card-body">
                 <div class="row">
-                  <div class="col-md-3 form-group">
-                    <label class="control-label" for="viewName">Name</label>
-                    <input class="form-control" id="viewName" type="text" [(ngModel)]="view.name" name="viewName">
+                  <div class="col-md-4 form-group">
+                    <label class="control-label">Name</label>
+                    <input type="text" class="form-control" [(ngModel)]="view.name" name="name">
                   </div>
-                  <div class="col-md-9 form-group">
-                    <label class="control-label" for="viewDescription">Description</label>
-                    <textarea rows="1" class="form-control" id="viewDescription" type="text" [(ngModel)]="view.description" name="viewDescription"></textarea>
+                  <div class="col-md-8 form-group">
+                    <label class="control-label">Description</label>
+                    <input type="text" class="form-control" [(ngModel)]="view.description" name="desc">
                   </div>
-                  <div class="col-md-3 form-group">
-                    <label class="control-label">Sub views</label>
-                    <tree-root #tree [nodes]="folders" [options]="options">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card h-100" id="contentCard">
+              <div class="card-header"><h4>Content <button type="button" class="btn btn-sm btn-success pull-right" (click)="addConcept()">Include</button></h4></div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-12" *ngIf="items.length === 0">[Empty]</div>
+                  <div class="col-md-12 scroll-box-400">
+                    <tree-root #tree [nodes]="items" [options]="options" (activate)="selectNode($event.node.data)" (updateData)="updated()">
                       <ng-template #treeNodeTemplate let-node>
-                        <div class="folder-item">
-                          {{ node.data.name }}<i ngbTooltip="{{node.data.description}}" class="info-icon"></i>
+                        <div class="folder-item show-child-on-hover">
+                          {{ node.data.conceptName }}<i *ngIf="node.data.contextId" ngbTooltip="Context: {{node.data.contextName}}" class="info-icon"></i>
                         </div>
                       </ng-template>
                     </tree-root>
-                  </div>
-                  <div class="col-md-9 form-group">
-                    <label class="control-label" for="viewContent">Concepts <button type="button" class="btn btn-xs btn-success" (click)="addConcept()">Add (Include?)</button></label>
-                    <div class="scroll-box-250" id="viewContent">
-                      <table class="table table-sm table-striped table-hover show-child-on-hover">
-                        <thead>
-                          <tr>
-                            <th>Context</th>
-                            <th>Name</th>
-                            <th>Status</th>
-                            <th></th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr *ngFor="let item of concepts">
-                            <td>{{item.context}}</td>
-                            <td>{{item.name}}</td>
-                            <td>{{item.status}}</td>
-                            <td><span class="child-to-show"><button type="button" class="btn btn-xs btn-danger"><i class="fa fa-fw fa-trash"></i></button> </span></td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
                   </div>
                 </div>
               </div>

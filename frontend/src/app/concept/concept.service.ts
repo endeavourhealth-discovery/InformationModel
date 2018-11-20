@@ -2,12 +2,8 @@ import { Injectable } from '@angular/core';
 import {Http, URLSearchParams} from '@angular/http';
 import {Observable} from 'rxjs/Observable';
 import {Concept} from '../models/Concept';
-import {RelatedConcept} from '../models/RelatedConcept';
 import {Attribute} from '../models/Attribute';
-import {ConceptEdits} from '../models/ConceptEdits';
-import {Bundle} from '../models/Bundle';
 import {Synonym} from '../models/Synonym';
-import {ConceptSummary} from '../models/ConceptSummary';
 import {SearchResult} from 'im-common/dist/models/SearchResult';
 
 @Injectable()
@@ -34,45 +30,47 @@ export class ConceptService {
   }
 
   getConcept(conceptId: number): Observable<Concept> {
-    const params = new URLSearchParams();
-    params.append('id', conceptId.toString());
-
-    return this.http.get('api/Concept', {search: params})
+    return this.http.get('api/Concept/' + conceptId.toString())
       .map((result) => result.json());
   }
 
-  getRelated(conceptId: number, includeDeprecated: boolean): Observable<RelatedConcept[]> {
-    const params = new URLSearchParams();
-    params.append('id', conceptId.toString());
-    params.append('includeDeprecated', includeDeprecated.toString());
-
-    return this.http.get('api/Concept/Related', {search: params})
-      .map((result) => result.json());
-  }
+  // getRelated(conceptId: number, includeDeprecated: boolean): Observable<RelatedConcept[]> {
+  //   const params = new URLSearchParams();
+  //   params.append('id', conceptId.toString());
+  //   params.append('includeDeprecated', includeDeprecated.toString());
+  //
+  //   return this.http.get('api/Concept/Related', {search: params})
+  //     .map((result) => result.json());
+  // }
 
   getAttributes(conceptId: number, includeDeprecated: boolean): Observable<Attribute[]> {
     const params = new URLSearchParams();
-    params.append('id', conceptId.toString());
     params.append('includeDeprecated', includeDeprecated.toString());
 
-    return this.http.get('api/Concept/Attributes', {search: params})
+    return this.http.get('api/Concept/' + conceptId.toString() + '/Attribute', {search: params})
       .map((result) => (result.text() === '') ? null : result.json());
   }
 
   getSynonyms(conceptId: number): Observable<Synonym[]> {
-    const params = new URLSearchParams();
-    params.append('id', conceptId.toString());
-
-    return this.http.get('api/Concept/Synonyms', {search: params})
+    return this.http.get('api/Concept/' + conceptId.toString() + '/Synonyms')
       .map((result) => (result.text() === '') ? null : result.json());
   }
 
-  save(concept: Concept, edits: ConceptEdits): Observable<Bundle> {
-    const bundle = {
-      concept: concept,
-      edits: edits
-    };
+  save(concept: Concept): Observable<Concept> {
+    return this.http.post('api/Concept', concept)
+      .map((result) => result.json());
+  }
 
-    return this.http.post('api/Concept', bundle).map((result) => result.json());
+  deleteConcept(id: number): Observable<any> {
+    return this.http.delete('api/Concept/' + id.toString());
+  }
+
+  saveAttribute(attribute: Attribute): Observable<Attribute> {
+    return this.http.post('api/Concept/Attribute', attribute)
+      .map((result) => result.json());
+  }
+
+  deleteAttribute(id: number): Observable<any> {
+    return this.http.delete('api/Concept/Attribute/' + id.toString());
   }
 }

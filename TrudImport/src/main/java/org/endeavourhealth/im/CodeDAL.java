@@ -54,7 +54,7 @@ public class CodeDAL {
 
     public void populateMap() throws SQLException {
         Long snomedCount = getSnomedCount();
-        Long nextId = TableIdHelper.getNextId("CodeableConcept", snomedCount);
+        Long nextId = TableIdHelper.getNextId("Concept", snomedCount);
         Connection conn = connectionCache.pop();
         String sql =
             "INSERT INTO code\n" +

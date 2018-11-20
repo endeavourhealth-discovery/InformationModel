@@ -107,15 +107,23 @@ public class ConceptLogic {
         return this.dal.saveConcept(concept);
     }
 
-    public void saveConceptBundle(Bundle bundle) throws Exception {
-        this.dal.saveConceptBundle(bundle);
-    }
-
     public void saveRelationship(RelatedConcept relatedConcept) throws Exception {
         throw new NotImplementedException();
     }
 
     public List<Synonym> getSynonyms(Long id) throws Exception {
         return this.dal.getSynonyms(id);
+    }
+
+    public void saveAttribute(Attribute attribute) throws Exception {
+        this.dal.saveAttribute(attribute);
+    }
+
+    public void deleteAttribute(Long id) throws Exception {
+        this.dal.deleteAttribute(id);
+    }
+
+    public void deleteConcept(Long id) throws Exception {
+        this.dal.deleteConcept(id);
     }
 }

@@ -12,4 +12,13 @@ export class Concept extends DbEntity {
   public version: number;
   public description: string;
   public useCount: number;
+
+  constructor() {
+    super();
+    this.superclass = {id: 1, name: 'Concept'};
+    this.url = 'http://';
+    this.status = ConceptStatus.DRAFT;
+    this.version = 0.1;
+    this.useCount = 0;
+  }
 }

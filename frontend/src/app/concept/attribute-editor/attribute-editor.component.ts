@@ -30,19 +30,18 @@ export class AttributeEditorComponent implements OnInit {
   constructor(private modal: NgbModal, public activeModal: NgbActiveModal, private logger: LoggerService, private conceptService: ConceptService) { }
 
   isLiteral() {
-    return this.result.valueConcept.id >= 8 && this.result.valueConcept.id <= 13;
+    return this.result.valueConcept && this.result.valueConcept.id >= 8 && this.result.valueConcept.id <= 13;
   }
 
-  search() {
-    const concept = (this.result.valueConcept.id == 7) ? 2 : this.result.valueConcept.id;
-    ConceptSelectorComponent.open(this.modal, false, concept, this.result.valueExpression)
+  selectValueType() {
+    ConceptSelectorComponent.open(this.modal, false)
       .result.then(
-      (result: Concept) => this.result.fixedConcept = {id: result.id, name: result.fullName},
+      (result: Concept) => this.result.valueConcept = {id: result.id, name: result.fullName},
       () => {}
     );
   }
 
-  selectValueConcept() {
+  selectFixedConcept() {
     ConceptSelectorComponent.open(this.modal, false)
       .result.then(
       (result: Concept) => this.result.fixedConcept = {id: result.id, name: result.fullName},
@@ -54,7 +53,11 @@ export class AttributeEditorComponent implements OnInit {
   }
 
   ok() {
-    this.activeModal.close(this.result);
+    this.conceptService.saveAttribute(this.result)
+      .subscribe(
+        (result) => this.activeModal.close(result),
+        (error) => this.logger.error(error)
+      );
   }
 
   cancel() {

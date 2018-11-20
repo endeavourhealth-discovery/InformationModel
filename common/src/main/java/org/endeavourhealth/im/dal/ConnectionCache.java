@@ -26,8 +26,10 @@ public class ConnectionCache extends GenericCache<Connection> {
             if (connection == null || connection.isClosed())
                 return false;
 
-            if (connection.isValid(VALID_TIMEOUT))
+            if (connection.isValid(VALID_TIMEOUT)) {
+                connection.setAutoCommit(true);
                 return true;
+            }
 
             connection.close();
             return false;

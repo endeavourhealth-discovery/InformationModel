@@ -1,7 +1,7 @@
 <div class="module">
   <div class="container-fluid">
     <div class="module-heading">
-      Concept editor
+      Concept editor : {{concept?.context}}
         <div class="pull-right">
           <button class="btn btn-danger" (click)="close(true)">Close</button>
         </div>
@@ -12,7 +12,14 @@
           <div class="col-md-6"><div class="row h-100">
           <div class="col-md-12 mb-4">
                 <div class="card h-100" id="detailCard" *ngIf="concept">
-                  <div class="card-header"><h4>Concept details : {{concept?.context}}<button class="btn btn-success pull-right" (click)="save(false)">Save</button></h4></div>
+                  <div class="card-header">
+                    <h4>Details
+                      <div class="pull-right">
+                        <button class="btn btn-success" (click)="saveConcept(false)">Save</button>
+                        <button class="btn btn-danger" (click)="promptDeleteConcept()">Delete</button>
+                      </div>
+                    </h4>
+                  </div>
                   <div class="card-body">
                     <div class="row" *ngIf="concept">
                       <div class="col-md-6 col-lg-3 form-group">
@@ -83,7 +90,7 @@
                   <span class="col-md-2"><i class="text-success fa fa-fw fa-plus-circle"></i> = Extends</span>
                   <span class="col-md-2"><i class="text-warning fa fa-fw fa-minus-circle"></i> = Constrains</span>
                 </small>-->
-                <button class="btn btn-success pull-right" (click)="addAttribute()">Add</button>
+                <button class="btn btn-success pull-right" (click)="addAttribute()" [disabled]="concept.id == null">Add</button>
               </h4> </div>
               <div class="card-body">
                 <div class="row mb-4">
@@ -128,7 +135,7 @@
                             <td style="width: 75px">
                               <div class="pull-right child-to-show">
                                 <button class="btn btn-xs btn-success" (click)="editAttribute(item)"><i class="fa fa-fw fa-pencil"></i></button>
-                                <button class="btn btn-xs btn-danger" (click)="deleteAttribute(item)" [disabled]="item.concept.id != concept.id"><i class="fa fa-fw fa-trash"></i></button>
+                                <button class="btn btn-xs btn-danger" (click)="promptDeleteAttribute(item)" [disabled]="item.concept.id != concept.id"><i class="fa fa-fw fa-trash"></i></button>
                               </div>
                             </td>
                           </tr>

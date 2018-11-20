@@ -7,6 +7,7 @@ export class Attribute extends DbEntity {
   public concept: Reference;
   public attribute: Reference;
   public type: Reference;
+  public order: number;
   public mandatory: boolean;
   public limit: number;
   public inheritance: number;

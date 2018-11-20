@@ -29,7 +29,7 @@ CREATE TABLE concept(
   CONSTRAINT concept_superclass_fk              FOREIGN KEY (superclass) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS concept_relationship;
+/*DROP TABLE IF EXISTS concept_relationship;
 CREATE TABLE concept_relationship (             -- Extends concept table for relationships
   id BIGINT AUTO_INCREMENT                      COMMENT 'The relationship ID',
   source BIGINT NOT NULL                        COMMENT 'The source concept',
@@ -48,7 +48,7 @@ CREATE TABLE concept_relationship (             -- Extends concept table for rel
   CONSTRAINT concept_relationship_relationship_fk FOREIGN KEY (relationship) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT concept_relationship_target_fk       FOREIGN KEY (target) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
+*/
 DROP TABLE IF EXISTS concept_attribute;
 CREATE TABLE concept_attribute (                -- Links attribute to concepts
   id BIGINT NOT NULL AUTO_INCREMENT             COMMENT 'Concept Attribute ID',
@@ -136,23 +136,36 @@ CREATE PROCEDURE proc_build_tct()
 
 DELIMITER ;
 
--- ********** VIEW/CONTENT TABLES **********
+-- ********** VIEWS TABLE **********
 
-DROP TABLE IF EXISTS concept_view;
-CREATE TABLE concept_view (
-    id BIGINT AUTO_INCREMENT                    COMMENT 'Unique view id',
-    parent BIGINT                               COMMENT 'Parent view (nested/folder)',
-    name VARCHAR(50)                            COMMENT 'View name',
-    description VARCHAR(4096)                   COMMENT 'Textual description of the view, purpose, content',
-    last_update DATETIME NOT NULL DEFAULT now() COMMENT 'Date/time the view was last updated',
+DROP TABLE IF EXISTS `view`;
+CREATE TABLE `view` (
+    id BIGINT NOT NULL AUTO_INCREMENT           COMMENT 'View id',
+    name VARCHAR(50) NOT NULL                   COMMENT 'View name',
+    description VARCHAR(1000)                   COMMENT 'View description',
 
-    PRIMARY KEY concept_view_id_pk (id),
-    KEY concept_view_parent (parent),
-
-    CONSTRAINT concept_view_parent_fk FOREIGN KEY (parent) REFERENCES concept_view(id) ON DELETE NO ACTION ON UPDATE NO ACTION
+    PRIMARY KEY view_id_pk (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
+DROP TABLE IF EXISTS view_item;
+CREATE TABLE view_item (
+    id BIGINT NOT NULL AUTO_INCREMENT           COMMENT 'Row id',
+    `view` BIGINT NOT NULL                      COMMENT 'The view',
+    concept BIGINT NOT NULL                     COMMENT 'Concept',
+    parent BIGINT                               COMMENT 'Parent',
+    context BIGINT                              COMMENT 'Context (optional)',
+
+
+    PRIMARY KEY view_item_id_pk (id),
+
+    KEY view_item_view_parent_idx (`view`, parent),
+
+    CONSTRAINT view_item_view_fk     FOREIGN KEY (`view`) REFERENCES view(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
+    CONSTRAINT view_item_concept_fk  FOREIGN KEY (concept) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
+    CONSTRAINT view_item_parent_fk   FOREIGN KEY (parent)  REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
+    CONSTRAINT view_item_context_fk  FOREIGN KEY (context) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ********** TERM/MAPPING TABLES **********
 

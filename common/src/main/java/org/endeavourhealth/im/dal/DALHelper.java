@@ -2,12 +2,11 @@ package org.endeavourhealth.im.dal;
 
 import org.endeavourhealth.im.models.*;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+
+import static java.sql.Types.*;
 
 public class DALHelper {
     public static List<String> getColumnList(ResultSet rs) throws SQLException {
@@ -94,11 +93,32 @@ public class DALHelper {
     public static View getViewFromResultSet(ResultSet rs) throws SQLException {
         View view = new View()
             .setId(rs.getLong("id"))
-            .setName(rs.getString("full_name"))
-            .setDescription(rs.getString("description"))
-            .setLastUpdated(rs.getDate("last_update"));
+            .setName(rs.getString("name"))
+            .setDescription(rs.getString("description"));
 
         return view;
+    }
+
+    public static List<ViewItem> getViewItemListFromStatement(PreparedStatement stmt) throws SQLException {
+        List<ViewItem> result = new ArrayList<>();
+        try (ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                result.add(getViewItemFromResultSet(rs));
+            }
+        }
+        return result;
+    }
+
+    public static ViewItem getViewItemFromResultSet(ResultSet rs) throws SQLException {
+        ViewItem viewItem = new ViewItem()
+            .setId(rs.getLong("id"))
+            .setConceptId(rs.getLong("concept"))
+            .setConceptName(rs.getString("concept_name"))
+            .setParentId(rs.getLong("parent"))
+            // .setParentName(rs.getString("parent_name"))
+            .setContextId(rs.getLong("context"))
+            .setContextName(rs.getString("context_name"));
+        return viewItem;
     }
 
     public static List<RelatedConcept> getRelatedListFromStatement(PreparedStatement stmt) throws SQLException {
@@ -178,6 +198,41 @@ public class DALHelper {
         result.setFixedValue(rs.getString("fixed_value"));
 
         return result;
+    }
+
+    public static void setLong(PreparedStatement stmt, int i, Long value) throws SQLException {
+        if (value == null)
+            stmt.setNull(i, BIGINT);
+        else
+            stmt.setLong(i, value);
+    }
+
+    public static void setInt(PreparedStatement stmt, int i, Integer value) throws SQLException {
+        if (value == null)
+            stmt.setNull(i, INTEGER);
+        else
+            stmt.setInt(i, value);
+    }
+
+    public static void setBool(PreparedStatement stmt, int i, Boolean value) throws SQLException {
+        if (value == null)
+            stmt.setNull(i, BOOLEAN);
+        else
+            stmt.setBoolean(i, value);
+    }
+
+    public static void setByte(PreparedStatement stmt, int i, Byte value) throws SQLException {
+        if (value == null)
+            stmt.setNull(i, TINYINT);
+        else
+            stmt.setByte(i, value);
+    }
+
+    public static void setString(PreparedStatement stmt, int i, String value) throws SQLException {
+        if (value == null)
+            stmt.setNull(i, VARCHAR);
+        else
+            stmt.setString(i, value);
     }
 
 }

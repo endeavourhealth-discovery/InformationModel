@@ -2,6 +2,7 @@ package org.endeavourhealth.im.dal;
 
 import org.endeavourhealth.im.models.*;
 
+import java.sql.SQLException;
 import java.util.List;
 
 public interface ConceptDAL {
@@ -13,7 +14,12 @@ public interface ConceptDAL {
     List<Attribute> getAttributes(Long id, Boolean includeDeprecated) throws Exception;
 
     Long saveConcept(Concept concept) throws Exception;
-    void saveConceptBundle(Bundle bundle) throws Exception;
 
     List<Synonym> getSynonyms(Long id) throws Exception;
+
+    void saveAttribute(Attribute attribute) throws Exception;
+
+    void deleteAttribute(Long id) throws Exception;
+
+    void deleteConcept(Long id) throws Exception;
 }

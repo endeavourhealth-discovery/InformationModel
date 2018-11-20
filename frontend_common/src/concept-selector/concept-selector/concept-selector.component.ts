@@ -1,6 +1,6 @@
-import {Component, OnInit} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, ViewChild} from '@angular/core';
 import {NgbActiveModal, NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
-import {InputBoxDialog, LoggerService} from 'eds-angular4';
+import {LoggerService} from 'eds-angular4';
 import {ConceptSelectorService} from '../concept-selector.service';
 import {Concept} from '../../models/Concept';
 import {ConceptStatus, ConceptStatusHelper} from '../../models/ConceptStatus';
@@ -20,7 +20,7 @@ import {SearchResult} from '../../models/SearchResult';
               <div class="form-group col-md-9">
                 <label class="control-label">Search criteria</label>
                 <div class="input-group">
-                  <input class="form-control" type="text" [(ngModel)]="criteria" name="filter" autofocus (keyup.enter)="search()">
+                  <input class="form-control" type="text" [(ngModel)]="criteria" name="filter" #focus autofocus (keyup.enter)="search()">
                   <div class="input-group-append">
                     <span class="input-group-text" (click)="search()"><i class="fa fa-search"></i></span>
                   </div>
@@ -64,7 +64,7 @@ import {SearchResult} from '../../models/SearchResult';
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-success" (click)="add()" name="add" *ngIf="showAdd">Add new</button>
+          <button type="button" class="btn btn-success" (click)="add()" name="add" *ngIf="showAdd">Create new</button>
           <button type="button" class="btn btn-success" (click)="ok()" name="Ok" [disabled]="selection==null">Select</button>
           <button type="button" class="btn btn-danger" (click)="cancel()" name="cancel">Cancel</button>
         </div>
@@ -72,7 +72,7 @@ import {SearchResult} from '../../models/SearchResult';
     `,
     providers: [LoggerService]
 })
-export class ConceptSelectorComponent implements OnInit {
+export class ConceptSelectorComponent implements AfterViewInit {
     hide: boolean;
     criteria: string;
     includeDeprecated = false;
@@ -84,7 +84,7 @@ export class ConceptSelectorComponent implements OnInit {
 
     getConceptStatusName = ConceptStatusHelper.getName;
 
-    public static open(modalService: NgbModal, showAdd: boolean = false, relatedConcept: number = null, expression: number = 0): NgbModalRef {
+    public static open(modalService: NgbModal, showAdd: boolean = false, relatedConcept: number = null, expression: number = null): NgbModalRef {
         const modalRef = modalService.open(ConceptSelectorComponent, {backdrop: 'static', size: 'lg'});
         modalRef.componentInstance.showAdd = showAdd;
         modalRef.componentInstance.relatedConcept = relatedConcept;
@@ -95,7 +95,10 @@ export class ConceptSelectorComponent implements OnInit {
     constructor(public modal: NgbModal, public activeModal: NgbActiveModal, private logger: LoggerService, private conceptService: ConceptSelectorService) {
     }
 
-    ngOnInit() {
+    @ViewChild('focus') focusField: ElementRef;
+    ngAfterViewInit(): void {
+        if (this.focusField != null)
+            this.focusField.nativeElement.focus();
     }
 
     search() {
@@ -118,12 +121,13 @@ export class ConceptSelectorComponent implements OnInit {
     }
 
     add() {
-        this.hide = true;
-        InputBoxDialog.open(this.modal, 'New concept', 'Enter name for new concept', '', 'Create', 'Cancel')
-            .result.then(
-            (result) => this.createAndClose(result),
-            (cancel) => this.activeModal.close(null)
-        );
+        this.createAndClose('');
+        // this.hide = true;
+        // InputBoxDialog.open(this.modal, 'New concept', 'Enter name for new concept', '', 'Create', 'Cancel')
+        //     .result.then(
+        //     (result) => this.createAndClose(result),
+        //     (cancel) => this.activeModal.close(null)
+        // );
     }
 
     createAndClose(name: string) {

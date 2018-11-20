@@ -13,19 +13,17 @@ export class ConceptSelectorService {
         params.append('searchTerm', searchTerm.toString());
         params.append('includeDeprecated', includeDeprecated.toString());
         params.append('page', page.toString());
-        if (relatedConcept)
+        if (relatedConcept!=null)
             params.append('relatedConcept', relatedConcept.toString());
-        params.append('expression', expression.toString())
+        if (expression!=null)
+            params.append('expression', expression.toString())
 
         return this.http.get('{information-model}/api/Concept/Search', {search: params})
             .map((result) => result.json());
     }
 
     getConcept(conceptId: number): Observable<Concept> {
-        const params = new URLSearchParams();
-        params.append('id', conceptId.toString());
-
-        return this.http.get('{information-model}/api/Concept', {search: params})
+        return this.http.get('{information-model}/api/Concept/' + conceptId.toString())
             .map((result) => result.json());
     }
 

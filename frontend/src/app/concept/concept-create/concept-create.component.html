@@ -1,0 +1,58 @@
+<div class="modal-header">
+  <h4 class="modal-title">Create concept</h4>
+  <button type="button" class="close" (click)="cancel()" aria-hidden="true">&times;</button>
+</div>
+<div class="modal-body">
+  <div class="container-fluid">
+
+    <div class="row" *ngIf="concept">
+      <div class="col-md-12 col-lg-4 form-group">
+        <label class="control-label" for="conceptContext">Context</label>
+        <input class="form-control" id="conceptContext" #focus type="text" [(ngModel)]="concept.context" name="conceptContext">
+      </div>
+      <div class="col-md-12 col-lg-4 form-group">
+        <label class="control-label" for="conceptSuperclass">Subtype of</label>
+        <div class="input-group">
+          <input class="form-control" id="conceptSuperclass" type="text" value="{{concept.superclass.name}}" name="conceptSuperclass" readonly>
+          <div class="input-group-append" (click)="promptSuperclass()"><span class="input-group-text"><i class="fa fa-fw fa-search"></i></span></div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-2 form-group">
+        <label class="control-label" for="conceptStatus">Status</label>
+        <div class="dropdown" id="conceptStatus">
+          <button class="dropdown-toggle-custom btn-block text-left form-control" id="statusDropdown" type="button" data-toggle="dropdown">{{getConceptStatusName(concept.status)}}<i class="fa fa-caret-down pull-right"></i></button>
+          <div class="dropdown-menu" aria-labelledby="statusDropdown">
+            <button class="dropdown-item" (click)="concept.status = (ConceptStatus.DRAFT)">Draft</button>
+            <button class="dropdown-item" (click)="concept.status = (ConceptStatus.ACTIVE)">Active</button>
+            <button class="dropdown-item" (click)="concept.status = (ConceptStatus.DEPRECATED)">Deprecated</button>
+            <button class="dropdown-item" (click)="concept.status = (ConceptStatus.TEMPORARY)">Temporary</button>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-2 form-group">
+        <label class="control-label" for="conceptVersion">Version</label>
+        <input class="form-control" id="conceptVersion" type="text" value="{{concept.version}}" name="conceptVersion" readonly>
+      </div>
+      <div class="col-md-12 col-lg-4 form-group">
+        <label class="control-label" for="conceptShortName">Short name</label>
+        <input class="form-control" id="conceptShortName" type="text" [(ngModel)]="concept.shortName" name="conceptShortName">
+      </div>
+      <div class="col-md-12 col-lg-8 form-group">
+        <label class="control-label" for="conceptName">Full name</label>
+        <input class="form-control" id="conceptName" type="text" [(ngModel)]="concept.fullName" name="conceptName">
+      </div>
+      <div class="col-md-12 col-lg-12 form-group">
+        <label class="control-label" for="conceptUrl">URL</label>
+        <input class="form-control" id="conceptUrl" type="text" [(ngModel)]="concept.url" name="conceptUrl">
+      </div>
+      <div class="col-md-12 col-lg-12 form-group">
+        <label class="control-label" for="conceptDescription">Description</label>
+        <textarea rows="1" class="form-control" id="conceptDescription" type="text" [(ngModel)]="concept.description" name="conceptDescription"></textarea>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-success" (click)="ok()" name="Ok" [disabled]="concept.context == null || concept.context == ''">Create</button>
+  <button type="button" class="btn btn-danger" (click)="cancel()" name="cancel">Cancel</button>
+</div>

@@ -43,16 +43,74 @@ import java.util.List;
 public class ConceptEndpoint {
     private static final Logger LOG = LoggerFactory.getLogger(ConceptEndpoint.class);
 
+    /******************** CONCEPTS ********************/
+
     @GET
+    @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Timed(absolute = true, name = "InformationModel.ConceptEndpoint.GET")
     @ApiOperation(value = "Returns concept by ID", response = Concept.class)
     public Response getById(@Context SecurityContext sc,
-                            @ApiParam(value = "Concept ID", required = true) @QueryParam("id") Long id) throws Exception {
+                            @ApiParam(value = "Concept ID", required = true) @PathParam("id") Long id) throws Exception {
         LOG.debug("Get concept by ID");
 
         Concept result = new ConceptLogic().get(id);
+
+        return Response
+            .ok()
+            .entity(result)
+            .build();
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Timed(absolute = true, name = "InformationModel.ConceptEndpoint.POST")
+    @ApiOperation(value = "Saves a concept to the database and returns the result",
+        response = Concept.class,
+        notes = "Where new database entries are created, the IDs will be populated in the returned bundle")
+    public Response saveConcept(@Context SecurityContext sc,
+                                @ApiParam(value = "Concept to save", required = true) Concept concept) throws Exception {
+        LOG.debug("Save concept");
+
+        new ConceptLogic().saveConcept(concept);
+
+        return Response
+            .ok()
+            .entity(concept)
+            .build();
+    }
+
+    @DELETE
+    @Path("/{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Timed(absolute = true, name = "InformationModel.ConceptEndpoint.DELETE")
+    @ApiOperation(value = "Deletes a concept from the database")
+    public Response deleteConcept(@Context SecurityContext sc,
+                                  @ApiParam(value = "Concept id", required = true) @PathParam("id") Long id) throws Exception {
+        LOG.debug("Delete concept");
+
+        new ConceptLogic().deleteConcept(id);
+
+        return Response
+            .ok()
+            .build();
+    }
+
+
+    @GET
+    @Path("/{id}/Synonyms")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Timed(absolute = true, name = "InformationModel.ConceptEndpoint.Synonyms.GET")
+    @ApiOperation(value = "Returns synonyms for the given concept", response = Synonym.class, responseContainer = "List")
+    public Response getAttributes(@Context SecurityContext sc,
+                                  @ApiParam(value = "Concept id", required = true) @PathParam("id") Long id) throws Exception {
+        LOG.debug("Get synonyms by ID");
+
+        List<Synonym> result = new ConceptLogic().getSynonyms(id);
 
         return Response
             .ok()
@@ -119,6 +177,7 @@ public class ConceptEndpoint {
             .build();
     }
 
+/*
     @GET
     @Path("/Related")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -137,15 +196,18 @@ public class ConceptEndpoint {
             .entity(result)
             .build();
     }
+*/
+
+    /******************** ATTRIBUTES ********************/
 
     @GET
-    @Path("/Attributes")
+    @Path("/{id}/Attribute")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Timed(absolute = true, name = "InformationModel.ConceptEndpoint.Attributes.GET")
     @ApiOperation(value = "Returns attributes for the given concept", response = Attribute.class, responseContainer = "List")
     public Response getAttributes(@Context SecurityContext sc,
-                                  @ApiParam(value = "Concept id", required = true) @QueryParam("id") Long id,
+                                  @ApiParam(value = "Concept id", required = true) @PathParam("id") Long id,
                                   @ApiParam(value = "Include deprecated") @QueryParam("includeDeprecated") Boolean includeDeprecated) throws Exception {
         LOG.debug("Get attributes by ID");
 
@@ -157,41 +219,41 @@ public class ConceptEndpoint {
             .build();
     }
 
-    @GET
-    @Path("/Synonyms")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    @Timed(absolute = true, name = "InformationModel.ConceptEndpoint.Synonyms.GET")
-    @ApiOperation(value = "Returns synonyms for the given concept", response = Synonym.class, responseContainer = "List")
-    public Response getAttributes(@Context SecurityContext sc,
-                                  @ApiParam(value = "Concept id", required = true) @QueryParam("id") Long id) throws Exception {
-        LOG.debug("Get synonyms by ID");
-
-        List<Synonym> result = new ConceptLogic().getSynonyms(id);
-
-        return Response
-            .ok()
-            .entity(result)
-            .build();
-    }
 
     @POST
+    @Path("/Attribute")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @Timed(absolute = true, name = "InformationModel.ConceptEndpoint.Attributes.POST")
-    @ApiOperation(value = "Saves a concept & associated edits (bundle) to the database and returns the result",
-        response = Bundle.class,
-        notes = "Where new database entries are created, the IDs will be populated in the returned bundle")
-    public Response saveConcept(@Context SecurityContext sc,
-                                @ApiParam(value = "Concept bundle to save", required = true) Bundle bundle) throws Exception {
-        LOG.debug("Save concept");
+    @Timed(absolute = true, name = "InformationModel.ConceptEndpoint.Attribute.POST")
+    @ApiOperation(value = "Saves an attribute to the database and returns the result",
+        response = Attribute.class,
+        notes = "Where new database entries are created, the IDs will be populated in the returned attribute")
+    public Response saveAttribute(@Context SecurityContext sc,
+                                @ApiParam(value = "Concept bundle to save", required = true) Attribute attribute) throws Exception {
+        LOG.debug("Save attribute");
 
-        new ConceptLogic().saveConceptBundle(bundle);
+        new ConceptLogic().saveAttribute(attribute);
 
         return Response
             .ok()
-            .entity(bundle)
+            .entity(attribute)
             .build();
     }
 
+    @DELETE
+    @Path("/Attribute/{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Timed(absolute = true, name = "InformationModel.ConceptEndpoint.Attribute.DELETE")
+    @ApiOperation(value = "Deletes an attribute from the database")
+    public Response deleteAttribute(@Context SecurityContext sc,
+                                    @ApiParam(value = "Attribute id", required = true) @PathParam("id") Long id) throws Exception {
+        LOG.debug("Delete attribute");
+
+        new ConceptLogic().deleteAttribute(id);
+
+        return Response
+            .ok()
+            .build();
+    }
 }

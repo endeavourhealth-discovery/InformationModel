@@ -2,38 +2,46 @@ import { Injectable } from '@angular/core';
 import {Http, URLSearchParams} from '@angular/http';
 import {Observable} from 'rxjs/Observable';
 import {View} from '../models/View';
-import {ViewFolder} from '../models/ViewFolder';
-import {ConceptSummary} from '../models/ConceptSummary';
+import {ViewItem} from '../models/ViewItem';
 
 @Injectable()
 export class ViewService {
 
   constructor(private http: Http) { }
 
-  getViews(parent: number = null): Observable<View[]> {
-    const params = new URLSearchParams();
-    if (parent != null)
-      params.append('parent', parent.toString());
-    return this.http.get('api/View/List', {search: params})
+  getViews(): Observable<View[]> {
+    return this.http.get('api/View')
       .map((result) => result.json());
   }
 
-  save(view: View): Observable<View> {
+  getView(id: number) {
+    return this.http.get('api/View/' + id.toString())
+      .map((result) => result.json());
+  }
+
+  save(view: View) {
     return this.http.post('api/View', view)
       .map((result) => result.json());
   }
 
-  get(id: any): Observable<View> {
+  getViewContents(viewId: number, parentId: number): Observable<ViewItem[]> {
     const params = new URLSearchParams();
-    params.append('id', id.toString());
-    return this.http.get('api/View', {search: params})
+    if (parentId)
+      params.append('parentId', parentId.toString());
+    return this.http.get('api/View/' + viewId + '/Children', {search: params})
       .map((result) => result.json());
   }
 
-  getConcepts(id: number): Observable<ConceptSummary[]> {
+  addViewItem(viewId: number, addStyle: string, conceptId: number, attributeIds: number[], parentId: number): Observable<any> {
     const params = new URLSearchParams();
-    params.append('id', id.toString());
-    return this.http.get('api/View/Concepts', {search: params})
-      .map((result) => result.json());
+    params.append('addStyle', addStyle);
+    if (parentId != null)
+      params.append('parentId', parentId.toString());
+    return this.http.post('api/View/' + viewId + '/Item/' + conceptId, attributeIds, {search: params});
+  }
+
+
+  delete(viewId: number): Observable<any> {
+    return this.http.delete('api/View/' + viewId);
   }
 }

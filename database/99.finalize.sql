@@ -1,57 +1,67 @@
--- ************************************** IM MODEL DATA **************************************
+/*-- ************************************** IM MODEL DATA **************************************
 
 -- ********** CODE SCHEMES **********
 INSERT INTO concept (id, superclass, context, full_name, description)
 VALUES
-       (5300, 1, 'Code Scheme', 'Coding scheme', 'A coding scheme'),
-       (5301, 1, 'Code Scheme.SNOMED', 'SNOMED CT', 'The SNOMED CT coding scheme'),
-       (5302, 1, 'Code Scheme.READ2', 'READ V2', 'Version 2 READ coding scheme'),
-       (5303, 1, 'Code Scheme.CTV3', 'READ V3', 'Version 3 READ coding scheme'),
-       (5304, 1, 'Code Scheme.OPCS', 'OPCS', 'OPCS coding scheme'),
-       (5305, 1, 'Code Scheme.ICD10', 'ICD10', 'ICD10 coding scheme');
-INSERT INTO concept_relationship (source, relationship, target)
-VALUES
-       (5301, 100, 5300), -- SNOMED                  -- is a --> Code scheme
-       (5302, 100, 5300), -- READ2                   -- is a --> Code scheme
-       (5303, 100, 5300), -- CTV3                    -- is a --> Code scheme
-       (5304, 100, 5300), -- OPCS                    -- is a --> Code scheme
-       (5305, 100, 5300); -- ICD10                  -- is a --> Code scheme
+       (5300, 1, 'Code Scheme',        'Coding scheme', 'A coding scheme'),
+       (5301, 1, 'Code Scheme.SNOMED', 'SNOMED CT',     'The SNOMED CT coding scheme'),
+       (5302, 1, 'Code Scheme.READ2',  'READ V2',       'Version 2 READ coding scheme'),
+       (5303, 1, 'Code Scheme.CTV3',   'READ V3',       'Version 3 READ coding scheme'),
+       (5304, 1, 'Code Scheme.OPCS',   'OPCS',          'OPCS coding scheme'),
+       (5305, 1, 'Code Scheme.ICD10',  'ICD10',         'ICD10 coding scheme');
+
+INSERT INTO concept_attribute (concept, attribute, `order`, mandatory, `limit`, inheritance, value_concept, value_expression)
+VALUE
+      (5301, 100, 0, 1, 1, 0, 5300, 0), -- SNOMED                  -- is a --> Code scheme
+      (5302, 100, 0, 1, 1, 0, 5300, 0), -- READv2                  -- is a --> Code scheme
+      (5303, 100, 0, 1, 1, 0, 5300, 0), -- CTV3                    -- is a --> Code scheme
+      (5304, 100, 0, 1, 1, 0, 5300, 0), -- OPCS                    -- is a --> Code scheme
+      (5305, 100, 0, 1, 1, 0, 5300, 0); -- ICD10                   -- is a --> Code scheme
+
+
+# INSERT INTO concept_relationship (source, relationship, target)
+# VALUES
+#        (5301, 100, 5300), -- SNOMED                  -- is a --> Code scheme
+#        (5302, 100, 5300), -- READ2                   -- is a --> Code scheme
+#        (5303, 100, 5300), -- CTV3                    -- is a --> Code scheme
+#        (5304, 100, 5300), -- OPCS                    -- is a --> Code scheme
+#        (5305, 100, 5300); -- ICD10                   -- is a --> Code scheme
 
 -- ********** DM+D **********
 INSERT INTO concept (id, superclass, context, full_name, description)
 VALUES
-       (5320, 4, 'DM+D.VTM', 'Virtual therapeutic moiety', ''),
-       (5321, 4, 'DM+D.VPI', 'Virtual product ingredient', ''),
+       (5320, 4, 'DM+D.VTM',  'Virtual therapeutic moiety', ''),
+       (5321, 4, 'DM+D.VPI',  'Virtual product ingredient', ''),
        (5322, 4, 'DM+D.CDPI', 'Controlled drug prescribing information', ''),
-       (5323, 4, 'DM+D.DRI', 'Drug route information', ''),
+       (5323, 4, 'DM+D.DRI',  'Drug route information', ''),
        (5324, 4, 'DM+D.ODRI', 'Ontology drug form & route info', ''),
-       (5325, 4, 'DM+D.DFI', 'Dose form information', ''),
-       (5326, 4, 'DM+D.VMP', 'Virtual medicinal product', ''),
-       (5327, 4, 'DM+D.APE', 'Actual product excipient', ''),
+       (5325, 4, 'DM+D.DFI',  'Dose form information', ''),
+       (5326, 4, 'DM+D.VMP',  'Virtual medicinal product', ''),
+       (5327, 4, 'DM+D.APE',  'Actual product excipient', ''),
        (5328, 4, 'DM+D.APrI', 'Appliance product information', ''),
-       (5329, 4, 'DM+D.LR', 'Licensed route', ''),
-       (5330, 4, 'DM+D.AMP', 'Actual medicinal product', ''),
+       (5329, 4, 'DM+D.LR',   'Licensed route', ''),
+       (5330, 4, 'DM+D.AMP',  'Actual medicinal product', ''),
        (5331, 4, 'DM+D.VCPC', 'Virtual combination pack content', ''),
        (5332, 4, 'DM+D.DTCI', 'Drug tariff category info', ''),
        (5333, 4, 'DM+D.VMPP', 'Virtual medicinal product pack', ''),
-       (5334, 4, 'DM+D.PPI', 'Product prescribing info', ''),
+       (5334, 4, 'DM+D.PPI',  'Product prescribing info', ''),
        (5335, 4, 'DM+D.APkI', 'Appliance pack info', ''),
-       (5336, 4, 'DM+D.RI', 'Reimbursement info', ''),
-       (5337, 4, 'DM+D.MPP', 'Medicinal product price', ''),
+       (5336, 4, 'DM+D.RI',   'Reimbursement info', ''),
+       (5337, 4, 'DM+D.MPP',  'Medicinal product price', ''),
        (5338, 4, 'DM+D.ACPC', 'Actual combination pack content', ''),
        (5339, 4, 'DM+D.AMPP', 'Actual medicinal product pack', '');
 INSERT INTO concept_attribute (concept, attribute, `order`, mandatory, `limit`)
 VALUES
-       (5326, 5320, 0, 0, 1),   -- VMP -- (0:1) --> VTM
-       (5326, 5321, 1, 0, 0),   -- VMP -- (0:*) --> VPI
-       (5326, 5322, 2, 0, 1),   -- VMP -- (0:1) --> CDPI
-       (5326, 5323, 3, 0, 0),   -- VMP -- (0:*) --> DRI
-       (5326, 5324, 4, 0, 0),   -- VMP -- (0:*) --> ODRI
-       (5326, 5325, 5, 0, 1),   -- VMP -- (0:1) --> DFI
+       (5326, 5320, 0, 0, 1),   -- VMP  -- (0:1) --> VTM
+       (5326, 5321, 1, 0, 0),   -- VMP  -- (0:*) --> VPI
+       (5326, 5322, 2, 0, 1),   -- VMP  -- (0:1) --> CDPI
+       (5326, 5323, 3, 0, 0),   -- VMP  -- (0:*) --> DRI
+       (5326, 5324, 4, 0, 0),   -- VMP  -- (0:*) --> ODRI
+       (5326, 5325, 5, 0, 1),   -- VMP  -- (0:1) --> DFI
 
-       (5330, 5327, 0, 0, 0),   -- AMP -- (0:*) --> APE
-       (5330, 5328, 1, 0, 1),   -- AMP -- (0:1) --> APrI
-       (5330, 5329, 2, 0, 0),   -- AMP -- (0:*) --> LR
+       (5330, 5327, 0, 0, 0),   -- AMP  -- (0:*) --> APE
+       (5330, 5328, 1, 0, 1),   -- AMP  -- (0:1) --> APrI
+       (5330, 5329, 2, 0, 0),   -- AMP  -- (0:*) --> LR
 
        (5333, 5331, 0, 0, 0),   -- VMPP -- (0:*) --> VCPC
        (5333, 5332, 1, 0, 1),   -- VMPP -- (0:1) --> DTCI
@@ -61,40 +71,48 @@ VALUES
        (5339, 5336, 2, 0, 1),   -- AMPP -- (0:1) --> RI
        (5339, 5337, 3, 0, 1),   -- AMPP -- (0:1) --> MPP
        (5339, 5338, 4, 0, 0);   -- AMPP -- (0:*) --> ACPC
-INSERT INTO concept_relationship (source, relationship, target, mandatory, `limit`)
-VALUES
-    -- DM+D data model relationships
-       (5330, 111, 5326, 1, 1),     -- AMP  -- (1:1) Branded --> VMP
-       (5333, 112, 5326, 1, 1),     -- VMPP -- (1:1) Pack of --> VMP
-       (5339, 111, 5333, 1, 1),     -- AMPP -- (1:1) Branded --> VMPP
-       (5339, 112, 5330, 1, 1);     -- AMPP -- (1:1) Pack of --> AMP
+
+INSERT INTO concept_attribute (concept, attribute, `order`, mandatory, `limit`, inheritance, value_concept, value_expression)
+VALUE
+      (5330, 111, 3, 1, 1, 0, 5326, 0),
+      (5333, 112, 2, 1, 1, 0, 5326, 0),
+      (5339, 111, 5, 1, 1, 0, 5333, 0),
+      (5339, 112, 6, 1, 1, 0, 5330, 0);
+
+# INSERT INTO concept_relationship (source, relationship, target, mandatory, `limit`)
+# VALUES
+#     -- DM+D data model relationships
+#        (5330, 111, 5326, 1, 1),     -- AMP  -- (1:1) Branded --> VMP
+#        (5333, 112, 5326, 1, 1),     -- VMPP -- (1:1) Pack of --> VMP
+#        (5339, 111, 5333, 1, 1),     -- AMPP -- (1:1) Branded --> VMPP
+#        (5339, 112, 5330, 1, 1);     -- AMPP -- (1:1) Pack of --> AMP
 
 -- ********** PCR v2 Schema/Relational model **********
 
 -- Base concepts
 INSERT INTO concept (id, superclass, context, full_name, description)
 VALUES
-       (5349, 1, 'Entity', 'Entity', ''),
+       (5349, 1,    'Entity', 'Entity', ''),
        (5350, 5349, 'Service', 'Service', ''),
-       (5351, 1, 'System', 'System', ''),
+       (5351, 1,    'System', 'System', ''),
        (5352, 5349, 'Department', 'Department', ''),
        (5353, 5349, 'Person', 'Person', ''),
        (5354, 5349, 'OrgSvcDept', 'Organisation, service or department',''),
        (5355, 5353, 'PersonInRole', 'Person in role', ''),
        (5356, 5349, 'Device', 'Device', ''),
-       (5357, 7, 'EditMode', 'Edit mode', '');
+       (5357, 7,    'EditMode', 'Edit mode', '');
 
 -- Transaction
 INSERT INTO concept (id, superclass, context, full_name, description)
 VALUES
-       (5360, 4, 'Transaction', 'Transaction', ''),
+       (5360, 4,  'Transaction', 'Transaction', ''),
        (5361, 11, 'EntryDateTime', 'Date and time of entry', ''),
-       (5362, 7, 'OwningOrganisation', 'Owning organisation', ''),
-       (5363, 7, 'EnteredByPerson', 'Entered by person', ''),
-       (5364, 7, 'EnteredByDevice', 'Entered by device', ''),
-       (5365, 7, 'TransactionMode', 'Transaction mode', ''),
-       (5366, 7, 'EntryType', 'Entry type', ''),
-       (5367, 7, 'EntryAttribute', 'Entry attribute', ''),
+       (5362, 7,  'OwningOrganisation', 'Owning organisation', ''),
+       (5363, 7,  'EnteredByPerson', 'Entered by person', ''),
+       (5364, 7,  'EnteredByDevice', 'Entered by device', ''),
+       (5365, 7,  'TransactionMode', 'Transaction mode', ''),
+       (5366, 7,  'EntryType', 'Entry type', ''),
+       (5367, 7,  'EntryAttribute', 'Entry attribute', ''),
        (5368, 12, 'ReplacedEntry', 'Replaced entry', '');
 
 
@@ -116,10 +134,15 @@ VALUES
        (5371, 7, 'Status.NHSNoVerification.Unverified', 'Unverified', ''),
        (5372, 7, 'Status.NHSNoVerification.Verified', 'Verified', '');
 
-INSERT INTO concept_relationship (source, relationship, target)
-VALUES
-       (5371, 100, 5370),   -- Unverified   -- is a --> NHS No verification status
-       (5372, 100, 5370);   -- Verified     -- is a --> NHS No verification status
+INSERT INTO concept_attribute (concept, attribute, `order`, mandatory, `limit`, inheritance, value_concept, value_expression)
+VALUE
+      (5371, 100, 0, 1, 1, 0, 5370, 0), -- Unverified   -- is a --> Verification status
+      (5372, 100, 0, 1, 1, 0, 5370, 0); -- Verified     -- is a --> Verification status
+
+# INSERT INTO concept_relationship (source, relationship, target)
+# VALUES
+#        (5371, 100, 5370),   -- Unverified   -- is a --> NHS No verification status
+#        (5372, 100, 5370);   -- Verified     -- is a --> NHS No verification status
 
 
 -- Administrative gender TODO: Replace with SNOMED
@@ -131,12 +154,19 @@ VALUES
        (5378, 7, 'AdministrativeGender.Other', 'Other', ''),
        (5379, 7, 'AdministrativeGender.Unknown', 'Unknown', '');
 
-INSERT INTO concept_relationship (source, relationship, target)
-VALUES
-       (5376, 100, 5375),   -- Male     -- is a --> Gender
-       (5377, 100, 5375),   -- Female   -- is a --> Gender
-       (5378, 100, 5375),   -- Other    -- is a --> Gender
-       (5379, 100, 5375);   -- Unknown  -- is a --> Gender
+INSERT INTO concept_attribute (concept, attribute, `order`, mandatory, `limit`, inheritance, value_concept, value_expression)
+VALUE
+      (5376, 100, 0, 1, 1, 0, 5375, 0), -- Male     -- is a --> Gender
+      (5377, 100, 0, 1, 1, 0, 5375, 0), -- Female   -- is a --> Gender
+      (5378, 100, 0, 1, 1, 0, 5375, 0), -- Other    -- is a --> Gender
+      (5379, 100, 0, 1, 1, 0, 5375, 0); -- Unknown  -- is a --> Gender
+
+# INSERT INTO concept_relationship (source, relationship, target)
+# VALUES
+#        (5376, 100, 5375),   -- Male     -- is a --> Gender
+#        (5377, 100, 5375),   -- Female   -- is a --> Gender
+#        (5378, 100, 5375),   -- Other    -- is a --> Gender
+#        (5379, 100, 5375);   -- Unknown  -- is a --> Gender
 
 -- Unit of measure
 INSERT INTO concept (id, superclass, context, full_name, description)
@@ -145,10 +175,15 @@ VALUES
        (5381, 7, 'UOM.g/dl', 'g/dl', 'Grams per deciliter'),
        (5382, 7, 'UOM.g/l', 'g/l', 'Grams per liter');
 
-INSERT INTO concept_relationship (source, relationship, target)
-VALUES
-       (5381, 100, 5380),   -- g/dl     -- is a --> UOM
-       (5382, 100, 5380);   -- g/l      -- is a --> UOM
+INSERT INTO concept_attribute (concept, attribute, `order`, mandatory, `limit`, inheritance, value_concept, value_expression)
+VALUE
+      (5381, 100, 0, 1, 1, 0, 5380, 0), -- g/dl     -- is a --> UOM
+      (5382, 100, 0, 1, 1, 0, 5380, 0); -- g/l      -- is a --> UOM
+
+# INSERT INTO concept_relationship (source, relationship, target)
+# VALUES
+#        (5381, 100, 5380),   -- g/dl     -- is a --> UOM
+#        (5382, 100, 5380);   -- g/l      -- is a --> UOM
 
 -- Date precision
 INSERT INTO concept (id, superclass, context, full_name, description)
@@ -159,12 +194,19 @@ VALUES
        (5388, 7, 'DatePrecision.YearMonth', 'Year and month only', 'MMM-YYYY'),
        (5389, 7, 'DatePrecision.YearOnly', 'Year only', 'YYYY');
 
-INSERT INTO concept_relationship (source, relationship, target)
-VALUES
-       (5386, 100, 5385),   -- Date/time    -- is a --> Date precision
-       (5387, 100, 5385),   -- Date only    -- is a --> Date precision
-       (5388, 100, 5385),   -- Year/month   -- is a --> Date precision
-       (5389, 100, 5385);   -- Year only    -- is a --> Date precision
+INSERT INTO concept_attribute (concept, attribute, `order`, mandatory, `limit`, inheritance, value_concept, value_expression)
+VALUE
+      (5386, 100, 0, 1, 1, 0, 5385, 0), -- Date/time   -- is a --> Date precision
+      (5387, 100, 0, 1, 1, 0, 5385, 0), -- Date only   -- is a --> Date precision
+      (5388, 100, 0, 1, 1, 0, 5385, 0), -- Year/month  -- is a --> Date precision
+      (5389, 100, 0, 1, 1, 0, 5385, 0); -- Year only   -- is a --> Date precision
+
+# INSERT INTO concept_relationship (source, relationship, target)
+# VALUES
+#        (5386, 100, 5385),   -- Date/time    -- is a --> Date precision
+#        (5387, 100, 5385),   -- Date only    -- is a --> Date precision
+#        (5388, 100, 5385),   -- Year/month   -- is a --> Date precision
+#        (5389, 100, 5385);   -- Year only    -- is a --> Date precision
 
 -- Address
 INSERT INTO concept (id, superclass, context, full_name, description)
@@ -203,6 +245,22 @@ VALUES
        (5414, 5411, 1, 1, 1),   -- Org -- (1:1) --> Name
        (5414, 5412, 2, 1, 1),   -- Org -- (1:1) --> Active flag
        (5414, 5413, 3, 1, 1);   -- Org -- (1:1) --> Type
+INSERT INTO concept_attribute (concept, attribute, `order`, mandatory, `limit`, inheritance, value_concept, value_expression)
+VALUES
+       (5414, 105, 4, 1, 0, 0, 5350, 0),  -- Org -- Delivers (1:*) --> Service
+       (5414, 106, 5, 1, 0, 0, 5351, 0),  -- Org -- Uses (1:*) --> System
+       (5414, 107, 6, 0, 0, 0, 5414, 0),  -- Org -- Has parent (0:1) --> Parent org
+       (5414, 102, 5420, 3, 0, 0),  -- Org -- Has (0:*) --> Location (qualifier = Main/None)
+
+       INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
+    VALUES
+    (5414, 105, 5350, 0, 1, 0),  -- Org -- Delivers (1:*) --> Service
+       (5414, 106, 5351, 1, 1, 0),  -- Org -- Uses (1:*) --> System
+       (5414, 107, 5414, 2, 0, 1),  -- Org -- Has parent (0:1) --> Parent org
+       (5414, 102, 5420, 3, 0, 0),  -- Org -- Has (0:*) --> Location (qualifier = Main/None)
+       (5414, 102, 5486, 4, 0, 0),  -- Org -- Has (0:*) --> Prompt
+       (5414, 102, 5434, 5, 0, 0),  -- Org -- Has (0:*) --> Practitioner
+       (5414, 102, 5458, 6, 0, 0);  -- Org -- Has (0:*) --> Patient
 
 -- Location
 INSERT INTO concept (id, superclass, context, full_name, description)
@@ -1230,16 +1288,8 @@ VALUES
        (5914, 5911, 11, 0, 1),  -- Care plan activity target (0:1) --> Outcome date
        (5914, 5912, 12, 1, 1);  -- Care plan activity target (1:1) --> Consent
 
--- Concept relationships
-INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
-VALUES
-       (5414, 105, 5350, 0, 1, 0),  -- Org -- Delivers (1:*) --> Service
-       (5414, 106, 5351, 1, 1, 0),  -- Org -- Uses (1:*) --> System
-       (5414, 107, 5414, 2, 0, 1),  -- Org -- Has parent (0:1) --> Parent org
-       (5414, 102, 5420, 3, 0, 0),  -- Org -- Has (0:*) --> Location (qualifier = Main/None)
-       (5414, 102, 5486, 4, 0, 0),  -- Org -- Has (0:*) --> Prompt
-       (5414, 102, 5434, 5, 0, 0),  -- Org -- Has (0:*) --> Practitioner
-       (5414, 102, 5458, 6, 0, 0);  -- Org -- Has (0:*) --> Patient
+-- ************************************** RELATIONSHIPS **************************************
+
 
 
 INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
@@ -1481,35 +1531,13 @@ WHERE concept = 5746    -- Numeric Observation
 INSERT INTO concept_relationship (source, relationship, target, `order`, mandatory, `limit`)
 VALUES (5922, 101, 5923, 0, 1, 1);
 
--- ************************************** MASSAGE RELATIONSHIPS INTO ATTRIBUTES **************************************
-
-INSERT INTO concept_attribute (concept, attribute, `order`, mandatory, `limit`, inheritance, value_concept, value_expression, fixed_concept, fixed_value)
-SELECT source as concept, relationship as attribute, `order`, mandatory, `limit`, 0, target as value_concept, 0 as value_expression, null, null
-FROM concept_relationship;
-
--- ************************************** IM MODEL DATA **************************************
-
 UPDATE concept
 SET status = 1;
 
+-- ************************************** IM MODEL DATA **************************************
+*/
 DELETE
 FROM table_id;
-INSERT INTO table_id (name, id)
-SELECT 'BaseConcept', MAX(id) + 1
-FROM concept
-WHERE id < 100;
-INSERT INTO table_id (name, id)
-SELECT 'Relationship', MAX(id) + 1
-FROM concept
-WHERE id < 500;
-INSERT INTO table_id (name, id)
-SELECT 'Folder', MAX(id) + 1
-FROM concept
-WHERE id < 1000;
-INSERT INTO table_id (name, id)
-SELECT 'RecordType', MAX(id) + 1
-FROM concept
-WHERE id < 1000000;
 INSERT INTO table_id (name, id)
 SELECT 'Concept', MAX(id) + 1
 FROM concept;

@@ -6,6 +6,7 @@ import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {Concept} from '../models/Concept';
 import {ConceptStatusHelper} from '../models/ConceptStatus';
 import {SearchResult} from 'im-common/dist/models/SearchResult';
+import {ConceptCreateComponent} from './concept-create/concept-create.component';
 
 @Component({
   selector: 'app-concept-library',
@@ -68,10 +69,11 @@ export class ConceptLibraryComponent implements OnInit {
   }
 
   addConcept() {
-      InputBoxDialog.open(this.modal, 'Add concept', 'Enter context name for the new concept', '', 'OK', 'Cancel')
-        .result.then(
-        (result) => this.router.navigate(['concept', 'add', result])
-      );
+    ConceptCreateComponent.open(this.modal)
+      .result.then(
+      (result) => this.router.navigate(['concept', result.id])
+    );
+
   }
 
   gotoPage(page) {

@@ -7,6 +7,7 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {ViewService} from './view.service';
 import { ViewEditorComponent } from './view-editor/view-editor.component';
 import {TreeModule} from 'angular-tree-component';
+import { ViewItemEditorComponent } from './view-item-editor/view-item-editor.component';
 
 @NgModule({
   imports: [
@@ -16,7 +17,8 @@ import {TreeModule} from 'angular-tree-component';
     NgbModule,
     TreeModule
   ],
-  declarations: [ViewLibraryComponent, ViewEditorComponent],
+  declarations: [ViewLibraryComponent, ViewEditorComponent, ViewItemEditorComponent],
+  entryComponents: [ViewItemEditorComponent],
   providers: [ViewService]
 })
 export class ViewsModule { }

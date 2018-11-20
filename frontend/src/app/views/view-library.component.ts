@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {View} from '../models/View';
 import {ViewService} from './view.service';
-import {InputBoxDialog, LoggerService} from 'eds-angular4';
+import {InputBoxDialog, LoggerService, MessageBoxDialog} from 'eds-angular4';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {Router} from '@angular/router';
 
@@ -11,32 +11,47 @@ import {Router} from '@angular/router';
   styleUrls: ['./view-library.component.css']
 })
 export class ViewLibraryComponent implements OnInit {
-  summaryList: View[];
+  viewList: View[];
 
   constructor(private modal: NgbModal, private router: Router, private log: LoggerService, private viewService: ViewService) { }
 
   ngOnInit() {
-    this.viewService.getViews(500)  // Base folder concept
+    this.viewService.getViews()  // Base folder concept
       .subscribe(
-        (result) => this.summaryList = result,
+        (result) => this.viewList = result,
         (error) => this.log.error(error)
       );
   }
 
   addView() {
-    InputBoxDialog.open(this.modal, 'Add view', 'View name', '','Add view', 'Cancel')
+    InputBoxDialog.open(this.modal, 'Create view', 'Enter name for new view', 'New view', 'Create view', 'Cancel')
       .result.then(
-      (result) => this.createView(result),
-      (error) => this.log.error(error)
+      (result) => this.viewService.save({id: null, name: result} as View)
+        .subscribe(
+          (result) => this.router.navigate(['view', result.id]),
+          (error) => this.log.error(error)
+        )
     );
-  }
-
-  createView(name: string) {
-    this.router.navigate(['view', 'add', name]);
   }
 
   editView(view: View) {
     this.router.navigate(['view', view.id]);
+  }
+
+  deleteView(view: View) {
+    MessageBoxDialog.open(this.modal, 'Delete view', 'Are you sure you want to delete <b><i>'+view.name+'</i></b>?', 'Delete view', 'Cancel')
+      .result.then(
+      (confirm) => {
+        this.viewService.delete(view.id)
+          .subscribe(
+            (result) => {
+              this.log.success('Delete successful', view, 'Delete view');
+              this.ngOnInit();
+            },
+                (error) => this.log.error(error)
+          )
+      }
+    );
   }
 
 }
