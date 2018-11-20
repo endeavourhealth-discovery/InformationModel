@@ -88,6 +88,8 @@ export class ViewEditorComponent implements AfterViewInit {
     this.viewService.getViewContents(this.view.id, viewItem.conceptId)
       .subscribe(
         (result) => {
+          if (viewItem.conceptId === 2)
+            this.log.warning('Codeable concepts restricted to 200 items for performance!', null, 'Partial load');
           result.forEach((r) => r.hasChildren = true);
           this.addChildViews(viewItem, result);
           },

@@ -123,8 +123,11 @@ public class ViewJDBCDAL implements ViewDAL {
             "LEFT JOIN concept p ON p.id = c.superclass\n";
         if (parent == null)
             sql += "WHERE c.superclass IS NULL\n";
-        else
+        else {
             sql += "WHERE c.superclass = ?\n";
+            if (parent == 2L)
+                sql += "LIMIT 200"; // Restrict for Codeable concepts so we dont try to load ~900,000 concepts!
+        }
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             if (parent != null)
