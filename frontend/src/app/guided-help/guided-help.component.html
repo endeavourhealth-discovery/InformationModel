@@ -1,0 +1,6 @@
+<i class="fa fa-fw fa-question-circle-o text-info" (click)="startHelp()"></i>
+<div #helpText class="help-box" [hidden]="step==null">
+  <div *ngIf="step!=null">
+    {{helpData[step].text}}
+  </div>
+</div>

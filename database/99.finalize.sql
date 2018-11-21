@@ -1,4 +1,4 @@
-/*-- ************************************** IM MODEL DATA **************************************
+-- ************************************** IM MODEL DATA **************************************
 
 -- ********** CODE SCHEMES **********
 INSERT INTO concept (id, superclass, context, full_name, description)
@@ -88,7 +88,7 @@ VALUE
 #        (5339, 112, 5330, 1, 1);     -- AMPP -- (1:1) Pack of --> AMP
 
 -- ********** PCR v2 Schema/Relational model **********
-
+/*
 -- Base concepts
 INSERT INTO concept (id, superclass, context, full_name, description)
 VALUES

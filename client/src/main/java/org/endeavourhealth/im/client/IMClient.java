@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.http.Header;
 import org.endeavourhealth.common.config.ConfigManager;
 import org.endeavourhealth.common.security.keycloak.client.KeycloakClient;
+import org.endeavourhealth.im.logic.ConceptLogic;
+import org.endeavourhealth.im.logic.MapLogic;
 import org.endeavourhealth.im.models.Concept;
 
 import javax.ws.rs.client.Client;
@@ -16,51 +18,44 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class IMClient {
-    public static Concept getConcept(Long scheme, String code) throws IOException {
-        Map<String, String> params = new HashMap<>();
-        params.put("scheme", scheme.toString());
-        params.put("code", code);
-
-        Response response = get("/api/Map", params);
-
-        if (response.getStatus() == 200)
-            return response.readEntity(Concept.class);
-        else
-            throw new IOException(response.readEntity(String.class));
+    public static Concept getConcept(Long scheme, String code) throws Exception {
+        return new MapLogic().get(code, scheme);
+//        Map<String, String> params = new HashMap<>();
+//        params.put("scheme", scheme.toString());
+//        params.put("code", code);
+//
+//        Response response = get("/api/Map", params);
+//
+//        if (response.getStatus() == 200)
+//            return response.readEntity(Concept.class);
+//        else
+//            throw new IOException(response.readEntity(String.class));
     }
 
-    public static Long getConceptId(Long scheme, String code) throws IOException {
-        Map<String, String> params = new HashMap<>();
-        params.put("scheme", scheme.toString());
-        params.put("code", code);
-
-        Response response = get("/api/Map", params);
-
-        if (response.getStatus() == 200)
-            return (response.readEntity(Concept.class)).getId();
-        else
-            throw new IOException(response.readEntity(String.class));
+    public static Long getConceptId(Long scheme, String code) throws Exception {
+        return getConcept(scheme, code).getId();
     }
 
-    public static Long getConceptId(String context) throws IOException {
+    public static Long getConceptId(String context) throws Exception {
         return getOrCreateConcept(context, false);
     }
 
-    public static Long getOrCreateConceptId(String context) throws IOException {
+    public static Long getOrCreateConceptId(String context) throws Exception {
         return getOrCreateConcept(context, true);
     }
 
-    private static Long getOrCreateConcept(String context, Boolean createMissing) throws IOException {
-        Map<String, String> params = new HashMap<>();
-        params.put("context", context);
-        params.put("createMissing", createMissing.toString());
-
-        Response response = get("/api/Concept/Context", params);
-
-        if (response.getStatus() == 200)
-            return (response.readEntity(Concept.class)).getId();
-        else
-            throw new IOException(response.readEntity(String.class));
+    private static Long getOrCreateConcept(String context, Boolean createMissing) throws Exception {
+        return new ConceptLogic().get(context, createMissing).getId();
+//        Map<String, String> params = new HashMap<>();
+//        params.put("context", context);
+//        params.put("createMissing", createMissing.toString());
+//
+//        Response response = get("/api/Concept/Context", params);
+//
+//        if (response.getStatus() == 200)
+//            return (response.readEntity(Concept.class)).getId();
+//        else
+//            throw new IOException(response.readEntity(String.class));
     }
 
 /*    public static boolean isMessageValid(Message message) {

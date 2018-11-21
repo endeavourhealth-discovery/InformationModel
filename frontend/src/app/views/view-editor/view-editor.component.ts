@@ -169,7 +169,7 @@ export class ViewEditorComponent implements AfterViewInit {
     if (!withConfirm)
       this.location.back();
     else
-      MessageBoxDialog.open(this.modal, 'Close concept editor', 'Unsaved changes will be lost.  Do you want to close the editor?', 'Close editor', 'Cancel')
+      MessageBoxDialog.open(this.modal, 'Close concept editor', 'Any unsaved changes will be lost.  Do you want to close the editor?', 'Close editor', 'Cancel')
         .result.then(
         (result) => this.location.back()
       )

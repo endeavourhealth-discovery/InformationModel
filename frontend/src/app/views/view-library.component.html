@@ -7,8 +7,8 @@
       <form>
         <div class="row">
           <div class="col-md-12">
-            <div class="card" id="taskCard">
-              <div class="card-header"><h4>Views<button type="button" (click)="addView()" class="btn btn-success pull-right">Add</button></h4></div>
+            <div class="card h-100" id="taskCard">
+              <div class="card-header"><h4>Views<button type="button" (click)="addView()" class="btn btn-success pull-right" id="addBtn">Add</button></h4></div>
               <div class="card-body">
                 <div class="row">
                   <div class="col-md-12">
@@ -18,7 +18,7 @@
                           <tr>
                             <th>Name</th>
                             <th>Description</th>
-                            <th>Last updated</th>
+                            <!--<th>Last updated</th>-->
                             <th style="width: 75px;"></th>
                           </tr>
                         </thead>
@@ -26,7 +26,7 @@
                           <tr class="show-child-on-hover" *ngFor="let item of viewList">
                             <td (click)="editView(item)">{{item.name}}</td>
                             <td (click)="editView(item)">{{item.description}}</td>
-                            <td (click)="editView(item)">LAST UPDATE</td>
+                            <!--<td (click)="editView(item)">LAST UPDATE</td>-->
                             <td>
                               <div class="child-to-show">
                                 <button type="button" class="btn btn-xs btn-danger" (click)="deleteView(item)"><i class="fa fa-fw fa-trash"></i></button>

@@ -8,6 +8,7 @@ import {ViewService} from './view.service';
 import { ViewEditorComponent } from './view-editor/view-editor.component';
 import {TreeModule} from 'angular-tree-component';
 import { ViewItemEditorComponent } from './view-item-editor/view-item-editor.component';
+import {GuidedHelpModule} from '../guided-help/guided-help.module';
 
 @NgModule({
   imports: [
@@ -15,7 +16,8 @@ import { ViewItemEditorComponent } from './view-item-editor/view-item-editor.com
     FormsModule,
     ControlsModule,
     NgbModule,
-    TreeModule
+    TreeModule,
+    GuidedHelpModule
   ],
   declarations: [ViewLibraryComponent, ViewEditorComponent, ViewItemEditorComponent],
   entryComponents: [ViewItemEditorComponent],
