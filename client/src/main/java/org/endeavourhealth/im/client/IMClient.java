@@ -1,21 +1,23 @@
 package org.endeavourhealth.im.client;
 
 
-import com.fasterxml.jackson.databind.JsonNode;
-import org.apache.http.Header;
-import org.endeavourhealth.common.config.ConfigManager;
-import org.endeavourhealth.common.security.keycloak.client.KeycloakClient;
 import org.endeavourhealth.im.logic.ConceptLogic;
 import org.endeavourhealth.im.logic.MapLogic;
 import org.endeavourhealth.im.models.Concept;
 
+/*
+import com.fasterxml.jackson.databind.JsonNode;
+import org.endeavourhealth.common.config.ConfigManager;
+import java.io.IOException;
+import java.util.Map;
+import org.endeavourhealth.common.security.keycloak.client.KeycloakClient;
+import org.apache.http.Header;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
 import java.util.HashMap;
-import java.util.Map;
+*/
 
 public class IMClient {
     public static Concept getConcept(Long scheme, String code) throws Exception {
@@ -94,7 +96,7 @@ public class IMClient {
     private static Response get(String path) throws IOException {
         return get(path, null);
     }
-*/
+
     private static Response get(String path, Map<String, String> params) throws IOException {
         String address = ConfigManager.getConfiguration("api", "information-model");
 
@@ -128,5 +130,5 @@ public class IMClient {
         );
 
         return KeycloakClient.instance().getAuthorizationHeader();
-    }
+    } */
 }

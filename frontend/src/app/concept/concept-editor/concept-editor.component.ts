@@ -299,7 +299,7 @@ export class ConceptEditorComponent implements AfterViewInit {
   }
 
   promptDeleteConcept() {
-    MessageBoxDialog.open(this.modal, 'Delete concept', 'Delete the <b><i>' + this.concept.context + '</i></b> concept?<br><br><b>NOTE:</b> The concept attributes will also be deleted!', 'Delete', 'Cancel')
+    MessageBoxDialog.open(this.modal, 'Delete concept', 'Delete the <b><i>' + this.concept.context + '</i></b> concept?', 'Delete', 'Cancel')
       .result.then(
       (result) => this.deleteConcept()
     );

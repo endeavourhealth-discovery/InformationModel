@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-    <groupId>org.endeavourhealth.im</groupId>
-    <artifactId>client</artifactId>
-    <version>1.4-SNAPSHOT</version>
-    <modelVersion>4.0.0</modelVersion>
+  <groupId>org.endeavourhealth.im</groupId>
+  <artifactId>client</artifactId>
+  <version>1.4-SNAPSHOT</version>
+  <modelVersion>4.0.0</modelVersion>
 
   <properties>
     <java.version>1.8</java.version>
@@ -31,70 +31,71 @@
         <artifactId>common</artifactId>
         <version>${version}</version>
       </dependency>
-        <dependency>
-            <groupId>org.endeavourhealth.common</groupId>
-            <artifactId>security</artifactId>
-            <version>${eds-security.version}</version>
-        </dependency>
-<!--
-        <dependency>
-            <groupId>javax.ws.rs</groupId>
-            <artifactId>javax.ws.rs-api</artifactId>
-            <version>${javax-ws-rs.version}</version>
-        </dependency>
+      <!--
+              <dependency>
+                  <groupId>org.endeavourhealth.common</groupId>
+                  <artifactId>security</artifactId>
+                  <version>${eds-security.version}</version>
+              </dependency>
 
-        &lt;!&ndash; Jersey &ndash;&gt;
-        <dependency>
-            <groupId>org.glassfish.jersey.core</groupId>
-            <artifactId>jersey-server</artifactId>
-            <version>${jersey.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.jersey.core</groupId>
-            <artifactId>jersey-common</artifactId>
-            <version>${jersey.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.jersey.core</groupId>
-            <artifactId>jersey-client</artifactId>
-            <version>${jersey.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.jersey.containers</groupId>
-            <artifactId>jersey-container-servlet</artifactId>
-            <version>${jersey.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.jersey.media</groupId>
-            <artifactId>jersey-media-json-jackson</artifactId>
-            <version>${jersey.version}</version>
-        </dependency>
-        &lt;!&ndash; End Jersey &ndash;&gt;
+              <dependency>
+                  <groupId>javax.ws.rs</groupId>
+                  <artifactId>javax.ws.rs-api</artifactId>
+                  <version>${javax-ws-rs.version}</version>
+              </dependency>
 
-        &lt;!&ndash; Keycloak &ndash;&gt;
-        <dependency>
-            <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-tomcat8-adapter</artifactId>
-            <version>${keycloak.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-admin-client</artifactId>
-            <version>${keycloak.version}</version>
-            <exclusions>
-                &lt;!&ndash; exclude common jars included in Tomcat lib directory, but
-                     include them below as provided dependencies&ndash;&gt;
-                <exclusion>
-                    <groupId>org.keycloak</groupId>
-                    <artifactId>keycloak-common</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.keycloak</groupId>
-                    <artifactId>keycloak-core</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>-->
+              &lt;!&ndash; Jersey &ndash;&gt;
+              <dependency>
+                  <groupId>org.glassfish.jersey.core</groupId>
+                  <artifactId>jersey-server</artifactId>
+                  <version>${jersey.version}</version>
+              </dependency>
+              <dependency>
+                  <groupId>org.glassfish.jersey.core</groupId>
+                  <artifactId>jersey-common</artifactId>
+                  <version>${jersey.version}</version>
+              </dependency>
+              <dependency>
+                  <groupId>org.glassfish.jersey.core</groupId>
+                  <artifactId>jersey-client</artifactId>
+                  <version>${jersey.version}</version>
+              </dependency>
+              <dependency>
+                  <groupId>org.glassfish.jersey.containers</groupId>
+                  <artifactId>jersey-container-servlet</artifactId>
+                  <version>${jersey.version}</version>
+              </dependency>
+              <dependency>
+                  <groupId>org.glassfish.jersey.media</groupId>
+                  <artifactId>jersey-media-json-jackson</artifactId>
+                  <version>${jersey.version}</version>
+              </dependency>
+              &lt;!&ndash; End Jersey &ndash;&gt;
+
+              &lt;!&ndash; Keycloak &ndash;&gt;
+              <dependency>
+                  <groupId>org.keycloak</groupId>
+                  <artifactId>keycloak-tomcat8-adapter</artifactId>
+                  <version>${keycloak.version}</version>
+                  <scope>provided</scope>
+              </dependency>
+              <dependency>
+                  <groupId>org.keycloak</groupId>
+                  <artifactId>keycloak-admin-client</artifactId>
+                  <version>${keycloak.version}</version>
+                  <exclusions>
+                      &lt;!&ndash; exclude common jars included in Tomcat lib directory, but
+                           include them below as provided dependencies&ndash;&gt;
+                      <exclusion>
+                          <groupId>org.keycloak</groupId>
+                          <artifactId>keycloak-common</artifactId>
+                      </exclusion>
+                      <exclusion>
+                          <groupId>org.keycloak</groupId>
+                          <artifactId>keycloak-core</artifactId>
+                      </exclusion>
+                  </exclusions>
+              </dependency>-->
 
         <dependency>
             <groupId>junit</groupId>
