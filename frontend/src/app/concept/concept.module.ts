@@ -14,6 +14,7 @@ import {RelatedEditorComponent} from './related-editor/related-editor.component'
 import {SynonymEditorComponent} from './synonym-editor/synonym-editor.component';
 import {ConceptSelectorModule} from 'im-common';
 import { ConceptCreateComponent } from './concept-create/concept-create.component';
+import {GuidedHelpModule} from '../guided-help/guided-help.module';
 
 @NgModule({
   imports: [
@@ -23,7 +24,8 @@ import { ConceptCreateComponent } from './concept-create/concept-create.componen
     NgbModule,
     NvD3Module,
     NodeGraphModule,
-    ConceptSelectorModule
+    ConceptSelectorModule,
+    GuidedHelpModule
   ],
   declarations: [
     ConceptLibraryComponent,

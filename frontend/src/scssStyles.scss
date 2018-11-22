@@ -4,26 +4,29 @@
   display:none;
 }
 
+$flash-light: #fff;
+$flash-dark: $theme-colour;
+
 @-webkit-keyframes argh-my-eyes {
-  0%   { background-color: #fff; }
-  49% { background-color: #fff; }
-  50% { background-color: #000; }
-  99% { background-color: #000; }
-  100% { background-color: #fff; }
+  0%   { border-color: $flash-light; }
+  49% { border-color: $flash-light; }
+  50% { border-color: $flash-dark; }
+  99% { border-color: $flash-dark; }
+  100% { border-color: $flash-light; }
 }
 @-moz-keyframes argh-my-eyes {
-  0%   { background-color: #fff; }
-  49% { background-color: #fff; }
-  50% { background-color: #000; }
-  99% { background-color: #000; }
-  100% { background-color: #fff; }
+  0%   { border-color: $flash-light; }
+  49% { border-color: $flash-light; }
+  50% { border-color: $flash-dark; }
+  99% { border-color: $flash-dark; }
+  100% { border-color: $flash-light; }
 }
 @keyframes argh-my-eyes {
-  0%   { background-color: #fff; }
-  49% { background-color: #fff; }
-  50% { background-color: #000; }
-  99% { background-color: #000; }
-  100% { background-color: #fff; }
+  0%   { border-color: $flash-light; }
+  49% { border-color: $flash-light; }
+  50% { border-color: $flash-dark; }
+  99% { border-color: $flash-dark; }
+  100% { border-color: $flash-light; }
 }
 
 .help-box {
@@ -31,6 +34,8 @@
   z-index: 2000;
   padding: 8px;
   border-radius: $border-radius;
+  border: 2px solid $flash-light;
+  background-color: $theme-lightest;
   -webkit-animation: argh-my-eyes 1s infinite;
   -moz-animation:    argh-my-eyes 1s infinite;
   animation:         argh-my-eyes 1s infinite;

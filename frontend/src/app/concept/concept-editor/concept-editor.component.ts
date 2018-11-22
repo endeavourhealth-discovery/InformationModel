@@ -228,7 +228,7 @@ export class ConceptEditorComponent implements AfterViewInit {
       (result) => {
         if (result) {
           if (!this.attributes.includes(att)) {
-            this.attributes.push(result);
+            this.attributes.unshift(result);
           } else {
             Object.assign(att, result);
           }

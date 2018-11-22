@@ -1,6 +1,11 @@
 <i class="fa fa-fw fa-question-circle-o text-info" (click)="startHelp()"></i>
 <div #helpText class="help-box" [hidden]="step==null">
   <div *ngIf="step!=null">
-    {{helpData[step].text}}
+    <small class="pull-right" (click)="step=null">x</small><br>
+    <span>{{helpData[step].text}}</span>
+    <div>
+      <small *ngIf="step > 0"><< Prev</small>
+      <small class="pull-right" *ngIf="step < helpData.length">Next >></small>
+    </div>
   </div>
 </div>

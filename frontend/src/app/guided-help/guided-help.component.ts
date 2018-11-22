@@ -1,4 +1,4 @@
-import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 
 @Component({
   selector: 'guided-help',
@@ -6,13 +6,43 @@ import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
   styleUrls: ['./guided-help.component.css']
 })
 export class GuidedHelpComponent implements OnInit {
+  @Input("section") section: String;
   @ViewChild("helpText") helpText: ElementRef;
 
   step: number = null;
+  helpData: any = [];
 
   constructor() { }
 
-  helpData: any = [
+  conceptLibraryHelp = [
+    {
+      selector: '#addConcept',
+      text: 'Click the "Add" button',
+      next: 'click'
+    },
+    {
+      selector: '#conceptContext',
+      text: 'Type a context name, e.g. "RecordType.Observation"',
+      next: 'focusout'
+    },
+    {
+      selector: '#promptSuperclass',
+      text: 'Pick the supertype',
+      next: 'click'
+    },
+    {
+      selector: '[name="filter"]',
+      text: 'Type search text, e.g. "RecordType" then press Enter',
+      next: 'focusout'
+    },
+    {
+      selector: '.modal-dialog .btn-success',
+      next: 'click',
+      text: 'Enter a view name and click Create view'
+    }
+  ];
+
+  viewLibraryHelp = [
     {
       selector: '#addBtn',
       next: 'click',
@@ -29,6 +59,11 @@ export class GuidedHelpComponent implements OnInit {
   }
 
   startHelp() {
+    if (this.section == 'ConceptLibrary')
+      this.helpData = this.conceptLibraryHelp;
+    else
+      this.helpData = this.viewLibraryHelp;
+
     this.step = 0;
     this.updateHelp();
   }
@@ -46,14 +81,18 @@ export class GuidedHelpComponent implements OnInit {
     let targets = document.querySelectorAll(this.helpData[this.step].selector);
     if (targets.length == 1) {
       let element = targets[0];
+      element.focus();
       let rect = element.getBoundingClientRect();
       document.body.appendChild(this.helpText.nativeElement);
       this.helpText.nativeElement.style.top = rect.top + 'px';
       let w = window.innerWidth;
-      if (rect.left > (w/2))
+      if (rect.left > (w/2)) {
         this.helpText.nativeElement.style.right = (w - rect.left) + 8 + 'px';
-      else
+        this.helpText.nativeElement.style.left = null;
+      } else {
         this.helpText.nativeElement.style.left = (rect.left + rect.width) + 'px';
+        this.helpText.nativeElement.style.right = null;
+      }
       element.addEventListener(this.helpData[this.step].next, () =>this.next());
     }
   }
