@@ -14,7 +14,7 @@
         <label class="control-label" for="conceptSuperclass">Subtype of</label>
         <div class="input-group">
           <input class="form-control" id="conceptSuperclass" type="text" value="{{concept.superclass.name}}" name="conceptSuperclass" readonly>
-          <div class="input-group-append" (click)="promptSuperclass()" id="promptSuperclass"><span class="input-group-text"><i class="fa fa-fw fa-search"></i></span></div>
+          <div class="input-group-append" (click)="promptSuperclass()"><button id="promptSuperclass" class="input-group-text"><i class="fa fa-fw fa-search"></i></button></div>
         </div>
       </div>
       <div class="col-md-6 col-lg-2 form-group">

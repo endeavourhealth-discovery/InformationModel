@@ -2,10 +2,10 @@
 <div #helpText class="help-box" [hidden]="step==null">
   <div *ngIf="step!=null">
     <small class="pull-right" (click)="step=null">x</small><br>
-    <span>{{helpData[step].text}}</span>
+    <span>{{helpItem[step].text}}</span>
     <div>
       <small *ngIf="step > 0"><< Prev</small>
-      <small class="pull-right" *ngIf="step < helpData.length">Next >></small>
+      <small class="pull-right" *ngIf="step < helpItem.length">Next >></small>
     </div>
   </div>
 </div>

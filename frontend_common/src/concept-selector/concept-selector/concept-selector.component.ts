@@ -19,10 +19,10 @@ import {SearchResult} from '../../models/SearchResult';
             <div class="row">
               <div class="form-group col-md-9">
                 <label class="control-label">Search criteria</label>
-                <div class="input-group">
+                <div class="input-group" id="conceptSelectorSearch">
                   <input class="form-control" type="text" [(ngModel)]="criteria" name="filter" #focus autofocus (keyup.enter)="search()">
                   <div class="input-group-append">
-                    <span class="input-group-text" (click)="search()"><i class="fa fa-search"></i></span>
+                    <button class="input-group-text" (click)="search()"><i class="fa fa-search"></i></button>
                   </div>
                 </div>
               </div>
@@ -64,9 +64,9 @@ import {SearchResult} from '../../models/SearchResult';
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-success" (click)="add()" name="add" *ngIf="showAdd">Create new</button>
-          <button type="button" class="btn btn-success" (click)="ok()" name="Ok" [disabled]="selection==null">Select</button>
-          <button type="button" class="btn btn-danger" (click)="cancel()" name="cancel">Cancel</button>
+          <button type="button" class="btn btn-success" (click)="add()" name="createConcept" *ngIf="showAdd">Create new</button>
+          <button type="button" class="btn btn-success" (click)="ok()" name="selectConcept" [disabled]="selection==null">Select</button>
+          <button type="button" class="btn btn-danger" (click)="cancel()" name="cancelConcept">Cancel</button>
         </div>
       </div>
     `,

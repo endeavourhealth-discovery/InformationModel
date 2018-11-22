@@ -25,7 +25,8 @@ export class ConceptCreateComponent implements AfterViewInit {
   ConceptStatus = ConceptStatus;
   getConceptStatusName = ConceptStatusHelper.getName;
 
-  constructor(private modal: NgbModal,
+  constructor(private dialog: ElementRef,
+              private modal: NgbModal,
               private activeModal: NgbActiveModal,
               private conceptService: ConceptService,
               private logger: LoggerService) { }
@@ -37,10 +38,23 @@ export class ConceptCreateComponent implements AfterViewInit {
   }
 
   promptSuperclass() {
+    this.hide();
     ConceptSelectorComponent.open(this.modal)
       .result.then(
-      (result) => this.concept.superclass = {id: result.id, name: result.fullName}
+      (result) => {
+        this.show();
+        this.concept.superclass = {id: result.id, name: result.fullName};
+      },
+      (cancel) => this.show()
     );
+  }
+
+  hide() {
+    this.dialog.nativeElement.style.display = 'none';
+  }
+
+  show() {
+    this.dialog.nativeElement.style.display = null;
   }
 
   ok() {
