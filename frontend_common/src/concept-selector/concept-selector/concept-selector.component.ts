@@ -99,6 +99,12 @@ export class ConceptSelectorComponent implements AfterViewInit {
     ngAfterViewInit(): void {
         if (this.focusField != null)
             this.focusField.nativeElement.focus();
+
+        this.conceptService.getMRU()
+            .subscribe(
+                (result) => this.result = result,
+                (error) => this.logger.error(error)
+        )
     }
 
     search() {

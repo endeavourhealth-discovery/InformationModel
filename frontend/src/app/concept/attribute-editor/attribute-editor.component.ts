@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {NgbActiveModal, NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {LoggerService} from 'eds-angular4';
+import {LoggerService, MessageBoxDialog} from 'eds-angular4';
 import {ConceptService} from '../concept.service';
 import {ConceptStatusHelper} from '../../models/ConceptStatus';
 import {Attribute} from '../../models/Attribute';
@@ -49,11 +49,20 @@ export class AttributeEditorComponent implements OnInit {
     );
   }
 
+  clearFixedConcept() {
+    MessageBoxDialog.open(this.modal, 'Clear concept', 'Do you want to clear the fixed concept for this attribute?', 'Clear', 'Cancel')
+      .result.then(
+      (clear) => this.result.fixedConcept = null,
+      (cancel) => {}
+    );
+
+  }
+
   ngOnInit() {
   }
 
   ok() {
-    this.conceptService.saveAttribute(this.result)
+    this.conceptService.saveAttribute(this.conceptId, this.result)
       .subscribe(
         (result) => this.activeModal.close(result),
         (error) => this.logger.error(error)

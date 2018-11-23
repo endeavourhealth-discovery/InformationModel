@@ -5,6 +5,7 @@ import {ConceptStatus, ConceptStatusHelper} from '../../models/ConceptStatus';
 import {ConceptSelectorComponent} from 'im-common/dist/concept-selector/concept-selector/concept-selector.component';
 import {ConceptService} from '../concept.service';
 import {LoggerService} from 'eds-angular4';
+import {Reference} from '../../models/Reference';
 
 @Component({
   selector: 'app-concept-create',
@@ -12,12 +13,14 @@ import {LoggerService} from 'eds-angular4';
   styleUrls: ['./concept-create.component.css']
 })
 export class ConceptCreateComponent implements AfterViewInit {
-  public static open(modal: NgbModal, context: string = null) {
+  public static open(modal: NgbModal, commonSubtypes: Reference[], context: string = null) {
     const modalRef = modal.open(ConceptCreateComponent, { backdrop: 'static', size: 'lg'});
+    modalRef.componentInstance.commonSubtypes = commonSubtypes;
     modalRef.componentInstance.concept.context = context;
     return modalRef;
   }
 
+  commonSubtypes: Reference[] = [];
   context: string;
   concept: Concept = new Concept();
 

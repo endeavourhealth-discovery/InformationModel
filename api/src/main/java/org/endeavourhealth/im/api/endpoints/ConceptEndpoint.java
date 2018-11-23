@@ -221,7 +221,7 @@ public class ConceptEndpoint {
 
 
     @POST
-    @Path("/Attribute")
+    @Path("/{id}/Attribute")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Timed(absolute = true, name = "InformationModel.ConceptEndpoint.Attribute.POST")
@@ -229,10 +229,11 @@ public class ConceptEndpoint {
         response = Attribute.class,
         notes = "Where new database entries are created, the IDs will be populated in the returned attribute")
     public Response saveAttribute(@Context SecurityContext sc,
-                                @ApiParam(value = "Concept bundle to save", required = true) Attribute attribute) throws Exception {
+                                @ApiParam(value = "Concept the attribute relates to", required = true) @PathParam("id") Long conceptId,
+                                @ApiParam(value = "Attribute to save", required = true) Attribute attribute) throws Exception {
         LOG.debug("Save attribute");
 
-        new ConceptLogic().saveAttribute(attribute);
+        new ConceptLogic().saveAttribute(conceptId, attribute);
 
         return Response
             .ok()

@@ -69,7 +69,12 @@ export class ConceptLibraryComponent implements OnInit {
   }
 
   addConcept() {
-    ConceptCreateComponent.open(this.modal)
+    let commonSubtypes = [
+      {id: 1, name: 'Concept'},
+      {id: 2, name: 'Codeable concept'},
+      {id: 4, name: 'Record type'}
+    ];
+    ConceptCreateComponent.open(this.modal, commonSubtypes)
       .result.then(
       (result) => this.router.navigate(['concept', result.id])
     );

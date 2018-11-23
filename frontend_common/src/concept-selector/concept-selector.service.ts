@@ -8,6 +8,11 @@ import {SearchResult} from '../models/SearchResult';
 export class ConceptSelectorService {
     constructor(private http: Http) {}
 
+    getMRU(): Observable<SearchResult> {
+        return this.http.get('{information-model}/api/Concept/MRU')
+            .map((result) => result.json());
+    }
+
     search(searchTerm: string, includeDeprecated: boolean, page: number = 1, relatedConcept: number = null, expression: number = 0): Observable<SearchResult> {
         const params = new URLSearchParams();
         params.append('searchTerm', searchTerm.toString());

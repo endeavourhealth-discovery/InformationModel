@@ -115,7 +115,12 @@ public class ConceptLogic {
         return this.dal.getSynonyms(id);
     }
 
-    public void saveAttribute(Attribute attribute) throws Exception {
+    public void saveAttribute(Long conceptId, Attribute attribute) throws Exception {
+        // Is this overriding an inherited attribute?
+        if (!conceptId.equals(attribute.getId())) {
+            attribute.setId(null);
+            attribute.getConcept().setId(conceptId);
+        }
         this.dal.saveAttribute(attribute);
     }
 

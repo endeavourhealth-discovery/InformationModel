@@ -12,9 +12,12 @@
       </div>
       <div class="col-md-12 col-lg-4 form-group">
         <label class="control-label" for="conceptSuperclass">Subtype of</label>
-        <div class="input-group">
-          <input class="form-control" id="conceptSuperclass" type="text" value="{{concept.superclass.name}}" name="conceptSuperclass" readonly>
-          <div class="input-group-append" (click)="promptSuperclass()"><button id="promptSuperclass" class="input-group-text"><i class="fa fa-fw fa-search"></i></button></div>
+        <div class="dropdown" id="conceptSuperclass">
+          <button class="dropdown-toggle-custom btn-block text-left form-control" id="superclassDropdown" type="button" data-toggle="dropdown">{{concept.superclass.name}}<i class="fa fa-caret-down pull-right"></i></button>
+          <div class="dropdown-menu" aria-labelledby="superclassDropdown">
+            <button *ngFor="let item of commonSubtypes" class="dropdown-item" (click)="concept.superclass = item;">{{item.name}}</button>
+            <button class="dropdown-item" (click)="promptSuperclass()">Search...</button>
+          </div>
         </div>
       </div>
       <div class="col-md-6 col-lg-2 form-group">

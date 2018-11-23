@@ -65,8 +65,8 @@ export class ConceptService {
     return this.http.delete('api/Concept/' + id.toString());
   }
 
-  saveAttribute(attribute: Attribute): Observable<Attribute> {
-    return this.http.post('api/Concept/Attribute', attribute)
+  saveAttribute(id: number, attribute: Attribute): Observable<Attribute> {
+    return this.http.post('api/Concept/' + id.toString() + '/Attribute', attribute)
       .map((result) => result.json());
   }
 

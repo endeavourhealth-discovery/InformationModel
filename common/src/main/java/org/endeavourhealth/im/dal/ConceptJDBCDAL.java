@@ -89,9 +89,9 @@ public class ConceptJDBCDAL implements ConceptDAL {
         if (expression == ValueExpression.OF_TYPE) sql += "AND c.superclass = ?\n";
         if (!includeDeprecated) sql += "AND c.status <> 2\n";
 
-        sql += "UNION\n";
+        sql += "UNION DISTINCT\n";
 
-        sql += "SELECT s.concept as id, s.term as full_name, c.context, s.status, c.version, true as synonym \n";
+        sql += "SELECT c.id, c.full_name, c.context, s.status, c.version, false as synonym \n";
         sql += "FROM concept_synonym s\n";
         sql += "JOIN concept c on c.id = s.concept\n";
         if (expression == ValueExpression.CHILD_OF) sql += "JOIN concept_relationship r ON c.id = r.source AND r.relationship = 100 AND r.target = ?\n";

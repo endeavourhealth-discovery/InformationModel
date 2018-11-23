@@ -44,6 +44,7 @@
           <input type="text" class="form-control" value="{{result.fixedConcept?.name}}" readonly (keyup.enter)="search()">
           <div class="input-group-append">
             <span class="input-group-text" (click)="selectFixedConcept()"><i class="fa fa-search"></i></span>
+            <span class="input-group-text" (click)="clearFixedConcept()"><i class="fa fa-times"></i></span>
           </div>
         </div>
       </div>

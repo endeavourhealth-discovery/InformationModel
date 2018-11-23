@@ -114,7 +114,7 @@
                         <tbody>
                           <ng-container *ngFor="let item of attributes; let i = index;">
                             <tr *ngIf="item.concept.id != concept.id && (i==0 || item.concept.id != attributes[i-1].concept.id)">
-                              <th colspan="4">From <a href="#/concept/{{item.concept.id}}">{{item.concept.name}}</a></th>
+                              <th colspan="5">From <a href="#/concept/{{item.concept.id}}">{{item.concept.name}}</a></th>
                             </tr>
                             <tr class="show-child-on-hover" [ngClass]="{'selection': selectedNode == item}" (click)="selectedNode = item">
                             <td>

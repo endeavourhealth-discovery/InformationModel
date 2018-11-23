@@ -188,7 +188,7 @@ export class ConceptEditorComponent implements AfterViewInit {
   }
 
   addAttribute() {
-    ConceptSelectorComponent.open(this.modal, true, 6, ValueExpression.OF_CLASS)
+    ConceptSelectorComponent.open(this.modal, true) //, 6, ValueExpression.OF_CLASS)
       .result.then(
       (result) => {
         if (result.id == null)
@@ -200,7 +200,17 @@ export class ConceptEditorComponent implements AfterViewInit {
   }
 
   createAttributeConcept() {
-    ConceptCreateComponent.open(this.modal)
+    let commonSubtypes = [
+      {id: 6, name: 'Attribute'},
+      {id: 7, name: 'Codeable attribute'},
+      {id: 8, name: 'Number attribute'},
+      {id: 9, name: 'Whole Number attribute'},
+      {id: 10, name: 'Decimal attribute'},
+      {id: 11, name: 'Date time attribute'},
+      {id: 12, name: 'Text attribute'},
+      {id: 13, name: 'Boolean attribute'}
+    ];
+    ConceptCreateComponent.open(this.modal, commonSubtypes)
       .result.then(
       (result) => this.createAttribute(result),
       (error) => this.logger.error(error)
