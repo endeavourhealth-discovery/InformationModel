@@ -75,7 +75,8 @@ public class ConceptLogic {
                 } else {
                     // It's been overridden (constrained)
                     Attribute existing = result.get(idx);
-                    existing.setInheritance(existing.getConcept().getId().equals(id) ? (byte)2 : (byte)0);
+                    if (existing.getInheritance() != (byte)2)
+                        existing.setInheritance(existing.getConcept().getId().equals(id) ? (byte)2 : (byte)0);
                     existing.setConcept(att.getConcept());
                     attIds.remove(idx);
                     result.remove(existing);

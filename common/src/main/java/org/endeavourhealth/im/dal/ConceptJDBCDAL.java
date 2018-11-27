@@ -85,7 +85,7 @@ public class ConceptJDBCDAL implements ConceptDAL {
         sql += "SELECT c.id, c.full_name, c.context, c.status, c.version, false as synonym\n" ;
         sql += "FROM concept c\n";
         if (expression == ValueExpression.CHILD_OF) sql += "JOIN concept_relationship r ON c.id = r.source AND r.relationship = 100 AND r.target = ?\n";
-        sql += "WHERE (c.full_name LIKE ? OR c.context LIKE ?)\n";
+        sql += "WHERE MATCH (c.full_name,c.context) AGAINST (? IN BOOLEAN MODE)\n";
         if (expression == ValueExpression.OF_TYPE) sql += "AND c.superclass = ?\n";
         if (!includeDeprecated) sql += "AND c.status <> 2\n";
 
@@ -95,7 +95,7 @@ public class ConceptJDBCDAL implements ConceptDAL {
         sql += "FROM concept_synonym s\n";
         sql += "JOIN concept c on c.id = s.concept\n";
         if (expression == ValueExpression.CHILD_OF) sql += "JOIN concept_relationship r ON c.id = r.source AND r.relationship = 100 AND r.target = ?\n";
-        sql += "WHERE s.term LIKE ?\n";
+        sql += "WHERE MATCH  (s.term) AGAINST (? IN BOOLEAN MODE)\n";
         if (expression == ValueExpression.OF_TYPE) sql += "AND c.superclass = ?\n";
         if (!includeDeprecated) sql += "AND s.status <> 2 ";
 
@@ -107,12 +107,11 @@ public class ConceptJDBCDAL implements ConceptDAL {
             int i = 1;
 
             if (expression == ValueExpression.CHILD_OF) stmt.setLong(i++, relatedConcept);
-            stmt.setString(i++, "%" + term + "%");
-            stmt.setString(i++, "%" + term + "%");
+            stmt.setString(i++, "+" + term + "*");
             if (expression == ValueExpression.OF_TYPE) stmt.setLong(i++, relatedConcept);
 
             if (expression == ValueExpression.CHILD_OF) stmt.setLong(i++, relatedConcept);
-            stmt.setString(i++, "%" + term + "%");
+            stmt.setString(i++, "+" + term + "*");
             if (expression == ValueExpression.OF_TYPE) stmt.setLong(i++, relatedConcept);
 
             stmt.setInt(i++, (page-1) * PAGE_SIZE);

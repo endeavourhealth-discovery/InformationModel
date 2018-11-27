@@ -25,7 +25,7 @@ CREATE TABLE concept(
   last_update DATETIME NOT NULL DEFAULT now()   COMMENT 'The date/time the concept was added/edited',
 
   PRIMARY KEY concept_id_pk (id),
-
+  FULLTEXT INDEX concept_full_name_context_idx  (full_name, context),
   CONSTRAINT concept_superclass_fk              FOREIGN KEY (superclass) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -83,7 +83,7 @@ CREATE TABLE concept_synonym (
 
   PRIMARY KEY concept_synonym_id_pk (id),
   KEY concept_synonym_concept_idx (concept),
-
+  FULLTEXT INDEX concept_synonym_term_idx (term),
   CONSTRAINT concept_synonym_concept_fk         FOREIGN KEY (concept) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
