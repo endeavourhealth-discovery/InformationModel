@@ -31,7 +31,6 @@ import {ConceptCreateComponent} from '../concept-create/concept-create.component
 })
 export class ConceptEditorComponent implements AfterViewInit {
   concept: Concept;
-  related: RelatedConcept[];
   attributes: Attribute[];
   synonyms: Synonym[];
 
@@ -70,12 +69,15 @@ export class ConceptEditorComponent implements AfterViewInit {
       Observable.forkJoin(
         this.conceptService.getConcept(id),
         this.conceptService.getAttributes(id, false),
-        // this.conceptService.getRelated(id, false),
         this.conceptService.getSynonyms(id)
       )
         .subscribe(
-          (result) => this.setData(result[0], result[1], [], result[2]),
-          (error) => this.logger.error(error)
+          (result) => {
+            this.concept = result[0];
+            this.attributes = result[1];
+            this.synonyms = result[2];
+            this.refreshDiagram();
+          }
         );
     }
   }
@@ -98,20 +100,11 @@ export class ConceptEditorComponent implements AfterViewInit {
     }
     this.concept = concept;
     this.attributes = [];
-    this.related = [];
-    this.refreshDiagram();
-  }
-
-  setData(concept: Concept, attributes: Attribute[], related: RelatedConcept[], synonyms: Synonym[]) {
-    this.concept = concept;
-    this.attributes = attributes;
-    this.related = related;
-    this.synonyms = synonyms;
     this.refreshDiagram();
   }
 
   refreshDiagram() {
-    if (this.concept && this.related && this.attributes) {
+    if (this.concept && this.attributes) {
       this.data = null;
       this.graph.clear();
       this.graph.assignColours([1, 2, 3, 0]);
@@ -120,7 +113,7 @@ export class ConceptEditorComponent implements AfterViewInit {
       // this.graph.addNodeData(this.concept.superclass.id, this.concept.superclass.name, 0, this.concept.superclass);
       // this.graph.addEdgeData(this.concept.id, this.concept.superclass.id, 'inherits from', this.concept.superclass);
 
-      this.updateDiagram(this.concept.id, this.related, this.attributes);
+      this.updateDiagram(this.concept.id, this.attributes);
     }
   }
 
@@ -145,16 +138,16 @@ export class ConceptEditorComponent implements AfterViewInit {
     //   );
   }
 
-  updateDiagram(conceptId: number, related: RelatedConcept[], attributes: Attribute[]) {
-    for (const item of related) {
-      if (item.source.id === conceptId) {
-        this.graph.addNodeData(item.target.id, item.target.name, 2, item);
-        this.graph.addEdgeData(conceptId, item.target.id, this.getRelationshipLabel(item), item);
-      } else {
-        this.graph.addNodeData(item.source.id, item.source.name, 2, item);
-        this.graph.addEdgeData(item.source.id, conceptId, this.getRelationshipLabel(item), item);
-      }
-    }
+  updateDiagram(conceptId: number, attributes: Attribute[]) {
+    // for (const item of related) {
+    //   if (item.source.id === conceptId) {
+    //     this.graph.addNodeData(item.target.id, item.target.name, 2, item);
+    //     this.graph.addEdgeData(conceptId, item.target.id, this.getRelationshipLabel(item), item);
+    //   } else {
+    //     this.graph.addNodeData(item.source.id, item.source.name, 2, item);
+    //     this.graph.addEdgeData(item.source.id, conceptId, this.getRelationshipLabel(item), item);
+    //   }
+    // }
 
     // for (const item of attributes) {
     //   this.graph.addNodeData(item.attribute.id, item.attribute.name, 3, item);
@@ -169,11 +162,11 @@ export class ConceptEditorComponent implements AfterViewInit {
     }
   }
 
-  getRelationshipLabel(related: RelatedConcept) : string {
-    var result = related.relationship.name;
-    result += this.getCardinality(related.mandatory, related.limit);
-    return result;
-  }
+  // getRelationshipLabel(related: RelatedConcept) : string {
+  //   var result = related.relationship.name;
+  //   result += this.getCardinality(related.mandatory, related.limit);
+  //   return result;
+  // }
 
   promptSuperclass() {
     ConceptSelectorComponent.open(this.modal)
@@ -261,11 +254,22 @@ export class ConceptEditorComponent implements AfterViewInit {
           if (att.concept.id === this.concept.id) {
             let idx = this.attributes.indexOf(att);
             this.attributes.splice(idx, 1);
+          } else {
+            this.loadAttributes();
           }
           this.refreshDiagram()
         },
         (error) => this.logger.error(error)
       );
+  }
+
+  loadAttributes() {
+    this.conceptService.getAttributes(this.concept.id, false)
+      .subscribe(
+        (result) => this.attributes = result,
+        (error) => this.logger.error(error)
+      );
+
   }
 
   nodeClick(node) {

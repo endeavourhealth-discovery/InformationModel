@@ -28,10 +28,7 @@
                       </div>
                       <div class="col-md-6 col-lg-3 form-group">
                         <label class="control-label" for="conceptSuperclass"><a href="#/concept/{{concept.superclass.id}}">Subtype of</a></label>
-                        <div class="input-group">
-                          <input class="form-control" id="conceptSuperclass" type="text" value="{{concept.superclass.name}}" name="conceptSuperclass" readonly>
-                          <div class="input-group-append" (click)="promptSuperclass()"><span class="input-group-text"><i class="fa fa-fw fa-search"></i></span></div>
-                        </div>
+                        <input class="form-control" id="conceptSuperclass" type="text" value="{{concept.superclass.name}}" name="conceptSuperclass" readonly>
                       </div>
                       <div class="col-md-6 col-lg-2 form-group">
                         <label class="control-label" for="conceptStatus">Status</label>
@@ -116,7 +113,7 @@
                             <tr *ngIf="item.concept.id != concept.id && (i==0 || item.concept.id != attributes[i-1].concept.id)">
                               <th colspan="5">From <a href="#/concept/{{item.concept.id}}">{{item.concept.name}}</a></th>
                             </tr>
-                            <tr class="show-child-on-hover" [ngClass]="{'selection': selectedNode == item}" (click)="selectedNode = item">
+                            <tr class="show-child-on-hover">
                             <td>
                               <i [class]="getInheritanceIcon(item.inheritance)"></i>
                               <a href="#/concept/{{item.attribute.id}}">{{item.attribute.name}}</a>
@@ -135,7 +132,7 @@
                             <td style="width: 75px">
                               <div class="pull-right child-to-show">
                                 <button class="btn btn-xs btn-success" (click)="editAttribute(item)"><i class="fa fa-fw fa-pencil"></i></button>
-                                <button class="btn btn-xs btn-danger" (click)="promptDeleteAttribute(item)" [disabled]="item.concept.id != concept.id"><i class="fa fa-fw fa-trash"></i></button>
+                                <button class="btn btn-xs btn-danger" (click)="promptDeleteAttribute(item)" [disabled]="item.concept.id != concept.id && item.inheritance == 0"><i class="fa fa-fw fa-trash"></i></button>
                               </div>
                             </td>
                           </tr>

@@ -55,61 +55,40 @@ public class ConceptLogic {
         return this.dal.search(term, page, includeDeprecated, relatedConcept, expression);
     }
 
-    public List<RelatedConcept> getRelated(Long id, Boolean includeDeprecated) throws Exception {
-        return this.dal.getRelated(id, includeDeprecated);
-    }
-
     public List<Attribute> getAttributes(Long id, Boolean includeDeprecated) throws Exception {
         List<Attribute> result = new ArrayList<>();
         List<Long> attIds = new ArrayList<>();
-        List<Long> ancestors = new ArrayList<>();
-        Long attConcept = id;
 
-        while (attConcept != null) {
-            List<Attribute> atts = this.dal.getAttributes(attConcept, includeDeprecated);
+        List<Attribute> atts = this.dal.getAttributes(id, includeDeprecated);
 
-            for (Attribute att : atts) {
-                int idx = attIds.indexOf(att.getAttribute().getId());
-                if (idx < 0) {
-                    att.setInheritance(att.getConcept().getId().equals(id) ? (byte)1 : (byte)0);
-                } else {
-                    // It's been overridden (constrained)
-                    Attribute existing = result.get(idx);
-                    if (existing.getInheritance() != (byte)2)
-                        existing.setInheritance(existing.getConcept().getId().equals(id) ? (byte)2 : (byte)0);
-                    existing.setConcept(att.getConcept());
-                    attIds.remove(idx);
-                    result.remove(existing);
-                    att = existing;
-                }
-                result.add(att);
-                attIds.add(att.getAttribute().getId());
+        for (Attribute att : atts) {
+            int idx = attIds.indexOf(att.getAttribute().getId());
+            if (idx < 0) {
+                att.setInheritance(att.getConcept().getId().equals(id) ? (byte)1 : (byte)0);
+            } else {
+                // It's been overridden (constrained)
+                Attribute existing = result.get(idx);
+                if (existing.getInheritance() != (byte)2)
+                    existing.setInheritance(existing.getConcept().getId().equals(id) ? (byte)2 : (byte)0);
+                existing.setConcept(att.getConcept());
+                attIds.remove(idx);
+                result.remove(existing);
+                att = existing;
             }
-
-            // Get superclass attributes
-            Concept concept = this.dal.get(attConcept);
-            if (concept == null)
-                throw new IndexOutOfBoundsException("Couldnt load concept " + attConcept);
-
-            attConcept = concept.getSuperclass().getId();
-
-            // Cyclic protection
-            if (attConcept == 1 || ancestors.contains(attConcept))
-                attConcept = null;
-            else
-                ancestors.add(attConcept);
-
+            result.add(att);
+            attIds.add(att.getAttribute().getId());
         }
 
         return result;
     }
 
-    public Long saveConcept(Concept concept) throws Exception {
-        return this.dal.saveConcept(concept);
-    }
+    public void saveConcept(Concept concept) throws Exception {
+        Long id = this.dal.saveConcept(concept);
 
-    public void saveRelationship(RelatedConcept relatedConcept) throws Exception {
-        throw new NotImplementedException();
+        if (concept.isNew())
+            this.dal.populateTct(id, concept.getSuperclass().getId());
+
+        concept.setId(id);
     }
 
     public List<Synonym> getSynonyms(Long id) throws Exception {
@@ -120,9 +99,9 @@ public class ConceptLogic {
         // Is this overriding an inherited attribute?
         if (!conceptId.equals(attribute.getId())) {
             attribute.setId(null);
-            attribute.getConcept().setId(conceptId);
+            attribute.setInheritance((byte)2);
         }
-        this.dal.saveAttribute(attribute);
+        this.dal.saveAttribute(conceptId, attribute);
     }
 
     public void deleteAttribute(Long id) throws Exception {

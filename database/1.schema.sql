@@ -25,6 +25,7 @@ CREATE TABLE concept(
   last_update DATETIME NOT NULL DEFAULT now()   COMMENT 'The date/time the concept was added/edited',
 
   PRIMARY KEY concept_id_pk (id),
+  KEY concept_last_update_idx (last_update),
   FULLTEXT INDEX concept_full_name_context_idx  (full_name, context),
   CONSTRAINT concept_superclass_fk              FOREIGN KEY (superclass) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -136,6 +137,21 @@ CREATE PROCEDURE proc_build_tct()
 
 DELIMITER ;
 
+-- ********** SCHEMA MAP TABLE **********
+
+DROP TABLE IF EXISTS concept_schema_map;
+CREATE TABLE concept_schema_map (
+    concept BIGINT NOT NULL             COMMENT 'The concept (usually RecordType subtype), e.g. Event',
+    attribute BIGINT NOT NULL           COMMENT 'The attribute of the concept, e.g. Event.EffectiveDate',
+    `table` VARCHAR(100) NOT NULL       COMMENT 'The table it maps to, e.g. observation',
+    field VARCHAR(100) NOT NULL         COMMENT 'The field it maps to, e.g. effective_date',
+
+    PRIMARY KEY concept_schema_map_pk (concept, attribute),
+
+    CONSTRAINT concept_schema_map_concept_fk FOREIGN KEY (concept) REFERENCES concept(id),
+    CONSTRAINT concept_schema_map_attribute_fk FOREIGN KEY (attribute) REFERENCES concept(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 -- ********** VIEWS TABLE **********
 
 DROP TABLE IF EXISTS `view`;
@@ -229,133 +245,3 @@ CREATE TABLE task (
   KEY task_type_idx (type),
   CONSTRAINT task_type_fk FOREIGN KEY (type) REFERENCES task_type(id) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-# -- ********** TEMP SNOMED TABLES **********
-# DROP TABLE IF EXISTS sct2_concept;
-# CREATE TABLE sct2_concept (
-#   id BIGINT NOT NULL,
-#   effectiveTime INT NOT NULL,
-#   active BOOLEAN NOT NULL,
-#   moduleId BIGINT NOT NULL,
-#   definitionStatusId BIGINT NOT NULL,
-#   KEY id_effectiveTime (id, effectiveTime)
-# ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-#
-# DROP TABLE IF EXISTS sct2_description;
-# CREATE TABLE sct2_description (
-#   id BIGINT NOT NULL,
-#   effectiveTime INT NOT NULL,
-#   active BOOLEAN NOT NULL,
-#   moduleId BIGINT NOT NULL,
-#   conceptId BIGINT NOT NULL,
-#   languageCode VARCHAR(4) NOT NULL,
-#   typeId BIGINT NOT NULL,
-#   term varchar(1000) DEFAULT NULL,
-#   caseSignificanceId BIGINT NOT NULL,
-#   KEY id_effectiveTime (id, effectiveTime)
-# ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-#
-# DROP TABLE IF EXISTS sct2_relationship;
-# CREATE TABLE sct2_relationship (
-#   id BIGINT NOT NULL,
-#   effectiveTime INT NOT NULL,
-#   active BOOLEAN NOT NULL,
-#   moduleId BIGINT NOT NULL,
-#   sourceId BIGINT NOT NULL,
-#   destinationId BIGINT NOT NULL,
-#   relationshipGroup BIGINT NOT NULL,
-#   typeId BIGINT NOT NULL,
-#   characteristicTypeId BIGINT NOT NULL,
-#   modifierId BIGINT NOT NULL,
-#   KEY id_active_idx (id, active),
-#   KEY typeId_sourceId_destinationId_idx (typeId, sourceId, destinationId),
-#   KEY id_typeId (id, typeId)
-# ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- ********** INBOUND MESSAGE TABLES **********
-#
-# DROP TABLE IF EXISTS message;
-# CREATE TABLE message (
-#   id BIGINT AUTO_INCREMENT PRIMARY KEY          COMMENT 'Unique message identifier',
-#   organisation_uuid VARCHAR(36) NOT NULL        COMMENT 'UUID of the message source organisation',
-#   system_concept_id BIGINT NOT NULL             COMMENT 'Reference to the message source system (concept.id)',
-#   version VARCHAR(10) NOT NULL                  COMMENT 'The version of the message source system',
-#   type_concept_id BIGINT NOT NULL               COMMENT 'Reference to the source message type (concept.id)',
-#
-#   CONSTRAINT message_system_concept_id_fk FOREIGN KEY (system_concept_id) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
-#   CONSTRAINT message_type_concept_id_fk FOREIGN KEY (type_concept_id) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION
-# ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-#
-# DROP TABLE IF EXISTS message_resource;
-# CREATE TABLE message_resource (
-#   id BIGINT AUTO_INCREMENT PRIMARY KEY          COMMENT 'Unique message resource identifier',
-#   message_id BIGINT NOT NULL                    COMMENT 'Reference to the message that this is a resource of',
-#   resource_concept_id BIGINT NOT NULL           COMMENT 'Reference to the resource type (concept.id)',
-#   KEY message_resource_message_idx (message_id),
-#
-#   CONSTRAINT message_resource_message_fk FOREIGN KEY (message_id) REFERENCES message (id) ON DELETE NO ACTION ON UPDATE NO ACTION,
-#   CONSTRAINT message_resource_resource_concept_id_fk FOREIGN KEY (resource_concept_id) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION
-# ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-#
-# DROP TABLE IF EXISTS message_resource_field;
-# CREATE TABLE message_resource_field (
-#   id BIGINT AUTO_INCREMENT PRIMARY KEY          COMMENT 'Unique message resource field identifier',
-#   message_resource_id BIGINT                    COMMENT 'Reference to the message resource of which this is a field',
-#   field_name VARCHAR(50) NOT NULL               COMMENT 'Name of the field',
-#   value VARCHAR(4096)                           COMMENT 'Example field value',
-#   scheme_concept_id BIGINT                      COMMENT 'Reference to the code scheme (concept.id) for the value where appropriate',
-#
-#   KEY message_resource_field_message_resource_idx (message_resource_id),
-#   CONSTRAINT message_resource_field_message_resource_fk FOREIGN KEY (message_resource_id) REFERENCES message_resource (id) ON DELETE NO ACTION ON UPDATE NO ACTION,
-#   CONSTRAINT message_resource_field_scheme_concept_id_fk FOREIGN KEY (scheme_concept_id) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION
-# ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-#
-# DROP TABLE IF EXISTS message_mapping;
-# CREATE TABLE message_mapping (
-#   source_field BIGINT NOT NULL                  COMMENT 'Reference to the message resource field (source)',
-#   target_record_type_attribute BIGINT NOT NULL  COMMENT 'Reference to the record type attribute (target)',
-#   description VARCHAR(500)                      COMMENT 'Full textual description of the mapping',
-#
-#   PRIMARY KEY (source_field, target_record_type_attribute),
-#   KEY message_mapping_source_field_idx (source_field),
-#   CONSTRAINT message_mapping_source_field_fk FOREIGN KEY (source_field) REFERENCES message_resource_field(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
-#   CONSTRAINT message_mapping_target_record_type_attribute_fk FOREIGN KEY (target_record_type_attribute) REFERENCES record_type_attribute(id) ON DELETE NO ACTION ON UPDATE NO ACTION
-# ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-#
-
--- ********** TRANSACTION TABLES **********
-
-# DROP TABLE IF EXISTS transaction_action;
-# CREATE TABLE transaction_action (
-#   id TINYINT NOT NULL PRIMARY KEY               COMMENT 'Transaction action unique identifier',
-#   action VARCHAR(25) NOT NULL                   COMMENT 'Name of the action'
-# ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-#
-# DROP TABLE IF EXISTS transaction_table;
-# CREATE TABLE transaction_table (
-#   id TINYINT NOT NULL PRIMARY KEY               COMMENT 'Transaction table identifier',
-#   `table` VARCHAR(25) NOT NULL                  COMMENT 'Name of the transaction table'
-# ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-#
-# DROP TABLE IF EXISTS transaction;
-# CREATE TABLE transaction (
-#   id BIGINT AUTO_INCREMENT PRIMARY KEY          COMMENT 'Unique transaction identifier',
-#   date_time DATETIME NOT NULL DEFAULT NOW()     COMMENT 'Date/time the transaction was created',
-#   owner VARCHAR(250) NOT NULL                   COMMENT 'Owner of the transaction',
-#   action TINYINT NOT NULL                       COMMENT 'The transaction action - 0=Create, 1=Update, 2=Delete',
-#
-#   CONSTRAINT transaction_action_fk FOREIGN KEY (action) REFERENCES transaction_action(id) ON DELETE NO ACTION ON UPDATE NO ACTION -- Move to component table!?
-# ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-#
-# DROP TABLE IF EXISTS transaction_component;
-# CREATE TABLE transaction_component (
-#   id BIGINT AUTO_INCREMENT PRIMARY KEY          COMMENT 'Unique transaction component identifier',
-#   transaction_id BIGINT NOT NULL                COMMENT 'The transaction that this is a component of',
-#   `order` INTEGER NOT NULL                      COMMENT 'The order of this component in relation to the others within the same transaction',
-#   table_id TINYINT NOT NULL                     COMMENT 'The table this transaction component effects',
-#   data LONGTEXT                                 COMMENT 'The data for the transaction component',
-#
-#   KEY transaction_component_transaction_id (transaction_id),
-#   CONSTRAINT transaction_component_transaction_id_fk FOREIGN KEY (transaction_id) REFERENCES transaction(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
-#   CONSTRAINT transaction_component_table_id_fk FOREIGN KEY (table_id) REFERENCES transaction_table(id) ON DELETE NO ACTION ON UPDATE NO ACTION
-# ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

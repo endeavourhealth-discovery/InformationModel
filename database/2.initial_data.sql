@@ -13,16 +13,27 @@ VALUES
        -- (5, 1, 'Concept.Relationship', 'Relationship', 'A concept only used in the relationship links between one concept and another, '),
        (6, 1, 'Concept.Attribute', 'Attribute', 'An attribute of a record type structure that holds a value');
 
+-- BASE Types (super = 1)
+INSERT INTO concept (id, superclass, context, full_name, description)
+VALUES
+       (11, 1, 'Number', 'Number data type', 'A number (whole or decimal)'),
+       (12, 1, 'Whole number', 'Whole number data type', 'A whole number'),
+       (13, 1, 'Decimal number', 'Decimal number data type', 'A decimal number'),
+       (14, 1, 'Date time', 'Date time data type', 'A date and time'),
+       (15, 1, 'Text', 'Text data type', 'A free text value'),
+       (16, 1, 'Boolean', 'Boolean data type', 'A boolean value (Yes/No, True/False, Active/Inactive, etc.)');
+
 -- BASE ATTRIBUTES (super = 6)
 INSERT INTO concept (id, superclass, context, full_name, description)
-    VALUES
-       (7, 6, 'Attribute.Codeable concept', 'Codeable concept attribute', 'An attribute whose value is a code concept'),
-       (8, 6, 'Attribute.Number', 'Number attribute', 'An attribute that holds a number (whole or decimal)'),
-       (9, 6, 'Attribute.Whole number', 'Whole number attribute', 'An attribute that holds a whole number'),
-       (10, 6, 'Attribute.Decimal number', 'Decimal number attribute', 'An attribute that holds a decimal number'),
-       (11, 6, 'Attribute.Date time', 'Date time attribute', 'An attribute that holds a date and time'),
-       (12, 6, 'Attribute.Text', 'Text attribute', 'An attribute that holds a free text value'),
-       (13, 6, 'Attribute.Boolean', 'Boolean attribute', 'An attribute that contains a boolean value (Yes/No, True/False, Active/Inactive, etc.)');
+VALUES
+       (30, 1, 'Attribute.Codeable concept', 'Codeable concept attribute', 'An attribute whose value is a code concept'),
+       (31, 1, 'Attribute.Number', 'Number attribute', 'An attribute that holds a number (whole or decimal)'),
+       (32, 1, 'Attribute.Whole number', 'Whole number attribute', 'An attribute that holds a whole number'),
+       (33, 1, 'Attribute.Decimal number', 'Decimal number attribute', 'An attribute that holds a decimal number'),
+       (34, 1, 'Attribute.Date time', 'Date time attribute', 'An attribute that holds a date and time'),
+       (35, 1, 'Attribute.Text', 'Text attribute', 'An attribute that holds a free text value'),
+       (36, 1, 'Attribute.Boolean', 'Boolean attribute', 'An attribute that contains a boolean value (Yes/No, True/False, Active/Inactive, etc.)');
+
 
 INSERT INTO concept (id, superclass, context, full_name, description)
 VALUES

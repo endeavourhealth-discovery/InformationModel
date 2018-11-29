@@ -52,18 +52,20 @@ public class TermLogic {
                 if (officialTerm != null) {
                     // If one was found, just use it
                     concept.setStatus(ConceptStatus.ACTIVE)
-                        // TODO: Replace with relationship
                         // .setType(new ConceptReference().setText("Class.Code"))
                         .setFullName(officialTerm);
-                    conceptId = this.conceptLogic.saveConcept(concept);
-                    importParentHierarchy(conceptId, system, code);
+                    this.conceptLogic.saveConcept(concept);
+                    conceptId = concept.getId();
+                    // TODO: Replace with attribute
+                    // importParentHierarchy(conceptId, system, code);
                 } else {
                     // otherwise create a draft/temporary one and associated task
                     concept.setStatus(ConceptStatus.DRAFT)
                         // TODO: Replace with relationship
                         // .setType(new ConceptReference().setText("Class.Code"))
                         .setFullName(termText);
-                    conceptId = this.conceptLogic.saveConcept(concept);
+                    this.conceptLogic.saveConcept(concept);
+                    conceptId = concept.getId();
                     this.taskLogic.createTask("New draft term [" + termText + "]", termConceptContext + " => " + termText, TaskType.TERM_MAPPINGS, conceptId);
                 }
             }
@@ -108,19 +110,21 @@ public class TermLogic {
             if (concept == null) {
                 concept = new Concept()
                     .setContext(context)
-                    // TODO: Replace with relationship
+                    // TODO: Replace with attributes
                     // .setType(new ConceptReference().setText("Class.Code"))
                     .setStatus(ConceptStatus.ACTIVE)
                     .setFullName(parent.getText());
 
-                Long parentConceptId = this.conceptLogic.saveConcept(concept);
+                this.conceptLogic.saveConcept(concept);
+                Long parentConceptId = concept.getId();
 
                 RelatedConcept relatedConcept = new RelatedConcept()
                     .setSource(new Reference().setId(parentConceptId))
                     .setRelationship(new Reference().setName("Relationship.HasChild"))
                     .setTarget(new Reference().setId(conceptId));
 
-                this.conceptLogic.saveRelationship(relatedConcept);
+                // TODO: Replace with attributes
+                // this.conceptLogic.saveRelationship(relatedConcept);
 
                 importSnomedParentHierarchy(parentConceptId, parent.getId().toString());
             }
