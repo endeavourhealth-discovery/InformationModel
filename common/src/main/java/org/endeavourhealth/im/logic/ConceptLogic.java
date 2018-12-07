@@ -51,8 +51,8 @@ public class ConceptLogic {
         return this.dal.getMRU(includeDeprecated);
     }
 
-    public SearchResult search(String term, Integer page, Boolean includeDeprecated, Long relatedConcept, ValueExpression expression) throws Exception {
-        return this.dal.search(term, page, includeDeprecated, relatedConcept, expression);
+    public SearchResult search(String term, Integer page, Boolean includeDeprecated, List<Long> schemes, Long relatedConcept, ValueExpression expression) throws Exception {
+        return this.dal.search(term, page, includeDeprecated, schemes, relatedConcept, expression);
     }
 
     public List<Attribute> getAttributes(Long id, Boolean includeDeprecated) throws Exception {
@@ -110,5 +110,9 @@ public class ConceptLogic {
 
     public void deleteConcept(Long id) throws Exception {
         this.dal.deleteConcept(id);
+    }
+
+    public List<ConceptSummary> getSubtypes(Long id, Boolean all) throws Exception {
+        return this.dal.getSubtypes(id, all);
     }
 }

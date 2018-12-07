@@ -4,6 +4,7 @@ import org.endeavourhealth.im.models.*;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static java.sql.Types.*;
@@ -53,7 +54,8 @@ public class DALHelper {
         if ((idx = fields.indexOf("description")) > 0) concept.setDescription(rs.getString(idx));
         if ((idx = fields.indexOf("use_count")) > 0) concept.setUseCount(rs.getLong(idx));
         if ((idx = fields.indexOf("last_update")) > 0) concept.setLastUpdate(rs.getDate(idx));
-
+        if ((idx = fields.indexOf("code")) > 0) concept.setCode(rs.getString(idx));
+        if ((idx = fields.indexOf("code_scheme")) > 0) concept.setScheme(new Reference(rs.getLong(idx), rs.getString("code_scheme_name")));
         return concept;
     }
 
@@ -75,7 +77,8 @@ public class DALHelper {
             .setContext(rs.getString("context"))
             .setStatus(ConceptStatus.byValue(rs.getByte("status")))
             .setVersion(rs.getFloat("version"))
-            .setSynonym(rs.getBoolean("synonym"));
+            .setSynonym(rs.getBoolean("synonym"))
+            .setScheme(new Reference().setId(rs.getLong("code_scheme")).setName(rs.getString("code_scheme_name")));
 
         return result;
     }
@@ -200,6 +203,28 @@ public class DALHelper {
         return result;
     }
 
+    public static List<SchemaMapping> getSchemaMappingListFromStatement(PreparedStatement stmt) throws SQLException {
+        List<SchemaMapping> result = new ArrayList<>();
+        try (ResultSet rs = stmt.executeQuery()) {
+            while(rs.next()) {
+                result.add(getSchemaMappingFromResultSet(rs));
+            }
+        }
+        return result;
+    }
+
+    public static SchemaMapping getSchemaMappingFromResultSet(ResultSet rs) throws SQLException {
+        return new SchemaMapping()
+            .setId(rs.getLong("id"))
+            .setAttribute(
+                new Reference()
+                .setId(rs.getLong("attribute"))
+                .setName(rs.getString("full_name"))
+            )
+            .setTable(rs.getString("table"))
+            .setField(rs.getString("field"));
+    }
+
     public static void setLong(PreparedStatement stmt, int i, Long value) throws SQLException {
         if (value == null)
             stmt.setNull(i, BIGINT);
@@ -235,4 +260,15 @@ public class DALHelper {
             stmt.setString(i, value);
     }
 
+    public static String inListParams(int size) {
+        List<String> q = Collections.nCopies(size, "?");
+        return String.join(",", q);
+    }
+
+    public static int setLongArray(PreparedStatement stmt, int i, List<Long> values) throws SQLException {
+        for(Long value: values) {
+            stmt.setLong(i++, value);
+        }
+        return i;
+    }
 }

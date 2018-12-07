@@ -5,13 +5,13 @@ import {ViewItem} from '../../models/ViewItem';
 import {ViewService} from '../view.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {Location} from '@angular/common';
-import {ConceptSummary} from '../../models/ConceptSummary';
 import {ConceptSelectorComponent} from 'im-common/dist/concept-selector/concept-selector/concept-selector.component';
-import {Concept} from '../../models/Concept';
 import {ITreeOptions, TreeComponent} from 'angular-tree-component';
 import {ViewItemEditorComponent} from '../view-item-editor/view-item-editor.component';
 import {Attribute} from '../../models/Attribute';
 import {View} from '../../models/View';
+import {ConceptSummary} from 'im-common/dist/models/ConceptSummary';
+import {Concept} from 'im-common/dist/models/Concept';
 
 @Component({
   selector: 'app-view-editor',

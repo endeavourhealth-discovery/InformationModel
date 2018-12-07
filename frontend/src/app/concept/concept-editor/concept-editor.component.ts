@@ -1,15 +1,12 @@
 import {AfterViewInit, Component, ViewChild} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {LoggerService, MessageBoxDialog} from 'eds-angular4';
-import {Concept} from '../../models/Concept';
-import {ConceptStatus, ConceptStatusHelper} from '../../models/ConceptStatus';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConceptService} from '../concept.service';
 import {Location} from '@angular/common';
 import {NodeGraphComponent} from 'eds-angular4/dist/node-graph/node-graph.component';
 import {NodeGraphDialogComponent} from '../node-graph-dialog/node-graph-dialog.component';
 import {ModuleStateService} from 'eds-angular4/dist/common';
-import {RelatedConcept} from '../../models/RelatedConcept';
 import {Attribute} from '../../models/Attribute';
 import {Observable} from 'rxjs/Observable';
 import {AttributeEditorComponent} from '../attribute-editor/attribute-editor.component';
@@ -17,10 +14,12 @@ import {SynonymEditorComponent} from '../synonym-editor/synonym-editor.component
 import {Synonym} from '../../models/Synonym';
 import {GraphNode} from 'eds-angular4/dist/node-graph/GraphNode';
 import {ConceptSelectorComponent} from 'im-common/dist/concept-selector/concept-selector/concept-selector.component';
-import {ValueExpression, ValueExpressionHelper} from '../../models/ValueExpression';
+import {ValueExpressionHelper} from '../../models/ValueExpression';
 import {InheritanceHelper} from '../../models/Inheritance';
 import {CardinalityHelper} from '../../models/CardinalityHelper';
 import {ConceptCreateComponent} from '../concept-create/concept-create.component';
+import {Concept} from 'im-common/dist/models/Concept';
+import {ConceptStatus, ConceptStatusHelper} from 'im-common/dist/models/ConceptStatus';
 
 @Component({
   selector: 'app-concept-editor',

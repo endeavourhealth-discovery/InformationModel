@@ -17,6 +17,8 @@ public class Concept extends DbEntity<Concept> {
     private String description;
     private Long useCount = 0L;
     private Date lastUpdate;
+    private String code;
+    private Reference scheme;
 
     public Reference getSuperclass() {
         return superclass;
@@ -110,6 +112,24 @@ public class Concept extends DbEntity<Concept> {
 
     public Concept setLastUpdate(Date lastUpdate) {
         this.lastUpdate = lastUpdate;
+        return this;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public Concept setCode(String code) {
+        this.code = code;
+        return this;
+    }
+
+    public Reference getScheme() {
+        return scheme;
+    }
+
+    public Concept setScheme(Reference scheme) {
+        this.scheme = scheme;
         return this;
     }
 }

@@ -1,11 +1,11 @@
 import {AfterViewInit, Component, ElementRef, ViewChild} from '@angular/core';
 import {LoggerService} from 'eds-angular4';
 import {NgbActiveModal, NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {Concept} from '../../models/Concept';
 import {ViewItem} from '../../models/ViewItem';
 import {Attribute} from '../../models/Attribute';
 import {ConceptService} from '../../concept/concept.service';
 import {ViewItemAddStyle} from '../../models/ViewItemAddStyle';
+import {Concept} from 'im-common/dist/models/Concept';
 
 @Component({
   selector: 'app-view-item-editor',

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import {Http, URLSearchParams} from '@angular/http';
 import {Observable} from 'rxjs/Observable';
 import {TermMapping} from '../models/TermMapping';
-import {ConceptSummary} from '../models/ConceptSummary';
+import {ConceptSummary} from 'im-common/dist/models/ConceptSummary';
 
 @Injectable()
 export class TermMappingsService {

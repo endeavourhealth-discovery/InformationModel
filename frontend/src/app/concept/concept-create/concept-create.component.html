@@ -13,7 +13,7 @@
       <div class="col-md-12 col-lg-4 form-group">
         <label class="control-label" for="conceptSuperclass">Subtype of</label>
         <div class="dropdown" id="conceptSuperclass">
-          <button class="dropdown-toggle-custom btn-block text-left form-control" id="superclassDropdown" type="button" data-toggle="dropdown">{{concept.superclass.name}}<i class="fa fa-caret-down pull-right"></i></button>
+          <button class="dropdown-toggle-custom btn-block text-left form-control" id="superclassDropdown" type="button" data-toggle="dropdown">{{concept.superclass?.name}}<i class="fa fa-caret-down pull-right"></i></button>
           <div class="dropdown-menu" aria-labelledby="superclassDropdown">
             <button *ngFor="let item of commonSubtypes" class="dropdown-item" (click)="concept.superclass = item;">{{item.name}}</button>
             <button class="dropdown-item" (click)="promptSuperclass()">Search...</button>

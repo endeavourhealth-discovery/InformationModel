@@ -1,91 +1,13 @@
 -- ************************************** IM MODEL DATA **************************************
 
--- ********** CODE SCHEMES **********
-INSERT INTO concept (id, superclass, context, full_name, description)
-VALUES
-       (5300, 1, 'Code Scheme',        'Coding scheme', 'A coding scheme'),
-       (5301, 1, 'Code Scheme.SNOMED', 'SNOMED CT',     'The SNOMED CT coding scheme'),
-       (5302, 1, 'Code Scheme.READ2',  'READ V2',       'Version 2 READ coding scheme'),
-       (5303, 1, 'Code Scheme.CTV3',   'READ V3',       'Version 3 READ coding scheme'),
-       (5304, 1, 'Code Scheme.OPCS',   'OPCS',          'OPCS coding scheme'),
-       (5305, 1, 'Code Scheme.ICD10',  'ICD10',         'ICD10 coding scheme');
+UPDATE concept
+SET code_scheme=5307
+WHERE code_scheme IS NULL;
 
-INSERT INTO concept_attribute (concept, attribute, `order`, mandatory, `limit`, inheritance, value_concept, value_expression)
-VALUE
-      (5301, 100, 0, 1, 1, 0, 5300, 0), -- SNOMED                  -- is a --> Code scheme
-      (5302, 100, 0, 1, 1, 0, 5300, 0), -- READv2                  -- is a --> Code scheme
-      (5303, 100, 0, 1, 1, 0, 5300, 0), -- CTV3                    -- is a --> Code scheme
-      (5304, 100, 0, 1, 1, 0, 5300, 0), -- OPCS                    -- is a --> Code scheme
-      (5305, 100, 0, 1, 1, 0, 5300, 0); -- ICD10                   -- is a --> Code scheme
-
-
-# INSERT INTO concept_relationship (source, relationship, target)
-# VALUES
-#        (5301, 100, 5300), -- SNOMED                  -- is a --> Code scheme
-#        (5302, 100, 5300), -- READ2                   -- is a --> Code scheme
-#        (5303, 100, 5300), -- CTV3                    -- is a --> Code scheme
-#        (5304, 100, 5300), -- OPCS                    -- is a --> Code scheme
-#        (5305, 100, 5300); -- ICD10                   -- is a --> Code scheme
-
--- ********** DM+D **********
-INSERT INTO concept (id, superclass, context, full_name, description)
-VALUES
-       (5320, 4, 'DM+D.VTM',  'Virtual therapeutic moiety', ''),
-       (5321, 4, 'DM+D.VPI',  'Virtual product ingredient', ''),
-       (5322, 4, 'DM+D.CDPI', 'Controlled drug prescribing information', ''),
-       (5323, 4, 'DM+D.DRI',  'Drug route information', ''),
-       (5324, 4, 'DM+D.ODRI', 'Ontology drug form & route info', ''),
-       (5325, 4, 'DM+D.DFI',  'Dose form information', ''),
-       (5326, 4, 'DM+D.VMP',  'Virtual medicinal product', ''),
-       (5327, 4, 'DM+D.APE',  'Actual product excipient', ''),
-       (5328, 4, 'DM+D.APrI', 'Appliance product information', ''),
-       (5329, 4, 'DM+D.LR',   'Licensed route', ''),
-       (5330, 4, 'DM+D.AMP',  'Actual medicinal product', ''),
-       (5331, 4, 'DM+D.VCPC', 'Virtual combination pack content', ''),
-       (5332, 4, 'DM+D.DTCI', 'Drug tariff category info', ''),
-       (5333, 4, 'DM+D.VMPP', 'Virtual medicinal product pack', ''),
-       (5334, 4, 'DM+D.PPI',  'Product prescribing info', ''),
-       (5335, 4, 'DM+D.APkI', 'Appliance pack info', ''),
-       (5336, 4, 'DM+D.RI',   'Reimbursement info', ''),
-       (5337, 4, 'DM+D.MPP',  'Medicinal product price', ''),
-       (5338, 4, 'DM+D.ACPC', 'Actual combination pack content', ''),
-       (5339, 4, 'DM+D.AMPP', 'Actual medicinal product pack', '');
-INSERT INTO concept_attribute (concept, attribute, `order`, mandatory, `limit`)
-VALUES
-       (5326, 5320, 0, 0, 1),   -- VMP  -- (0:1) --> VTM
-       (5326, 5321, 1, 0, 0),   -- VMP  -- (0:*) --> VPI
-       (5326, 5322, 2, 0, 1),   -- VMP  -- (0:1) --> CDPI
-       (5326, 5323, 3, 0, 0),   -- VMP  -- (0:*) --> DRI
-       (5326, 5324, 4, 0, 0),   -- VMP  -- (0:*) --> ODRI
-       (5326, 5325, 5, 0, 1),   -- VMP  -- (0:1) --> DFI
-
-       (5330, 5327, 0, 0, 0),   -- AMP  -- (0:*) --> APE
-       (5330, 5328, 1, 0, 1),   -- AMP  -- (0:1) --> APrI
-       (5330, 5329, 2, 0, 0),   -- AMP  -- (0:*) --> LR
-
-       (5333, 5331, 0, 0, 0),   -- VMPP -- (0:*) --> VCPC
-       (5333, 5332, 1, 0, 1),   -- VMPP -- (0:1) --> DTCI
-
-       (5339, 5334, 0, 0, 1),   -- AMPP -- (0:1) --> PPI
-       (5339, 5335, 1, 0, 1),   -- AMPP -- (0:1) --> APkI
-       (5339, 5336, 2, 0, 1),   -- AMPP -- (0:1) --> RI
-       (5339, 5337, 3, 0, 1),   -- AMPP -- (0:1) --> MPP
-       (5339, 5338, 4, 0, 0);   -- AMPP -- (0:*) --> ACPC
-
-INSERT INTO concept_attribute (concept, attribute, `order`, mandatory, `limit`, inheritance, value_concept, value_expression)
-VALUE
-      (5330, 111, 3, 1, 1, 0, 5326, 0),
-      (5333, 112, 2, 1, 1, 0, 5326, 0),
-      (5339, 111, 5, 1, 1, 0, 5333, 0),
-      (5339, 112, 6, 1, 1, 0, 5330, 0);
-
-# INSERT INTO concept_relationship (source, relationship, target, mandatory, `limit`)
-# VALUES
-#     -- DM+D data model relationships
-#        (5330, 111, 5326, 1, 1),     -- AMP  -- (1:1) Branded --> VMP
-#        (5333, 112, 5326, 1, 1),     -- VMPP -- (1:1) Pack of --> VMP
-#        (5339, 111, 5333, 1, 1),     -- AMPP -- (1:1) Branded --> VMPP
-#        (5339, 112, 5330, 1, 1);     -- AMPP -- (1:1) Pack of --> AMP
+ALTER TABLE concept
+MODIFY code_scheme BIGINT NOT NULL DEFAULT 5307,
+ADD UNIQUE KEY concept_code_code_scheme_idx (code, code_scheme),
+ADD CONSTRAINT concept_code_scheme_fk FOREIGN KEY (code_scheme) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- ********** PCR v2 Schema/Relational model **********
 /*

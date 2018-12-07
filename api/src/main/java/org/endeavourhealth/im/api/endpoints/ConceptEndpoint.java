@@ -119,6 +119,25 @@ public class ConceptEndpoint {
     }
 
     @GET
+    @Path("/{id}/Subtypes")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Timed(absolute = true, name = "InformationModel.ConceptEndpoint.Subtypes.GET")
+    @ApiOperation(value = "Returns subtypes of the given concept", response = Concept.class)
+    public Response getConceptSubtypes(@Context SecurityContext sc,
+                                       @ApiParam(value = "Concept ID", required = true) @PathParam("id") Long id,
+                                       @ApiParam(value = "All", required = false) @QueryParam("all") Boolean all) throws Exception {
+        LOG.debug("Get concept by ID");
+
+        List<ConceptSummary> result = new ConceptLogic().getSubtypes(id, all);
+
+        return Response
+            .ok()
+            .entity(result)
+            .build();
+    }
+
+    @GET
     @Path("/Context")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -165,11 +184,12 @@ public class ConceptEndpoint {
                            @ApiParam(value = "Term", required = true) @QueryParam("searchTerm") String term,
                            @ApiParam(value = "Page") @QueryParam("page") Integer page,
                            @ApiParam(value = "Include deprecated") @QueryParam("includeDeprecated") Boolean includeDeprecated,
+                           @ApiParam(value = "Scheme filter") @QueryParam("scheme") List<Long> schemes,
                            @ApiParam(value = "Optional concept restriction") @QueryParam("relatedConcept") Long relatedConcept,
                            @ApiParam(value = "Optional relationship expression ID") @QueryParam("expression") Byte expression) throws Exception {
         LOG.debug("Search by term");
 
-        SearchResult result = new ConceptLogic().search(term, page, includeDeprecated, relatedConcept, ValueExpression.byValue(expression));
+        SearchResult result = new ConceptLogic().search(term, page, includeDeprecated, schemes, relatedConcept, ValueExpression.byValue(expression));
 
         return Response
             .ok()

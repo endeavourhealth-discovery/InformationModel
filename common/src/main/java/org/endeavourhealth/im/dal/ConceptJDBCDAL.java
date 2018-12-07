@@ -18,9 +18,10 @@ public class ConceptJDBCDAL implements ConceptDAL {
     @Override
     public Concept get(Long id) throws SQLException {
         Connection conn = ConnectionPool.InformationModel.pop();
-        String sql = "SELECT c.*, s.full_name as superclass_name " +
+        String sql = "SELECT c.*, s.full_name as superclass_name, cs.full_name as code_scheme_name " +
             "FROM concept c " +
             "JOIN concept s ON s.id = c.superclass " +
+            "LEFT JOIN concept cs ON cs.id = c.code_scheme " +
             "WHERE c.id = ?";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -35,9 +36,10 @@ public class ConceptJDBCDAL implements ConceptDAL {
     public Concept getConceptByContext(String context) throws SQLException {
         Connection conn = ConnectionPool.InformationModel.pop();
 
-        String sql = "SELECT c.*, s.full_name as superclass_name " +
+        String sql = "SELECT c.*, s.full_name as superclass_name, cs.full_name as code_scheme_name " +
             "FROM concept c " +
             "JOIN concept s ON s.id = c.superclass " +
+            "LEFT JOIN concept cs ON cs.id = c.code_scheme " +
             "WHERE c.context = ?";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -54,13 +56,14 @@ public class ConceptJDBCDAL implements ConceptDAL {
 
         SearchResult result = new SearchResult().setPage(1);
 
-        String sql = "SELECT c.id, c.context, c.full_name, c.status, c.version, false as synonym " +
-            "FROM concept c ";
+        String sql = "SELECT c.id, c.context, c.full_name, c.status, c.version, false as synonym, c.code_scheme, s.full_name AS code_scheme_name " +
+            "FROM concept c " +
+            "LEFT JOIN concept s ON s.id = c.code_scheme ";
 
         if (includeDeprecated == null || !includeDeprecated)
             sql += "WHERE c.status <> 2 ";
 
-        sql += "ORDER BY last_update DESC " +
+        sql += "ORDER BY c.last_update DESC " +
             "LIMIT ? ";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -75,29 +78,33 @@ public class ConceptJDBCDAL implements ConceptDAL {
     }
 
     @Override
-    public SearchResult search(String term, Integer page, Boolean includeDeprecated, Long relatedConcept, ValueExpression expression) throws SQLException {
+    public SearchResult search(String term, Integer page, Boolean includeDeprecated, List<Long> schemes, Long relatedConcept, ValueExpression expression) throws SQLException {
         Connection conn = ConnectionPool.InformationModel.pop();
         if (page == null)
             page = 1;
         SearchResult result = new SearchResult().setPage(page);
 
         String sql = "SELECT SQL_CALC_FOUND_ROWS * FROM (\n";
-        sql += "SELECT c.id, c.full_name, c.context, c.status, c.version, false as synonym\n" ;
+        sql += "SELECT c.id, c.full_name, c.context, c.status, c.version, false as synonym, c.code_scheme, cs.full_name as code_scheme_name\n" ;
         sql += "FROM concept c\n";
+        sql += "LEFT JOIN concept cs ON cs.id = c.code_scheme\n";
         if (expression == ValueExpression.CHILD_OF) sql += "JOIN concept_relationship r ON c.id = r.source AND r.relationship = 100 AND r.target = ?\n";
         sql += "WHERE MATCH (c.full_name,c.context) AGAINST (? IN BOOLEAN MODE)\n";
         if (expression == ValueExpression.OF_TYPE) sql += "AND c.superclass = ?\n";
         if (!includeDeprecated) sql += "AND c.status <> 2\n";
+        if (schemes != null && schemes.size() > 0) sql += "AND c.code_scheme IN (" + inListParams(schemes.size()) + ")\n";
 
         sql += "UNION DISTINCT\n";
 
-        sql += "SELECT c.id, c.full_name, c.context, s.status, c.version, false as synonym \n";
+        sql += "SELECT c.id, c.full_name, c.context, s.status, c.version, false as synonym, c.code_scheme, cs.full_name as code_scheme_name \n";
         sql += "FROM concept_synonym s\n";
         sql += "JOIN concept c on c.id = s.concept\n";
+        sql += "LEFT JOIN concept cs ON cs.id = c.code_scheme\n";
         if (expression == ValueExpression.CHILD_OF) sql += "JOIN concept_relationship r ON c.id = r.source AND r.relationship = 100 AND r.target = ?\n";
         sql += "WHERE MATCH  (s.term) AGAINST (? IN BOOLEAN MODE)\n";
         if (expression == ValueExpression.OF_TYPE) sql += "AND c.superclass = ?\n";
         if (!includeDeprecated) sql += "AND s.status <> 2 ";
+        if (schemes != null && schemes.size() > 0) sql += "AND c.code_scheme IN (" + inListParams(schemes.size()) + ")\n";
 
         sql += ") x\n" +
             "ORDER BY (x.status=2), LENGTH(full_name), full_name\n" +
@@ -109,10 +116,14 @@ public class ConceptJDBCDAL implements ConceptDAL {
             if (expression == ValueExpression.CHILD_OF) stmt.setLong(i++, relatedConcept);
             stmt.setString(i++, "+" + term + "*");
             if (expression == ValueExpression.OF_TYPE) stmt.setLong(i++, relatedConcept);
+            if (schemes != null && schemes.size() > 0)
+                i = setLongArray(stmt, i, schemes);
 
             if (expression == ValueExpression.CHILD_OF) stmt.setLong(i++, relatedConcept);
             stmt.setString(i++, "+" + term + "*");
             if (expression == ValueExpression.OF_TYPE) stmt.setLong(i++, relatedConcept);
+            if (schemes != null && schemes.size() > 0)
+                i = setLongArray(stmt, i, schemes);
 
             stmt.setInt(i++, (page-1) * PAGE_SIZE);
             stmt.setInt(i++, PAGE_SIZE);
@@ -139,24 +150,6 @@ public class ConceptJDBCDAL implements ConceptDAL {
     @Override
     public List<Attribute> getAttributes(Long id, Boolean includeDeprecated) throws Exception {
         Connection conn = ConnectionPool.InformationModel.pop();
-
-/*        String sql = "SELECT ca.*, " +
-            "c.full_name as concept_name, " +
-            "a.full_name as attribute_name, " +
-            "vc.full_name as value_type_name, " +
-            "fc.full_name as fixed_value_name " +
-            "FROM concept_attribute ca " +
-            "JOIN concept c ON c.id = ca.concept " +
-            "JOIN concept a ON a.id = ca.attribute " +
-            "LEFT OUTER JOIN concept vc ON vc.id = ca.value_concept " +
-            "LEFT OUTER JOIN concept fc ON fc.id = ca.fixed_concept " +
-            "WHERE ca.concept = ? ";
-
-        if (!includeDeprecated)
-            sql += "AND ca.status <> 2 " +
-                "AND a.status <> 2 ";
-
-        sql += "ORDER BY ca.`order` ";*/
 
         String sql = "(select ca.*, -1 as level,\n" +
             "            c.full_name as concept_name,\n" +
@@ -292,7 +285,7 @@ public class ConceptJDBCDAL implements ConceptDAL {
     }
 
     @Override
-    public void populateTct(Long id, Long superclass) throws Exception {
+    public void populateTct(Long id, Long superclass) throws SQLException {
         Connection conn = ConnectionPool.InformationModel.pop();
         conn.setAutoCommit(false);
         try {
@@ -307,6 +300,34 @@ public class ConceptJDBCDAL implements ConceptDAL {
                 stmt.executeUpdate();
             }
             conn.commit();
+        } finally {
+            ConnectionPool.InformationModel.push(conn);
+        }
+    }
+
+    @Override
+    public List<ConceptSummary> getSubtypes(Long id, Boolean all) throws SQLException {
+        Connection conn = ConnectionPool.InformationModel.pop();
+        String sql = "SELECT c.id, c.full_name, c.context, c.status, c.version, false as synonym, c.code_scheme, cs.full_name as code_scheme_name\n" +
+            "FROM concept c\n" +
+            "LEFT JOIN concept cs ON cs.id = c.code_scheme\n" +
+            "WHERE c.superclass = ?\n";
+
+        if (all)
+            sql += "UNION\n" +
+            "SELECT c.id, c.full_name, c.context, c.status, c.version, false as synonym, c.code_scheme, cs.full_name as code_scheme_name\n" +
+            "FROM concept_tct t\n" +
+            "JOIN concept c on c.id = t.concept\n" +
+            "LEFT JOIN concept cs ON cs.id = c.code_scheme\n" +
+            "WHERE t.ancestor = ?;\n";
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, id);
+            if (all)
+                stmt.setLong(2, id);
+
+            return getConceptSummaryListFromStatement(stmt);
+
         } finally {
             ConnectionPool.InformationModel.push(conn);
         }

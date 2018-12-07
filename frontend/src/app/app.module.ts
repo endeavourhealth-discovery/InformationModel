@@ -17,6 +17,7 @@ import {WorkflowManagerModule} from './workflow-manager/workflow-manager.module'
 import {TermMappingsModule} from './term-mappings/term-mappings.module';
 import {ViewsModule} from './views/views.module';
 import {GuidedHelpModule} from './guided-help/guided-help.module';
+import {SchemaMappingsModule} from './schema-mappings/schema-mappings.module';
 
 @NgModule({
   imports: [
@@ -33,6 +34,7 @@ import {GuidedHelpModule} from './guided-help/guided-help.module';
     ViewsModule,
     WorkflowManagerModule,
     TermMappingsModule,
+    SchemaMappingsModule,
 
     RouterModule.forRoot(AppMenuService.getRoutes(), {useHash: true}),
     NgbModule.forRoot(),

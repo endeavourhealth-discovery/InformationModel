@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import {Http, URLSearchParams} from '@angular/http';
 import {Observable} from 'rxjs/Observable';
-import {Concept} from '../models/Concept';
 import {Attribute} from '../models/Attribute';
 import {Synonym} from '../models/Synonym';
 import {SearchResult} from 'im-common/dist/models/SearchResult';
+import {Concept} from 'im-common/dist/models/Concept';
+import {ConceptSummary} from 'im-common/dist/models/ConceptSummary';
 
 @Injectable()
 export class ConceptService {
@@ -19,9 +20,12 @@ export class ConceptService {
       .map((result) => result.json());
   }
 
-  search(searchTerm: string, includeDeprecated: boolean, page:number = 1): Observable<SearchResult> {
+  search(searchTerm: string, includeDeprecated: boolean, schemes: number[], page:number = 1): Observable<SearchResult> {
     const params = new URLSearchParams();
-    params.append('searchTerm', searchTerm.toString());
+    params.append('searchTerm', searchTerm);
+    if (schemes)
+      for(let scheme of schemes)
+        params.append('scheme', scheme.toString());
     params.append('includeDeprecated', includeDeprecated.toString());
     params.append('page', page.toString());
 
@@ -54,6 +58,15 @@ export class ConceptService {
   getSynonyms(conceptId: number): Observable<Synonym[]> {
     return this.http.get('api/Concept/' + conceptId.toString() + '/Synonyms')
       .map((result) => (result.text() === '') ? null : result.json());
+  }
+
+  getSubtypes(conceptId: number, all: boolean = false): Observable<ConceptSummary[]> {
+    const params = new URLSearchParams();
+    if (all)
+      params.append('all', all.toString());
+
+    return this.http.get('api/Concept/' + conceptId.toString() + '/Subtypes', {search: params})
+      .map((result) => result.json());
   }
 
   save(concept: Concept): Observable<Concept> {

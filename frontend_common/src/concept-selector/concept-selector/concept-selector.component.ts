@@ -5,6 +5,7 @@ import {ConceptSelectorService} from '../concept-selector.service';
 import {Concept} from '../../models/Concept';
 import {ConceptStatus, ConceptStatusHelper} from '../../models/ConceptStatus';
 import {SearchResult} from '../../models/SearchResult';
+import {ConceptSummary} from '../../models/ConceptSummary';
 
 @Component({
     selector: 'app-concept-selector',
@@ -17,7 +18,7 @@ import {SearchResult} from '../../models/SearchResult';
         <div class="modal-body">
           <div class="container-fluid">
             <div class="row">
-              <div class="form-group col-md-9">
+              <div class="form-group col-md-6">
                 <label class="control-label">Search criteria</label>
                 <div class="input-group" id="conceptSelectorSearch">
                   <input class="form-control" type="text" [(ngModel)]="criteria" name="filter" #focus autofocus (keyup.enter)="search()">
@@ -26,8 +27,13 @@ import {SearchResult} from '../../models/SearchResult';
                   </div>
                 </div>
               </div>
-              <div class="form-group col-md-3">
+              <div class="form-group col-md-2">
                 <label class="control-label">Search options</label>
+                <multiSelectDropdown [data]="codeSchemes" nameField="name" noneText="All schemes" allText="All schemes" itemText="Scheme" [(ngModel)]="schemeFilter" name="schemeFilter"></multiSelectDropdown>
+              </div>
+              <div class="form-group col-md-2">
+                <label class="control-label">&nbsp;</label>
+
                 <div class="custom-control custom-checkbox form-control-plaintext">
                   <input type="checkbox" class="custom-control-input" [(ngModel)]="includeDeprecated" id="chkIncDep">
                   <label class="custom-control-label" for="chkIncDep">Include deprecated</label>
@@ -41,16 +47,20 @@ import {SearchResult} from '../../models/SearchResult';
                     <table class="table table-striped table-hover table-sm">
                       <thead>
                         <tr class="d-flex">
-                          <th class="col-8">Term</th>
-                          <th class="col-3">Context</th>
+                          <th class="col-2">Context</th>
+                          <th class="col-7">Name</th>
                           <th class="col-1">Status</th>
+                          <th class="col-1">Version</th>
+                          <th class="col-1">Scheme</th>
                         </tr>
                       </thead>
                       <tbody>
                         <tr class="d-flex" *ngFor="let item of result?.results" (click)="selection=item" (dblclick)="ok()" [class.selection]="selection==item" [class.text-warning]="item.status == 2">
-                          <td class="col-8">{{item.name}} <span *ngIf="item.synonym" class="badge badge-info">Synonym</span></td>
-                          <td class="col-3">{{item.context}}</td>
+                          <td class="col-2">{{item.context}}</td>
+                          <td class="col-7">{{item.name}} <span *ngIf="item.synonym" class="badge badge-info">Synonym</span></td>
                           <td class="col-1">{{getConceptStatusName(item.status)}}</td>
+                          <td class="col-1">{{item.version}}</td>
+                          <td class="col-1">{{item.scheme.name}}</td>
                         </tr>
                       </tbody>
                     </table>
@@ -81,6 +91,8 @@ export class ConceptSelectorComponent implements AfterViewInit {
     showAdd: boolean = false;
     relatedConcept: number;
     expression: number;
+    codeSchemes: ConceptSummary[];
+    schemeFilter: number[];
 
     getConceptStatusName = ConceptStatusHelper.getName;
 
@@ -100,17 +112,30 @@ export class ConceptSelectorComponent implements AfterViewInit {
         if (this.focusField != null)
             this.focusField.nativeElement.focus();
 
+        this.getMRU();
+        this.getCodeSchemes();
+    }
+
+    getMRU() {
         this.conceptService.getMRU()
             .subscribe(
                 (result) => this.result = result,
                 (error) => this.logger.error(error)
-        )
+            );
+    }
+
+    getCodeSchemes() {
+        this.conceptService.getSubtypes(5300, true) // 5300 = Code scheme supertype
+            .subscribe(
+                (result) => this.codeSchemes = result,
+                (error) => this.logger.error(error)
+            )
     }
 
     search() {
         this.result = null;
 
-        this.conceptService.search(this.criteria, this.includeDeprecated, 1, this.relatedConcept, this.expression)
+        this.conceptService.search(this.criteria, this.includeDeprecated, this.schemeFilter, 1, this.relatedConcept, this.expression)
             .subscribe(
                 (result) => this.result = result,
                 (error) => this.logger.error(error)
@@ -119,7 +144,7 @@ export class ConceptSelectorComponent implements AfterViewInit {
 
     gotoPage(page) {
         this.result = null;
-        this.conceptService.search(this.criteria, this.includeDeprecated, page, this.relatedConcept, this.expression)
+        this.conceptService.search(this.criteria, this.includeDeprecated, this.schemeFilter, page, this.relatedConcept, this.expression)
             .subscribe(
                 (result) => this.result = result,
                 (error) => this.logger.error(error)
@@ -147,7 +172,8 @@ export class ConceptSelectorComponent implements AfterViewInit {
             useCount: 0,
             version: 0.1,
             status: ConceptStatus.DRAFT,
-            url: ''
+            url: '',
+            scheme: {id: 5306, name: 'Discovery'}
         };
 
         this.activeModal.close(result);

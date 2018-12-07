@@ -1,7 +1,6 @@
-import {Reference} from './Reference';
-import {DbEntity} from './DbEntity';
-import {ConceptStatus} from './ConceptStatus';
-// import {AttributeValue} from './AttributeValue';
+import {DbEntity} from 'im-common/dist/models/DbEntity';
+import {Reference} from 'im-common/dist/models/Reference';
+import {ConceptStatus} from 'im-common/dist/models/ConceptStatus';
 
 export class Attribute extends DbEntity {
   public concept: Reference;

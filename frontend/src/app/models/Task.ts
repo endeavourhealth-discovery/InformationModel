@@ -1,5 +1,5 @@
-import {DbEntity} from './DbEntity';
 import {TaskType} from './TaskType';
+import {DbEntity} from 'im-common/dist/models/DbEntity';
 
 export class Task extends DbEntity {
   public type: TaskType;

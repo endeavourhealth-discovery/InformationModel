@@ -19,7 +19,7 @@
     "@angular/platform-server": "4.3.4",
     "@angular/router": "4.2.6",
     "@ng-bootstrap/ng-bootstrap": "1.0.0-alpha.26",
-    "eds-angular4": "https://github.com/endeavourhealth-discovery/Angular4/raw/BS-4.1.3/eds-angular4-1.1.2.tgz",
+    "eds-angular4": "https://github.com/endeavourhealth-discovery/Angular4/raw/BS-4.1.3/eds-angular4-1.1.4.tgz",
     "jquery": "^3.3.1",
     "rxjs": "^5.1.0",
     "typescript": "~2.3.3",

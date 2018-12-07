@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import {NgbActiveModal, NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {LoggerService} from 'eds-angular4';
 import {ConceptService} from '../concept.service';
-import {ConceptStatusHelper} from '../../models/ConceptStatus';
 import {Synonym} from '../../models/Synonym';
+import {ConceptStatusHelper} from 'im-common/dist/models/ConceptStatus';
 
 @Component({
   selector: 'app-synonym-editor',

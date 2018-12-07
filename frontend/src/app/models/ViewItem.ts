@@ -1,4 +1,4 @@
-import {DbEntity} from './DbEntity';
+import {DbEntity} from 'im-common/dist/models/DbEntity';
 
 export class ViewItem extends DbEntity {
   conceptId: number;

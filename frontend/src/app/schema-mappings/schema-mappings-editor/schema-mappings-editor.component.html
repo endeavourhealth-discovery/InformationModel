@@ -1,0 +1,37 @@
+<div class="module">
+  <div class="container-fluid">
+    <div class="module-heading">
+      Edit schema mappings
+      <div class="pull-right">
+        <button class="btn btn-danger" (click)="close(true)">Close</button>
+      </div>
+    </div>
+    <div class="module-body">
+      <form>
+        <div class="row">
+          <div class="col-md-12 mb-4">
+            <div class="card h-100" id="detailCard">
+              <div class="card-header"><h4>Attribute mappings <button type="button" class="btn btn-sm btn-success pull-right" (click)="save()">Save</button></h4></div>
+              <div class="card-body">
+                <table class="table table-sm table-striped">
+                  <thead>
+                    <th>Attribute</th>
+                    <th>Table</th>
+                    <th>Field</th>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let item of schemaMaps">
+                      <td>{{item.attribute.name}}</td>
+                      <td>{{item.table}}</td>
+                      <td>{{item.field}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

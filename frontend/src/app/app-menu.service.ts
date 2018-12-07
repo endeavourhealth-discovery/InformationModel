@@ -9,6 +9,8 @@ import {TermMappingsEditorComponent} from './term-mappings/term-mappings-editor/
 import {ConceptEditorComponent} from './concept/concept-editor/concept-editor.component';
 import {ViewLibraryComponent} from './views/view-library.component';
 import {ViewEditorComponent} from './views/view-editor/view-editor.component';
+import {SchemaMappingsComponent} from './schema-mappings/schema-mappings.component';
+import {SchemaMappingsEditorComponent} from './schema-mappings/schema-mappings-editor/schema-mappings-editor.component';
 
 export class DummyComponent {}
 
@@ -26,7 +28,8 @@ export class AppMenuService implements  AbstractMenuProvider {
       { path: 'workflowManager', component: WorkflowManagerComponent },
       { path: 'termMappings', component: TermMappingsComponent },
       { path: 'termMappings/:id', component: TermMappingsEditorComponent },
-
+      { path: 'schemaMappings', component: SchemaMappingsComponent },
+      { path: 'schemaMappings/:id', component: SchemaMappingsEditorComponent },
       { path: 'eds-user-manager', component: DummyComponent },
 
     ];
@@ -43,9 +46,10 @@ export class AppMenuService implements  AbstractMenuProvider {
   getMenuOptions(): MenuOption[] {
     return [
       {caption: 'Concept library', state: 'conceptLibrary', icon: 'fa fa-lightbulb-o', role: 'eds-info-manager:conceptLibrary'},
-      {caption: 'Views library', state: 'viewLibrary', icon: 'fa fa-eye'},
+      {caption: 'Views library', state: 'viewLibrary', icon: 'fa fa-eye', role: 'eds-info-manager:viewLibrary'},
       {caption: 'Workflow manager', state: 'workflowManager', icon: 'fa fa-code-fork', role: 'eds-info-manager:workflow'},
-      {caption: 'Term mappings', state: 'termMappings', icon: 'fa fa-code', role: 'eds-info-manager:termMappings'}
+      {caption: 'Term mappings', state: 'termMappings', icon: 'fa fa-code', role: 'eds-info-manager:termMappings'},
+      {caption: 'Schema mappings', state: 'schemaMappings', icon: 'fa fa-database', role: 'eds-info-manager:schemaMappings'}
     ];
   }
 

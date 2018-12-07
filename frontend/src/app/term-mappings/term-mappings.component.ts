@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import {LoggerService} from 'eds-angular4';
-import {ConceptSummary} from '../models/ConceptSummary';
 import {Router} from '@angular/router';
 import {TermMappingsService} from './term-mappings.service';
+import {ConceptSummary} from 'im-common/dist/models/ConceptSummary';
 
 @Component({
   selector: 'app-term-mappings',

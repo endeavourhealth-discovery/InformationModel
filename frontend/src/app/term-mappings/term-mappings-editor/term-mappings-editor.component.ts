@@ -1,14 +1,13 @@
-import {AfterViewInit, Component, OnInit} from '@angular/core';
+import {AfterViewInit, Component} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {InputBoxDialog, LoggerService} from 'eds-angular4';
-import {Concept} from '../../models/Concept';
-import {ConceptStatus, ConceptStatusHelper} from '../../models/ConceptStatus';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConceptService} from '../../concept/concept.service';
 import {Location} from '@angular/common';
 import {TermMappingsService} from '../term-mappings.service';
 import {TermMapping} from '../../models/TermMapping';
-import {forkJoin} from 'rxjs/observable/forkJoin';
+import {Concept} from 'im-common/dist/models/Concept';
+import {ConceptStatus, ConceptStatusHelper} from 'im-common/dist/models/ConceptStatus';
 
 @Component({
   selector: 'app-term-mappings-editor',

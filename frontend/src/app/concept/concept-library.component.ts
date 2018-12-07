@@ -1,12 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import {InputBoxDialog, LoggerService} from 'eds-angular4';
+import {LoggerService} from 'eds-angular4';
 import {Router} from '@angular/router';
 import {ConceptService} from './concept.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {Concept} from '../models/Concept';
-import {ConceptStatusHelper} from '../models/ConceptStatus';
 import {SearchResult} from 'im-common/dist/models/SearchResult';
 import {ConceptCreateComponent} from './concept-create/concept-create.component';
+import {ConceptStatusHelper} from 'im-common/dist/models/ConceptStatus';
+import {Concept} from 'im-common/dist/models/Concept';
+import {ConceptSummary} from 'im-common/dist/models/ConceptSummary';
 
 @Component({
   selector: 'app-concept-library',
@@ -18,6 +19,8 @@ export class ConceptLibraryComponent implements OnInit {
 
   listTitle = 'Most recently used';
   summaryList: SearchResult;
+  codeSchemes: ConceptSummary[];
+  schemeFilter: number[];
   searchTerm: string;
   includeDeprecated = false;
 
@@ -29,6 +32,7 @@ export class ConceptLibraryComponent implements OnInit {
 
   ngOnInit() {
     this.getMRU();
+    this.getCodeSchemes();
   }
 
   getMRU() {
@@ -40,10 +44,19 @@ export class ConceptLibraryComponent implements OnInit {
       );
   }
 
+  getCodeSchemes() {
+    this.codeSchemes = null;
+    this.conceptService.getSubtypes(5300, true) // 5300 = Code scheme supertype
+      .subscribe(
+        (result) => this.codeSchemes = result,
+        (error) => this.log.error(error)
+      )
+  }
+
   search() {
     this.listTitle = 'Search results for "' + this.searchTerm + '"';
     this.summaryList = null;
-    this.conceptService.search(this.searchTerm, this.includeDeprecated)
+    this.conceptService.search(this.searchTerm, this.includeDeprecated, this.schemeFilter)
       .subscribe(
         (result) => this.summaryList = result,
         (error) => this.log.error(error)
@@ -84,7 +97,7 @@ export class ConceptLibraryComponent implements OnInit {
   gotoPage(page) {
     this.listTitle = 'Search results for "' + this.searchTerm + '"';
     this.summaryList = null;
-    this.conceptService.search(this.searchTerm, this.includeDeprecated, page)
+    this.conceptService.search(this.searchTerm, this.includeDeprecated, this.schemeFilter, page)
       .subscribe(
         (result) => this.summaryList = result,
         (error) => this.log.error(error)

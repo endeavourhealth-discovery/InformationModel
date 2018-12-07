@@ -2,11 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import {NgbActiveModal, NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {LoggerService, MessageBoxDialog} from 'eds-angular4';
 import {ConceptService} from '../concept.service';
-import {ConceptStatusHelper} from '../../models/ConceptStatus';
 import {Attribute} from '../../models/Attribute';
-import {Concept} from '../../models/Concept';
 import {ConceptSelectorComponent} from 'im-common/dist/concept-selector/concept-selector/concept-selector.component';
 import {ValueExpressionHelper} from '../../models/ValueExpression';
+import {Concept} from 'im-common/dist/models/Concept';
 
 @Component({
   selector: 'app-attribute-editor',

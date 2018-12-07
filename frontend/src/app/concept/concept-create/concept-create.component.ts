@@ -1,11 +1,11 @@
 import {AfterViewInit, Component, ElementRef, ViewChild} from '@angular/core';
 import {NgbActiveModal, NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {Concept} from '../../models/Concept';
-import {ConceptStatus, ConceptStatusHelper} from '../../models/ConceptStatus';
 import {ConceptSelectorComponent} from 'im-common/dist/concept-selector/concept-selector/concept-selector.component';
 import {ConceptService} from '../concept.service';
 import {LoggerService} from 'eds-angular4';
-import {Reference} from '../../models/Reference';
+import {Reference} from 'im-common/dist/models/Reference';
+import {Concept} from 'im-common/dist/models/Concept';
+import {ConceptStatus, ConceptStatusHelper} from 'im-common/dist/models/ConceptStatus';
 
 @Component({
   selector: 'app-concept-create',

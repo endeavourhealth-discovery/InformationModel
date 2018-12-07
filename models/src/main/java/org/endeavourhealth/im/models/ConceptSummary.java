@@ -6,6 +6,7 @@ public class ConceptSummary extends DbEntity<ConceptSummary> {
     private ConceptStatus status;
     private Float version;
     private Boolean synonym;
+    private Reference scheme;
 
     public String getName() {
         return name;
@@ -49,6 +50,15 @@ public class ConceptSummary extends DbEntity<ConceptSummary> {
 
     public ConceptSummary setSynonym(Boolean synonym) {
         this.synonym = synonym;
+        return this;
+    }
+
+    public Reference getScheme() {
+        return scheme;
+    }
+
+    public ConceptSummary setScheme(Reference scheme) {
+        this.scheme = scheme;
         return this;
     }
 }
