@@ -1,7 +1,7 @@
 import {AfterViewInit, Component} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {Location} from '@angular/common';
-import {LoggerService} from 'eds-angular4';
+import {LoggerService, MessageBoxDialog} from 'eds-angular4';
 import {SchemaMappingsService} from '../schema-mappings.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
@@ -33,4 +33,10 @@ export class SchemaMappingsEditorComponent implements AfterViewInit {
     );
   }
 
+  save() {
+    this.location.back();
+  }
+  close(withConfirm: boolean) {
+    this.location.back();
+  }
 }
