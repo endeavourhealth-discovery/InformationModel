@@ -340,9 +340,8 @@ public class ConceptJDBCDAL implements ConceptDAL {
             String sql;
             Long id = concept.getId();
             if (id == null) {
-                id = TableIdHelper.getNextId("Concept");
-                sql = "INSERT INTO concept (superclass, url, full_name, short_name, context, status, version, description, use_count, last_update, id) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                sql = "INSERT INTO concept (superclass, url, full_name, short_name, context, status, version, description, use_count, last_update) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             } else {
                 sql = "UPDATE concept SET superclass = ?, url = ?, full_name = ?, short_name = ?, context = ?, status = ?, version = ?, " +
                     "description = ?, use_count = ?, last_update = ? WHERE id = ?";
@@ -350,7 +349,7 @@ public class ConceptJDBCDAL implements ConceptDAL {
             concept.setLastUpdate(new java.util.Date());
 
 
-            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            try (PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
                 int i = 1;
                 stmt.setLong(i++, concept.getSuperclass().getId());
                 if (concept.getUrl() == null) stmt.setNull(i++, VARCHAR); else stmt.setString(i++, concept.getUrl());
@@ -362,7 +361,8 @@ public class ConceptJDBCDAL implements ConceptDAL {
                 if (concept.getDescription() == null) stmt.setNull(i++, VARCHAR); else stmt.setString(i++, concept.getDescription());
                 if (concept.getUseCount() == null) stmt.setNull(i++, BIGINT); else stmt.setLong(i++, concept.getUseCount());
                 stmt.setTimestamp(i++, new Timestamp(concept.getLastUpdate().getTime()));
-                stmt.setLong(i++, id);
+                if (id != null)
+                    stmt.setLong(i++, id);
 
                 stmt.executeUpdate();
 

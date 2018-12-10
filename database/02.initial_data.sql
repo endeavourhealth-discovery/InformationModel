@@ -9,9 +9,10 @@ VALUES
        (1, null, 'Concept', 'Concept', 'Abstract base concept to which all concept types belong'),
        (2, 1, 'Concept.CodedTerm', 'Coded term', 'Any concept that can be identified as part of a taxonomy or classification'),
        (3, 1, 'Concept.Folder', 'Folder', 'A concept that contains other concepts as a place holder in a view'),
-       (4, 1, 'Concept.Record Type', 'Record', 'A structure that contains attributes'),
+       (4, 1, 'Concept.Record Type', 'Record', 'A clinical entry such as an observation or medication'),
        -- (5, 1, 'Concept.Relationship', 'Relationship', 'A concept only used in the relationship links between one concept and another, '),
-       (6, 1, 'Concept.Attribute', 'Attribute', 'An attribute of a record type structure that holds a value');
+       (6, 1, 'Concept.Attribute', 'Attribute', 'An attribute of a record type structure that holds a value'),
+       (7, 1, 'Concept.Entity', 'Entity', 'An entity (such as a Person, Organisation, etc)');
 
 -- BASE Types (super = 1)
 INSERT INTO concept (id, superclass, context, full_name, description)

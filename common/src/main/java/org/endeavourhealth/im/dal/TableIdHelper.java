@@ -1,3 +1,4 @@
+/*
 package org.endeavourhealth.im.dal;
 
 import org.slf4j.Logger;
@@ -59,3 +60,4 @@ public class TableIdHelper {
         return nextId;
     }
 }
+*/

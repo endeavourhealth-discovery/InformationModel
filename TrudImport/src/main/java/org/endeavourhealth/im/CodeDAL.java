@@ -1,6 +1,6 @@
 package org.endeavourhealth.im;
 
-import org.endeavourhealth.im.dal.TableIdHelper;
+// import org.endeavourhealth.im.dal.TableIdHelper;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -54,7 +54,7 @@ public class CodeDAL {
 
     public void populateMap() throws SQLException {
         Long snomedCount = getSnomedCount();
-        Long nextId = TableIdHelper.getNextId("Concept", snomedCount);
+        Long nextId = 0L; // TableIdHelper.getNextId("Concept", snomedCount);
         Connection conn = connectionCache.pop();
         String sql =
             "INSERT INTO code\n" +

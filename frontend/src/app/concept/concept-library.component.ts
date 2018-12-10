@@ -85,7 +85,9 @@ export class ConceptLibraryComponent implements OnInit {
     let commonSubtypes = [
       {id: 1, name: 'Concept'},
       {id: 2, name: 'Codeable concept'},
-      {id: 4, name: 'Record type'}
+      {id: 4, name: 'Record type'},
+      {id: 6, name: 'Attribute'},
+      {id: 7, name: 'Entity'}
     ];
     ConceptCreateComponent.open(this.modal, commonSubtypes)
       .result.then(
