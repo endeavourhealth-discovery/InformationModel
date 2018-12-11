@@ -4,7 +4,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum ValueExpression {
     OF_TYPE ((byte)0, "Of type"),
-    CHILD_OF ((byte)1, "Child of")
+    CHILD_OF ((byte)1, "Child of"),
+    TYPE_OR_SUBTYPE ((byte)2, "Type or subtype")
     ;
 
     private final Byte value;
