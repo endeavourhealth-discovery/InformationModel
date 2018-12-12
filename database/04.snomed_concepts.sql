@@ -13,10 +13,12 @@ WHERE r.acceptabilityId = 900000000000548007
 ALTER TABLE snomed_refset_clinical_active_preferred_component ADD UNIQUE INDEX snomed_refset_clinical_active_preferred_component_pk (referencedComponentId);
 
 CREATE TABLE snomed_description_active_fully_specified
-SELECT id, conceptId, term
-FROM snomed_description USE INDEX (snomed_description_active_typeId_idx)
-WHERE active = 1
-  AND typeId = 900000000000003001;
+SELECT d.id, d.conceptId, d.term
+FROM snomed_description d
+         JOIN snomed_concept c on c.id = d.conceptId
+WHERE d.active = 1
+  AND d.typeId = 900000000000003001
+  AND c.active = 1;
 
 ALTER TABLE snomed_description_active_fully_specified ADD UNIQUE INDEX snomed_description_active_fully_specified_pk (id);
 

@@ -1,8 +1,8 @@
 -- ********************* CONCEPT *********************
-/*
+
 DROP TABLE IF EXISTS snomed_concept;
 CREATE TABLE snomed_concept (
-    id VARCHAR(20) NOT NULL             COMMENT '',
+    id BIGINT NOT NULL             COMMENT '',
     effectiveTime VARCHAR(8) NOT NULL   COMMENT '',
     active BOOLEAN NOT NULL             COMMENT '',
     moduleId BIGINT NOT NULL            COMMENT '',
@@ -22,7 +22,7 @@ LOAD DATA LOCAL INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 5.7\\Uploads\\uk_sc
     FIELDS TERMINATED BY '\t'
     LINES TERMINATED BY '\r\n'
     IGNORE 1 LINES;
-*/
+
 -- ********************* DESCRIPTION *********************
 
 DROP TABLE IF EXISTS snomed_description;

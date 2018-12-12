@@ -23,7 +23,7 @@ CREATE TABLE concept(
   PRIMARY KEY concept_id_pk (id),
   KEY concept_last_update_idx (last_update),
   FULLTEXT INDEX concept_full_name_context_idx  (full_name, context),
-  CONSTRAINT concept_superclass_fk              FOREIGN KEY (superclass) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT concept_superclass_fk              FOREIGN KEY (superclass) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*DROP TABLE IF EXISTS concept_relationship;

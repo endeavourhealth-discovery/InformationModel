@@ -1,13 +1,6 @@
 -- ************************************** IM MODEL DATA **************************************
 
-UPDATE concept
-SET code_scheme=5307
-WHERE code_scheme IS NULL;
 
-ALTER TABLE concept
-MODIFY code_scheme BIGINT NOT NULL DEFAULT 5307,
-ADD UNIQUE KEY concept_code_code_scheme_idx (code, code_scheme),
-ADD CONSTRAINT concept_code_scheme_fk FOREIGN KEY (code_scheme) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- ********** PCR v2 Schema/Relational model **********
 /*
@@ -1456,13 +1449,8 @@ VALUES (5922, 101, 5923, 0, 1, 1);
 UPDATE concept
 SET status = 1;
 
--- ************************************** IM MODEL DATA **************************************
 */
-DELETE
-FROM table_id;
-INSERT INTO table_id (name, id)
-SELECT 'Concept', MAX(id) + 1
-FROM concept;
+
 
 -- Build the transitive closure table for concept inheritance hierarchy
 CALL proc_build_tct();

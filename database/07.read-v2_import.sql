@@ -16,7 +16,7 @@ LINES TERMINATED BY '\r\n'
 
 -- ********************* READ V2 -> SNOMED MAP *********************
 
-DROP TABLE IF EXISTS read_v2_map;
+/*DROP TABLE IF EXISTS read_v2_map;
 CREATE TABLE read_v2_map (
     mapid VARCHAR(40) NOT NULL,
     code VARCHAR(6) COLLATE utf8_bin NOT NULL,
@@ -38,4 +38,4 @@ SET descid = nullif(@dscid, '')
 ;
 
 alter table read_v2_map
-    add key active (termid, assured, status);
+    add key active (termid, assured, status);*/

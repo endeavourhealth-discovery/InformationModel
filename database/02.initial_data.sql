@@ -91,6 +91,15 @@ VALUES
     (5306, 5300, 'Code Scheme.DM+D',        'DM+D',          'DM+D'),
     (5307, 5300, 'Code Scheme.Discovery',   'Discovery',     'Discovery');
 
+UPDATE concept
+SET code_scheme=5307
+WHERE code_scheme IS NULL;
+
+ALTER TABLE concept
+    MODIFY code_scheme BIGINT NOT NULL DEFAULT 5307,
+    ADD UNIQUE KEY concept_code_code_scheme_idx (code, code_scheme),
+    ADD CONSTRAINT concept_code_scheme_fk FOREIGN KEY (code_scheme) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
 -- ************************************** VIEWS **************************************
 INSERT INTO `view` (id, name, description)
 VALUES
@@ -116,3 +125,58 @@ VALUES (0, 'Attribute model'),
        (1, 'Value model'),
        (2, 'Message mappings'),
        (3, 'Term mappings');
+
+-- ********** DM+D **********
+INSERT INTO concept (id, superclass, context, full_name, description)
+VALUES
+(5320, 2, 'DM+D.VTM',  'Virtual therapeutic moiety', ''),
+(5321, 1, 'DM+D.VPI',  'Virtual product ingredient', ''),
+(5322, 1, 'DM+D.CDPI', 'Controlled drug prescribing information', ''),
+(5323, 1, 'DM+D.DRI',  'Drug route information', ''),
+(5324, 1, 'DM+D.ODRI', 'Ontology drug form & route info', ''),
+(5325, 1, 'DM+D.DFI',  'Dose form information', ''),
+(5326, 2, 'DM+D.VMP',  'Virtual medicinal product', ''),
+(5327, 1, 'DM+D.APE',  'Actual product excipient', ''),
+(5328, 1, 'DM+D.APrI', 'Appliance product information', ''),
+(5329, 1, 'DM+D.LR',   'Licensed route', ''),
+(5330, 2, 'DM+D.AMP',  'Actual medicinal product', ''),
+(5331, 1, 'DM+D.VCPC', 'Virtual combination pack content', ''),
+(5332, 1, 'DM+D.DTCI', 'Drug tariff category info', ''),
+(5333, 2, 'DM+D.VMPP', 'Virtual medicinal product pack', ''),
+(5334, 1, 'DM+D.PPI',  'Product prescribing info', ''),
+(5335, 1, 'DM+D.APkI', 'Appliance pack info', ''),
+(5336, 1, 'DM+D.RI',   'Reimbursement info', ''),
+(5337, 1, 'DM+D.MPP',  'Medicinal product price', ''),
+(5338, 1, 'DM+D.ACPC', 'Actual combination pack content', ''),
+(5339, 2, 'DM+D.AMPP', 'Actual medicinal product pack', '');
+
+INSERT INTO concept_attribute (concept, attribute, `order`, mandatory, `limit`)
+VALUES
+(5326, 5320, 0, 0, 1),   -- VMP  -- (0:1) --> VTM
+(5326, 5321, 1, 0, 0),   -- VMP  -- (0:*) --> VPI
+(5326, 5322, 2, 0, 1),   -- VMP  -- (0:1) --> CDPI
+(5326, 5323, 3, 0, 0),   -- VMP  -- (0:*) --> DRI
+(5326, 5324, 4, 0, 0),   -- VMP  -- (0:*) --> ODRI
+(5326, 5325, 5, 0, 1),   -- VMP  -- (0:1) --> DFI
+
+(5330, 5327, 0, 0, 0),   -- AMP  -- (0:*) --> APE
+(5330, 5328, 1, 0, 1),   -- AMP  -- (0:1) --> APrI
+(5330, 5329, 2, 0, 0),   -- AMP  -- (0:*) --> LR
+
+(5333, 5331, 0, 0, 0),   -- VMPP -- (0:*) --> VCPC
+(5333, 5332, 1, 0, 1),   -- VMPP -- (0:1) --> DTCI
+
+(5339, 5334, 0, 0, 1),   -- AMPP -- (0:1) --> PPI
+(5339, 5335, 1, 0, 1),   -- AMPP -- (0:1) --> APkI
+(5339, 5336, 2, 0, 1),   -- AMPP -- (0:1) --> RI
+(5339, 5337, 3, 0, 1),   -- AMPP -- (0:1) --> MPP
+(5339, 5338, 4, 0, 0);   -- AMPP -- (0:*) --> ACPC
+
+-- ********************* DM+D STRUCTURE DEFINITION *********************
+
+INSERT INTO concept_attribute (concept, attribute, `order`, mandatory, `limit`, inheritance, value_concept, value_expression)
+    VALUE
+    (5330, 111, 3, 1, 1, 0, 5326, 0),
+    (5333, 112, 2, 1, 1, 0, 5326, 0),
+    (5339, 111, 5, 1, 1, 0, 5333, 0),
+    (5339, 112, 6, 1, 1, 0, 5330, 0);
