@@ -80,16 +80,17 @@ VALUES
        (516, 3, 'Folder.Attribute types', 'Attribute types', 'A list of attribute types used in the core model');
 
 -- ********** CODE SCHEMES **********
-INSERT INTO concept (id, superclass, context, full_name, description)
+INSERT INTO concept (id, superclass, context, full_name, description, url)
 VALUES
-    (5300, 1, 'Code Scheme',        'Coding scheme', 'A coding scheme'),
-    (5301, 5300, 'Code Scheme.SNOMED',      'SNOMED CT',     'The SNOMED CT coding scheme'),
-    (5302, 5300, 'Code Scheme.READ2',       'READ V2',       'Version 2 READ coding scheme'),
-    (5303, 5300, 'Code Scheme.CTV3',        'CTV3',          'Version 3 READ coding scheme'),
-    (5304, 5300, 'Code Scheme.OPCS',        'OPCS',          'OPCS coding scheme'),
-    (5305, 5300, 'Code Scheme.ICD10',       'ICD10',         'ICD10 coding scheme'),
-    (5306, 5300, 'Code Scheme.DM+D',        'DM+D',          'DM+D'),
-    (5307, 5300, 'Code Scheme.Discovery',   'Discovery',     'Discovery');
+    (5300, 1,    'Code Scheme',             'Coding scheme', 'A coding scheme', null),
+    (5301, 5300, 'Code Scheme.SNOMED',      'SNOMED CT',     'The SNOMED CT coding scheme', 'http://www.snomed.org'),
+    (5302, 5300, 'Code Scheme.READ2',       'READ V2',       'Version 2 READ coding scheme', 'https://digital.nhs.uk/read'),
+    (5303, 5300, 'Code Scheme.CTV3',        'CTV3',          'Version 3 READ coding scheme', 'https://digital.nhs.uk/ctv3'),
+    (5304, 5300, 'Code Scheme.OPCS',        'OPCS',          'OPCS coding scheme', 'https://digital.nhs.uk/opcs'),
+    (5305, 5300, 'Code Scheme.ICD10',       'ICD10',         'ICD10 coding scheme', 'https://icd.who.int'),
+    (5306, 5300, 'Code Scheme.DM+D',        'DM+D',          'DM+D', 'https://digital.nhs.uk/dmd'),
+    (5307, 5300, 'Code Scheme.Discovery',   'Discovery',     'Discovery', 'http://im.discoverydataservice.org'),
+    (5308, 5300, 'Code Scheme.FHIR',        'FHIR',          'FHIR value set codes', 'http://hl7.org/fhir');
 
 UPDATE concept
 SET code_scheme=5307

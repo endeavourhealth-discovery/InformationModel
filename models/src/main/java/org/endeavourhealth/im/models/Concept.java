@@ -132,4 +132,8 @@ public class Concept extends DbEntity<Concept> {
         this.scheme = scheme;
         return this;
     }
+
+    public void incVersion() {
+        this.version += 0.1f;
+    }
 }

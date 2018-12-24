@@ -26,29 +26,29 @@ CREATE TABLE concept(
   CONSTRAINT concept_superclass_fk              FOREIGN KEY (superclass) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-/*DROP TABLE IF EXISTS concept_relationship;
-CREATE TABLE concept_relationship (             -- Extends concept table for relationships
-  id BIGINT AUTO_INCREMENT                      COMMENT 'The relationship ID',
-  source BIGINT NOT NULL                        COMMENT 'The source concept',
-  relationship BIGINT NOT NULL                  COMMENT 'The relationship source -> (rel) -> target',
-  target BIGINT NOT NULL                        COMMENT 'The target concept',
-  `order` INTEGER DEFAULT 0                     COMMENT 'Display order',
-  mandatory BOOLEAN DEFAULT 1                   COMMENT 'Is this relationship optional (0:??) or mandatory (1:??)',
-  `limit` INTEGER DEFAULT 1                     COMMENT 'Is this relationship limited (??:n) or unlimited (??:*)',
-  status TINYINT NOT NULL DEFAULT 0             COMMENT 'Relationship status - 0=Draft, 1=Active, 2=Deprecated, 3=Temporary',
+DROP TABLE IF EXISTS concept_archive;
+CREATE TABLE concept_archive (
+                        id BIGINT AUTO_INCREMENT                      COMMENT 'Main concept id, common across all tables',
+                        superclass BIGINT                             COMMENT 'The superclass concept that this concept inherits from',
+                        url VARCHAR(250)                              COMMENT 'URL for where documentation for this concept is published',
+                        full_name VARCHAR(500)                        COMMENT 'Full, clear, unambiguous name for the concept',
+                        short_name VARCHAR(125)                       COMMENT 'Short name for use when context is known',
+                        context VARCHAR(250) NOT NULL                 COMMENT 'Unique, computable (immutable) name for the concept',
+                        status TINYINT NOT NULL DEFAULT 0             COMMENT 'Concept status - 0=Draft, 1=Active, 2=Deprecated, 3=Temporary',
+                        version FLOAT NOT NULL DEFAULT 0.1            COMMENT 'Concept version',
+                        description VARCHAR(4096)                     COMMENT 'Full textual description of the concept',
+                        use_count BIGINT NOT NULL DEFAULT 0           COMMENT 'Counter for number of occurrences of use (could be used for ordering?)',
+                        last_update DATETIME NOT NULL DEFAULT now()   COMMENT 'The date/time the concept was added/edited',
+                        code VARCHAR(20) COLLATE utf8_bin             COMMENT 'Original ontology code **CASE SENSITIVE!**',
+                        code_scheme BIGINT                            COMMENT 'Original ontology code scheme',
 
-  PRIMARY KEY concept_relationship_id_pk (id),
-  KEY concept_relationship_source_idx (source),
-  KEY concept_relationship_target_idx (target),
-
-  CONSTRAINT concept_relationship_source_fk       FOREIGN KEY (source) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT concept_relationship_relationship_fk FOREIGN KEY (relationship) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT concept_relationship_target_fk       FOREIGN KEY (target) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION
+                        PRIMARY KEY concept_archive_id_pk (id, version)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-*/
+
 DROP TABLE IF EXISTS concept_attribute;
 CREATE TABLE concept_attribute (                -- Links attribute to concepts
   id BIGINT NOT NULL AUTO_INCREMENT             COMMENT 'Concept Attribute ID',
+  version FLOAT NOT NULL DEFAULT 0.1            COMMENT 'Concept attribute version',
   concept BIGINT NOT NULL                       COMMENT 'The concept the attribute is part of',
   attribute BIGINT NOT NULL                     COMMENT 'The attribute/relationship',
   `order` INTEGER NOT NULL DEFAULT 0            COMMENT 'Display order',
@@ -68,6 +68,25 @@ CREATE TABLE concept_attribute (                -- Links attribute to concepts
   CONSTRAINT concept_attribute_attribute_fk     FOREIGN KEY (attribute) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT concept_attribute_value_concept_fk FOREIGN KEY (value_concept) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT concept_attribute_fixed_concept_fk FOREIGN KEY (fixed_concept) REFERENCES concept(id) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS concept_attribute_archive;
+CREATE TABLE concept_attribute_archive (                -- Links attribute to concepts
+                                   id BIGINT NOT NULL AUTO_INCREMENT             COMMENT 'Concept Attribute ID',
+                                   version FLOAT NOT NULL                        COMMENT 'Concept attribute version',
+                                   concept BIGINT NOT NULL                       COMMENT 'The concept the attribute is part of',
+                                   attribute BIGINT NOT NULL                     COMMENT 'The attribute/relationship',
+                                   `order` INTEGER NOT NULL DEFAULT 0            COMMENT 'Display order',
+                                   mandatory BOOLEAN DEFAULT 0                   COMMENT 'Is this attribute optional (0:??) or mandatory (1:??)',
+                                   `limit` INTEGER DEFAULT 1                     COMMENT 'Is this attribute limited (??:n) or unlimited (??:*)',
+                                   inheritance TINYINT DEFAULT 1                 COMMENT 'Inheritance type (0 - unchanged ("Is a"), 1 - Extends, 2 - Constrains) ',  -- TODO: Can be calculated?
+                                   value_concept BIGINT                          COMMENT 'The allowed values for the attribute (based on the expression)/relationship target',
+                                   value_expression TINYINT                      COMMENT 'The expression for the attribute value (0 - Of type(=), 1 - Child (<), 2 - Type or child (<<))',
+                                   fixed_concept BIGINT                          COMMENT 'The fixed value concept (in the case of a constraint attribute)',
+                                   fixed_value TEXT                              COMMENT 'The fixed value when not a concept (in the case of a constraint attribute)',
+                                   status TINYINT NOT NULL DEFAULT 0             COMMENT 'Concept status - 0=Draft, 1=Active, 2=Deprecated, 3=Temporary',
+
+                                   PRIMARY KEY concept_attribute_archive_pk (id, version)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS concept_synonym;

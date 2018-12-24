@@ -1,6 +1,7 @@
 package org.endeavourhealth.im.models;
 
 public class Attribute extends DbEntity<Attribute> {
+    private Float version = 0.1f;
     private Reference concept;
     private Reference attribute;
     private Integer order;
@@ -12,6 +13,15 @@ public class Attribute extends DbEntity<Attribute> {
     private Reference fixedConcept;
     private String fixedValue;
     private ConceptStatus status;
+
+    public Float getVersion() {
+        return version;
+    }
+
+    public Attribute setVersion(Float version) {
+        this.version = version;
+        return this;
+    }
 
     public Reference getConcept() {
         return concept;
@@ -110,5 +120,9 @@ public class Attribute extends DbEntity<Attribute> {
     public Attribute setStatus(ConceptStatus status) {
         this.status = status;
         return this;
+    }
+
+    public void incVersion() {
+        this.version += 0.1f;
     }
 }

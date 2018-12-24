@@ -40,7 +40,7 @@ public enum BaseConcepts {
         return this.value.toString();
     }
 
-    public static BaseConcepts byValue(Byte value) {
+    public static BaseConcepts byValue(Long value) {
         for (BaseConcepts t: BaseConcepts.values()) {
             if (t.value.equals(value))
                 return t;

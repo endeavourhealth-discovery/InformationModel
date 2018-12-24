@@ -24,7 +24,7 @@ public enum CodeScheme {
         return this.value.toString();
     }
 
-    public static CodeScheme byValue(Byte value) {
+    public static CodeScheme byValue(Long value) {
         for (CodeScheme t: CodeScheme.values()) {
             if (t.value.equals(value))
                 return t;

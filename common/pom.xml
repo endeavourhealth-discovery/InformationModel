@@ -14,7 +14,7 @@
     <maven-surefire-plugin.version>2.12.4</maven-surefire-plugin.version>
 
     <eds-cache.version>1.2-SNAPSHOT</eds-cache.version>
-    <eds-config-manager.version>1.21-SNAPSHOT</eds-config-manager.version>
+    <eds-config-manager.version>1.23-SNAPSHOT</eds-config-manager.version>
   </properties>
 
   <dependencies>

@@ -24,11 +24,11 @@ public class DALHelper {
     }
 
     public static Long getGeneratedKey(PreparedStatement stmt) throws SQLException {
-        ResultSet rs = stmt.getGeneratedKeys();
-        rs.next();
-        Long result = rs.getLong(1);
-        rs.close();
-        return result;
+        try (ResultSet rs = stmt.getGeneratedKeys()) {
+            rs.next();
+            Long result = rs.getLong(1);
+            return result;
+        }
     }
 
     public static Concept getConceptFromStatement(PreparedStatement stmt) throws SQLException {
@@ -170,6 +170,7 @@ public class DALHelper {
     public static Attribute getAttributeFromResultSet(ResultSet rs) throws SQLException {
         Attribute result = new Attribute()
             .setId(rs.getLong("id"))
+            .setVersion(rs.getFloat("version"))
             .setConcept(
                 new Reference()
                     .setId(rs.getLong("concept"))
@@ -230,6 +231,13 @@ public class DALHelper {
             stmt.setNull(i, BIGINT);
         else
             stmt.setLong(i, value);
+    }
+
+    public static void setFloat(PreparedStatement stmt, int i, Float value) throws SQLException {
+        if (value == null)
+            stmt.setNull(i, FLOAT);
+        else
+            stmt.setFloat(i, value);
     }
 
     public static void setInt(PreparedStatement stmt, int i, Integer value) throws SQLException {

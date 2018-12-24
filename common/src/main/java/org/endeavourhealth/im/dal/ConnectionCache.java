@@ -56,7 +56,7 @@ public class ConnectionCache extends GenericCache<Connection> {
             props.setProperty("user", user);
             props.setProperty("password", pass);
 
-            Connection connection = DriverManager.getConnection(url, props);
+            Connection connection = DriverManager.getConnection(url, props);    // NOSONAR
 
             LOG.debug("New DB Connection created");
 

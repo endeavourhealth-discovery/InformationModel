@@ -97,7 +97,7 @@ public class ConceptLogic {
 
     public void saveAttribute(Long conceptId, Attribute attribute) throws Exception {
         // Is this overriding an inherited attribute?
-        if (!conceptId.equals(attribute.getId())) {
+        if (!conceptId.equals(attribute.getConcept().getId())) {
             attribute.setId(null);
             attribute.setInheritance((byte)2);
         }
