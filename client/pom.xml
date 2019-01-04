@@ -18,18 +18,21 @@
     <javax-ws-rs.version>2.0.1</javax-ws-rs.version>
     <jersey.version>2.22.1</jersey.version>
     <keycloak.version>3.0.0.Final</keycloak.version>
+
+    <sonar.projectKey>endeavourhealth-discovery_InformationModel::client</sonar.projectKey>
+
   </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.endeavourhealth.im</groupId>
             <artifactId>models</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
         </dependency>
       <dependency>
         <groupId>org.endeavourhealth.im</groupId>
         <artifactId>common</artifactId>
-        <version>${version}</version>
+        <version>${project.version}</version>
       </dependency>
       <!--
               <dependency>

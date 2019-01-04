@@ -13,12 +13,16 @@ import java.util.Map;
 
 public class ConceptLogic {
     private ConceptDAL dal;
+    private TaskLogic taskLogic;
 
     public ConceptLogic() {
         this.dal = new ConceptJDBCDAL();
+        this.taskLogic = new TaskLogic();
     }
-    protected ConceptLogic(ConceptDAL dal) {
+
+    protected ConceptLogic(ConceptDAL dal, TaskLogic taskLogic) {
         this.dal = dal;
+        this.taskLogic = taskLogic;
     }
 
     public Concept get(Long id) throws Exception {
@@ -41,7 +45,7 @@ public class ConceptLogic {
             Long newId = this.dal.saveConcept(concept);
             concept.setId(newId);
 
-            new TaskLogic().createTask("Auto concept: "+context, TaskType.ATTRIBUTE_MODEL, newId);
+           taskLogic.createTask("Auto concept: "+context, TaskType.ATTRIBUTE_MODEL, newId);
         }
 
         return concept;

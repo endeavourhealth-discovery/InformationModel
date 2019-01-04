@@ -25,7 +25,6 @@ public class TermLogic {
         this.conceptLogic = conceptLogic;
     }
 
-
     public Term getTerm(String organisation, String context, String system, String code, String termText) throws Exception {
         // Look for existing mapping
         Long conceptId = this.dal.getConceptId(organisation, context, system, code);

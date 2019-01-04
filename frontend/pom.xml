@@ -1,15 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+  <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <relativePath>../pom.xml</relativePath>
-        <groupId>org.endeavourhealth.im</groupId>
-        <artifactId>informationmodel</artifactId>
-        <version>1.5-SNAPSHOT</version>
-    </parent>
+  <parent>
+    <relativePath>../pom.xml</relativePath>
+    <groupId>org.endeavourhealth.im</groupId>
+    <artifactId>informationmodel</artifactId>
+    <version>1.5-SNAPSHOT</version>
+  </parent>
 
-    <artifactId>frontend</artifactId>
+  <artifactId>frontend</artifactId>
+
+  <properties>
+    <sonar.projectKey>endeavourhealth-discovery_InformationModel::frontend</sonar.projectKey>
+  </properties>
 
   <build>
     <plugins>
@@ -20,38 +24,46 @@
         <executions>
           <execution>
             <id>install node and npm</id>
-            <goals><goal>install-node-and-npm</goal></goals>
+            <goals>
+              <goal>install-node-and-npm</goal>
+            </goals>
             <configuration>
               <nodeVersion>${node.version}</nodeVersion>
             </configuration>
           </execution>
           <execution>
             <id>npm set no progress</id>
-            <goals><goal>npm</goal></goals>
+            <goals>
+              <goal>npm</goal>
+            </goals>
             <configuration>
               <arguments>set progress=false</arguments>
             </configuration>
           </execution>
           <execution>
             <id>npm install</id>
-            <goals><goal>npm</goal></goals>
+            <goals>
+              <goal>npm</goal>
+            </goals>
           </execution>
           <execution>
             <id>ng build</id>
-            <goals><goal>npm</goal></goals>
+            <goals>
+              <goal>npm</goal>
+            </goals>
             <configuration>
               <arguments>run build</arguments>
             </configuration>
           </execution>
-<!--
-          <execution>
-            <id>javascript tests</id>
-            <goals>
-              <goal>karma</goal>
-            </goals>
-            <phase>test</phase>
-          </execution>
--->
+          <!--
+                    <execution>
+                      <id>javascript tests</id>
+                      <goals>
+                        <goal>karma</goal>
+                      </goals>
+                      <phase>test</phase>
+                    </execution>
+          -->
         </executions>
       </plugin>
     </plugins>
