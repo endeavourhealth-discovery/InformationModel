@@ -53,6 +53,7 @@
     <sonar.exclusions>**/docs/**/*</sonar.exclusions>
     <sonar.coverage.exclusions>**/api/**/*, **/dal/**/*, **/models/**/*</sonar.coverage.exclusions>
     <sonar.junit.reportPaths>target/surefire-reports</sonar.junit.reportPaths>
+    <sonar.scm.provider>git</sonar.scm.provider>
   </properties>
 
   <build>
