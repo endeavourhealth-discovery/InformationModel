@@ -2,7 +2,7 @@
 ![Version](https://s3.eu-west-2.amazonaws.com/endeavour-codebuild/badges/informationmodel/version.svg)
 ![Build Status](https://s3.eu-west-2.amazonaws.com/endeavour-codebuild/badges/informationmodel/build.svg)
 ![Unit Tests](https://s3.eu-west-2.amazonaws.com/endeavour-codebuild/badges/informationmodel/unit-test.svg)
-![SonarQube](https://sonarcloud.io/api/project_badges/measure?project=endeavourhealth-discovery_InformationModel&metric=alert_status)
+[<img src="https://sonarcloud.io/api/project_badges/measure?project=endeavourhealth-discovery_InformationModel&metric=alert_status">](https://sonarcloud.io/dashboard?id=endeavourhealth-discovery_InformationModel)
 ## Build Angular Frontend
 
 Checkout from GIT
