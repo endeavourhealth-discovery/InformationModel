@@ -7,13 +7,13 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class TaskMockDAL implements TaskDAL {
-    public Boolean createTaskCalled = false;
-    public Long createTaskResult = null;
+    public Boolean createTask_Called = false;
+    public Long createTask_Result = null;
 
     @Override
     public Long createTask(String title, String description, TaskType taskType, Long conceptId) throws Exception {
-        createTaskCalled = true;
-        return createTaskResult;
+        createTask_Called = true;
+        return createTask_Result;
     }
 
     @Override

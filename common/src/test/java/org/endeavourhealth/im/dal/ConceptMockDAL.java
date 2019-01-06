@@ -5,36 +5,35 @@ import org.endeavourhealth.im.models.*;
 import java.util.List;
 
 public class ConceptMockDAL implements ConceptDAL {
-    public Concept conceptResult = null;
+    public boolean get_Called = false;
+    public Long get_Value = null;
+    public Concept get_Result = null;
 
-    public Boolean getCalled = false;
-    public Long getValue = null;
+    public boolean getConceptByContext_Called = false;
+    public String getConceptByContext_Value = null;
+    public Concept getConceptByContext_Result = null;
 
-    public Boolean getConceptByContextCalled = false;
-    public String getConceptByContextValue = null;
+    public boolean saveConcept_Called = false;
+    public Concept saveConcept_Value = null;
+    public Long saveConcept_Result = null;
 
-    public Boolean saveConceptCalled = false;
-    public Concept saveConceptValue = null;
+    public boolean populateTct_Called = false;
 
-    public Long saveResult = null;
-
-    public Boolean populateTctCalled = false;
-
-    public Boolean getAttributesCalled = false;
-    public List<Attribute> getAttributesResult = null;
+    public boolean getAttributes_Called = false;
+    public List<Attribute> getAttributes_Result = null;
 
     @Override
     public Concept get(Long id) throws Exception {
-        getCalled = true;
-        getValue = id;
-        return conceptResult;
+        get_Called = true;
+        get_Value = id;
+        return get_Result;
     }
 
     @Override
     public Concept getConceptByContext(String name) throws Exception {
-        getConceptByContextCalled = true;
-        getConceptByContextValue = name;
-        return conceptResult;
+        getConceptByContext_Called = true;
+        getConceptByContext_Value = name;
+        return getConceptByContext_Result;
     }
 
     @Override
@@ -49,15 +48,15 @@ public class ConceptMockDAL implements ConceptDAL {
 
     @Override
     public List<Attribute> getAttributes(Long id, Boolean includeDeprecated) throws Exception {
-        getAttributesCalled = true;
-        return getAttributesResult;
+        getAttributes_Called = true;
+        return getAttributes_Result;
     }
 
     @Override
     public Long saveConcept(Concept concept) throws Exception {
-        saveConceptCalled = true;
-        saveConceptValue = concept;
-        return saveResult;
+        saveConcept_Called = true;
+        saveConcept_Value = concept;
+        return saveConcept_Result;
     }
 
     @Override
@@ -82,7 +81,7 @@ public class ConceptMockDAL implements ConceptDAL {
 
     @Override
     public void populateTct(Long id, Long superclass) throws Exception {
-        populateTctCalled = true;
+        populateTct_Called = true;
     }
 
     @Override

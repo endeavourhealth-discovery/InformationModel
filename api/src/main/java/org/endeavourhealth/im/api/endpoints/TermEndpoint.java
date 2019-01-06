@@ -27,26 +27,6 @@ import java.util.List;
 public class TermEndpoint {
     private static final Logger LOG = LoggerFactory.getLogger(TermEndpoint.class);
 
-    @POST
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @Produces(MediaType.APPLICATION_JSON)
-    @Timed(absolute = true, name = "InformationModel.TermEndpoint.Post")
-    @ApiOperation(value = "Import TRUD data file")
-    public Response uploadTrudDataFile(@Context SecurityContext sc,
-                                       @ApiParam(value = "Code data file") @FormDataParam("codeFile") InputStream codeFileStream,
-                                       @FormDataParam("codeFile") FormDataContentDisposition codeFileDetail,
-                                       @ApiParam(value = "Relationship data file") @FormDataParam("relFile") InputStream relFileStream,
-                                       @FormDataParam("relFile") FormDataContentDisposition relFileDetail) throws Exception {
-        LOG.debug("Code file " + codeFileDetail.getFileName());
-        LOG.debug("Rel file " + relFileDetail.getFileName());
-
-        new TermLogic().ProcessTrud(codeFileStream, relFileStream);
-
-        return Response
-            .ok()
-            .build();
-    }
-
     @GET
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
