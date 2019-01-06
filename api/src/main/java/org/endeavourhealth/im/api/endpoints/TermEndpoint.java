@@ -5,6 +5,7 @@ import io.astefanutti.metrics.aspectj.Metrics;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.endeavourhealth.im.dal.TermJDBCDAL;
 import org.endeavourhealth.im.logic.TermLogic;
 import org.endeavourhealth.im.models.Term;
 import org.endeavourhealth.im.models.TermMapping;
@@ -60,7 +61,7 @@ public class TermEndpoint {
     ) throws Exception {
         LOG.debug("Get mappings for term concept");
 
-        List<TermMapping> result = new TermLogic().getMappings(conceptId);
+        List<TermMapping> result = new TermJDBCDAL().getMappings(conceptId);
 
         return Response
             .ok()

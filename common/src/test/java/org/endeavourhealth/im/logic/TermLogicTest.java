@@ -14,18 +14,16 @@ public class TermLogicTest {
     private ConceptMockDAL conceptMockDAL;
     private ConceptLogic conceptLogic;
     private TaskMockDAL taskMockDAL;
-    private TaskLogic taskLogic;
     private TermMockDAL termMockDAL;
     private TermLogic termLogic;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         taskMockDAL = new TaskMockDAL();
-        taskLogic = new TaskLogic(taskMockDAL);
         conceptMockDAL = new ConceptMockDAL();
-        conceptLogic = new ConceptLogic(conceptMockDAL, taskLogic);
+        conceptLogic = new ConceptLogic(conceptMockDAL, taskMockDAL);
         termMockDAL = new TermMockDAL();
-        termLogic = new TermLogic(termMockDAL, taskLogic, conceptLogic);
+        termLogic = new TermLogic(termMockDAL, taskMockDAL, conceptMockDAL);
     }
 
     @Test

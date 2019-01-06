@@ -2,35 +2,25 @@ package org.endeavourhealth.im.logic;
 
 import org.endeavourhealth.im.dal.ConceptDAL;
 import org.endeavourhealth.im.dal.ConceptJDBCDAL;
+import org.endeavourhealth.im.dal.TaskDAL;
+import org.endeavourhealth.im.dal.TaskJDBCDAL;
 import org.endeavourhealth.im.models.*;
-import org.w3c.dom.Attr;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class ConceptLogic {
     private ConceptDAL dal;
-    private TaskLogic taskLogic;
+    private TaskDAL taskDAL;
 
     public ConceptLogic() {
         this.dal = new ConceptJDBCDAL();
-        this.taskLogic = new TaskLogic();
+        this.taskDAL = new TaskJDBCDAL();
     }
 
-    protected ConceptLogic(ConceptDAL dal, TaskLogic taskLogic) {
+    protected ConceptLogic(ConceptDAL dal, TaskDAL taskDAL) {
         this.dal = dal;
-        this.taskLogic = taskLogic;
-    }
-
-    public Concept get(Long id) throws Exception {
-        return this.dal.get(id);
-    }
-
-    public Concept get(String context) throws Exception {
-        return get(context, false);
+        this.taskDAL = taskDAL;
     }
 
     public Concept get(String context, Boolean createMissing) throws Exception {
@@ -45,18 +35,10 @@ public class ConceptLogic {
             Long newId = this.dal.saveConcept(concept);
             concept.setId(newId);
 
-           taskLogic.createTask("Auto concept: "+context, TaskType.ATTRIBUTE_MODEL, newId);
+           taskDAL.createTask("Auto concept: "+context, null, TaskType.ATTRIBUTE_MODEL, newId);
         }
 
         return concept;
-    }
-
-    public SearchResult getMRU(Boolean includeDeprecated) throws Exception {
-        return this.dal.getMRU(includeDeprecated);
-    }
-
-    public SearchResult search(String term, Integer page, Boolean includeDeprecated, List<Long> schemes, Long relatedConcept, ValueExpression expression) throws Exception {
-        return this.dal.search(term, page, includeDeprecated, schemes, relatedConcept, expression);
     }
 
     public List<Attribute> getAttributes(Long id, Boolean includeDeprecated) throws Exception {
@@ -95,10 +77,6 @@ public class ConceptLogic {
         concept.setId(id);
     }
 
-    public List<Synonym> getSynonyms(Long id) throws Exception {
-        return this.dal.getSynonyms(id);
-    }
-
     public void saveAttribute(Long conceptId, Attribute attribute) throws Exception {
         // Is this overriding an inherited attribute?
         if (!conceptId.equals(attribute.getConcept().getId())) {
@@ -106,17 +84,5 @@ public class ConceptLogic {
             attribute.setInheritance((byte)2);
         }
         this.dal.saveAttribute(conceptId, attribute);
-    }
-
-    public void deleteAttribute(Long id) throws Exception {
-        this.dal.deleteAttribute(id);
-    }
-
-    public void deleteConcept(Long id) throws Exception {
-        this.dal.deleteConcept(id);
-    }
-
-    public List<ConceptSummary> getSubtypes(Long id, Boolean all) throws Exception {
-        return this.dal.getSubtypes(id, all);
     }
 }

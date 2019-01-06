@@ -1,27 +1,14 @@
 package org.endeavourhealth.im.client;
 
 
+import org.endeavourhealth.im.dal.MapJDBCDAL;
 import org.endeavourhealth.im.logic.ConceptLogic;
-import org.endeavourhealth.im.logic.MapLogic;
 import org.endeavourhealth.im.models.Concept;
 
-/*
-import com.fasterxml.jackson.databind.JsonNode;
-import org.endeavourhealth.common.config.ConfigManager;
-import java.io.IOException;
-import java.util.Map;
-import org.endeavourhealth.common.security.keycloak.client.KeycloakClient;
-import org.apache.http.Header;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Response;
-import java.util.HashMap;
-*/
 
 public class IMClient {
     public static Concept getConcept(Long scheme, String code) throws Exception {
-        return new MapLogic().get(code, scheme);
+        return new MapJDBCDAL().getByCodeAndScheme(code, scheme);
 //        Map<String, String> params = new HashMap<>();
 //        params.put("scheme", scheme.toString());
 //        params.put("code", code);

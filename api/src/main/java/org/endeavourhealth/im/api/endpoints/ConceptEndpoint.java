@@ -3,6 +3,7 @@ package org.endeavourhealth.im.api.endpoints;
 import com.codahale.metrics.annotation.Timed;
 import io.astefanutti.metrics.aspectj.Metrics;
 import io.swagger.annotations.*;
+import org.endeavourhealth.im.dal.ConceptJDBCDAL;
 import org.endeavourhealth.im.logic.ConceptLogic;
 import org.endeavourhealth.im.models.*;
 import org.slf4j.Logger;
@@ -55,7 +56,7 @@ public class ConceptEndpoint {
                             @ApiParam(value = "Concept ID", required = true) @PathParam("id") Long id) throws Exception {
         LOG.debug("Get concept by ID");
 
-        Concept result = new ConceptLogic().get(id);
+        Concept result = new ConceptJDBCDAL().get(id);
 
         return Response
             .ok()
@@ -92,7 +93,7 @@ public class ConceptEndpoint {
                                   @ApiParam(value = "Concept id", required = true) @PathParam("id") Long id) throws Exception {
         LOG.debug("Delete concept");
 
-        new ConceptLogic().deleteConcept(id);
+        new ConceptJDBCDAL().deleteConcept(id);
 
         return Response
             .ok()
@@ -110,7 +111,7 @@ public class ConceptEndpoint {
                                   @ApiParam(value = "Concept id", required = true) @PathParam("id") Long id) throws Exception {
         LOG.debug("Get synonyms by ID");
 
-        List<Synonym> result = new ConceptLogic().getSynonyms(id);
+        List<Synonym> result = new ConceptJDBCDAL().getSynonyms(id);
 
         return Response
             .ok()
@@ -129,7 +130,7 @@ public class ConceptEndpoint {
                                        @ApiParam(value = "All", required = false) @QueryParam("all") Boolean all) throws Exception {
         LOG.debug("Get concept by ID");
 
-        List<ConceptSummary> result = new ConceptLogic().getSubtypes(id, all);
+        List<ConceptSummary> result = new ConceptJDBCDAL().getSubtypes(id, all);
 
         return Response
             .ok()
@@ -166,7 +167,7 @@ public class ConceptEndpoint {
                            @ApiParam(value = "Include deprecated") @QueryParam("includeDeprecated") Boolean includeDeprecated) throws Exception {
         LOG.debug("Get most recently used concepts");
 
-        SearchResult result = new ConceptLogic().getMRU(includeDeprecated);
+        SearchResult result = new ConceptJDBCDAL().getMRU(includeDeprecated);
 
         return Response
             .ok()
@@ -189,7 +190,7 @@ public class ConceptEndpoint {
                            @ApiParam(value = "Optional relationship expression ID") @QueryParam("expression") Byte expression) throws Exception {
         LOG.debug("Search by term");
 
-        SearchResult result = new ConceptLogic().search(term, page, includeDeprecated, schemes, relatedConcept, ValueExpression.byValue(expression));
+        SearchResult result = new ConceptJDBCDAL().search(term, page, includeDeprecated, schemes, relatedConcept, ValueExpression.byValue(expression));
 
         return Response
             .ok()
@@ -271,7 +272,7 @@ public class ConceptEndpoint {
                                     @ApiParam(value = "Attribute id", required = true) @PathParam("id") Long id) throws Exception {
         LOG.debug("Delete attribute");
 
-        new ConceptLogic().deleteAttribute(id);
+        new ConceptJDBCDAL().deleteAttribute(id);
 
         return Response
             .ok()

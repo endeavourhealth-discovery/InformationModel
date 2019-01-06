@@ -3,6 +3,7 @@ package org.endeavourhealth.im.api.endpoints;
 import com.codahale.metrics.annotation.Timed;
 import io.astefanutti.metrics.aspectj.Metrics;
 import io.swagger.annotations.*;
+import org.endeavourhealth.im.dal.SchemaMappingsJDBCDAL;
 import org.endeavourhealth.im.logic.SchemaMappingsLogic;
 import org.endeavourhealth.im.models.SchemaMapping;
 import org.endeavourhealth.im.models.SearchResult;
@@ -31,7 +32,7 @@ public class SchemaMappingsEndpoint {
     public Response getRecordTypes(@Context SecurityContext sc) throws Exception {
         LOG.debug("Get record type concepts");
 
-        SearchResult result = new SchemaMappingsLogic().getRecordTypes();
+        SearchResult result = new SchemaMappingsJDBCDAL().getRecordTypes();
 
         return Response
             .ok()

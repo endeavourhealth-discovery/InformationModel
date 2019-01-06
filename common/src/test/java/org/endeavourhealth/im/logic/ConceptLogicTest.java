@@ -19,39 +19,19 @@ public class ConceptLogicTest {
     private ConceptMockDAL conceptMockDAL;
     private ConceptLogic conceptLogic;
     private TaskMockDAL taskMockDAL;
-    private TaskLogic taskLogic;
 
 
     @Before
     public void setup() {
         taskMockDAL = new TaskMockDAL();
-        taskLogic = new TaskLogic(taskMockDAL);
         conceptMockDAL = new ConceptMockDAL();
-        conceptLogic = new ConceptLogic(conceptMockDAL, taskLogic);
+        conceptLogic = new ConceptLogic(conceptMockDAL, taskMockDAL);
     }
-
-    @Test
-    public void getId_Missing() throws Exception {
-        conceptMockDAL.get_Result = null;
-        Concept result = conceptLogic.get(-1L);
-        assertTrue(conceptMockDAL.get_Called);
-        assertNull(result);
-    }
-
-    @Test
-    public void getId_Exists() throws Exception {
-        conceptMockDAL.get_Result = new Concept();
-        Concept result = conceptLogic.get(-1L);
-        assertTrue(conceptMockDAL.get_Called);
-        assertNotNull(result);
-        assertEquals(conceptMockDAL.get_Result, result);
-    }
-
 
     @Test
     public void getContextCreate_MissingContextNoCreate() throws Exception {
         conceptMockDAL.get_Result = null;
-        Concept result = conceptLogic.get("NO_SUCH_CONTEXT");
+        Concept result = conceptLogic.get("NO_SUCH_CONTEXT", false);
         assertTrue(conceptMockDAL.getConceptByContext_Called);
         assertFalse(conceptMockDAL.saveConcept_Called);
         assertFalse(taskMockDAL.createTask_Called);
@@ -72,7 +52,7 @@ public class ConceptLogicTest {
     @Test
     public void getContextCreate_ExistingContextNoCreate() throws Exception {
         conceptMockDAL.getConceptByContext_Result = new Concept();
-        Concept result = conceptLogic.get("EXISTING_CONTEXT");
+        Concept result = conceptLogic.get("EXISTING_CONTEXT", false);
         assertTrue(conceptMockDAL.getConceptByContext_Called);
         assertFalse(conceptMockDAL.saveConcept_Called);
         assertFalse(taskMockDAL.createTask_Called);
@@ -122,4 +102,33 @@ public class ConceptLogicTest {
         assertNotNull(attributes);
         assertEquals(3, attributes.size());
     }
+
+    @Test
+    public void saveAttribute_OwnAttribute() throws Exception {
+        Attribute attribute = new Attribute()
+            .setId(1L)
+            .setConcept(new Reference(10L, "Own Attribute"))
+            .setInheritance((byte)0);
+
+        conceptLogic.saveAttribute(10L, attribute);
+
+        assertEquals(1L, attribute.getId().longValue());
+        assertEquals((byte)0, attribute.getInheritance().byteValue());
+        assertTrue(conceptMockDAL.saveAttribute_Called);
+    }
+
+    @Test
+    public void saveAttribute_InheritedAttribute() throws Exception {
+        Attribute attribute = new Attribute()
+            .setId(1L)
+            .setConcept(new Reference(10L, "Inherited Attribute"))
+            .setInheritance((byte)0);
+
+        conceptLogic.saveAttribute(20L, attribute);
+
+        assertNull(attribute.getId());
+        assertEquals((byte)2, attribute.getInheritance().byteValue());
+        assertTrue(conceptMockDAL.saveAttribute_Called);
+    }
+
 }

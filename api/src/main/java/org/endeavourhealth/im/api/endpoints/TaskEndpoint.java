@@ -5,7 +5,7 @@ import io.astefanutti.metrics.aspectj.Metrics;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.endeavourhealth.im.logic.TaskLogic;
+import org.endeavourhealth.im.dal.TaskJDBCDAL;
 import org.endeavourhealth.im.models.Task;
 import org.endeavourhealth.im.models.TaskType;
 import org.slf4j.Logger;
@@ -34,7 +34,7 @@ public class TaskEndpoint {
     ) throws Exception {
         LOG.debug("Get tasks called");
 
-        List<Task> tasks = new TaskLogic().getTasks(TaskType.byValue(taskTypeId));
+        List<Task> tasks = new TaskJDBCDAL().getTasks(TaskType.byValue(taskTypeId));
 
         return Response
             .ok()

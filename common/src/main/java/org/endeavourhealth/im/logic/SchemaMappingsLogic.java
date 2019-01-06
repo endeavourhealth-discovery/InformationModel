@@ -4,7 +4,6 @@ import org.endeavourhealth.im.dal.SchemaMappingsDAL;
 import org.endeavourhealth.im.dal.SchemaMappingsJDBCDAL;
 import org.endeavourhealth.im.models.Attribute;
 import org.endeavourhealth.im.models.SchemaMapping;
-import org.endeavourhealth.im.models.SearchResult;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,20 +12,19 @@ import java.util.Map;
 
 public class SchemaMappingsLogic {
     private SchemaMappingsDAL dal;
+    private ConceptLogic conceptLogic;
 
     public SchemaMappingsLogic() {
         this.dal = new SchemaMappingsJDBCDAL();
+        this.conceptLogic = new ConceptLogic();
     }
-    protected SchemaMappingsLogic(SchemaMappingsDAL dal) {
+    protected SchemaMappingsLogic(SchemaMappingsDAL dal, ConceptLogic conceptLogic) {
         this.dal = dal;
-    }
-
-    public SearchResult getRecordTypes() throws Exception {
-        return this.dal.getRecordTypes();
+        this.conceptLogic = conceptLogic;
     }
 
     public List<SchemaMapping> getSchemaMappings(Long conceptId) throws Exception {
-        List<Attribute> attributes = new ConceptLogic().getAttributes(conceptId, false);
+        List<Attribute> attributes = conceptLogic.getAttributes(conceptId, false);
         Map<Long, SchemaMapping> mappings = new HashMap<>();
         this.dal.getSchemaMappings(conceptId).forEach((m) -> mappings.put(m.getAttribute().getId(), m));
         List<SchemaMapping> result = new ArrayList<>();

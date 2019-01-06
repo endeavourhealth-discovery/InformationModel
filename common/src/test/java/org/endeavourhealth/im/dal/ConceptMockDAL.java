@@ -21,6 +21,7 @@ public class ConceptMockDAL implements ConceptDAL {
 
     public boolean getAttributes_Called = false;
     public List<Attribute> getAttributes_Result = null;
+    public boolean saveAttribute_Called = false;
 
     @Override
     public Concept get(Long id) throws Exception {
@@ -66,7 +67,7 @@ public class ConceptMockDAL implements ConceptDAL {
 
     @Override
     public void saveAttribute(Long conceptId, Attribute attribute) throws Exception {
-
+        saveAttribute_Called = true;
     }
 
     @Override

@@ -1,28 +1,26 @@
 package org.endeavourhealth.im.logic;
 
-import org.endeavourhealth.im.dal.TermDAL;
-import org.endeavourhealth.im.dal.TermJDBCDAL;
+import org.endeavourhealth.im.dal.*;
 import org.endeavourhealth.im.models.*;
-
-import java.io.*;
-import java.util.Arrays;
-import java.util.List;
 
 public class TermLogic {
 
     private TermDAL dal;
-    private TaskLogic taskLogic;
+    private TaskDAL taskDAL;
+    private ConceptDAL conceptDAL;
     private ConceptLogic conceptLogic;
 
     public TermLogic() {
         this.dal = new TermJDBCDAL();
-        this.taskLogic = new TaskLogic();
-        this.conceptLogic = new ConceptLogic();
+        this.taskDAL = new TaskJDBCDAL();
+        this.conceptDAL = new ConceptJDBCDAL();
+        this.conceptLogic = new ConceptLogic(conceptDAL, taskDAL);
     }
-    protected TermLogic(TermDAL dal, TaskLogic taskLogic, ConceptLogic conceptLogic) {
+    protected TermLogic(TermDAL dal, TaskDAL taskDAL, ConceptDAL conceptDAL) {
         this.dal = dal;
-        this.taskLogic = taskLogic;
-        this.conceptLogic = conceptLogic;
+        this.taskDAL = taskDAL;
+        this.conceptDAL = conceptDAL;
+        this.conceptLogic = new ConceptLogic(conceptDAL, taskDAL);
     }
 
     public Term getTerm(String organisation, String context, String system, String code, String termText) throws Exception {
@@ -32,12 +30,12 @@ public class TermLogic {
 
         // Mapping exists, return it
         if (conceptId != null) {
-            concept = this.conceptLogic.get(conceptId);
+            concept = this.conceptDAL.get(conceptId);
             concept.incUseCount();
-            this.conceptLogic.saveConcept(concept);
+            this.conceptDAL.saveConcept(concept);
         } else {
             String termConceptContext = "Term." + system + "." + code;            // Try to find based on context
-            concept = this.conceptLogic.get(termConceptContext);
+            concept = this.conceptLogic.get(termConceptContext, false);
 
             if (concept != null) {
                 conceptId = concept.getId();
@@ -54,7 +52,7 @@ public class TermLogic {
                     concept.setStatus(ConceptStatus.ACTIVE)
                         // .setType(new ConceptReference().setText("Class.Code"))
                         .setFullName(officialTerm);
-                    this.conceptLogic.saveConcept(concept);
+                    this.conceptDAL.saveConcept(concept);
                     conceptId = concept.getId();
                     // TODO: Replace with attribute
                     // importParentHierarchy(conceptId, system, code);
@@ -64,9 +62,9 @@ public class TermLogic {
                         // TODO: Replace with relationship
                         // .setType(new ConceptReference().setText("Class.Code"))
                         .setFullName(termText);
-                    this.conceptLogic.saveConcept(concept);
+                    this.conceptDAL.saveConcept(concept);
                     conceptId = concept.getId();
-                    this.taskLogic.createTask("New draft term [" + termText + "]", termConceptContext + " => " + termText, TaskType.TERM_MAPPINGS, conceptId);
+                    this.taskDAL.createTask("New draft term [" + termText + "]", termConceptContext + " => " + termText, TaskType.TERM_MAPPINGS, conceptId);
                 }
             }
 
@@ -77,10 +75,6 @@ public class TermLogic {
         return new Term()
                 .setId(conceptId)
                 .setText(concept.getFullName());
-    }
-
-    public List<TermMapping> getMappings(Long conceptId) throws Exception {
-        return this.dal.getMappings(conceptId);
     }
 
     private String getOfficialTermForCode(String system, String code) throws Exception {

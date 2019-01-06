@@ -3,7 +3,7 @@ package org.endeavourhealth.im.api.endpoints;
 import com.codahale.metrics.annotation.Timed;
 import io.astefanutti.metrics.aspectj.Metrics;
 import io.swagger.annotations.*;
-import org.endeavourhealth.im.logic.MapLogic;
+import org.endeavourhealth.im.dal.MapJDBCDAL;
 import org.endeavourhealth.im.models.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +30,7 @@ public class MapEndpoint {
                         @ApiParam(value = "Scheme", required = true) @QueryParam("scheme") Long scheme) throws Exception {
         LOG.debug("Get concept by code map");
 
-        Concept result = new MapLogic().get(code, scheme);
+        Concept result = new MapJDBCDAL().getByCodeAndScheme(code, scheme);
 
         return Response
             .ok()

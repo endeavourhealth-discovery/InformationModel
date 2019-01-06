@@ -5,6 +5,7 @@ import io.astefanutti.metrics.aspectj.Metrics;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.endeavourhealth.im.dal.ViewJDBCDAL;
 import org.endeavourhealth.im.logic.ViewLogic;
 import org.endeavourhealth.im.models.*;
 import org.slf4j.Logger;
@@ -31,7 +32,7 @@ public class ViewEndpoint {
     public Response getList(@Context SecurityContext sc) throws Exception {
         LOG.debug("Get views");
 
-        List<View> result = new ViewLogic().list();
+        List<View> result = new ViewJDBCDAL().list();
 
         return Response
             .ok()
@@ -50,7 +51,7 @@ public class ViewEndpoint {
     ) throws Exception {
         LOG.debug("Get view");
 
-        View result = new ViewLogic().get(viewId);
+        View result = new ViewJDBCDAL().get(viewId);
 
         return Response
             .ok()
@@ -69,7 +70,7 @@ public class ViewEndpoint {
                          @ApiParam(value = "View", required = true) View view) throws Exception {
         LOG.debug("Save view");
 
-        View result = new ViewLogic().save(view);
+        View result = new ViewJDBCDAL().save(view);
 
         return Response
             .ok()
@@ -88,7 +89,7 @@ public class ViewEndpoint {
     ) throws Exception {
         LOG.debug("Delete view");
 
-        new ViewLogic().delete(viewId);
+        new ViewJDBCDAL().delete(viewId);
 
         return Response
             .ok()
@@ -132,7 +133,7 @@ public class ViewEndpoint {
                             @ApiParam(value = "Attribute ids", required = true) List<Long> attributeIds) throws Exception {
         LOG.debug("Add to view");
 
-        new ViewLogic().addItem(viewId, ViewItemAddStyle.fromInt(addStyle), conceptId, attributeIds, parentId);
+        new ViewJDBCDAL().addItem(viewId, ViewItemAddStyle.fromInt(addStyle), conceptId, attributeIds, parentId);
 
         return Response
             .ok()
@@ -150,7 +151,7 @@ public class ViewEndpoint {
     ) throws Exception {
         LOG.debug("Delete view item");
 
-        new ViewLogic().deleteViewItem(viewItemId);
+        new ViewJDBCDAL().deleteViewItem(viewItemId);
 
         return Response
             .ok()
