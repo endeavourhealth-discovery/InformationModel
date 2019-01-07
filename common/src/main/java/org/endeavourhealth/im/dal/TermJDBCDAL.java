@@ -13,7 +13,7 @@ import java.util.List;
 public class TermJDBCDAL implements TermDAL {
 
     @Override
-    public Long getConceptId(String organisation, String context, String system, String code) throws Exception {
+    public Long getConceptId(String organisation, String context, String system, String code) throws DALException {
         String sql = "SELECT concept_id FROM term_mapping WHERE organisation = ? AND context = ? AND system = ? AND code = ?";
         Connection conn = ConnectionPool.InformationModel.pop();
         Long result = null;
@@ -27,14 +27,15 @@ public class TermJDBCDAL implements TermDAL {
                     result = rs.getLong(1);
             }
             return result;
-
+        } catch (SQLException e) {
+            throw new DALException("Error fetching concept id", e);
         } finally {
             ConnectionPool.InformationModel.push(conn);
         }
     }
 
     @Override
-    public void createTermMap(String organisation, String context, String system, String code, Long termId) throws Exception {
+    public void createTermMap(String organisation, String context, String system, String code, Long termId) throws DALException {
         TermMapping termMapping = new TermMapping()
             .setOrganisation(organisation)
             .setContext(context)
@@ -46,7 +47,7 @@ public class TermJDBCDAL implements TermDAL {
     }
 
     @Override
-    public String getSnomedTerm(String code) throws SQLException {
+    public String getSnomedTerm(String code) throws DALException {
         String sql = "SELECT display FROM trm_concept WHERE code = ?";
         String result = null;
 
@@ -60,13 +61,15 @@ public class TermJDBCDAL implements TermDAL {
 
             }
             return result;
+        } catch (SQLException e) {
+            throw new DALException("Error fetching snomed term", e);
         } finally {
             ConnectionPool.Snomed.push(conn);
         }
     }
 
     @Override
-    public Term getSnomedParent(String code) throws SQLException {
+    public Term getSnomedParent(String code) throws DALException {
         String sql = "SELECT p.code, p.display " +
             "FROM trm_concept p " +
             "JOIN trm_concept_pc_link l ON l.parent_pid = p.pid " +
@@ -85,6 +88,8 @@ public class TermJDBCDAL implements TermDAL {
                         .setText(rs.getString("display"));
             }
             return result;
+        } catch (SQLException e) {
+            throw new DALException("Error fetching snomed parent", e);
         } finally {
             ConnectionPool.Snomed.push(conn);
         }
@@ -101,7 +106,7 @@ public class TermJDBCDAL implements TermDAL {
     }
 
     @Override
-    public List<TermMapping> getMappings(Long conceptId) throws Exception {
+    public List<TermMapping> getMappings(Long conceptId) throws DALException {
         List<TermMapping> result = new ArrayList<>();
 
 /*
@@ -120,7 +125,8 @@ public class TermJDBCDAL implements TermDAL {
                     );
                 }
             }
-
+        } catch (SQLException e) {
+            throw new DALException("Error fetching mappings", e);
         } finally {
             ConnectionPool.InformationModel.push(conn);
         }

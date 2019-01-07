@@ -11,7 +11,7 @@ import static org.endeavourhealth.im.dal.DALHelper.getGeneratedKey;
 
 public class TaskJDBCDAL implements TaskDAL {
     @Override
-    public Long createTask(String title, String description, TaskType taskType, Long conceptId) throws Exception {
+    public Long createTask(String title, String description, TaskType taskType, Long conceptId) throws DALException {
         Task task = new Task()
                 .setName(title)
                 .setDescription(description)
@@ -23,7 +23,7 @@ public class TaskJDBCDAL implements TaskDAL {
     }
 
     @Override
-    public List<Task> getTasks(TaskType taskType) throws SQLException {
+    public List<Task> getTasks(TaskType taskType) throws DALException {
         List<Task> tasks = new ArrayList<>();
 
         Connection conn = ConnectionPool.InformationModel.pop();
@@ -50,7 +50,8 @@ public class TaskJDBCDAL implements TaskDAL {
                     );
                 }
             }
-
+        } catch (SQLException e) {
+            throw new DALException("Error fetching tasks", e);
         } finally {
             ConnectionPool.InformationModel.push(conn);
         }
@@ -58,7 +59,7 @@ public class TaskJDBCDAL implements TaskDAL {
         return tasks;
     }
 
-    private Long save(Task task) throws SQLException {
+    private Long save(Task task) throws DALException {
         Connection conn = ConnectionPool.InformationModel.pop();
         String sql = (task.getId() == null)
             ? "INSERT INTO task (title, description, type, created, identifier) VALUES (?, ?, ?, ?, ?)"
@@ -80,6 +81,8 @@ public class TaskJDBCDAL implements TaskDAL {
 
             if (task.getId() == null)
                 task.setId(getGeneratedKey(stmt));
+        } catch (SQLException e) {
+            throw new DALException("Error saving task", e);
 
         } finally {
             ConnectionPool.InformationModel.push(conn);
@@ -92,7 +95,7 @@ public class TaskJDBCDAL implements TaskDAL {
     /*
 
     @Override
-    public Long getTaskIdByTypeAndResourceId(TaskType taskType, Long resourceId) throws SQLException {
+    public Long getTaskIdByTypeAndResourceId(TaskType taskType, Long resourceId) throws DALException {
         Connection conn = ConnectionPool.InformationModel.pop();
 
         try (PreparedStatement stmt = conn.prepareStatement("SELECT id FROM task WHERE type = ? and identifier = ?")) {
@@ -104,6 +107,8 @@ public class TaskJDBCDAL implements TaskDAL {
                 return rs.getLong(1);
             else
                 return null;
+        } catch (SQLException e) {
+            throw new DALException("Error fetching task id by type and resource", e);
         } finally {
             ConnectionPool.InformationModel.push(conn);
         }

@@ -6,7 +6,7 @@ import org.endeavourhealth.im.models.SearchResult;
 import java.util.List;
 
 public interface SchemaMappingsDAL {
-    SearchResult getRecordTypes() throws Exception;
+    SearchResult getRecordTypes() throws DALException;
 
-    List<SchemaMapping> getSchemaMappings(Long conceptId) throws Exception;
+    List<SchemaMapping> getSchemaMappings(Long conceptId) throws DALException;
 }

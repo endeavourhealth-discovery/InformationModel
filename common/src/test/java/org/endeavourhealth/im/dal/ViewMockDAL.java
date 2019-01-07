@@ -12,44 +12,44 @@ public class ViewMockDAL implements ViewDAL {
 
 
     @Override
-    public List<View> list() throws Exception {
+    public List<View> list() throws DALException {
         return null;
     }
 
     @Override
-    public View get(Long viewId) throws Exception {
+    public View get(Long viewId) throws DALException {
         return null;
     }
 
     @Override
-    public View save(View view) throws Exception {
+    public View save(View view) throws DALException {
         return null;
     }
 
     @Override
-    public void delete(Long viewId) throws Exception {
+    public void delete(Long viewId) throws DALException {
 
     }
 
     @Override
-    public List<ViewItem> getViewContents(Long view, Long parent) throws Exception {
+    public List<ViewItem> getViewContents(Long view, Long parent) throws DALException {
         getViewContents_Called = true;
         return null;
     }
 
     @Override
-    public List<ViewItem> getSubTypes(Long parent) throws Exception {
+    public List<ViewItem> getSubTypes(Long parent) throws DALException {
         getSubTypes_Called = true;
         return null;
     }
 
     @Override
-    public void addItem(Long viewId, ViewItemAddStyle addStyle, Long conceptId, List<Long> attributeIds, Long parentId) throws Exception {
+    public void addItem(Long viewId, ViewItemAddStyle addStyle, Long conceptId, List<Long> attributeIds, Long parentId) throws DALException {
 
     }
 
     @Override
-    public void deleteViewItem(Long viewItemId) throws Exception {
+    public void deleteViewItem(Long viewItemId) throws DALException {
 
     }
 }

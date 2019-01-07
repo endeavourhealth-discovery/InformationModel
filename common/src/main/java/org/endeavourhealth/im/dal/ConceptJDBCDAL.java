@@ -16,7 +16,7 @@ public class ConceptJDBCDAL implements ConceptDAL {
     private static final Integer PAGE_SIZE = 15;
 
     @Override
-    public Concept get(Long id) throws SQLException {
+    public Concept get(Long id) throws DALException {
         Connection conn = ConnectionPool.InformationModel.pop();
         String sql = "SELECT c.*, s.full_name as superclass_name, cs.full_name as code_scheme_name " +
             "FROM concept c " +
@@ -27,13 +27,15 @@ public class ConceptJDBCDAL implements ConceptDAL {
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setLong(1, id);
             return getConceptFromStatement(stmt);
+        } catch (SQLException e) {
+            throw new DALException("Error fetching concept", e);
         } finally {
             ConnectionPool.InformationModel.push(conn);
         }
     }
 
     @Override
-    public Concept getConceptByContext(String context) throws SQLException {
+    public Concept getConceptByContext(String context) throws DALException {
         Connection conn = ConnectionPool.InformationModel.pop();
 
         String sql = "SELECT c.*, s.full_name as superclass_name, cs.full_name as code_scheme_name " +
@@ -45,13 +47,15 @@ public class ConceptJDBCDAL implements ConceptDAL {
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, context);
             return getConceptFromStatement(stmt);
+        } catch (SQLException e) {
+            throw new DALException("Error fetching concept by context", e);
         } finally {
             ConnectionPool.InformationModel.push(conn);
         }
     }
 
     @Override
-    public SearchResult getMRU(Boolean includeDeprecated) throws SQLException {
+    public SearchResult getMRU(Boolean includeDeprecated) throws DALException {
         Connection conn = ConnectionPool.InformationModel.pop();
 
         SearchResult result = new SearchResult().setPage(1);
@@ -72,13 +76,15 @@ public class ConceptJDBCDAL implements ConceptDAL {
             result.setCount(result.getResults().size());
 
             return result;
+        } catch (SQLException e) {
+            throw new DALException("Error fetching MRU", e);
         } finally {
             ConnectionPool.InformationModel.push(conn);
         }
     }
 
     @Override
-    public SearchResult search(String term, Integer page, Boolean includeDeprecated, List<Long> schemes, Long relatedConcept, ValueExpression expression) throws SQLException {
+    public SearchResult search(String term, Integer page, Boolean includeDeprecated, List<Long> schemes, Long relatedConcept, ValueExpression expression) throws DALException {
         Connection conn = ConnectionPool.InformationModel.pop();
         if (page == null)
             page = 1;
@@ -132,12 +138,14 @@ public class ConceptJDBCDAL implements ConceptDAL {
             result.setCount(getFoundRows(conn));
 
             return result;
+        } catch (SQLException e) {
+            throw new DALException("Error performing search", e);
         } finally {
             ConnectionPool.InformationModel.push(conn);
         }
     }
 
-    private Integer getFoundRows(Connection conn) throws SQLException {
+    private Integer getFoundRows(Connection conn) throws DALException {
         try (PreparedStatement stmt = conn.prepareStatement("SELECT FOUND_ROWS()")) {
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next())
@@ -145,11 +153,13 @@ public class ConceptJDBCDAL implements ConceptDAL {
                 else
                     return 0;
             }
+        } catch (SQLException e) {
+            throw new DALException("Error fetching found rows", e);
         }
     }
 
     @Override
-    public List<Attribute> getAttributes(Long id, Boolean includeDeprecated) throws Exception {
+    public List<Attribute> getAttributes(Long id, Boolean includeDeprecated) throws DALException {
         Connection conn = ConnectionPool.InformationModel.pop();
 
         String sql = "(select ca.*, -1 as level,\n" +
@@ -185,13 +195,15 @@ public class ConceptJDBCDAL implements ConceptDAL {
             stmt.setLong(1, id);
             stmt.setLong(2, id);
             return getAttributeListFromStatement(stmt);
+        } catch (SQLException e) {
+            throw new DALException("Error fetching attributes", e);
         } finally {
             ConnectionPool.InformationModel.push(conn);
         }
     }
 
     @Override
-    public List<Synonym> getSynonyms(Long id) throws SQLException {
+    public List<Synonym> getSynonyms(Long id) throws DALException {
         Connection conn = ConnectionPool.InformationModel.pop();
         List<Synonym> result = new ArrayList<>();
 
@@ -210,6 +222,8 @@ public class ConceptJDBCDAL implements ConceptDAL {
                     );
                 }
             }
+        } catch (SQLException e) {
+            throw new DALException("Error fetching synonyms", e);
         } finally {
             ConnectionPool.InformationModel.push(conn);
         }
@@ -217,75 +231,83 @@ public class ConceptJDBCDAL implements ConceptDAL {
     }
 
     @Override
-    public void saveAttribute(Long conceptId, Attribute attribute) throws SQLException {
+    public void saveAttribute(Long conceptId, Attribute attribute) throws DALException {
         String sql;
 
         Connection conn = ConnectionPool.InformationModel.pop();
-        conn.setAutoCommit(false);
+        try {
+            conn.setAutoCommit(false);
 
-        if (attribute.getId() == null) {
-            sql = "INSERT INTO concept_attribute " +
-                "(concept, version, attribute, `order`, mandatory, `limit`, inheritance, value_concept, value_expression, fixed_concept, fixed_value, status) " +
-                "VALUES (?, ?, ?, ? ,?, ?, ? ,? ,? ,? ,? , ?)";
-        } else {
-            archiveAttribute(conn, attribute.getId());
-            attribute.incVersion();
-            sql = "UPDATE concept_attribute SET " +
-                "concept = ?, version = ?, attribute = ?, `order` = ?, mandatory = ?, `limit` = ?, inheritance = ?, value_concept = ?, value_expression = ?, fixed_concept = ?, fixed_value = ?, status = ? " +
-                "WHERE id = ?";
-        }
+            if (attribute.getId() == null) {
+                sql = "INSERT INTO concept_attribute " +
+                    "(concept, version, attribute, `order`, mandatory, `limit`, inheritance, value_concept, value_expression, fixed_concept, fixed_value, status) " +
+                    "VALUES (?, ?, ?, ? ,?, ?, ? ,? ,? ,? ,? , ?)";
+            } else {
+                archiveAttribute(conn, attribute.getId());
+                attribute.incVersion();
+                sql = "UPDATE concept_attribute SET " +
+                    "concept = ?, version = ?, attribute = ?, `order` = ?, mandatory = ?, `limit` = ?, inheritance = ?, value_concept = ?, value_expression = ?, fixed_concept = ?, fixed_value = ?, status = ? " +
+                    "WHERE id = ?";
+            }
 
-        try (PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            int i = 1;
+            try (PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                int i = 1;
 
-            setLong(stmt, i++, conceptId);
-            setFloat(stmt, i++, attribute.getVersion());
-            setLong(stmt, i++, attribute.getAttribute().getId());
-            setInt(stmt, i++, attribute.getOrder() == null ? 0 : attribute.getOrder());
-            setBool(stmt, i++, attribute.getMandatory() == null ? false : attribute.getMandatory());
-            setInt(stmt, i++, attribute.getLimit() == null ? 1 : attribute.getLimit());
-            setByte(stmt, i++, attribute.getInheritance() == null ? 1 : attribute.getInheritance());
-            setLong(stmt, i++, attribute.getValueConcept().getId());
-            setByte(stmt, i++, attribute.getValueExpression().getValue());
-            setLong(stmt, i++, (attribute.getFixedConcept() == null) ? null : attribute.getFixedConcept().getId());
-            setString(stmt, i++, attribute.getFixedValue());
-            setByte(stmt, i++, attribute.getStatus() == null ? 0 : attribute.getStatus().getValue());
-            if (attribute.getId() != null)
-                setLong(stmt, i++, attribute.getId());
+                setLong(stmt, i++, conceptId);
+                setFloat(stmt, i++, attribute.getVersion());
+                setLong(stmt, i++, attribute.getAttribute().getId());
+                setInt(stmt, i++, attribute.getOrder() == null ? 0 : attribute.getOrder());
+                setBool(stmt, i++, attribute.getMandatory() == null ? false : attribute.getMandatory());
+                setInt(stmt, i++, attribute.getLimit() == null ? 1 : attribute.getLimit());
+                setByte(stmt, i++, attribute.getInheritance() == null ? 1 : attribute.getInheritance());
+                setLong(stmt, i++, attribute.getValueConcept().getId());
+                setByte(stmt, i++, attribute.getValueExpression().getValue());
+                setLong(stmt, i++, (attribute.getFixedConcept() == null) ? null : attribute.getFixedConcept().getId());
+                setString(stmt, i++, attribute.getFixedValue());
+                setByte(stmt, i++, attribute.getStatus() == null ? 0 : attribute.getStatus().getValue());
+                if (attribute.getId() != null)
+                    setLong(stmt, i++, attribute.getId());
 
-            stmt.executeUpdate();
-            if (attribute.getId() == null)
-                attribute.setId(getGeneratedKey(stmt));
+                stmt.executeUpdate();
+                if (attribute.getId() == null)
+                    attribute.setId(getGeneratedKey(stmt));
 
-            conn.commit();
+                conn.commit();
+            }
+        } catch (SQLException e) {
+            throw new DALException("Error saving attribute", e);
         } finally {
             ConnectionPool.InformationModel.push(conn);
         }
     }
 
-    private void archiveAttribute(Connection conn, Long attributeId) throws SQLException {
+    private void archiveAttribute(Connection conn, Long attributeId) throws DALException {
         try (PreparedStatement stmt = conn.prepareStatement("INSERT INTO concept_attribute_archive SELECT * FROM concept_attribute WHERE id = ?")) {
             stmt.setLong(1, attributeId);
             stmt.execute();
+        } catch (SQLException e) {
+            throw new DALException("Error archiving attribute", e);
         }
     }
 
     @Override
-    public void deleteAttribute(Long id) throws SQLException {
+    public void deleteAttribute(Long id) throws DALException {
         Connection conn = ConnectionPool.InformationModel.pop();
         try (PreparedStatement stmt = conn.prepareStatement("DELETE FROM concept_attribute WHERE id = ?")) {
             stmt.setLong(1, id);
             stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new DALException("Error deleting attribute", e);
         } finally {
             ConnectionPool.InformationModel.push(conn);
         }
     }
 
     @Override
-    public void deleteConcept(Long id) throws SQLException {
+    public void deleteConcept(Long id) throws DALException {
         Connection conn = ConnectionPool.InformationModel.pop();
-        conn.setAutoCommit(false);
         try {
+            conn.setAutoCommit(false);
             try (PreparedStatement stmt = conn.prepareStatement("DELETE FROM concept_tct WHERE concept = ?")) {
                 stmt.setLong(1, id);
                 stmt.executeUpdate();
@@ -299,16 +321,18 @@ public class ConceptJDBCDAL implements ConceptDAL {
                 stmt.executeUpdate();
             }
             conn.commit();
+        } catch (SQLException e) {
+            throw new DALException("Error deleting concept", e);
         }finally {
             ConnectionPool.InformationModel.push(conn);
         }
     }
 
     @Override
-    public void populateTct(Long id, Long superclass) throws SQLException {
+    public void populateTct(Long id, Long superclass) throws DALException {
         Connection conn = ConnectionPool.InformationModel.pop();
-        conn.setAutoCommit(false);
         try {
+            conn.setAutoCommit(false);
             try (PreparedStatement stmt = conn.prepareStatement("INSERT INTO concept_tct (concept, ancestor, level) SELECT ?, ancestor, level+1 FROM concept_tct WHERE concept = ?")) {
                 stmt.setLong(1, id);
                 stmt.setLong(2, superclass);
@@ -320,13 +344,15 @@ public class ConceptJDBCDAL implements ConceptDAL {
                 stmt.executeUpdate();
             }
             conn.commit();
+        } catch (SQLException e) {
+            throw new DALException("Error populating tct", e);
         } finally {
             ConnectionPool.InformationModel.push(conn);
         }
     }
 
     @Override
-    public List<ConceptSummary> getSubtypes(Long id, Boolean all) throws SQLException {
+    public List<ConceptSummary> getSubtypes(Long id, Boolean all) throws DALException {
         Connection conn = ConnectionPool.InformationModel.pop();
         String sql = "SELECT c.id, c.full_name, c.context, c.status, c.version, false as synonym, c.code_scheme, cs.full_name as code_scheme_name\n" +
             "FROM concept c\n" +
@@ -347,17 +373,18 @@ public class ConceptJDBCDAL implements ConceptDAL {
                 stmt.setLong(2, id);
 
             return getConceptSummaryListFromStatement(stmt);
-
+        } catch (SQLException e) {
+            throw new DALException("Error fetching subtypes", e);
         } finally {
             ConnectionPool.InformationModel.push(conn);
         }
     }
 
     @Override
-    public Long saveConcept(Concept concept) throws SQLException {
+    public Long saveConcept(Concept concept) throws DALException {
         Connection conn = ConnectionPool.InformationModel.pop();
-        conn.setAutoCommit(false);
         try {
+            conn.setAutoCommit(false);
             String sql;
             Long id = concept.getId();
             if (id == null) {
@@ -397,15 +424,19 @@ public class ConceptJDBCDAL implements ConceptDAL {
 
                 return id;
             }
+        } catch (SQLException e) {
+            throw new DALException("Error saving concept", e);
         } finally {
             ConnectionPool.InformationModel.push(conn);
         }
     }
 
-    private void archiveConcept(Connection conn, Long conceptId) throws SQLException {
+    private void archiveConcept(Connection conn, Long conceptId) throws DALException {
         try (PreparedStatement stmt = conn.prepareStatement("INSERT INTO concept_archive SELECT * FROM concept WHERE id = ?")) {
             stmt.setLong(1, conceptId);
             stmt.execute();
+        } catch (SQLException e) {
+            throw new DALException("Error archiving concept", e);
         }
     }
 }

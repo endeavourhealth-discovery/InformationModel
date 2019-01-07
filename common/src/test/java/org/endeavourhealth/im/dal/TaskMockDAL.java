@@ -11,13 +11,13 @@ public class TaskMockDAL implements TaskDAL {
     public Long createTask_Result = null;
 
     @Override
-    public Long createTask(String title, String description, TaskType taskType, Long conceptId) throws Exception {
+    public Long createTask(String title, String description, TaskType taskType, Long conceptId) throws DALException {
         createTask_Called = true;
         return createTask_Result;
     }
 
     @Override
-    public List<Task> getTasks(TaskType taskType) throws SQLException {
+    public List<Task> getTasks(TaskType taskType) throws DALException {
         return null;
     }
 }

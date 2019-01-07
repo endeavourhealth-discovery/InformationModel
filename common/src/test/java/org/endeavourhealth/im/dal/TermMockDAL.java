@@ -16,24 +16,24 @@ public class TermMockDAL implements TermDAL {
     public String getSnomedTerm_Result = null;
 
     @Override
-    public Long getConceptId(String organisation, String context, String system, String code) throws Exception {
+    public Long getConceptId(String organisation, String context, String system, String code) throws DALException {
         getConceptId_Called = true;
         return getConceptId_Result;
     }
 
     @Override
-    public void createTermMap(String organisation, String context, String code, String system, Long termId) throws Exception {
+    public void createTermMap(String organisation, String context, String code, String system, Long termId) throws DALException {
         createTermMap_Called = true;
     }
 
     @Override
-    public String getSnomedTerm(String code) throws SQLException {
+    public String getSnomedTerm(String code) throws DALException {
         getSnomedTerm_Called = true;
         return getSnomedTerm_Result;
     }
 
     @Override
-    public Term getSnomedParent(String code) throws SQLException {
+    public Term getSnomedParent(String code) throws DALException {
         return null;
     }
 
@@ -48,7 +48,7 @@ public class TermMockDAL implements TermDAL {
     }
 
     @Override
-    public List<TermMapping> getMappings(Long conceptId) throws Exception {
+    public List<TermMapping> getMappings(Long conceptId) throws DALException {
         return null;
     }
 }

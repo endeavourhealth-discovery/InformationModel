@@ -10,20 +10,22 @@ import static org.endeavourhealth.im.dal.DALHelper.*;
 
 public class ViewJDBCDAL implements ViewDAL {
     @Override
-    public List<View> list() throws SQLException {
+    public List<View> list() throws DALException {
         Connection conn = ConnectionPool.InformationModel.pop();
         String sql = "SELECT *\n" +
             "FROM view\n";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             return getViewListFromStatement(stmt);
+        } catch (SQLException e) {
+            throw new DALException("Error fetching view list", e);
         } finally {
             ConnectionPool.InformationModel.push(conn);
         }
     }
 
     @Override
-    public View get(Long viewId) throws SQLException {
+    public View get(Long viewId) throws DALException {
         Connection conn = ConnectionPool.InformationModel.pop();
         String sql = "SELECT *\n" +
             "FROM view\n" +
@@ -38,13 +40,15 @@ public class ViewJDBCDAL implements ViewDAL {
                     return null;
                 }
             }
+        } catch (SQLException e) {
+            throw new DALException("Error fetching view", e);
         } finally {
             ConnectionPool.InformationModel.push(conn);
         }
     }
 
     @Override
-    public View save(View view) throws SQLException {
+    public View save(View view) throws DALException {
         Connection conn = ConnectionPool.InformationModel.pop();
         String sql = view.getId() == null
             ? "INSERT INTO `view` (name, description) VALUES (?, ?)"
@@ -62,17 +66,19 @@ public class ViewJDBCDAL implements ViewDAL {
                 view.setId(getGeneratedKey(stmt));
 
             return view;
+        } catch (SQLException e) {
+            throw new DALException("Error saving view", e);
         } finally {
             ConnectionPool.InformationModel.push(conn);
         }
     }
 
     @Override
-    public void delete(Long viewId) throws SQLException {
+    public void delete(Long viewId) throws DALException {
         Connection conn = ConnectionPool.InformationModel.pop();
-        conn.setAutoCommit(false);
 
         try {
+            conn.setAutoCommit(false);
             try (PreparedStatement stmt = conn.prepareStatement("DELETE FROM view_item WHERE view = ?")) {
                 stmt.setLong(1, viewId);
                 stmt.executeUpdate();
@@ -82,16 +88,20 @@ public class ViewJDBCDAL implements ViewDAL {
                 stmt.executeUpdate();
             }
             conn.commit();
-        } catch (Exception e) {
-            conn.rollback();
-            throw e;
+        } catch (SQLException e) {
+            try {
+                conn.rollback();
+                throw new DALException("Error deleting view", e);
+            } catch (SQLException e2) {
+                throw new DALException("Error rolling back view delete", e2);
+            }
         } finally {
             ConnectionPool.InformationModel.push(conn);
         }
     }
 
     @Override
-    public List<ViewItem> getViewContents(Long view, Long parent) throws SQLException {
+    public List<ViewItem> getViewContents(Long view, Long parent) throws DALException {
         Connection conn = ConnectionPool.InformationModel.pop();
         String sql = "SELECT v.*, c.full_name AS concept_name, p.full_name AS parent_name, x.full_name AS context_name\n" +
             "FROM view_item v\n" +
@@ -110,13 +120,15 @@ public class ViewJDBCDAL implements ViewDAL {
                 stmt.setLong(2, parent);
 
             return getViewItemListFromStatement(stmt);
+        } catch (SQLException e) {
+            throw new DALException("Error fetching view contents", e);
         } finally {
             ConnectionPool.InformationModel.push(conn);
         }
     }
 
     @Override
-    public List<ViewItem> getSubTypes(Long parent) throws SQLException {
+    public List<ViewItem> getSubTypes(Long parent) throws DALException {
         Connection conn = ConnectionPool.InformationModel.pop();
         String sql = "SELECT c.id as id, c.id as concept, c.full_name AS concept_name, c.superclass as parent, p.full_name AS parent_name, null as context, null AS context_name\n" +
             "FROM concept c\n" +
@@ -134,13 +146,15 @@ public class ViewJDBCDAL implements ViewDAL {
                 stmt.setLong(1, parent);
 
             return getViewItemListFromStatement(stmt);
+        } catch (SQLException e) {
+            throw new DALException("Error fetching subtypes", e);
         } finally {
             ConnectionPool.InformationModel.push(conn);
         }
     }
 
     @Override
-    public void addItem(Long viewId, ViewItemAddStyle addStyle, Long conceptId, List<Long> attributeIds, Long parentId) throws SQLException {
+    public void addItem(Long viewId, ViewItemAddStyle addStyle, Long conceptId, List<Long> attributeIds, Long parentId) throws DALException {
         Connection conn = ConnectionPool.InformationModel.pop();
 
         try {
@@ -157,28 +171,34 @@ public class ViewJDBCDAL implements ViewDAL {
                 }
             }
             conn.commit();
-        } catch (Exception e) {
-            conn.rollback();
-            throw e;
+        } catch (SQLException e) {
+            try {
+                conn.rollback();
+                throw new DALException("Error adding item", e);
+            } catch (SQLException e2) {
+                throw new DALException("Error rolling back item add", e2);
+            }
         } finally {
             ConnectionPool.InformationModel.push(conn);
         }
     }
 
     @Override
-    public void deleteViewItem(Long viewItemId) throws SQLException {
+    public void deleteViewItem(Long viewItemId) throws DALException {
         Connection conn = ConnectionPool.InformationModel.pop();
         String sql = "DELETE FROM view_item WHERE id = ?";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setLong(1, viewItemId);
             stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new DALException("Error deleting view item", e);
         } finally {
             ConnectionPool.InformationModel.push(conn);
         }
     }
 
-    private Long saveViewItem(Connection conn, Long viewId, Long conceptId, Long contextId, Long parentId) throws SQLException {
+    private Long saveViewItem(Connection conn, Long viewId, Long conceptId, Long contextId, Long parentId) throws DALException {
         try (PreparedStatement stmt = conn.prepareStatement("INSERT INTO view_item (view, concept, context, parent) VALUES (?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS)) {
             stmt.setLong(1, viewId);
             stmt.setLong(2, conceptId);
@@ -186,6 +206,8 @@ public class ViewJDBCDAL implements ViewDAL {
             if (parentId == null) stmt.setNull(4, BIGINT); else stmt.setLong(4, parentId);
             stmt.executeUpdate();
             return getGeneratedKey(stmt);
+        } catch (SQLException e) {
+            throw new DALException("Error saving view item", e);
         }
     }
 }

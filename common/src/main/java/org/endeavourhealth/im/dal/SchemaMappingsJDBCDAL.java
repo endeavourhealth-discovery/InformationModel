@@ -13,7 +13,7 @@ import static org.endeavourhealth.im.dal.DALHelper.getSchemaMappingListFromState
 
 public class SchemaMappingsJDBCDAL implements SchemaMappingsDAL {
     @Override
-    public SearchResult getRecordTypes() throws SQLException {
+    public SearchResult getRecordTypes() throws DALException {
         Connection conn = ConnectionPool.InformationModel.pop();
 
         SearchResult result = new SearchResult().setPage(1);
@@ -30,13 +30,15 @@ public class SchemaMappingsJDBCDAL implements SchemaMappingsDAL {
             result.setCount(result.getResults().size());
 
             return result;
+        } catch (SQLException e) {
+            throw new DALException("Error fetching record types", e);
         } finally {
             ConnectionPool.InformationModel.push(conn);
         }
     }
 
     @Override
-    public List<SchemaMapping> getSchemaMappings(Long conceptId) throws SQLException {
+    public List<SchemaMapping> getSchemaMappings(Long conceptId) throws DALException {
         Connection conn = ConnectionPool.InformationModel.pop();
         String sql = "SELECT m.*, a.full_name " +
             "FROM concept_schema_map m " +
@@ -45,6 +47,9 @@ public class SchemaMappingsJDBCDAL implements SchemaMappingsDAL {
         try(PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setLong(1, conceptId);
             return getSchemaMappingListFromStatement(stmt);
+        } catch (SQLException e) {
+            throw new DALException("Error fetching schema mappings", e);
+
         } finally {
             ConnectionPool.InformationModel.push(conn);
         }
