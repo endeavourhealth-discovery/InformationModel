@@ -1,9 +1,6 @@
 package org.endeavourhealth.im.logic;
 
-import org.endeavourhealth.im.dal.ConceptDAL;
-import org.endeavourhealth.im.dal.ConceptJDBCDAL;
-import org.endeavourhealth.im.dal.TaskDAL;
-import org.endeavourhealth.im.dal.TaskJDBCDAL;
+import org.endeavourhealth.im.dal.*;
 import org.endeavourhealth.im.models.*;
 
 import java.util.ArrayList;
@@ -23,7 +20,7 @@ public class ConceptLogic {
         this.taskDAL = taskDAL;
     }
 
-    public Concept get(String context, Boolean createMissing) throws Exception {
+    public Concept get(String context, Boolean createMissing) throws DALException {
         Concept concept = this.dal.getConceptByContext(context);
 
         if (concept == null && createMissing) {
@@ -41,7 +38,7 @@ public class ConceptLogic {
         return concept;
     }
 
-    public List<Attribute> getAttributes(Long id, Boolean includeDeprecated) throws Exception {
+    public List<Attribute> getAttributes(Long id, Boolean includeDeprecated) throws DALException {
         List<Attribute> result = new ArrayList<>();
         List<Long> attIds = new ArrayList<>();
 
@@ -68,7 +65,7 @@ public class ConceptLogic {
         return result;
     }
 
-    public void saveConcept(Concept concept) throws Exception {
+    public void saveConcept(Concept concept) throws DALException {
         Long id = this.dal.saveConcept(concept);
 
         if (concept.isNew())
@@ -77,7 +74,7 @@ public class ConceptLogic {
         concept.setId(id);
     }
 
-    public void saveAttribute(Long conceptId, Attribute attribute) throws Exception {
+    public void saveAttribute(Long conceptId, Attribute attribute) throws DALException {
         // Is this overriding an inherited attribute?
         if (!conceptId.equals(attribute.getConcept().getId())) {
             attribute.setId(null);

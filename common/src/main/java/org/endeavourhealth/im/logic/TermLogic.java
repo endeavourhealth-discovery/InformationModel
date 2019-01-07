@@ -23,7 +23,7 @@ public class TermLogic {
         this.conceptLogic = new ConceptLogic(conceptDAL, taskDAL);
     }
 
-    public Term getTerm(String organisation, String context, String system, String code, String termText) throws Exception {
+    public Term getTerm(String organisation, String context, String system, String code, String termText) throws DALException {
         // Look for existing mapping
         Long conceptId = this.dal.getConceptId(organisation, context, system, code);
         Concept concept;
@@ -77,7 +77,7 @@ public class TermLogic {
                 .setText(concept.getFullName());
     }
 
-    private String getOfficialTermForCode(String system, String code) throws Exception {
+    private String getOfficialTermForCode(String system, String code) throws DALException {
         // TODO: Replace with IM based ontologies
 
         String officialTerm = null;

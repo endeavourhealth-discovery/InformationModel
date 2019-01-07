@@ -3,6 +3,7 @@ package org.endeavourhealth.im.api.endpoints;
 import com.codahale.metrics.annotation.Timed;
 import io.astefanutti.metrics.aspectj.Metrics;
 import io.swagger.annotations.*;
+import org.endeavourhealth.im.dal.DALException;
 import org.endeavourhealth.im.dal.MapJDBCDAL;
 import org.endeavourhealth.im.models.*;
 import org.slf4j.Logger;
@@ -27,7 +28,7 @@ public class MapEndpoint {
     @ApiOperation(value = "Returns concept by ID", response = Concept.class)
     public Response get(@Context SecurityContext sc,
                         @ApiParam(value = "Code", required = true) @QueryParam("code") String code,
-                        @ApiParam(value = "Scheme", required = true) @QueryParam("scheme") Long scheme) throws Exception {
+                        @ApiParam(value = "Scheme", required = true) @QueryParam("scheme") Long scheme) throws DALException {
         LOG.debug("Get concept by code map");
 
         Concept result = new MapJDBCDAL().getByCodeAndScheme(code, scheme);

@@ -5,6 +5,7 @@ import io.astefanutti.metrics.aspectj.Metrics;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.endeavourhealth.im.dal.DALException;
 import org.endeavourhealth.im.dal.TermJDBCDAL;
 import org.endeavourhealth.im.logic.TermLogic;
 import org.endeavourhealth.im.models.Term;
@@ -39,7 +40,7 @@ public class TermEndpoint {
                                                   @ApiParam(value = "Coding System") @QueryParam("system") String system,
                                                   @ApiParam(value = "Code id") @QueryParam("code") String code,
                                                   @ApiParam(value = "Term text") @QueryParam("term") String termText
-    ) throws Exception {
+    ) throws DALException {
         LOG.debug("Get mapped term");
 
         Term term = new TermLogic().getTerm(organisation, context, system, code, termText);
@@ -58,7 +59,7 @@ public class TermEndpoint {
     @ApiOperation(value = "Returns Term by code in context")
     public Response getMappingsForConcept(@Context SecurityContext sc,
                                           @ApiParam(value = "Concept id") @QueryParam("concept_id") Long conceptId
-    ) throws Exception {
+    ) throws DALException {
         LOG.debug("Get mappings for term concept");
 
         List<TermMapping> result = new TermJDBCDAL().getMappings(conceptId);

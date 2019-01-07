@@ -1,5 +1,6 @@
 package org.endeavourhealth.im.logic;
 
+import org.endeavourhealth.im.dal.DALException;
 import org.endeavourhealth.im.dal.SchemaMappingsDAL;
 import org.endeavourhealth.im.dal.SchemaMappingsJDBCDAL;
 import org.endeavourhealth.im.models.Attribute;
@@ -23,7 +24,7 @@ public class SchemaMappingsLogic {
         this.conceptLogic = conceptLogic;
     }
 
-    public List<SchemaMapping> getSchemaMappings(Long conceptId) throws Exception {
+    public List<SchemaMapping> getSchemaMappings(Long conceptId) throws DALException {
         List<Attribute> attributes = conceptLogic.getAttributes(conceptId, false);
         Map<Long, SchemaMapping> mappings = new HashMap<>();
         this.dal.getSchemaMappings(conceptId).forEach((m) -> mappings.put(m.getAttribute().getId(), m));

@@ -3,6 +3,7 @@ package org.endeavourhealth.im.api.endpoints;
 import com.codahale.metrics.annotation.Timed;
 import io.astefanutti.metrics.aspectj.Metrics;
 import io.swagger.annotations.*;
+import org.endeavourhealth.im.dal.DALException;
 import org.endeavourhealth.im.dal.SchemaMappingsJDBCDAL;
 import org.endeavourhealth.im.logic.SchemaMappingsLogic;
 import org.endeavourhealth.im.models.SchemaMapping;
@@ -29,7 +30,7 @@ public class SchemaMappingsEndpoint {
     @Produces(MediaType.APPLICATION_JSON)
     @Timed(absolute = true, name = "InformationModel.SchemaMappingsEndpoint.RecordTypes.GET")
     @ApiOperation(value = "Returns list of record type concepts", response = SearchResult.class)
-    public Response getRecordTypes(@Context SecurityContext sc) throws Exception {
+    public Response getRecordTypes(@Context SecurityContext sc) throws DALException {
         LOG.debug("Get record type concepts");
 
         SearchResult result = new SchemaMappingsJDBCDAL().getRecordTypes();
@@ -48,7 +49,7 @@ public class SchemaMappingsEndpoint {
     @ApiOperation(value = "Returns mappings for given concept", response = SchemaMapping.class, responseContainer = "List")
     public Response getById(@Context SecurityContext sc,
                             @ApiParam(name="Concept id", required = true) @PathParam("conceptId") Long conceptId
-    ) throws Exception {
+    ) throws DALException {
         LOG.debug("Get schema mappings for concept");
 
         List<SchemaMapping> result = new SchemaMappingsLogic().getSchemaMappings(conceptId);

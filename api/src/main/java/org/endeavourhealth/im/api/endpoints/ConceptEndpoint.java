@@ -4,6 +4,7 @@ import com.codahale.metrics.annotation.Timed;
 import io.astefanutti.metrics.aspectj.Metrics;
 import io.swagger.annotations.*;
 import org.endeavourhealth.im.dal.ConceptJDBCDAL;
+import org.endeavourhealth.im.dal.DALException;
 import org.endeavourhealth.im.logic.ConceptLogic;
 import org.endeavourhealth.im.models.*;
 import org.slf4j.Logger;
@@ -53,7 +54,7 @@ public class ConceptEndpoint {
     @Timed(absolute = true, name = "InformationModel.ConceptEndpoint.GET")
     @ApiOperation(value = "Returns concept by ID", response = Concept.class)
     public Response getById(@Context SecurityContext sc,
-                            @ApiParam(value = "Concept ID", required = true) @PathParam("id") Long id) throws Exception {
+                            @ApiParam(value = "Concept ID", required = true) @PathParam("id") Long id) throws DALException {
         LOG.debug("Get concept by ID");
 
         Concept result = new ConceptJDBCDAL().get(id);
@@ -72,7 +73,7 @@ public class ConceptEndpoint {
         response = Concept.class,
         notes = "Where new database entries are created, the IDs will be populated in the returned bundle")
     public Response saveConcept(@Context SecurityContext sc,
-                                @ApiParam(value = "Concept to save", required = true) Concept concept) throws Exception {
+                                @ApiParam(value = "Concept to save", required = true) Concept concept) throws DALException {
         LOG.debug("Save concept");
 
         new ConceptLogic().saveConcept(concept);
@@ -90,7 +91,7 @@ public class ConceptEndpoint {
     @Timed(absolute = true, name = "InformationModel.ConceptEndpoint.DELETE")
     @ApiOperation(value = "Deletes a concept from the database")
     public Response deleteConcept(@Context SecurityContext sc,
-                                  @ApiParam(value = "Concept id", required = true) @PathParam("id") Long id) throws Exception {
+                                  @ApiParam(value = "Concept id", required = true) @PathParam("id") Long id) throws DALException {
         LOG.debug("Delete concept");
 
         new ConceptJDBCDAL().deleteConcept(id);
@@ -108,7 +109,7 @@ public class ConceptEndpoint {
     @Timed(absolute = true, name = "InformationModel.ConceptEndpoint.Synonyms.GET")
     @ApiOperation(value = "Returns synonyms for the given concept", response = Synonym.class, responseContainer = "List")
     public Response getAttributes(@Context SecurityContext sc,
-                                  @ApiParam(value = "Concept id", required = true) @PathParam("id") Long id) throws Exception {
+                                  @ApiParam(value = "Concept id", required = true) @PathParam("id") Long id) throws DALException {
         LOG.debug("Get synonyms by ID");
 
         List<Synonym> result = new ConceptJDBCDAL().getSynonyms(id);
@@ -127,7 +128,7 @@ public class ConceptEndpoint {
     @ApiOperation(value = "Returns subtypes of the given concept", response = Concept.class)
     public Response getConceptSubtypes(@Context SecurityContext sc,
                                        @ApiParam(value = "Concept ID", required = true) @PathParam("id") Long id,
-                                       @ApiParam(value = "All", required = false) @QueryParam("all") Boolean all) throws Exception {
+                                       @ApiParam(value = "All", required = false) @QueryParam("all") Boolean all) throws DALException {
         LOG.debug("Get concept by ID");
 
         List<ConceptSummary> result = new ConceptJDBCDAL().getSubtypes(id, all);
@@ -146,7 +147,7 @@ public class ConceptEndpoint {
     @ApiOperation(value = "Returns concept by context", response = Concept.class)
     public Response getByContext(@Context SecurityContext sc,
                                  @ApiParam(value = "Concept context", required = true) @QueryParam("context") String context,
-                                 @ApiParam(value = "Create missing") @QueryParam("createMissing") Boolean createMissing) throws Exception {
+                                 @ApiParam(value = "Create missing") @QueryParam("createMissing") Boolean createMissing) throws DALException {
         LOG.debug("Get concept by ID");
 
         Concept result = new ConceptLogic().get(context, createMissing);
@@ -164,7 +165,7 @@ public class ConceptEndpoint {
     @Timed(absolute = true, name = "InformationModel.ConceptEndpoint.MRU.GET")
     @ApiOperation(value = "Returns most recently used concepts", response = SearchResult.class)
     public Response getMRU(@Context SecurityContext sc,
-                           @ApiParam(value = "Include deprecated") @QueryParam("includeDeprecated") Boolean includeDeprecated) throws Exception {
+                           @ApiParam(value = "Include deprecated") @QueryParam("includeDeprecated") Boolean includeDeprecated) throws DALException {
         LOG.debug("Get most recently used concepts");
 
         SearchResult result = new ConceptJDBCDAL().getMRU(includeDeprecated);
@@ -187,7 +188,7 @@ public class ConceptEndpoint {
                            @ApiParam(value = "Include deprecated") @QueryParam("includeDeprecated") Boolean includeDeprecated,
                            @ApiParam(value = "Scheme filter") @QueryParam("scheme") List<Long> schemes,
                            @ApiParam(value = "Optional concept restriction") @QueryParam("relatedConcept") Long relatedConcept,
-                           @ApiParam(value = "Optional relationship expression ID") @QueryParam("expression") Byte expression) throws Exception {
+                           @ApiParam(value = "Optional relationship expression ID") @QueryParam("expression") Byte expression) throws DALException {
         LOG.debug("Search by term");
 
         SearchResult result = new ConceptJDBCDAL().search(term, page, includeDeprecated, schemes, relatedConcept, ValueExpression.byValue(expression));
@@ -197,27 +198,6 @@ public class ConceptEndpoint {
             .entity(result)
             .build();
     }
-
-/*
-    @GET
-    @Path("/Related")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    @Timed(absolute = true, name = "InformationModel.ConceptEndpoint.Related.GET")
-    @ApiOperation(value = "Returns list of related concepts for the given concept", response = RelatedConcept.class, responseContainer = "List")
-    public Response getRelated(@Context SecurityContext sc,
-                               @ApiParam(value = "Concept id", required = true) @QueryParam("id") Long id,
-                               @ApiParam(value = "Include deprecated") @QueryParam("includeDeprecated") Boolean includeDeprecated) throws Exception {
-        LOG.debug("Get related by ID");
-
-        List<RelatedConcept> result = new ConceptLogic().getRelated(id, includeDeprecated);
-
-        return Response
-            .ok()
-            .entity(result)
-            .build();
-    }
-*/
 
     /******************** ATTRIBUTES ********************/
 
@@ -229,7 +209,7 @@ public class ConceptEndpoint {
     @ApiOperation(value = "Returns attributes for the given concept", response = Attribute.class, responseContainer = "List")
     public Response getAttributes(@Context SecurityContext sc,
                                   @ApiParam(value = "Concept id", required = true) @PathParam("id") Long id,
-                                  @ApiParam(value = "Include deprecated") @QueryParam("includeDeprecated") Boolean includeDeprecated) throws Exception {
+                                  @ApiParam(value = "Include deprecated") @QueryParam("includeDeprecated") Boolean includeDeprecated) throws DALException {
         LOG.debug("Get attributes by ID");
 
         List<Attribute> result = new ConceptLogic().getAttributes(id, includeDeprecated);
@@ -251,7 +231,7 @@ public class ConceptEndpoint {
         notes = "Where new database entries are created, the IDs will be populated in the returned attribute")
     public Response saveAttribute(@Context SecurityContext sc,
                                 @ApiParam(value = "Concept the attribute relates to", required = true) @PathParam("id") Long conceptId,
-                                @ApiParam(value = "Attribute to save", required = true) Attribute attribute) throws Exception {
+                                @ApiParam(value = "Attribute to save", required = true) Attribute attribute) throws DALException {
         LOG.debug("Save attribute");
 
         new ConceptLogic().saveAttribute(conceptId, attribute);
@@ -269,7 +249,7 @@ public class ConceptEndpoint {
     @Timed(absolute = true, name = "InformationModel.ConceptEndpoint.Attribute.DELETE")
     @ApiOperation(value = "Deletes an attribute from the database")
     public Response deleteAttribute(@Context SecurityContext sc,
-                                    @ApiParam(value = "Attribute id", required = true) @PathParam("id") Long id) throws Exception {
+                                    @ApiParam(value = "Attribute id", required = true) @PathParam("id") Long id) throws DALException {
         LOG.debug("Delete attribute");
 
         new ConceptJDBCDAL().deleteAttribute(id);

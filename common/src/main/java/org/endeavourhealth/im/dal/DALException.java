@@ -1,6 +1,6 @@
 package org.endeavourhealth.im.dal;
 
-public class DALException extends RuntimeException {
+public class DALException extends Exception {
     public DALException(String message) {
         super(message);
     }

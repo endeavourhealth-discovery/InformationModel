@@ -1,5 +1,6 @@
 package org.endeavourhealth.im.logic;
 
+import org.endeavourhealth.im.dal.DALException;
 import org.endeavourhealth.im.dal.ViewDAL;
 import org.endeavourhealth.im.dal.ViewJDBCDAL;
 import org.endeavourhealth.im.models.*;
@@ -16,7 +17,7 @@ public class ViewLogic {
         this.dal = dal;
     }
 
-    public List<ViewItem> getViewContents(Long view, Long parent) throws Exception {
+    public List<ViewItem> getViewContents(Long view, Long parent) throws DALException {
         if (view == 1L)
             return this.dal.getSubTypes(parent);
         else
