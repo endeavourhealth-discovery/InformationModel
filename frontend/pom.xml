@@ -14,7 +14,7 @@
   <properties>
     <sonar.projectKey>endeavourhealth-discovery_InformationModel::frontend</sonar.projectKey>
     <sonar.sources>src</sonar.sources>
-    <sonar.typescript.node>/node/node.exe</sonar.typescript.node>
+    <sonar.typescript.node>${project.basedir}/node/node.exe</sonar.typescript.node>
     <sonar.typescript.tsconfigPath>tsconfig.json</sonar.typescript.tsconfigPath>
     <sonar.ts.tslint.configPath>tslint.json</sonar.ts.tslint.configPath>
   </properties>
