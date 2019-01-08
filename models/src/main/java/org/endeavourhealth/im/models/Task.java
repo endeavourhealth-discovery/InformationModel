@@ -41,7 +41,7 @@ public class Task extends DbEntity<Task> {
     }
 
     public Task setCreated(Date created) {
-        this.created = created;
+        this.created = new Date(created.getTime());
         return this;
     }
 

@@ -13,7 +13,7 @@ import static org.endeavourhealth.im.dal.DALHelper.getSchemaMappingListFromState
 
 public class SchemaMappingsJDBCDAL implements SchemaMappingsDAL {
     @Override
-    public SearchResult getRecordTypes() throws DALException {
+    public SearchResult getRecordTypes() {
         Connection conn = ConnectionPool.InformationModel.pop();
 
         SearchResult result = new SearchResult().setPage(1);
@@ -38,7 +38,7 @@ public class SchemaMappingsJDBCDAL implements SchemaMappingsDAL {
     }
 
     @Override
-    public List<SchemaMapping> getSchemaMappings(Long conceptId) throws DALException {
+    public List<SchemaMapping> getSchemaMappings(Long conceptId) {
         Connection conn = ConnectionPool.InformationModel.pop();
         String sql = "SELECT m.*, a.full_name " +
             "FROM concept_schema_map m " +

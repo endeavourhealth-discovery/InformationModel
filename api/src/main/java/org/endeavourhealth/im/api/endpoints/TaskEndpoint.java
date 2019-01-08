@@ -5,7 +5,6 @@ import io.astefanutti.metrics.aspectj.Metrics;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.endeavourhealth.im.dal.DALException;
 import org.endeavourhealth.im.dal.TaskJDBCDAL;
 import org.endeavourhealth.im.models.Task;
 import org.endeavourhealth.im.models.TaskType;
@@ -21,7 +20,7 @@ import java.util.List;
 
 @Path("/Task")
 @Metrics(registry = "TaskMetricRegistry")
-@Api(description = "API for all calls relating to Tasks")
+@Api(tags={"Task"})
 public class TaskEndpoint {
     private static final Logger LOG = LoggerFactory.getLogger(TaskEndpoint.class);
 
@@ -32,7 +31,7 @@ public class TaskEndpoint {
     @ApiOperation(value = "Returns workflow manager tasks optionally by type")
     public Response get(@Context SecurityContext sc,
                              @ApiParam(value = "Task type filter (optional)") @QueryParam("TaskTypeId") Byte taskTypeId
-    ) throws DALException {
+    ) {
         LOG.debug("Get tasks called");
 
         List<Task> tasks = new TaskJDBCDAL().getTasks(TaskType.byValue(taskTypeId));

@@ -20,7 +20,7 @@ public class ConceptLogic {
         this.taskDAL = taskDAL;
     }
 
-    public Concept get(String context, Boolean createMissing) throws DALException {
+    public Concept get(String context, Boolean createMissing) {
         Concept concept = this.dal.getConceptByContext(context);
 
         if (concept == null && createMissing) {
@@ -38,7 +38,7 @@ public class ConceptLogic {
         return concept;
     }
 
-    public List<Attribute> getAttributes(Long id, Boolean includeDeprecated) throws DALException {
+    public List<Attribute> getAttributes(Long id, Boolean includeDeprecated) {
         List<Attribute> result = new ArrayList<>();
         List<Long> attIds = new ArrayList<>();
 
@@ -65,7 +65,7 @@ public class ConceptLogic {
         return result;
     }
 
-    public void saveConcept(Concept concept) throws DALException {
+    public void saveConcept(Concept concept) {
         Long id = this.dal.saveConcept(concept);
 
         if (concept.isNew())
@@ -74,7 +74,7 @@ public class ConceptLogic {
         concept.setId(id);
     }
 
-    public void saveAttribute(Long conceptId, Attribute attribute) throws DALException {
+    public void saveAttribute(Long conceptId, Attribute attribute) {
         // Is this overriding an inherited attribute?
         if (!conceptId.equals(attribute.getConcept().getId())) {
             attribute.setId(null);

@@ -111,7 +111,7 @@ public class Concept extends DbEntity<Concept> {
     }
 
     public Concept setLastUpdate(Date lastUpdate) {
-        this.lastUpdate = lastUpdate;
+        this.lastUpdate = new Date(lastUpdate.getTime());
         return this;
     }
 

@@ -10,7 +10,7 @@ import static org.endeavourhealth.im.dal.DALHelper.*;
 
 public class ViewJDBCDAL implements ViewDAL {
     @Override
-    public List<View> list() throws DALException {
+    public List<View> list() {
         Connection conn = ConnectionPool.InformationModel.pop();
         String sql = "SELECT *\n" +
             "FROM view\n";
@@ -25,7 +25,7 @@ public class ViewJDBCDAL implements ViewDAL {
     }
 
     @Override
-    public View get(Long viewId) throws DALException {
+    public View get(Long viewId) {
         Connection conn = ConnectionPool.InformationModel.pop();
         String sql = "SELECT *\n" +
             "FROM view\n" +
@@ -48,7 +48,7 @@ public class ViewJDBCDAL implements ViewDAL {
     }
 
     @Override
-    public View save(View view) throws DALException {
+    public View save(View view) {
         Connection conn = ConnectionPool.InformationModel.pop();
         String sql = view.getId() == null
             ? "INSERT INTO `view` (name, description) VALUES (?, ?)"
@@ -74,7 +74,7 @@ public class ViewJDBCDAL implements ViewDAL {
     }
 
     @Override
-    public void delete(Long viewId) throws DALException {
+    public void delete(Long viewId) {
         Connection conn = ConnectionPool.InformationModel.pop();
 
         try {
@@ -101,7 +101,7 @@ public class ViewJDBCDAL implements ViewDAL {
     }
 
     @Override
-    public List<ViewItem> getViewContents(Long view, Long parent) throws DALException {
+    public List<ViewItem> getViewContents(Long view, Long parent) {
         Connection conn = ConnectionPool.InformationModel.pop();
         String sql = "SELECT v.*, c.full_name AS concept_name, p.full_name AS parent_name, x.full_name AS context_name\n" +
             "FROM view_item v\n" +
@@ -128,7 +128,7 @@ public class ViewJDBCDAL implements ViewDAL {
     }
 
     @Override
-    public List<ViewItem> getSubTypes(Long parent) throws DALException {
+    public List<ViewItem> getSubTypes(Long parent) {
         Connection conn = ConnectionPool.InformationModel.pop();
         String sql = "SELECT c.id as id, c.id as concept, c.full_name AS concept_name, c.superclass as parent, p.full_name AS parent_name, null as context, null AS context_name\n" +
             "FROM concept c\n" +
@@ -154,7 +154,7 @@ public class ViewJDBCDAL implements ViewDAL {
     }
 
     @Override
-    public void addItem(Long viewId, ViewItemAddStyle addStyle, Long conceptId, List<Long> attributeIds, Long parentId) throws DALException {
+    public void addItem(Long viewId, ViewItemAddStyle addStyle, Long conceptId, List<Long> attributeIds, Long parentId) {
         Connection conn = ConnectionPool.InformationModel.pop();
 
         try {
@@ -184,7 +184,7 @@ public class ViewJDBCDAL implements ViewDAL {
     }
 
     @Override
-    public void deleteViewItem(Long viewItemId) throws DALException {
+    public void deleteViewItem(Long viewItemId) {
         Connection conn = ConnectionPool.InformationModel.pop();
         String sql = "DELETE FROM view_item WHERE id = ?";
 
@@ -198,7 +198,7 @@ public class ViewJDBCDAL implements ViewDAL {
         }
     }
 
-    private Long saveViewItem(Connection conn, Long viewId, Long conceptId, Long contextId, Long parentId) throws DALException {
+    private Long saveViewItem(Connection conn, Long viewId, Long conceptId, Long contextId, Long parentId) {
         try (PreparedStatement stmt = conn.prepareStatement("INSERT INTO view_item (view, concept, context, parent) VALUES (?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS)) {
             stmt.setLong(1, viewId);
             stmt.setLong(2, conceptId);

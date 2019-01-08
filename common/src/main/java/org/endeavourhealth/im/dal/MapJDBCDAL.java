@@ -11,7 +11,7 @@ import static org.endeavourhealth.im.dal.DALHelper.getConceptFromStatement;
 public class MapJDBCDAL implements MapDAL {
 
     @Override
-    public Concept getByCodeAndScheme(String code, Long scheme) throws DALException {
+    public Concept getByCodeAndScheme(String code, Long scheme) {
         Connection conn = ConnectionPool.InformationModel.pop();
         String sql = "SELECT c.*, s.full_name as superclass_name " +
             "FROM concept c " +

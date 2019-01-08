@@ -13,6 +13,8 @@
 
   <properties>
     <sonar.projectKey>endeavourhealth-discovery_InformationModel::frontend</sonar.projectKey>
+    <sonar.sources>src</sonar.sources>
+    <sonar.ts.tslint.configPath>tslint.json</sonar.ts.tslint.configPath>
   </properties>
 
   <build>

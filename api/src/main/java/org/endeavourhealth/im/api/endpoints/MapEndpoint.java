@@ -3,7 +3,6 @@ package org.endeavourhealth.im.api.endpoints;
 import com.codahale.metrics.annotation.Timed;
 import io.astefanutti.metrics.aspectj.Metrics;
 import io.swagger.annotations.*;
-import org.endeavourhealth.im.dal.DALException;
 import org.endeavourhealth.im.dal.MapJDBCDAL;
 import org.endeavourhealth.im.models.*;
 import org.slf4j.Logger;
@@ -17,7 +16,7 @@ import javax.ws.rs.core.SecurityContext;
 
 @Path("Map")
 @Metrics(registry = "MapMetricRegistry")
-@Api(value = "Map", description = "API for all calls relating to Maps")
+@Api(tags={"Map"})
 public class MapEndpoint {
     private static final Logger LOG = LoggerFactory.getLogger(MapEndpoint.class);
 
@@ -28,7 +27,7 @@ public class MapEndpoint {
     @ApiOperation(value = "Returns concept by ID", response = Concept.class)
     public Response get(@Context SecurityContext sc,
                         @ApiParam(value = "Code", required = true) @QueryParam("code") String code,
-                        @ApiParam(value = "Scheme", required = true) @QueryParam("scheme") Long scheme) throws DALException {
+                        @ApiParam(value = "Scheme", required = true) @QueryParam("scheme") Long scheme) {
         LOG.debug("Get concept by code map");
 
         Concept result = new MapJDBCDAL().getByCodeAndScheme(code, scheme);

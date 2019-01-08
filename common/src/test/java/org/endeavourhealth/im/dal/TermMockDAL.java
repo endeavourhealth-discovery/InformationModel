@@ -3,7 +3,6 @@ package org.endeavourhealth.im.dal;
 import org.endeavourhealth.im.models.Term;
 import org.endeavourhealth.im.models.TermMapping;
 
-import java.sql.SQLException;
 import java.util.List;
 
 public class TermMockDAL implements TermDAL {
@@ -16,24 +15,24 @@ public class TermMockDAL implements TermDAL {
     public String getSnomedTerm_Result = null;
 
     @Override
-    public Long getConceptId(String organisation, String context, String system, String code) throws DALException {
+    public Long getConceptId(String organisation, String context, String system, String code) {
         getConceptId_Called = true;
         return getConceptId_Result;
     }
 
     @Override
-    public void createTermMap(String organisation, String context, String code, String system, Long termId) throws DALException {
+    public void createTermMap(String organisation, String context, String code, String system, Long termId) {
         createTermMap_Called = true;
     }
 
     @Override
-    public String getSnomedTerm(String code) throws DALException {
+    public String getSnomedTerm(String code) {
         getSnomedTerm_Called = true;
         return getSnomedTerm_Result;
     }
 
     @Override
-    public Term getSnomedParent(String code) throws DALException {
+    public Term getSnomedParent(String code) {
         return null;
     }
 
@@ -48,7 +47,7 @@ public class TermMockDAL implements TermDAL {
     }
 
     @Override
-    public List<TermMapping> getMappings(Long conceptId) throws DALException {
+    public List<TermMapping> getMappings(Long conceptId) {
         return null;
     }
 }

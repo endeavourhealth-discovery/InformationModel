@@ -11,7 +11,7 @@ import static org.endeavourhealth.im.dal.DALHelper.getGeneratedKey;
 
 public class TaskJDBCDAL implements TaskDAL {
     @Override
-    public Long createTask(String title, String description, TaskType taskType, Long conceptId) throws DALException {
+    public Long createTask(String title, String description, TaskType taskType, Long conceptId) {
         Task task = new Task()
                 .setName(title)
                 .setDescription(description)
@@ -23,7 +23,7 @@ public class TaskJDBCDAL implements TaskDAL {
     }
 
     @Override
-    public List<Task> getTasks(TaskType taskType) throws DALException {
+    public List<Task> getTasks(TaskType taskType) {
         List<Task> tasks = new ArrayList<>();
 
         Connection conn = ConnectionPool.InformationModel.pop();
@@ -59,7 +59,7 @@ public class TaskJDBCDAL implements TaskDAL {
         return tasks;
     }
 
-    private Long save(Task task) throws DALException {
+    private Long save(Task task) {
         Connection conn = ConnectionPool.InformationModel.pop();
         String sql = (task.getId() == null)
             ? "INSERT INTO task (title, description, type, created, identifier) VALUES (?, ?, ?, ?, ?)"
@@ -90,29 +90,4 @@ public class TaskJDBCDAL implements TaskDAL {
 
         return task.getId();
     }
-
-
-    /*
-
-    @Override
-    public Long getTaskIdByTypeAndResourceId(TaskType taskType, Long resourceId) throws DALException {
-        Connection conn = ConnectionPool.InformationModel.pop();
-
-        try (PreparedStatement stmt = conn.prepareStatement("SELECT id FROM task WHERE type = ? and identifier = ?")) {
-            stmt.setLong(1, taskType.getValue());
-            stmt.setLong(2, resourceId);
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next())
-                return rs.getLong(1);
-            else
-                return null;
-        } catch (SQLException e) {
-            throw new DALException("Error fetching task id by type and resource", e);
-        } finally {
-            ConnectionPool.InformationModel.push(conn);
-        }
-    }
-
-    */
 }

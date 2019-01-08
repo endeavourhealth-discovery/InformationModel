@@ -13,7 +13,7 @@ import java.util.List;
 public class TermJDBCDAL implements TermDAL {
 
     @Override
-    public Long getConceptId(String organisation, String context, String system, String code) throws DALException {
+    public Long getConceptId(String organisation, String context, String system, String code) {
         String sql = "SELECT concept_id FROM term_mapping WHERE organisation = ? AND context = ? AND system = ? AND code = ?";
         Connection conn = ConnectionPool.InformationModel.pop();
         Long result = null;
@@ -35,19 +35,19 @@ public class TermJDBCDAL implements TermDAL {
     }
 
     @Override
-    public void createTermMap(String organisation, String context, String system, String code, Long termId) throws DALException {
-        TermMapping termMapping = new TermMapping()
-            .setOrganisation(organisation)
-            .setContext(context)
-            .setSystem(system)
-            .setCode(code)
-            .setConceptId(termId);
+    public void createTermMap(String organisation, String context, String system, String code, Long termId) {
+//        TermMapping termMapping = new TermMapping()
+//            .setOrganisation(organisation)
+//            .setContext(context)
+//            .setSystem(system)
+//            .setCode(code)
+//            .setConceptId(termId);
 
 //        this.filer.storeAndApply("Endeavour Health", TransactionAction.CREATE, TransactionTable.TERM_MAPPING, termMapping);
     }
 
     @Override
-    public String getSnomedTerm(String code) throws DALException {
+    public String getSnomedTerm(String code) {
         String sql = "SELECT display FROM trm_concept WHERE code = ?";
         String result = null;
 
@@ -69,7 +69,7 @@ public class TermJDBCDAL implements TermDAL {
     }
 
     @Override
-    public Term getSnomedParent(String code) throws DALException {
+    public Term getSnomedParent(String code) {
         String sql = "SELECT p.code, p.display " +
             "FROM trm_concept p " +
             "JOIN trm_concept_pc_link l ON l.parent_pid = p.pid " +
@@ -106,7 +106,7 @@ public class TermJDBCDAL implements TermDAL {
     }
 
     @Override
-    public List<TermMapping> getMappings(Long conceptId) throws DALException {
+    public List<TermMapping> getMappings(Long conceptId) {
         List<TermMapping> result = new ArrayList<>();
 
 /*

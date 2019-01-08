@@ -23,7 +23,7 @@ public class TermLogic {
         this.conceptLogic = new ConceptLogic(conceptDAL, taskDAL);
     }
 
-    public Term getTerm(String organisation, String context, String system, String code, String termText) throws DALException {
+    public Term getTerm(String organisation, String context, String system, String code, String termText) {
         // Look for existing mapping
         Long conceptId = this.dal.getConceptId(organisation, context, system, code);
         Concept concept;
@@ -77,21 +77,18 @@ public class TermLogic {
                 .setText(concept.getFullName());
     }
 
-    private String getOfficialTermForCode(String system, String code) throws DALException {
+    private String getOfficialTermForCode(String system, String code) {
         // TODO: Replace with IM based ontologies
 
-        String officialTerm = null;
         switch (system.toLowerCase()) {
             case "snomed":
-                officialTerm = this.dal.getSnomedTerm(code);    // Switch to official SNOMED term text
-                break;
+                return this.dal.getSnomedTerm(code);    // Switch to official SNOMED term text
             case "icd10":
-                officialTerm = this.dal.getICD10Term(code);     // Switch to official ICD10 term text
-                break;
+                return this.dal.getICD10Term(code);     // Switch to official ICD10 term text
             case "opcs":
-                officialTerm = this.dal.getOpcsTerm(code);      // Switch to official OPCS term text
-                break;
+                return this.dal.getOpcsTerm(code);      // Switch to official OPCS term text
+            default:
+                return null;
         }
-        return officialTerm;
     }
 }

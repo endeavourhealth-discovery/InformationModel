@@ -10,7 +10,7 @@ import java.util.List;
 import static java.sql.Types.*;
 
 public class DALHelper {
-    public static List<String> getColumnList(ResultSet rs) throws DALException {
+    public static List<String> getColumnList(ResultSet rs) {
         List<String> result = new ArrayList<>();
 
         try {
@@ -27,17 +27,16 @@ public class DALHelper {
         }
     }
 
-    public static Long getGeneratedKey(PreparedStatement stmt) throws DALException {
+    public static Long getGeneratedKey(PreparedStatement stmt) {
         try (ResultSet rs = stmt.getGeneratedKeys()) {
             rs.next();
-            Long result = rs.getLong(1);
-            return result;
+            return rs.getLong(1);
         } catch (SQLException e) {
             throw new DALException("Error fetching generated key", e);
         }
     }
 
-    public static Concept getConceptFromStatement(PreparedStatement stmt) throws DALException {
+    public static Concept getConceptFromStatement(PreparedStatement stmt) {
         try (ResultSet rs = stmt.executeQuery()) {
             if (rs.next())
                 return getConceptFromResultSet(rs, getColumnList(rs));
@@ -48,7 +47,7 @@ public class DALHelper {
         }
     }
 
-    public static Concept getConceptFromResultSet(ResultSet rs, List<String> fields) throws DALException {
+    public static Concept getConceptFromResultSet(ResultSet rs, List<String> fields) {
         int idx;
         Concept concept = new Concept();
         try {
@@ -71,7 +70,7 @@ public class DALHelper {
         }
     }
 
-    public static List<ConceptSummary> getConceptSummaryListFromStatement(PreparedStatement stmt) throws DALException {
+    public static List<ConceptSummary> getConceptSummaryListFromStatement(PreparedStatement stmt) {
         try (ResultSet rs = stmt.executeQuery()) {
             List<ConceptSummary> result = new ArrayList<>();
             while (rs.next()) {
@@ -85,7 +84,7 @@ public class DALHelper {
         }
     }
 
-    public static  ConceptSummary getConceptSummaryFromResultSet(ResultSet rs) throws DALException {
+    public static  ConceptSummary getConceptSummaryFromResultSet(ResultSet rs) {
         try {
             ConceptSummary result = new ConceptSummary()
                 .setId(rs.getLong("id"))
@@ -102,7 +101,7 @@ public class DALHelper {
         }
     }
 
-    public static List<View> getViewListFromStatement(PreparedStatement stmt) throws DALException {
+    public static List<View> getViewListFromStatement(PreparedStatement stmt) {
         List<View> result = new ArrayList<>();
         try (ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
@@ -114,7 +113,7 @@ public class DALHelper {
         return result;
     }
 
-    public static View getViewFromResultSet(ResultSet rs) throws DALException {
+    public static View getViewFromResultSet(ResultSet rs) {
         try {
             View view = new View()
                 .setId(rs.getLong("id"))
@@ -127,7 +126,7 @@ public class DALHelper {
         }
     }
 
-    public static List<ViewItem> getViewItemListFromStatement(PreparedStatement stmt) throws DALException {
+    public static List<ViewItem> getViewItemListFromStatement(PreparedStatement stmt) {
         List<ViewItem> result = new ArrayList<>();
         try (ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
@@ -140,7 +139,7 @@ public class DALHelper {
         }
     }
 
-    public static ViewItem getViewItemFromResultSet(ResultSet rs) throws DALException {
+    public static ViewItem getViewItemFromResultSet(ResultSet rs) {
         try {
             ViewItem viewItem = new ViewItem()
                 .setId(rs.getLong("id"))
@@ -156,7 +155,7 @@ public class DALHelper {
         }
     }
 
-    public static List<Attribute> getAttributeListFromStatement(PreparedStatement stmt) throws DALException {
+    public static List<Attribute> getAttributeListFromStatement(PreparedStatement stmt) {
         List<Attribute> result = new ArrayList<>();
         try (ResultSet rs = stmt.executeQuery()) {
             while(rs.next()) {
@@ -167,7 +166,7 @@ public class DALHelper {
             throw new DALException("Error fetching attribute list from statement", e);
         }
     }
-    public static Attribute getAttributeFromResultSet(ResultSet rs) throws DALException {
+    public static Attribute getAttributeFromResultSet(ResultSet rs) {
         try {
             Attribute result = new Attribute()
                 .setId(rs.getLong("id"))
@@ -208,7 +207,7 @@ public class DALHelper {
         }
     }
 
-    public static List<SchemaMapping> getSchemaMappingListFromStatement(PreparedStatement stmt) throws DALException {
+    public static List<SchemaMapping> getSchemaMappingListFromStatement(PreparedStatement stmt) {
         List<SchemaMapping> result = new ArrayList<>();
         try (ResultSet rs = stmt.executeQuery()) {
             while(rs.next()) {
@@ -220,7 +219,7 @@ public class DALHelper {
         }
     }
 
-    public static SchemaMapping getSchemaMappingFromResultSet(ResultSet rs) throws DALException {
+    public static SchemaMapping getSchemaMappingFromResultSet(ResultSet rs) {
         try {
             return new SchemaMapping()
                 .setId(rs.getLong("id"))
@@ -236,7 +235,7 @@ public class DALHelper {
         }
     }
 
-    public static void setLong(PreparedStatement stmt, int i, Long value) throws DALException {
+    public static void setLong(PreparedStatement stmt, int i, Long value) {
         try {
             if (value == null)
                 stmt.setNull(i, BIGINT);
@@ -247,7 +246,7 @@ public class DALHelper {
         }
     }
 
-    public static void setFloat(PreparedStatement stmt, int i, Float value) throws DALException {
+    public static void setFloat(PreparedStatement stmt, int i, Float value) {
         try {
             if (value == null)
                 stmt.setNull(i, FLOAT);
@@ -258,7 +257,7 @@ public class DALHelper {
         }
     }
 
-    public static void setInt(PreparedStatement stmt, int i, Integer value) throws DALException {
+    public static void setInt(PreparedStatement stmt, int i, Integer value) {
         try {
             if (value == null)
                 stmt.setNull(i, INTEGER);
@@ -269,7 +268,7 @@ public class DALHelper {
         }
     }
 
-    public static void setBool(PreparedStatement stmt, int i, Boolean value) throws DALException {
+    public static void setBool(PreparedStatement stmt, int i, Boolean value) {
         try {
             if (value == null)
                 stmt.setNull(i, BOOLEAN);
@@ -280,7 +279,7 @@ public class DALHelper {
         }
     }
 
-    public static void setByte(PreparedStatement stmt, int i, Byte value) throws DALException {
+    public static void setByte(PreparedStatement stmt, int i, Byte value) {
         try {
             if (value == null)
                 stmt.setNull(i, TINYINT);
@@ -291,7 +290,7 @@ public class DALHelper {
         }
     }
 
-    public static void setString(PreparedStatement stmt, int i, String value) throws DALException {
+    public static void setString(PreparedStatement stmt, int i, String value) {
         try {
             if (value == null)
                 stmt.setNull(i, VARCHAR);
@@ -302,12 +301,23 @@ public class DALHelper {
         }
     }
 
+    public static void setTimestamp(PreparedStatement stmt, int i, Timestamp value) {
+        try {
+            if (value == null)
+                stmt.setNull(i, TIMESTAMP);
+            else
+                stmt.setTimestamp(i, value);
+        } catch (SQLException e) {
+            throw new DALException("Error setting TIMESTAMP value", e);
+        }
+    }
+
     public static String inListParams(int size) {
         List<String> q = Collections.nCopies(size, "?");
         return String.join(",", q);
     }
 
-    public static int setLongArray(PreparedStatement stmt, int i, List<Long> values) throws DALException {
+    public static int setLongArray(PreparedStatement stmt, int i, List<Long> values) {
         try {
             for (Long value : values) {
                 stmt.setLong(i++, value);

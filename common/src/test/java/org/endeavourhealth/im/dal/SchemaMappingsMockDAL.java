@@ -10,12 +10,12 @@ public class SchemaMappingsMockDAL implements SchemaMappingsDAL {
     public List<SchemaMapping> getSchemaMappings_Result = null;
 
     @Override
-    public SearchResult getRecordTypes() throws DALException {
+    public SearchResult getRecordTypes() {
         return null;
     }
 
     @Override
-    public List<SchemaMapping> getSchemaMappings(Long conceptId) throws DALException {
+    public List<SchemaMapping> getSchemaMappings(Long conceptId) {
         getSchemaMappings_Called = true;
         return getSchemaMappings_Result;
     }

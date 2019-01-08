@@ -5,7 +5,6 @@ import io.astefanutti.metrics.aspectj.Metrics;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.endeavourhealth.im.dal.DALException;
 import org.endeavourhealth.im.dal.ViewJDBCDAL;
 import org.endeavourhealth.im.logic.ViewLogic;
 import org.endeavourhealth.im.models.*;
@@ -21,7 +20,7 @@ import java.util.List;
 
 @Path("View")
 @Metrics(registry = "ViewMetricRegistry")
-@Api(description = "API for all calls relating to Viewss")
+@Api(tags={"View"})
 public class ViewEndpoint {
     private static final Logger LOG = LoggerFactory.getLogger(ViewEndpoint.class);
 
@@ -30,7 +29,7 @@ public class ViewEndpoint {
     @Produces(MediaType.APPLICATION_JSON)
     @Timed(absolute = true, name = "InformationModel.ViewEndpoint.GET")
     @ApiOperation(value = "Returns list of defined views")
-    public Response getList(@Context SecurityContext sc) throws DALException {
+    public Response getList(@Context SecurityContext sc) {
         LOG.debug("Get views");
 
         List<View> result = new ViewJDBCDAL().list();
@@ -49,7 +48,7 @@ public class ViewEndpoint {
     @ApiOperation(value = "Returns a view")
     public Response getView(@Context SecurityContext sc,
                             @ApiParam(value = "View id") @PathParam("viewId") Long viewId
-    ) throws DALException {
+    ) {
         LOG.debug("Get view");
 
         View result = new ViewJDBCDAL().get(viewId);
@@ -68,7 +67,7 @@ public class ViewEndpoint {
         response = ViewItem.class,
         notes = "Where new database entries are created, the ID will be populated in the returned view")
     public Response save(@Context SecurityContext sc,
-                         @ApiParam(value = "View", required = true) View view) throws DALException {
+                         @ApiParam(value = "View", required = true) View view) {
         LOG.debug("Save view");
 
         View result = new ViewJDBCDAL().save(view);
@@ -87,7 +86,7 @@ public class ViewEndpoint {
     @ApiOperation(value = "Deletes a view")
     public Response deleteView(@Context SecurityContext sc,
                                @ApiParam(value = "View id") @PathParam("viewId") Long viewId
-    ) throws DALException {
+    ) {
         LOG.debug("Delete view");
 
         new ViewJDBCDAL().delete(viewId);
@@ -106,7 +105,7 @@ public class ViewEndpoint {
     public Response getChildren(@Context SecurityContext sc,
                                 @ApiParam(value = "View id") @PathParam("viewId") Long view,
                                 @ApiParam(value = "Parent") @QueryParam("parentId") Long parent
-    ) throws DALException {
+    ) {
         LOG.debug("Get view contents");
 
         List<ViewItem> result = new ViewLogic().getViewContents(view, parent);
@@ -131,7 +130,7 @@ public class ViewEndpoint {
                             @ApiParam(value = "Concept id", required = true) @PathParam("conceptId") Long conceptId,
                             @ApiParam(value = "Add style", required = true) @QueryParam("addStyle") Integer addStyle,
                             @ApiParam(value = "Parent", required = false) @QueryParam("parentId") Long parentId,
-                            @ApiParam(value = "Attribute ids", required = true) List<Long> attributeIds) throws DALException {
+                            @ApiParam(value = "Attribute ids", required = true) List<Long> attributeIds) {
         LOG.debug("Add to view");
 
         new ViewJDBCDAL().addItem(viewId, ViewItemAddStyle.fromInt(addStyle), conceptId, attributeIds, parentId);
@@ -149,7 +148,7 @@ public class ViewEndpoint {
     @ApiOperation(value = "Delete a view item")
     public Response deleteViewItem(@Context SecurityContext sc,
                                    @ApiParam(value = "View item id") @PathParam("viewItemId") Long viewItemId
-    ) throws DALException {
+    ) {
         LOG.debug("Delete view item");
 
         new ViewJDBCDAL().deleteViewItem(viewItemId);
