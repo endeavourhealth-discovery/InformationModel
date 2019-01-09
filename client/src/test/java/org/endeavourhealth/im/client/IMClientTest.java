@@ -26,7 +26,7 @@ public class IMClientTest {
     @Test
     public void getConceptId() throws Exception {
         Long conceptId = IMClient.getConceptId(CodeScheme.SNOMED.getValue(), "195967001");
-        assertEquals(1187044L, conceptId.longValue());
+        assertEquals(21034L, conceptId.longValue());
     }
 
     @Test

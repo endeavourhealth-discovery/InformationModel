@@ -35,7 +35,32 @@
         <url-pattern>/api/*</url-pattern>
     </servlet-mapping>
 
-    <!-- ===== PUBLIC ENDPOINTS SERVLET ===== -->
+  <!-- ===== PRIVATE API SERVLET ===== -->
+  <servlet>
+    <servlet-name>Information Model internal (private) API</servlet-name>
+    <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
+    <init-param>
+      <param-name>jersey.config.server.provider.packages</param-name>
+      <param-value>io.swagger.jaxrs.listing,org.endeavourhealth.coreui.endpoints,org.endeavourhealth.im.api.endpoints</param-value>
+    </init-param>
+    <init-param>
+      <param-name>jersey.config.server.provider.classnames</param-name>
+      <param-value>org.glassfish.jersey.jackson.JacksonFeature,
+        org.glassfish.jersey.media.multipart.MultiPartFeature,
+        org.endeavourhealth.common.security.CustomRolesAllowedFeature,
+        org.endeavourhealth.im.api.framework.exceptions.BaseExceptionMapper,
+      </param-value>
+    </init-param>
+
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>Information Model internal (private) API</servlet-name>
+    <url-pattern>/internal/api/*</url-pattern>
+  </servlet-mapping>
+
+  <!-- ===== PUBLIC ENDPOINTS SERVLET ===== -->
     <servlet>
         <servlet-name>Public Resources</servlet-name>
         <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
