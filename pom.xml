@@ -51,7 +51,6 @@
     <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     <sonar.login>8ddba9bbb23a08a7cff43ecc620be3738a152b65</sonar.login>
     <sonar.typescript.node>frontend/node/node</sonar.typescript.node>
-    <sonar.exclusions>**/docs/**/*</sonar.exclusions>
     <sonar.coverage.exclusions>**/api/**/*, **/dal/**/*, **/models/**/*, **/IMClient.java</sonar.coverage.exclusions>
     <sonar.junit.reportPaths>target/surefire-reports</sonar.junit.reportPaths>
   </properties>

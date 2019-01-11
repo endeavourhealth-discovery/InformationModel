@@ -12,6 +12,7 @@
 
   <properties>
     <sonar.projectKey>endeavourhealth-discovery_InformationModel::api</sonar.projectKey>
+    <sonar.exclusions>**/docs/**/*</sonar.exclusions>
   </properties>
 
   <dependencies>

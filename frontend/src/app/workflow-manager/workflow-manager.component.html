@@ -14,10 +14,10 @@
                   <div class="col-md-2">
                     <h4>Tasks</h4>
                     <div>
-                      <div class="hover-box" [class.selection]="taskTypeFilter == null" (click)="loadTasks()"><i class="fa fa-fw fa-folder"></i>&nbsp;All</div>
-                      <div class="hover-box" [class.selection]="taskTypeFilter == 0" (click)="loadTasks(0)"><i class="fa fa-blank"></i><i class="fa fa-fw fa-lightbulb-o"></i>&nbsp;Concepts</div>
-                      <div class="hover-box" [class.selection]="taskTypeFilter == 2" (click)="loadTasks(2)"><i class="fa fa-blank"></i><i class="fa fa-fw fa-exchange"></i>&nbsp;Message Mappings</div>
-                      <div class="hover-box" [class.selection]="taskTypeFilter == 3" (click)="loadTasks(3)"><i class="fa fa-blank"></i><i class="fa fa-fw fa-code"></i>&nbsp;Term Mappings</div>
+                      <div class="hover-box" [class.selection]="taskTypeFilter == null" (click)="loadTasks()"><i class="fa fa-fw fa-folder" aria-hidden="true"></i>&nbsp;All</div>
+                      <div class="hover-box" [class.selection]="taskTypeFilter == 0" (click)="loadTasks(0)"><i class="fa fa-blank" aria-hidden="true"></i><i class="fa fa-fw fa-lightbulb-o" aria-hidden="true"></i>&nbsp;Concepts</div>
+                      <div class="hover-box" [class.selection]="taskTypeFilter == 2" (click)="loadTasks(2)"><i class="fa fa-blank" aria-hidden="true"></i><i class="fa fa-fw fa-exchange" aria-hidden="true"></i>&nbsp;Message Mappings</div>
+                      <div class="hover-box" [class.selection]="taskTypeFilter == 3" (click)="loadTasks(3)"><i class="fa fa-blank" aria-hidden="true"></i><i class="fa fa-fw fa-code" aria-hidden="true"></i>&nbsp;Term Mappings</div>
                     </div>
                   </div>
                   <div class="col-md-10">
@@ -35,7 +35,7 @@
                           <tbody>
                             <tr *ngFor="let task of tasks" (click)="gotoTask(task)">
                               <td>{{getTaskTypeName(task.type)}}</td>
-                              <td>{{task.name}} <i class="fa fa-fw fa-info-circle" [ngbTooltip]="task.description"></i></td>
+                              <td>{{task.name}} <i class="fa fa-fw fa-info-circle" [ngbTooltip]="task.description" aria-hidden="true"></i></td>
                               <td>{{task.created | date:'dd-MMM-yyyy HH:mm:ss'}}</td>
                             </tr>
                           </tbody>

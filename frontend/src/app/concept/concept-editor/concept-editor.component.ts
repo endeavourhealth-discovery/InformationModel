@@ -62,6 +62,8 @@ export class ConceptEditorComponent implements AfterViewInit {
   }
 
   loadConcept(id: any, context: string) {
+    console.log(id);
+    console.log(context);
     if (id === 'add') {
       setTimeout(() => this.newConcept(context));
     } else {

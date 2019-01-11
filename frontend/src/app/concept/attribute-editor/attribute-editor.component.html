@@ -19,7 +19,7 @@
       <div class="form-group col-md-4">
         <label class="control-label">Value expression</label>
         <div class="dropdown" id="conceptStatus">
-          <button [disabled]="result.concept.id != conceptId" class="dropdown-toggle dropdown-toggle-custom btn-block text-left form-control" id="statusDropdown" type="button" data-toggle="dropdown">{{getValueExpressionPrefix(result.valueExpression)}}<i class="fa fa-caret-down pull-right"></i> </button>
+          <button [disabled]="result.concept.id != conceptId" class="dropdown-toggle dropdown-toggle-custom btn-block text-left form-control" id="statusDropdown" type="button" data-toggle="dropdown">{{getValueExpressionPrefix(result.valueExpression)}}<i class="fa fa-caret-down pull-right" aria-hidden="true"></i> </button>
           <div class="dropdown-menu"  aria-labelledby="statusDropdown">
             <button *ngFor="let option of expressionOptions" class="dropdown-item" (click)="result.valueExpression = option">{{getValueExpressionPrefix(option)}}</button>
           </div>
@@ -30,7 +30,7 @@
         <div class="input-group">
           <input type="text" class="form-control" value="{{result.valueConcept?.name}}" readonly [ngClass]="{'looks-enabled': result.concept.id == conceptId}">
           <div class="input-group-append" *ngIf="result.concept.id == conceptId">
-            <span class="input-group-text" (click)="selectValueType()"><i class="fa fa-search"></i></span>
+            <span class="input-group-text" (click)="selectValueType()"><i class="fa fa-search" aria-hidden="true"></i></span>
           </div>
         </div>
       </div>
@@ -43,8 +43,8 @@
         <div class="input-group">
           <input type="text" class="form-control looks-enabled" value="{{result.fixedConcept?.name}}" readonly (keyup.enter)="search()">
           <div class="input-group-append">
-            <span class="input-group-text" (click)="selectFixedConcept()"><i class="fa fa-search"></i></span>
-            <span class="input-group-text" (click)="clearFixedConcept()"><i class="fa fa-times"></i></span>
+            <span class="input-group-text" (click)="selectFixedConcept()"><i class="fa fa-search" aria-hidden="true"></i></span>
+            <span class="input-group-text" (click)="clearFixedConcept()"><i class="fa fa-times" aria-hidden="true"></i></span>
           </div>
         </div>
       </div>

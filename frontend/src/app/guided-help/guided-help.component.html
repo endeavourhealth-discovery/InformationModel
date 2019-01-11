@@ -1,5 +1,5 @@
-<i class="fa fa-fw fa-question-circle-o text-info" (click)="startHelp()"></i>
-<div #helpText class="help-box" [hidden]="step==null">
+<i class="fa fa-fw fa-question-circle-o text-info" (click)="startHelp()" aria-hidden="true"></i>
+<div #helpText class="help-box" [hidden]="step==null" aria-hidden="true">
   <div *ngIf="step!=null">
     <small class="pull-right" (click)="step=null">x</small><br>
     <span>{{helpItem[step].text}}</span>

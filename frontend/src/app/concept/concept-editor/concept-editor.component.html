@@ -29,7 +29,7 @@
                       <div class="col-md-6 col-lg-2 form-group">
                         <label class="control-label" for="conceptStatus">Status</label>
                         <div class="dropdown" id="conceptStatus">
-                          <button class="dropdown-toggle btn-block text-left form-control" id="statusDropdown" type="button" data-toggle="dropdown">{{getConceptStatusName(concept.status)}}<i class="fa fa-caret-down pull-right"></i> </button>
+                          <button class="dropdown-toggle btn-block text-left form-control" id="statusDropdown" type="button" data-toggle="dropdown">{{getConceptStatusName(concept.status)}}<i class="fa fa-caret-down pull-right" aria-hidden="true"></i> </button>
                           <div class="dropdown-menu"  aria-labelledby="statusDropdown">
                             <button class="dropdown-item" (click)="concept.status = (ConceptStatus.DRAFT)">Draft</button>
                             <button class="dropdown-item" (click)="concept.status = (ConceptStatus.ACTIVE)">Active</button>
@@ -97,9 +97,9 @@
               </h4> </div>
               <div class="card-body">
                 <div class="row mb-4">
-                  <div class="col-md-2"><i class="text-info fa fa-fw fa-circle"></i> = Unchanged</div>
-                  <div class="col-md-2"><i class="text-success fa fa-fw fa-plus-circle"></i> = Extends</div>
-                  <div class="col-md-2"><i class="text-warning fa fa-fw fa-minus-circle"></i> = Constrains</div>
+                  <div class="col-md-2"><i class="text-info fa fa-fw fa-circle" aria-hidden="true"></i> = Unchanged</div>
+                  <div class="col-md-2"><i class="text-success fa fa-fw fa-plus-circle" aria-hidden="true"></i> = Extends</div>
+                  <div class="col-md-2"><i class="text-warning fa fa-fw fa-minus-circle" aria-hidden="true"></i> = Constrains</div>
                 </div>
                 <div class="row">
                   <div class="col-md-12 form-group">
@@ -121,7 +121,7 @@
                             </tr>
                             <tr class="show-child-on-hover">
                             <td>
-                              <i [class]="getInheritanceIcon(item.inheritance)"></i>
+                              <i [class]="getInheritanceIcon(item.inheritance)" aria-hidden="true"></i>
                               <a href="#/concept/{{item.attribute.id}}">{{item.attribute.name}}</a>
                             </td>
                               <td>
@@ -137,8 +137,8 @@
                             </td>
                             <td style="width: 75px">
                               <div class="pull-right child-to-show">
-                                <button class="btn btn-xs btn-success" (click)="editAttribute(item)"><i class="fa fa-fw fa-pencil"></i></button>
-                                <button class="btn btn-xs btn-danger" (click)="promptDeleteAttribute(item)" [disabled]="item.concept.id != concept.id && item.inheritance == 0"><i class="fa fa-fw fa-trash"></i></button>
+                                <button class="btn btn-xs btn-success" (click)="editAttribute(item)"><i class="fa fa-fw fa-pencil" aria-hidden="true"></i></button>
+                                <button class="btn btn-xs btn-danger" (click)="promptDeleteAttribute(item)" [disabled]="item.concept.id != concept.id && item.inheritance == 0"><i class="fa fa-fw fa-trash" aria-hidden="true"></i></button>
                               </div>
                             </td>
                           </tr>

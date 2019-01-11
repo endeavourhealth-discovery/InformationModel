@@ -1,6 +1,13 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SchemaMappingsEditorComponent } from './schema-mappings-editor.component';
+import {ActivatedRoute, Params} from '@angular/router';
+import {RouterTestingModule} from '@angular/router/testing';
+import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {LoggerService} from 'eds-angular4';
+import {ToastModule} from 'ng2-toastr/ng2-toastr';
+import {SchemaMappingsService} from '../schema-mappings.service';
+import {HttpModule} from '@angular/http';
 
 describe('SchemaMappingsEditComponent', () => {
   let component: SchemaMappingsEditorComponent;
@@ -8,7 +15,24 @@ describe('SchemaMappingsEditComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ SchemaMappingsEditorComponent ]
+      imports: [
+        HttpModule,
+        RouterTestingModule,
+        NgbModule.forRoot(),
+        ToastModule.forRoot()
+      ],
+      declarations: [ SchemaMappingsEditorComponent ],
+      providers: [
+        Location,
+        LoggerService,
+        SchemaMappingsService,
+        { provide: ActivatedRoute, useValue: {
+            params: {
+              subscribe: (fn: (value: Params) => void) => fn({id: 1, context: 'Observation'}),
+            }
+          }
+        }
+      ]
     })
     .compileComponents();
   }));

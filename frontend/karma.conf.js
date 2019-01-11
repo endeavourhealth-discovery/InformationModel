@@ -27,7 +27,13 @@ module.exports = function (config) {
     colors: true,
     logLevel: config.LOG_INFO,
     autoWatch: true,
-    browsers: ['Chrome'],
+    browsers: ['Chrome_without_security'],
+    customLaunchers:{
+      Chrome_without_security:{
+        base: 'ChromeHeadless',
+        flags: ['--disable-web-security']
+      }
+    },
     singleRun: true
   });
 };

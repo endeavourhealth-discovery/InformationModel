@@ -41,7 +41,7 @@
                     <tree-root #tree [nodes]="items" [options]="options" (activate)="selectNode($event.node.data)" (updateData)="updated()">
                       <ng-template #treeNodeTemplate let-node>
                         <div class="folder-item show-child-on-hover">
-                          {{ node.data.conceptName }}<i *ngIf="node.data.contextId" ngbTooltip="Context: {{node.data.contextName}}" class="info-icon"></i>
+                          {{ node.data.conceptName }}<i *ngIf="node.data.contextId" ngbTooltip="Context: {{node.data.contextName}}" class="info-icon" aria-hidden="true"></i>
                         </div>
                       </ng-template>
                     </tree-root>
@@ -55,7 +55,7 @@
               <div class="card-header"><h4>Available concepts</h4></div>
               <div class="card-body">
                 <div class="row">
-                  <div class="col-md-12"><b>TODO:</b> Search & View navigator of existing concepts for Drag/drop into content panel opposite</div>
+                  <div class="col-md-12"><strong>TODO:</strong> Search & View navigator of existing concepts for Drag/drop into content panel opposite</div>
                 </div>
               </div>
             </div>

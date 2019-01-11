@@ -4,7 +4,12 @@ import { WorkflowManagerComponent } from './workflow-manager.component';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {FormsModule} from '@angular/forms';
 import {WorkflowManagerService} from './workflow-manager.service';
-import {MockWorkflowManagerService} from '../mocks/mock.workflow-manager-service.service';
+import {ControlsModule} from 'eds-angular4/dist/controls';
+import {LoggerService} from 'eds-angular4';
+import {ToastModule} from 'ng2-toastr/ng2-toastr';
+import {HttpModule} from '@angular/http';
+import {RouterTestingModule} from '@angular/router/testing';
+import {ModuleStateService} from 'eds-angular4/dist/common';
 
 describe('WorkflowManagerComponent', () => {
   let component: WorkflowManagerComponent;
@@ -12,12 +17,20 @@ describe('WorkflowManagerComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [FormsModule, NgbModule.forRoot()],
+      imports: [
+        FormsModule,
+        HttpModule,
+        ControlsModule,
+        RouterTestingModule,
+        NgbModule.forRoot(),
+        ToastModule.forRoot()
+      ],
       declarations: [ WorkflowManagerComponent ],
       providers: [
-        {provide: WorkflowManagerService, useClass: MockWorkflowManagerService },
+        LoggerService,
+        ModuleStateService,
+        WorkflowManagerService,
       ]
-
     })
     .compileComponents();
   }));

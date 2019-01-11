@@ -9,21 +9,21 @@
         <!--<label class="control-label">Add to view:</label>-->
         <div class="custom-control custom-radio form-control-plaintext">
           <input type="radio" class="custom-control-input" [(ngModel)]="addStyle" id="rdoAddConcept" name="rdoAddConcept" [value]="AddStyle.CONCEPT_ONLY">
-          <label class="custom-control-label" for="rdoAddConcept">Concept only <i class="info-icon" ngbTooltip="Add only the concept"></i></label>
+          <label class="custom-control-label" for="rdoAddConcept">Concept only <i class="info-icon" ngbTooltip="Add only the concept" aria-hidden="true"></i></label>
         </div>
       </div>
       <div class="col-md-4 form-group">
         <!--<label class="control-label">&nbsp;</label>-->
         <div class="custom-control custom-radio form-control-plaintext">
           <input type="radio" class="custom-control-input" [(ngModel)]="addStyle" id="rdoAddAtts" name="rdoAddAtts" [value]="AddStyle.ATTRIBUTES_ONLY">
-          <label class="custom-control-label" for="rdoAddAtts">Attributes only <i class="info-icon" ngbTooltip="Add only the attributes"></i></label>
+          <label class="custom-control-label" for="rdoAddAtts">Attributes only <i class="info-icon" ngbTooltip="Add only the attributes" aria-hidden="true"></i></label>
         </div>
       </div>
       <div class="col-md-4 form-group">
         <!--<label class="control-label">&nbsp;</label>-->
         <div class="custom-control custom-radio form-control-plaintext">
           <input type="radio" class="custom-control-input" [(ngModel)]="addStyle" id="rdoAddBoth" name="rdoAddBoth" [value]="AddStyle.BOTH">
-          <label class="custom-control-label" for="rdoAddBoth">Both <i class="info-icon" ngbTooltip="Add the concept as a folder and its attributes as sub-items"></i></label>
+          <label class="custom-control-label" for="rdoAddBoth">Both <i class="info-icon" ngbTooltip="Add the concept as a folder and its attributes as sub-items" aria-hidden="true"></i></label>
         </div>
       </div>
 
@@ -45,7 +45,7 @@
               </thead>
               <tbody>
                 <tr *ngFor="let item of attributes" (click)="item.excluded = !item.excluded">
-                  <td><i [ngClass]="item.excluded ? 'fa fa-fw fa-times text-danger' : 'fa fa-fw fa-check text-success'"></i></td>
+                  <td><i [ngClass]="item.excluded ? 'fa fa-fw fa-times text-danger' : 'fa fa-fw fa-check text-success'" aria-hidden="true"></i></td>
                   <td>{{item.attribute.name}}</td>
                 </tr>
               </tbody>

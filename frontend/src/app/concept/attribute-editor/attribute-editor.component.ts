@@ -29,7 +29,9 @@ export class AttributeEditorComponent implements OnInit {
   constructor(private modal: NgbModal, public activeModal: NgbActiveModal, private logger: LoggerService, private conceptService: ConceptService) { }
 
   isLiteral() {
-    return this.result.valueConcept && this.result.valueConcept.id >= 8 && this.result.valueConcept.id <= 13;
+    return this.result.valueConcept != null
+      && this.result.valueConcept.id >= 11
+      && this.result.valueConcept.id <= 16;
   }
 
   selectValueType() {
