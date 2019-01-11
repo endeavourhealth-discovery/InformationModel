@@ -7,7 +7,6 @@ phases:
       - echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list
       - apt-get -y update
       - apt-get -y install google-chrome-stable
-      - npm install
   pre_build:
     commands:
       - IP=$(curl http://checkip.amazonaws.com)/32
