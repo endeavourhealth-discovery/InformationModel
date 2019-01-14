@@ -34,7 +34,7 @@ module.exports = function (config) {
         flags: [
           '--no-sandbox',
           '--disable-gpu',
-          '--enable-logging',
+          '--enable-logging=stderr',
           '--no-default-browser-check',
           '--no-first-run',
           '--disable-default-apps',
