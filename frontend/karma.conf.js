@@ -25,7 +25,7 @@ module.exports = function (config) {
     reporters: ['progress', 'kjhtml'],
     port: 9876,
     colors: true,
-    logLevel: config.LOG_INFO,
+    logLevel: config.LOG_DEBUG,
     autoWatch: true,
     browsers: ['Chrome_without_security'],
     customLaunchers:{
@@ -44,7 +44,8 @@ module.exports = function (config) {
           '--disable-renderer-backgrounding',
           '--disable-device-discovery-notifications',
           '--remote-debugging-port=9222',
-          '--disable-web-security'
+          '--disable-web-security',
+          '--v=1'
         ]
       }
     },
