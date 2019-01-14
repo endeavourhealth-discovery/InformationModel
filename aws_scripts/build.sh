@@ -31,7 +31,7 @@ aws s3 cp badges s3://endeavour-codebuild/badges/${artifact}/ --recursive --acl 
 }
 
 # Build
-if [ "$buildresult" -gt "0" ] ; then
+if [[ "$buildresult" -gt "0" ]] ; then
         badge_status=failing
         badge_colour=red
 else
@@ -44,7 +44,7 @@ curl -s "https://img.shields.io/badge/Build-$badge_status-$badge_colour.svg" > b
 # Unit tests
 failures=$( xmllint --xpath 'string(//testsuite/@failures) + string(//testsuite/@errors)' api/target/surefire-reports/TEST-*.xml )
 
-if [ "$failures" -gt "0" ] ; then
+if [[ "$failures" -gt "0" ]] ; then
         badge_status=failing
         badge_colour=red
 else
