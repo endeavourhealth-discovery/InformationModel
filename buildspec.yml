@@ -17,7 +17,7 @@ phases:
       - chmod +x aws_scripts/build.sh
       - echo IM Build started on `date`
       - aws_scripts/build.sh mvn -B deploy
-      - cat /tmp/chrome_debug.log
+      - cat /tmp/*/chrome_debug.log
       - mvn sonar:sonar
   post_build:
     commands:

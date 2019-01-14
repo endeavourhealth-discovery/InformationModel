@@ -45,8 +45,7 @@ module.exports = function (config) {
           '--disable-device-discovery-notifications',
           '--remote-debugging-port=9222',
           '--disable-web-security',
-          '--v=1',
-          '--user-data-dir=/tmp'
+          '--v=1'
         ]
       }
     },
