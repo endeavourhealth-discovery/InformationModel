@@ -37,7 +37,8 @@ module.exports = function (config) {
           '--disable-gpu',
           '--disable-translate',
           '--disable-extensions',
-          '--disable-web-security'
+          '--disable-web-security',
+          '--remote-debugging-port=9222'
         ]
       }
     },
