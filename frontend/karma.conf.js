@@ -31,7 +31,14 @@ module.exports = function (config) {
     customLaunchers:{
       Chrome_without_security:{
         base: 'ChromeHeadless',
-        flags: ['--disable-web-security', '--no-sandbox']
+        flags: [
+          '--no-sandbox',
+          '--headless',
+          '--disable-gpu',
+          '--disable-translate',
+          '--disable-extensions',
+          '--disable-web-security'
+        ]
       }
     },
     singleRun: true
