@@ -33,12 +33,18 @@ module.exports = function (config) {
         base: 'ChromeHeadless',
         flags: [
           '--no-sandbox',
-          '--headless',
           '--disable-gpu',
+          '--enable-logging',
+          '--no-default-browser-check',
+          '--no-first-run',
+          '--disable-default-apps',
+          '--disable-popup-blocking',
           '--disable-translate',
-          '--disable-extensions',
-          '--disable-web-security',
-          '--remote-debugging-port=9222'
+          '--disable-background-timer-throttling',
+          '--disable-renderer-backgrounding',
+          '--disable-device-discovery-notifications',
+          '--remote-debugging-port=9222',
+          '--disable-web-security'
         ]
       }
     },
