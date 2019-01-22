@@ -13,9 +13,6 @@ phases:
       - curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
       - sudo apt-get install -y nodejs
 
-      # Install npm
-      - apt-get install -y npm
-
       # Install puppeteer as a dev dependency
       - npm i -D puppeteer
 
