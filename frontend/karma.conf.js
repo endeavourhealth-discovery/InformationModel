@@ -1,7 +1,5 @@
 // Karma configuration file, see link for more information
 // https://karma-runner.github.io/0.13/config/configuration-file.html
-process.env.CHROME_BIN = require('puppeteer').executablePath();
-
 module.exports = function (config) {
   config.set({
     basePath: '',
@@ -30,19 +28,12 @@ module.exports = function (config) {
     autoWatch: true,
     browsers: ['HeadlessChrome'],
     customLaunchers:{
-      HeadlessChrome:{
-        base: 'ChromiumHeadless',
-        flags: [
-          '--no-sandbox',
-          '--headless',
-          '--disable-gpu',
-          '--disable-translate',
-          '--disable-extensions',
-          // Without a remote debugging port, Google Chrome exits immediately.
-          '--remote-debugging-port=9222',
-          '--disable-web-security'
-        ]
-      }
+      base: 'ChromeHeadless',
+      flags: [
+        '--disable-translate',
+        '--disable-extensions',
+        '--no-sandbox'
+      ]
     },
     singleRun: true
   });
