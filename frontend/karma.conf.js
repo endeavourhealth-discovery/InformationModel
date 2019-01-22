@@ -28,12 +28,14 @@ module.exports = function (config) {
     autoWatch: true,
     browsers: ['HeadlessChrome'],
     customLaunchers:{
-      base: 'ChromeHeadless',
-      flags: [
-        '--disable-translate',
-        '--disable-extensions',
-        '--no-sandbox'
-      ]
+      HeadlessChrome: {
+        base: 'ChromeHeadless',
+        flags: [
+          '--disable-translate',
+          '--disable-extensions',
+          '--no-sandbox'
+        ]
+      }
     },
     singleRun: true
   });
