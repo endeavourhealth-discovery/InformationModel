@@ -14,7 +14,7 @@ phases:
       - sudo apt-get install -y nodejs
 
       # Install chromium
-      - apt-get -y install chromium=72.0.3618.0
+      - apt-get -y install chromium-browser=72.0.3618.0
   pre_build:
     commands:
       - IP=$(curl http://checkip.amazonaws.com)/32
