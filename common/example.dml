@@ -1,0 +1,72 @@
+ModelInformation  (
+               model_document = <https://DiscoveryDataService/InformationModel/im/1.0.1>,
+               version = “1.0.1”,
+               import = <https://DiscoveryDataService/InformationModel/patterns/1.0.1>,
+               use = <https://DiscoveryDataService/InformationModel/qm/1.0.0>
+              supported_language ( language =  IM_data_model_language,
+                                                  version = “1.0.0”),
+              supported_language ( language = IM_query_language,
+                                                  version = “1.0.0”),
+              prefix ( prefix = “pm”, iri = “https:DiscoveryDataService/InformationModel/patterns#” ),
+              prefix ( prefix = “qm”,  iri = “https:DiscoveryDataService/InformationModel/qm#” ) )
+
+Concept Chest_Pain (
+                id = 234567,
+               status =active,
+                name =“Chest pain (finding)”,
+                short =“chest pain”,
+                description =“pain situated somewhere in the chest”,
+                version =“1.0.0”,
+                code_scheme = Snomed-CT,
+                 code = “29857009” )
+
+Structure Person (
+ cardinality =  has_up_to_one,
+  Property =  administrative_gender )
+
+Structure Person (
+ cardinality =  has_many,
+  Property =  main_residence )
+
+Structure Person (
+ cardinality =  has_up_to_one,
+  Property =  administrative_gender )
+
+Definition  administrative_gender (
+ Inherits_properties_from Property_Event,
+is_subtype_of Gender )
+
+Definition Property_Event (
+                    Inherits_properties_from Event )
+
+Structure Property_Event (
+                        has_one      Date_of_update )
+
+Definition Date_of_update (
+                                     Is dateTime )
+
+
+Definition Chest_Pain (
+                Is_a =  Pain_of_Truncal_structure—Finding--,
+                Is_a =  Finding of region of thorax )
+
+Definition Chest_Pain (
+                is_equivalent_to (
+                         is_intersection_of (
+                                                   finding_of_region_of_thorax_--finding-- ,
+                                                    pain_of_truncal_structure_finding (
+                                                          finding_site—attribute   = thoracic_structure_-body_structure )
+                                            )
+                                 )
+                      )
+
+Pattern P1 (
+                      Key = Haemoglobin_estimation,
+                      Count = 500000,
+                      Observation (
+                                             Observed_Concept/Concept ( Haemoglobin_estimation_count = 500000 ) ,
+                                             Observed_Concept/Units_of_measure ( g/l_count = 495000,
+                                                                                                                g/dl_count = 25000 )
+                                    )
+            )
+

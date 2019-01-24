@@ -60,7 +60,7 @@
               <arguments>run build</arguments>
             </configuration>
           </execution>
-          <execution>
+<!--          <execution>
             <id>javascript tests</id>
             <goals>
               <goal>npm</goal>
@@ -69,7 +69,7 @@
               <arguments>run test</arguments>
             </configuration>
             <phase>test</phase>
-          </execution>
+          </execution>-->
         </executions>
       </plugin>
     </plugins>

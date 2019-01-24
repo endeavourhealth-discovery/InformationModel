@@ -150,10 +150,10 @@ export class ConceptEditorComponent implements AfterViewInit {
     //   }
     // }
 
-    // for (const item of attributes) {
-    //   this.graph.addNodeData(item.attribute.id, item.attribute.name, 3, item);
-    //   this.graph.addEdgeData(conceptId, item.attribute.id, 'has attribute', item);
-    // }
+    for (const item of attributes) {
+      this.graph.addNodeData(item.attribute.id, item.attribute.name, 3, item);
+      this.graph.addEdgeData(conceptId, item.attribute.id, 'has', item);
+    }
 
     // Ensure graph isnt too big!
     if (this.graph.nodeData.length < 50) {
