@@ -16,6 +16,6 @@ public class ModellingLanguageParserTest {
 
     @Test
     public void execute() throws Exception {
-        parser.execute(new Scanner(new File("example.dml")));
+        parser.execute(new Scanner2(new File("example.dml")));
     }
 }
