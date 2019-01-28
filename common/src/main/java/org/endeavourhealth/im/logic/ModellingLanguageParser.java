@@ -27,8 +27,9 @@ public class ModellingLanguageParser {
     }
 
     private boolean parseDocument(Scanner2 scanner) {
-        String token = scanner.next().toLowerCase();
+        String token = scanner.next();
         do {
+            token = token.toLowerCase();
             if ("modelinformation".equals(token)) processModelInformation(scanner);
             else if ("concept".equals(token)) processConcept(scanner);
             else if ("structure".equals(token)) processStructure(scanner);
@@ -36,8 +37,8 @@ public class ModellingLanguageParser {
             else if ("pattern".equals(token)) processPattern(scanner);
             else
                 throw new InputMismatchException("Unknown document token: [" + token + "]");
-            token = scanner.next().toLowerCase();
-        } while (!token.isEmpty());
+            token = scanner.next();
+        } while (token != null && !token.isEmpty());
 
         return true;
     }
