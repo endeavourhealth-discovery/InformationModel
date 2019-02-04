@@ -18,13 +18,13 @@ module.exports = function (config) {
     coverageIstanbulReporter: {
       dir: require('path').join(__dirname, 'coverage'),
       reports: [ 'html', 'lcovonly' ],
-      fixWebpackSourcePaths: true,
-      thresholds: {
-        statements: 85,
-        lines: 85,
-        branches: 55,
-        functions: 80
-      }
+      fixWebpackSourcePaths: true // ,
+      // thresholds: {
+      //   statements: 85,
+      //   lines: 85,
+      //   branches: 55,
+      //   functions: 80
+      // }
     },
     captureTimeout: 210000,
     browserDisconnectTolerance: 3,
@@ -35,9 +35,10 @@ module.exports = function (config) {
     listenAddress: 'localhost',
     hostname: 'localhost',
     colors: true,
-    logLevel: config.LOG_DEBUG,
+    logLevel: config.LOG_INFO,
     autoWatch: true,
-    browsers: ['ChromeHeadlessNoSandbox'],
+    browsers: ['Chrome'],
+    // browsers: ['ChromeHeadlessNoSandbox'],
     customLaunchers: {
       ChromeHeadlessNoSandbox: {
         base: 'ChromeHeadless',
@@ -50,6 +51,6 @@ module.exports = function (config) {
         ],
       },
     },
-    singleRun: true
+    singleRun: false
   });
 };
