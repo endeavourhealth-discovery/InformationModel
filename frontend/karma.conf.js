@@ -1,7 +1,3 @@
-// Karma configuration file, see link for more information
-// https://karma-runner.github.io/0.13/config/configuration-file.html
-process.env.CHROME_BIN = require('puppeteer').executablePath();
-
 module.exports = function (config) {
   config.set({
     basePath: '',
@@ -14,35 +10,45 @@ module.exports = function (config) {
       require('@angular/cli/plugins/karma')
     ],
     client:{
-      clearContext: false // leave Jasmine Spec Runner output visible in browser
+      clearContext: false, // leave Jasmine Spec Runner output visible in browser
+      jasmine: {
+        random: false
+      }
     },
     coverageIstanbulReporter: {
+      dir: require('path').join(__dirname, 'coverage'),
       reports: [ 'html', 'lcovonly' ],
-      fixWebpackSourcePaths: true
+      fixWebpackSourcePaths: true,
+      thresholds: {
+        statements: 85,
+        lines: 85,
+        branches: 55,
+        functions: 80
+      }
     },
-    angularCli: {
-      environment: 'dev'
-    },
+    captureTimeout: 210000,
+    browserDisconnectTolerance: 3,
+    browserDisconnectTimeout : 210000,
+    browserNoActivityTimeout : 210000,
     reporters: ['progress', 'kjhtml'],
     port: 9876,
+    listenAddress: 'localhost',
+    hostname: 'localhost',
     colors: true,
     logLevel: config.LOG_DEBUG,
     autoWatch: true,
-    browsers: ['HeadlessChrome'],
-    customLaunchers:{
-      HeadlessChrome:{
+    browsers: ['ChromeHeadlessNoSandbox'],
+    customLaunchers: {
+      ChromeHeadlessNoSandbox: {
         base: 'ChromeHeadless',
         flags: [
-          '--no-sandbox',
           '--headless',
-          '--disable-gpu',
-          '--disable-translate',
-          '--disable-extensions',
-          // Without a remote debugging port, Google Chrome exits immediately.
-          '--remote-debugging-port=9222',
-          '--disable-web-security'
-        ]
-      }
+          '--no-sandbox',
+          '--password-store=basic',
+          '--enable-logging',
+          '--v=1'
+        ],
+      },
     },
     singleRun: true
   });
