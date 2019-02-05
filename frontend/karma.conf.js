@@ -18,13 +18,7 @@ module.exports = function (config) {
     coverageIstanbulReporter: {
       dir: require('path').join(__dirname, 'coverage'),
       reports: [ 'html', 'lcovonly' ],
-      fixWebpackSourcePaths: true // ,
-      // thresholds: {
-      //   statements: 85,
-      //   lines: 85,
-      //   branches: 55,
-      //   functions: 80
-      // }
+      fixWebpackSourcePaths: true
     },
     captureTimeout: 210000,
     browserDisconnectTolerance: 3,
@@ -37,7 +31,6 @@ module.exports = function (config) {
     colors: true,
     logLevel: config.LOG_INFO,
     autoWatch: true,
-    // browsers: ['Chrome'],
     browsers: ['ChromeHeadlessNoSandbox'],
     customLaunchers: {
       ChromeHeadlessNoSandbox: {
