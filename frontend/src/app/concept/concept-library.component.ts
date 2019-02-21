@@ -18,7 +18,7 @@ export class ConceptLibraryComponent implements OnInit {
   getStatusName = ConceptStatusHelper.getName;
 
   listTitle = 'Most recently used';
-  summaryList: SearchResult;
+  summaryList: Concept[];
   codeSchemes: ConceptSummary[];
   schemeFilter: number[];
   searchTerm: string;
@@ -46,11 +46,11 @@ export class ConceptLibraryComponent implements OnInit {
 
   getCodeSchemes() {
     this.codeSchemes = null;
-    this.conceptService.getSubtypes(5300, true) // 5300 = Code scheme supertype
-      .subscribe(
-        (result) => this.codeSchemes = result,
-        (error) => this.log.error(error)
-      )
+    // this.conceptService.getSubtypes(5300, true) // 5300 = Code scheme supertype
+    //   .subscribe(
+    //     (result) => this.codeSchemes = result,
+    //     (error) => this.log.error(error)
+    //   )
   }
 
   search() {
@@ -77,21 +77,14 @@ export class ConceptLibraryComponent implements OnInit {
     this.getMRU();
   }
 
-  editConcept(concept: Concept) {
+  editConcept(concept: any) {
     this.router.navigate(['concept', concept.id])
   }
 
   addConcept() {
-    let commonSubtypes = [
-      {id: 1, name: 'Concept'},
-      {id: 2, name: 'Codeable concept'},
-      {id: 4, name: 'Record type'},
-      {id: 6, name: 'Attribute'},
-      {id: 7, name: 'Entity'}
-    ];
-    ConceptCreateComponent.open(this.modal, commonSubtypes)
+    ConceptCreateComponent.open(this.modal)
       .result.then(
-      (result) => this.router.navigate(['concept', result.id])
+      (result) => this.router.navigate(['concept', result])
     );
 
   }

@@ -1,0 +1,141 @@
+{
+  "@document": "http/DiscoveryDataService/InformationModel/dm/HealthData/1.0.1",
+  "@import": "http://DiscoveryDataService/InformationModel/dm/core/1.0.1",
+  "Concepts": [
+    {
+      "@id": "Duration",
+      "@name": "Duration of time",
+      "@description": "Duration of time measurement with units",
+      "@is_subtype_of": {
+        "@id": "Quantity"
+      }
+    },
+    {
+      "@id": "Quantity",
+      "@name": "Quantity",
+      "@description": "A measurement of quantity",
+      "comparator": {
+        "@has_value_type": {
+          "@id": "text"
+        }
+      },
+      "unit_of_measure": {
+        "@has_value_type": {
+          "@id": "UnitsOfMeasure"
+        }
+      }
+    },
+    {
+      "@id": "UnitsOfMeasure",
+      "@name": "Units of measure",
+      "@description": "A concept that measures a value in units",
+      "@is_subtype_of": {
+        "@id": "Concept"
+      }
+    },
+    {
+      "@id": "GeneralPractice",
+      "@name": "General Practice",
+      "@description": "An organisation that provides General practice services",
+      "@is_subtype_of": {
+        "@id": "PrimaryCareOrganisation"
+      },
+      "is_commissioned_by": {
+        "@has_value_type": {
+          "@id": "ClinicalCommissioningGroup"
+        }
+      }
+    },
+    {
+      "@id": "PrimaryCareOrganisation",
+      "@name": "Primary Care Organisation",
+      "@description": "An organisation providing primary care services",
+      "@is_subtype_of": {
+        "@id": "Organisation"
+      },
+      "is_commissioned_by" :{"@has_value_type": {"@id":"CommissioningOrganisation"}}
+    },
+    {
+      "@id": "Organisation",
+      "@name": "Organisation",
+      "@description": "an organised body of people with a particular purpose",
+      "@is_subtype_of": {
+        "@id": "Entity"
+      },
+      "organisation_name": {
+        "@has_value_type": "text"
+      },
+      "parent_organisation": {
+        "@has_value_type": {
+          "@id": "Organisation"
+        }
+      }
+    },
+    {
+      "@id": "ClinicalCommissioningGroup",
+      "@name": "Clinical Commissioning Group",
+      "@description": "An locality based organisation providing commissioning services",
+      "@is_subtype_of": {
+        "@id": "CommissioningOrganisation"
+      }
+    },
+    {
+      "@id": "CommissioningOrganisation",
+      "@name": "Clinical commissioning organisation",
+      "@is_subtype_of": {
+        "@id": "Organisation"
+      }
+    },
+    {
+      "@id": "Entity",
+      "@name": "Entity",
+      "@description": "A physical thing of some kind",
+      "@is_subtype_of": {
+        "@id": "Concept"
+      }
+    },
+    {
+      "@id": "is_commissioned_by",
+      "@name": "is commissioned by",
+      "@is_subtype_of": {
+        "@id": "@object_property"
+      },
+      "@has_value_type": {
+        "id ": "CommissioningOrganisation"
+      }
+    },
+    {
+      "@id": "parent_organisation",
+      "@name": "parent organisation",
+      "@description": "the parent organisation in an organisational hierarchy",
+      "@is_subtype_of": {
+        "@id": "@object_property"
+      },
+      "@has_value_type": {
+        "@id": "Organisation"
+      }
+    },
+    {
+      "@id": "duration_to_event",
+      "@name": "duration to event",
+      "@description": "duration between the before event and the after event",
+      "@is_subtype_of": {
+        "@id": "@object_property"
+      },
+      "@has_value_type": {
+        "id": "Duration"
+      }
+    },
+    {
+      "@id": "unit_of_measure",
+      "@name": "unit of measure",
+      "@description": "a property that has a unit of measure as its value",
+      "@is_subtype_of": {
+        "@id": "@data_property"
+      },
+      "@has_value_type": {
+        "@id": "UnitsOfMeasure"
+      }
+    }
+  ]
+}

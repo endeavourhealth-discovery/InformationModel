@@ -1,11 +1,10 @@
 <div class="modal-header">
-  <h4 class="modal-title">Create concept</h4>
+  <h4 class="modal-title">Raw editor</h4>
   <button type="button" class="close" (click)="cancel()" aria-hidden="true">&times;</button>
 </div>
 <div class="modal-body">
   <div class="container-fluid">
-
-    <div class="row">
+    <div class="row" *ngIf="json">
       <div class="col-md-12 col-lg-12 form-group">
         <label class="control-label required-field" for="conceptDocument">Document</label>
         <div class="dropdown" id="conceptDocument">
@@ -15,23 +14,15 @@
           </div>
         </div>
       </div>
-
-      <div class="col-md-12 col-lg-6 form-group">
-        <label class="control-label required-field" for="conceptContext">Id</label>
-        <input class="form-control" id="conceptContext" #focus type="text" [(ngModel)]="id" name="conceptContext">
-      </div>
-      <div class="col-md-12 col-lg-6 form-group">
-        <label class="control-label" for="conceptName">Name</label>
-        <input class="form-control" id="conceptName" type="text" [(ngModel)]="name" name="conceptName">
-      </div>
-
-      <div class="col-md-12 col-lg-12 form-group">
-        <div class="required-field-note"></div>
+      <div class="col-md-12 form-group">
+        <label class="control-label required-field" for="conceptDocument">Concept</label>
+        <textarea class="form-control text-monospace" [(ngModel)]="json" rows="25" #textarea></textarea>
       </div>
     </div>
   </div>
 </div>
 <div class="modal-footer">
-  <button type="button" class="btn btn-success" (click)="ok()" name="Ok" [disabled]="id == null || id == '' || document == null || document == ''">Create</button>
+  <button type="button" class="btn btn-info" (click)="validateClick()" name="Validate">Validate</button>
+  <button type="button" class="btn btn-success" (click)="ok()" name="Ok">Ok</button>
   <button type="button" class="btn btn-danger" (click)="cancel()" name="cancel">Cancel</button>
 </div>

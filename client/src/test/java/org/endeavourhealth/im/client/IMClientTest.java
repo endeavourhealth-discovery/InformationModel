@@ -1,3 +1,4 @@
+/*
 package org.endeavourhealth.im.client;
 
 import org.endeavourhealth.common.config.ConfigManager;
@@ -40,4 +41,4 @@ public class IMClientTest {
         Long conceptId = IMClient.getOrCreateConceptId("MadeUpStatus.Temporary");
         assertNotNull(conceptId);
     }
-}
+}*/

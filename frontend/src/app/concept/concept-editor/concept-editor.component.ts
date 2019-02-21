@@ -6,20 +6,11 @@ import {ConceptService} from '../concept.service';
 import {Location} from '@angular/common';
 import {NodeGraphComponent} from 'eds-angular4/dist/node-graph/node-graph.component';
 import {NodeGraphDialogComponent} from '../node-graph-dialog/node-graph-dialog.component';
-import {ModuleStateService} from 'eds-angular4/dist/common';
 import {Attribute} from '../../models/Attribute';
-import {Observable} from 'rxjs/Observable';
-import {AttributeEditorComponent} from '../attribute-editor/attribute-editor.component';
-import {SynonymEditorComponent} from '../synonym-editor/synonym-editor.component';
-import {Synonym} from '../../models/Synonym';
 import {GraphNode} from 'eds-angular4/dist/node-graph/GraphNode';
 import {ConceptSelectorComponent} from 'im-common/dist/concept-selector/concept-selector/concept-selector.component';
-import {ValueExpressionHelper} from '../../models/ValueExpression';
-import {InheritanceHelper} from '../../models/Inheritance';
-import {CardinalityHelper} from '../../models/CardinalityHelper';
-import {ConceptCreateComponent} from '../concept-create/concept-create.component';
 import {Concept} from 'im-common/dist/models/Concept';
-import {ConceptStatus, ConceptStatusHelper} from 'im-common/dist/models/ConceptStatus';
+import {ConceptRawComponent} from '../concept-raw/concept-raw.component';
 
 @Component({
   selector: 'app-concept-editor',
@@ -30,102 +21,62 @@ import {ConceptStatus, ConceptStatusHelper} from 'im-common/dist/models/ConceptS
 })
 export class ConceptEditorComponent implements AfterViewInit {
   concept: Concept;
-  attributes: Attribute[];
-  synonyms: Synonym[];
-
-  data: any;
-  selectedNode: any;
-  testJson: string;
+  documents: string[] = [];
+  nature: string;
+  superclass: string;
+  nameCache: any = {};
 
   @ViewChild('nodeGraph') graph: NodeGraphComponent;
-
-  // Local enum instance
-  ConceptStatus = ConceptStatus;
-  getConceptStatusName = ConceptStatusHelper.getName;
-  getValueExpressionPrefix = ValueExpressionHelper.getPrefix;
-  getInheritanceIcon = InheritanceHelper.getIcon;
-  getCardinality = CardinalityHelper.asNumeric;
 
   constructor(private router: Router,
               private route: ActivatedRoute,
               private location: Location,
               private logger: LoggerService,
               private modal: NgbModal,
-              private conceptService: ConceptService,
-              private stateService: ModuleStateService) { }
+              private conceptService: ConceptService) { }
 
   ngAfterViewInit() {
-    this.testJson = this.stateService.getState('ConceptEditor');
     this.route.params.subscribe(
-      (params) => this.loadConcept(params['id'], params['context'])
+      (params) => this.loadConcept(params['id'])
+    );
+    this.conceptService.getDocuments()
+      .subscribe(
+        (result) => this.documents = result,
+        (error) => this.logger.error(error)
       );
   }
 
-  loadConcept(id: any, context: string) {
+  loadConcept(id: any) {
     console.log(id);
-    console.log(context);
-    if (id === 'add') {
-      setTimeout(() => this.newConcept(context));
-    } else {
-      Observable.forkJoin(
-        this.conceptService.getConcept(id),
-        this.conceptService.getAttributes(id, false),
-        this.conceptService.getSynonyms(id)
-      )
-        .subscribe(
-          (result) => {
-            this.concept = result[0];
-            this.attributes = result[1];
-            this.synonyms = result[2];
-            this.refreshDiagram();
-          }
-        );
-    }
-  }
+    this.conceptService.getConcept(id)
+      .subscribe(
+        (result) => {
+          this.concept = result;
+          if (this.concept['@is_instance_of'] != null)
+            this.nature = '@is_instance_of';
+          else
+            this.nature = '@is_subtype_of';
 
-  newConcept(context: string) {
-    const concept = {
-      superclass: {id: 1, name: 'Type'},
-      context: context,
-      status: ConceptStatus.DRAFT,
-      version: 0.1,
-      useCount: 0
-    } as Concept;
+          if (this.concept[this.nature] == null)
+            this.concept[this.nature] = {'@id': 'Concept'};
 
-    // Set full name to last part of context name as a default
-    const dot = context.lastIndexOf('.');
-    if (dot > 0) {
-      concept.fullName = context.substring(dot + 1);
-    } else {
-      concept.fullName = context;
-    }
-    this.concept = concept;
-    this.attributes = [];
-    this.refreshDiagram();
+          this.superclass = this.concept[this.nature]['@id'];
+        }
+      );
   }
 
   refreshDiagram() {
-    if (this.concept && this.attributes) {
-      this.data = null;
-      this.graph.clear();
-      this.graph.assignColours([1, 2, 3, 0]);
-      this.graph.addNodeData(this.concept.id, this.concept.fullName, 1, this.concept, this.getAttributeTable(this.attributes));
-
-      // this.graph.addNodeData(this.concept.superclass.id, this.concept.superclass.name, 0, this.concept.superclass);
-      // this.graph.addEdgeData(this.concept.id, this.concept.superclass.id, 'inherits from', this.concept.superclass);
-
-      this.updateDiagram(this.concept.id, this.attributes);
-    }
-  }
-
-  getAttributeTable(attributes: Attribute[]) : string {
-    let html : string = '';
-
-    for(let att of attributes) {
-      html += att.attribute.name + '<br>';
-    }
-
-    return html;
+    // if (this.concept && this.attributes) {
+    //   this.data = null;
+    //   this.graph.clear();
+    //   this.graph.assignColours([1, 2, 3, 0]);
+    //   this.graph.addNodeData(this.concept.id, this.concept.fullName, 1, this.concept, this.getAttributeTable(this.attributes));
+    //
+    //   // this.graph.addNodeData(this.concept.superclass.id, this.concept.superclass.name, 0, this.concept.superclass);
+    //   // this.graph.addEdgeData(this.concept.id, this.concept.superclass.id, 'inherits from', this.concept.superclass);
+    //
+    //   this.updateDiagram(this.concept.id, this.attributes);
+    // }
   }
 
   expandNode(node: GraphNode) {
@@ -169,112 +120,17 @@ export class ConceptEditorComponent implements AfterViewInit {
   //   return result;
   // }
 
-  promptSuperclass() {
-    ConceptSelectorComponent.open(this.modal)
+  selectSupertype() {
+    ConceptSelectorComponent.open(this.modal, this.superclass)
       .result.then(
-      (result) => this.setSuperclass(result)
+      (result) => this.superclass = result.id,
+      () => {}
     );
   }
 
-  setSuperclass(concept: Concept) {
-    this.concept.superclass = {id: concept.id, name: concept.fullName};
-    this.refreshDiagram();
-  }
-
-  addAttribute() {
-    ConceptSelectorComponent.open(this.modal, true) //, 6, ValueExpression.OF_CLASS)
-      .result.then(
-      (result) => {
-        if (result.id == null)
-          this.createAttributeConcept();
-        else
-          this.createAttribute(result);
-      }
-    );
-  }
-
-  createAttributeConcept() {
-    let commonSubtypes = [
-      {id: 6, name: 'Attribute'},
-      {id: 7, name: 'Codeable attribute'},
-      {id: 8, name: 'Number attribute'},
-      {id: 9, name: 'Whole Number attribute'},
-      {id: 10, name: 'Decimal attribute'},
-      {id: 11, name: 'Date time attribute'},
-      {id: 12, name: 'Text attribute'},
-      {id: 13, name: 'Boolean attribute'}
-    ];
-    ConceptCreateComponent.open(this.modal, commonSubtypes)
-      .result.then(
-      (result) => this.createAttribute(result),
-      (error) => this.logger.error(error)
-    );
-  }
-
-  createAttribute(attConcept: Concept) {
-    const att: Attribute = {
-      concept: {id: this.concept.id, name: this.concept.fullName},
-      attribute: {id: attConcept.id, name: attConcept.fullName},
-      mandatory: false,
-      limit: 1,
-      order: 0,
-      inheritance: 1,
-      status: ConceptStatus.DRAFT,
-      valueExpression: 0
-    } as Attribute;
-
-    this.editAttribute(att);
-  }
-
-  editAttribute(att: Attribute) {
-    AttributeEditorComponent.open(this.modal, this.concept.id, att)
-      .result.then(
-      (result) => {
-        if (result) {
-          if (!this.attributes.includes(att)) {
-            this.attributes.unshift(result);
-          } else {
-            Object.assign(att, result);
-          }
-        }
-      }
-    );
-  }
-
-  promptDeleteAttribute(att: Attribute) {
-    MessageBoxDialog.open(this.modal, 'Delete attribute', 'Delete the attribute from this concept?', 'Delete', 'Cancel')
-      .result.then(
-      (result) => this.deleteAttribute(att)
-    );
-  }
-
-  deleteAttribute(att: Attribute) {
-    this.conceptService.deleteAttribute(att.id)
-      .subscribe(
-        (result) => {
-          if (att.concept.id === this.concept.id) {
-            let idx = this.attributes.indexOf(att);
-            this.attributes.splice(idx, 1);
-          } else {
-            this.loadAttributes();
-          }
-          this.refreshDiagram()
-        },
-        (error) => this.logger.error(error)
-      );
-  }
-
-  loadAttributes() {
-    this.conceptService.getAttributes(this.concept.id, false)
-      .subscribe(
-        (result) => this.attributes = result,
-        (error) => this.logger.error(error)
-      );
-
-  }
 
   nodeClick(node) {
-    this.selectedNode = node.data;
+    // this.selectedNode = node.data;
   }
 
   nodeDblClick(node) {
@@ -292,19 +148,15 @@ export class ConceptEditorComponent implements AfterViewInit {
     );
   }
 
-  editSynonyms() {
-    SynonymEditorComponent.open(this.modal, this.synonyms)
-      .result.then(
-      (ok) => {},
-      (cancel) => {}
-    )
-  }
+  save(close: boolean) {
+    // cleanup nature
+    delete this.concept['@is_subtype_of'];
+    delete this.concept['@is_instance_of'];
+    this.concept[this.nature] = { '@id' : this.superclass };
 
-  saveConcept(close: boolean) {
      this.conceptService.save(this.concept)
        .subscribe(
-         (result) => {
-           this.concept = result;
+         () => {
            this.logger.success('Concept saved', this.concept, 'Saved');
            if (close)
              this.close(false)
@@ -337,4 +189,67 @@ export class ConceptEditorComponent implements AfterViewInit {
         (result) => this.location.back()
       )
   }
+
+  navigateTo(id: any) {
+    this.router.navigate(['concept', id])
+  }
+
+  getProperties() {
+    const ignore: string[] = ['@id', '@document', '@name', '@description', '@is_subtype_of', '@is_instance_of'];
+    return Object.keys(this.concept).filter(k => ignore.indexOf(k) == -1);
+  }
+
+  getValue(prop) {
+    return this.nodeValue(this.concept[prop]);
+  }
+
+  nodeValue(v) {
+    if (v instanceof Array) {
+      let elem: string[] = [];
+
+      for (let i of v) {
+        elem.push(Object.keys(i)[0]);
+      }
+
+      return '[' + elem.join(", ") + ']';
+    }
+
+    if (v instanceof Object) {
+      if (v['@id'] != null)
+        return v['@id'];
+
+      if (v['@has_value_type'] != null)
+        return 'Value type: ' + this.nodeValue(v['@has_value_type']);
+
+      return JSON.stringify(v);
+    }
+
+    return v;
+  }
+
+  getName(id: string)  {
+    let result = this.nameCache[id];
+
+    if (result == null) {
+      this.nameCache[id] = id;
+      result = this.nameCache[id];
+
+      this.conceptService.getName(id)
+        .subscribe(
+          (name) => { if (name != null && name != '') this.nameCache[id] = name },
+          (error) => this.logger.error(error)
+        )
+    }
+
+    return result;
+  }
+
+  editRaw() {
+    ConceptRawComponent.open(this.modal, this.concept)
+      .result.then(
+      (result) => this.concept = result,
+      () => {}
+    )
+  }
+
 }

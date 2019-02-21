@@ -1,0 +1,166 @@
+{
+  "@document": "http/DiscoveryDataService/InformationModel/dm/core/1.0.1",
+  "Concepts": [
+
+    {
+      "@id": "@Expression",
+      "@name": "Expression",
+      "@description": "Free form expression"
+    },
+    {
+      "@id": "@has_up_to_one",
+      "@name": "has up to one",
+      "@description": "property pointed to has a cardinality of zero or one with the subject",
+      "@is_subtype_of": {
+        "@id": "@cardinality"
+      }
+    },
+    {
+      "@id": "@has_one",
+      "@name": "has one",
+      "@description": "@Concept pointed to has a cardinality of one with the subject",
+      "@is_subtype_of": {
+        "@id": "@Cardinality"
+      }
+    },
+    {
+      "@id": "@name",
+      "@name": "@name",
+      "@description": "the name of the concept preferably unambiguous",
+      "@is_subtype_of": {
+        "@id": "@data_property"
+      },
+      "@has_value_type": {
+        "@id": "@text"
+      }
+    },
+    {
+      "@id": "@description",
+      "@name": "@description",
+      "@description": "the description of the concept to make the meaning unambigous",
+      "@is_subtype_of": {
+        "@id": "@data_property"
+      },
+      "@has_value_type": {
+        "@id": "@text"
+      }
+    },
+    {
+      "@id": "@code_scheme",
+      "@name": "code scheme",
+      "@description": "The code scheme the concept came from",
+      "@is_subtype_of": {
+        "@id": "@data_property"
+      },
+      "@has_value_type": {
+        "@id": "@text"
+      }
+    },
+    {
+      "@id": "@code",
+      "@name": "code",
+      "@description": "A code which was assigned to the concept in the code scheme",
+      "@is_subtype_of": {
+        "@id": "@data_property"
+      },
+      "@has_value_type": {
+        "@id": "text"
+      }
+    },
+    {
+      "@id": "@is_subtype_of",
+      "@name": "is a subtype of",
+      "@description": "a property that states that the subject is a subtype of the object",
+      "@is_subtype_of": {
+        "@id": "is_descendant_of"
+      }
+    },
+    {
+      "@id": "@id",
+      "@name": "identifier",
+      "@description": "an identifier",
+      "@is_subtype_of": {
+        "@id": "@data_property"
+      },
+      "@has_value_type": {
+        "@id": "@text"
+      }
+    },
+    {
+      "@id": "is_descendant_of",
+      "@name": "is a descendant of",
+      "@description": "An concept that is a descendant of another concept recursively",
+      "@is_subtype_of": {
+        "@id": "@relationship"
+      },
+      "inverse_property": {
+        "@id": "@has_descendant"
+      }
+    },
+    {
+      "@id": "@has_descendant",
+      "@name": "has descendants",
+      "@description": "@Concept has descendants recursively",
+      "@is_subtype_of": {
+        "@id": "@relationship"
+      }
+    },
+    {
+      "@id": "@relationship",
+      "@name": "relationship",
+      "@description": "relationship between one property and another",
+      "@is_subtype_of": {
+        "@id": "@object_property"
+      },
+      "@has_value_type": {
+        "@id": "@Concept"
+      }
+    },
+    {
+      "@id": "@object_property",
+      "@name": "@Concept property",
+      "@description": "a property whose value or target is a concept",
+      "@is_subtype_of": {
+        "@id": "@Concept"
+      },
+      "@has_value_type": {
+        "@id": "@Concept"
+      }
+    },
+    {
+      "@id": "@data_property",
+      "@name": "data property",
+      "@description": "the property is going to have a simple data type as a value",
+      "@is_subtype_of": {
+        "@id": "@Concept"
+      },
+      "@has_value_type": {
+        "@id": "@SimpleDataType"
+      }
+    },
+    {
+      "@id": "@text",
+      "@name": "text",
+      "@description": "a text value",
+      "@is_subtype_of": {
+        "@id": "@SimpleDataType"
+      }
+    },
+    {
+      "@id": "@SimpleDataType",
+      "@name": "simple data type",
+      "@description": "a text or numeric or date value",
+      "@is_subtype_of": {
+        "@id": "@Concept"
+      }
+    },
+    {
+      "@id": "@cardinality",
+      "@name": "Cardinality",
+      "@description": "whether something has zero one or many values for a relationship or attribute",
+      "@is_subtype_of": {
+        "@id": "@Concept"
+      }
+    }
+  ]
+}

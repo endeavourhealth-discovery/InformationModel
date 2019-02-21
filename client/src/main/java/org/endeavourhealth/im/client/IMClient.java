@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class IMClient {
-    public static Concept getConcept(Long scheme, String code) throws IOException {
+/*    public static Concept getConcept(Long scheme, String code) throws IOException {
         Map<String, String> params = new HashMap<>();
         params.put("scheme", scheme.toString());
         params.put("code", code);
@@ -66,5 +66,5 @@ public class IMClient {
         return target
             .request()
             .get();
-    }
+    }*/
 }

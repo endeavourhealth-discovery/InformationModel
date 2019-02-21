@@ -14,6 +14,7 @@ import {SynonymEditorComponent} from './synonym-editor/synonym-editor.component'
 import {ConceptSelectorModule} from 'im-common';
 import { ConceptCreateComponent } from './concept-create/concept-create.component';
 import {GuidedHelpModule} from '../guided-help/guided-help.module';
+import {ConceptRawComponent} from './concept-raw/concept-raw.component';
 
 @NgModule({
   imports: [
@@ -32,13 +33,15 @@ import {GuidedHelpModule} from '../guided-help/guided-help.module';
     NodeGraphDialogComponent,
     AttributeEditorComponent,
     SynonymEditorComponent,
-    ConceptCreateComponent
+    ConceptCreateComponent,
+    ConceptRawComponent,
   ],
   entryComponents: [
     NodeGraphDialogComponent,
     AttributeEditorComponent,
     SynonymEditorComponent,
-    ConceptCreateComponent
+    ConceptCreateComponent,
+    ConceptRawComponent
   ],
   providers: [ConceptService]
 })

@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import {Http, URLSearchParams} from '@angular/http';
 import {Observable} from 'rxjs/Observable';
-import {Attribute} from '../models/Attribute';
-import {Synonym} from '../models/Synonym';
 import {SearchResult} from 'im-common/dist/models/SearchResult';
 import {Concept} from 'im-common/dist/models/Concept';
+import {Attribute} from '../models/Attribute';
+import {Synonym} from '../models/Synonym';
 import {ConceptSummary} from 'im-common/dist/models/ConceptSummary';
 
 @Injectable()
@@ -12,32 +12,42 @@ export class ConceptService {
 
   constructor(private http: Http) { }
 
-  getMRU(includeDeprecated: boolean): Observable<SearchResult> {
+  getMRU(includeDeprecated: boolean): Observable<Concept[]> {
+    return this.http.get('api/IM/MRU')
+      .map((result) => result.json());
+  }
+
+  search(searchTerm: string, includeDeprecated: boolean, schemes: number[], page:number = 1): Observable<Concept[]> {
     const params = new URLSearchParams();
-    params.append('includeDeprecated', includeDeprecated.toString());
+    params.append('term', searchTerm);
 
-    return this.http.get('api/Concept/MRU', {search: params})
+    return this.http.get('api/IM/Search', {search: params})
       .map((result) => result.json());
   }
 
-  search(searchTerm: string, includeDeprecated: boolean, schemes: number[], page:number = 1): Observable<SearchResult> {
-    const params = new URLSearchParams();
-    params.append('searchTerm', searchTerm);
-    if (schemes)
-      for(let scheme of schemes)
-        params.append('scheme', scheme.toString());
-    params.append('includeDeprecated', includeDeprecated.toString());
-    params.append('page', page.toString());
-
-    return this.http.get('api/Concept/Search', {search: params})
+  getConcept(conceptId): Observable<Concept> {
+    return this.http.get('api/IM/' + conceptId)
       .map((result) => result.json());
   }
 
-  getConcept(conceptId: number): Observable<Concept> {
-    return this.http.get('api/Concept/' + conceptId.toString())
+  getName(conceptId): Observable<string> {
+    return this.http.get('api/IM/' + conceptId + '/name')
+      .map((result) => result.text());
+  }
+
+  getDocuments(): Observable<string[]> {
+    return this.http.get('api/IM/document')
       .map((result) => result.json());
   }
 
+  validateIds(ids: string[]) {
+    return this.http.post('api/IM/ValidateIds', ids)
+      .map((result) => result.text());
+  }
+
+  save(concept: any): Observable<any> {
+    return this.http.post('api/IM', concept);
+  }
   // getRelated(conceptId: number, includeDeprecated: boolean): Observable<RelatedConcept[]> {
   //   const params = new URLSearchParams();
   //   params.append('id', conceptId.toString());
@@ -69,10 +79,6 @@ export class ConceptService {
       .map((result) => result.json());
   }
 
-  save(concept: Concept): Observable<Concept> {
-    return this.http.post('api/Concept', concept)
-      .map((result) => result.json());
-  }
 
   deleteConcept(id: number): Observable<any> {
     return this.http.delete('api/Concept/' + id.toString());
