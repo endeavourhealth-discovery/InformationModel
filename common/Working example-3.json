@@ -14,9 +14,15 @@
       "@id": "Quantity",
       "@name": "Quantity",
       "@description": "A measurement of quantity",
+      "@is_subtype_of": {
+        "@id": "ComplexDataType"
+      },
+      "value": {
+        "@id": "numeric"
+      },
       "comparator": {
         "@has_value_type": {
-          "@id": "text"
+          "@id": "comparator"
         }
       },
       "unit_of_measure": {
@@ -44,6 +50,14 @@
         "@has_value_type": {
           "@id": "ClinicalCommissioningGroup"
         }
+      },
+      "branch_surgery": {
+        "@has_value_type": {
+          "@id": "Location"
+        },
+        "@cardinality": {
+          "@id": "@has_up_to many"
+        }
       }
     },
     {
@@ -53,7 +67,11 @@
       "@is_subtype_of": {
         "@id": "Organisation"
       },
-      "is_commissioned_by" :{"@has_value_type": {"@id":"CommissioningOrganisation"}}
+      "is_commissioned_by": {
+        "@has_value_type": {
+          "@id": "CommissioningOrganisation"
+        }
+      }
     },
     {
       "@id": "Organisation",
@@ -135,6 +153,279 @@
       },
       "@has_value_type": {
         "@id": "UnitsOfMeasure"
+      }
+    },
+    {
+      "@id": "comparator",
+      "@name": "Comparator",
+      "@description": "comparators for a numeric value e.g. less than or greater than",
+      "@is_subtype_of": {
+        "@id": "@Concept"
+      }
+    },
+    {
+      "@id": "less_than",
+      "@name": "less than",
+      "@description": "less than the numeric value",
+      "@is_subtype_of": {
+        "@id": "comparator"
+      }
+    },
+    {
+      "@id": "less_than_or_equal",
+      "@name": "less than or equal",
+      "@description": "less than or equal to the numeric value",
+      "@is_subtype_of": {
+        "@id": "comparator"
+      }
+    },
+    {
+      "@id": "greater_than",
+      "@name": "greater than",
+      "@description": "greater than or the numeric value",
+      "@is_subtype_of": {
+        "@id": "comparator"
+      }
+    },
+    {
+      "@id": "greater_than_or_equal",
+      "@name": "greater than or equal",
+      "@description": "greater than or equal to the numeric value",
+      "@is_subtype_of": {
+        "@id": "comparator"
+      }
+    },
+    {
+      "@id": "ComplexDataType",
+      "@name": "Complex data type",
+      "@description": "Parent concept for complex data types which are data types with structure",
+      "@is_subtype_of": {
+        "@id": "@Concept"
+      }
+    },
+    {
+      "@id": "branch_surgery",
+      "@name": "branch surgery",
+      "@description": "banch surgery for a general practice organisation",
+      "@is_subtype_of": {
+        "@id": "@object_property"
+      },
+      "@has_value_type": {
+        "@id": "Location"
+      }
+    },
+    {
+      "@id": "Location",
+      "@is_subtype_of": {
+        "@id": "Entity"
+      },
+      "@name": "Location",
+      "@description": "A location with latitude and longitude"
+    },
+    {
+      "@id": "Folder",
+      "@name": "Folder",
+      "@description": "A folder containing other folders or concepts used as a node in a  view when no other concept is attached",
+      "@is_subtype_of": {
+        "@id": "@Concept"
+      }
+    },
+    {
+      "@id": "Heading",
+      "@name": "Heading",
+      "@description": "A heading or section in a record",
+      "@is_subtype_of": {
+        "@id": "@Concept"
+      },
+      "content": {
+        "has_value_type": {
+          "@id": "@Concept"
+        },
+        "@cardinality": {
+          "@id": "@has_up_to_many"
+        }
+      }
+    },
+    {
+      "@id": "CodeableConcept",
+      "@name": "Codeable Concept",
+      "@description": "a concept consisting of an expression and/ or an original code and term",
+      "expression": {
+        "@has_value_type": "@Expression"
+      },
+      "original_code": {
+        "code": {
+          "@has_value_type": {
+            "@id": "@Text"
+          }
+        },
+        "code_scheme": {
+          "@has_value_type": {
+            "@id": "@code_scheme"
+          }
+        },
+        "@cardinality": {
+          "@id": "@has_up_to_many"
+        }
+      }
+    },
+    {
+      "@id": "Observation",
+      "@name": "Observation",
+      "@description": "A general note of something heard, seen or measured about the patient",
+      "@is_subtype_of": {
+        "@id": "RecordEntry"
+      },
+      "effective_date": {
+        "@has_value_type": {
+          "@id": "@DateTime"
+        }
+      },
+      "observable_concept": {
+        "@has_value_type": {
+          "@id": "@Expression"
+        }
+      }
+    },
+    {
+      "@id": "Provenance",
+      "@name": "Provenance",
+      "@description": "The original entry date and time and current owner of the items linked to this item",
+      "@is_subtype_of": "HealthRecordEntry",
+      "current_owner": {
+        "@has_value_type": {
+          "@id": "Organisation"
+        }
+      },
+      "date_time_of_entry": {
+        "@has_value_type": {
+          "@id": "@DateTime"
+        }
+      },
+      "entered_by_person": {
+        "@has_value_type": {
+          "@id": "HealthCareWorker"
+        }
+      },
+      "entered_by_device": {
+        "@has_value_type": {
+          "@id": "Device"
+        }
+      },
+      "transaction_history": {
+        "@has_value_type": {
+          "@id": "TransactionHistory"
+        }
+      }
+    },
+    {
+      "@id": "current_owner",
+      "@name": "current owner",
+      "@description": "current owning organisation for an entry which is linked to a data controller",
+      "@is_subtype_of": {
+        "@id": "@object_property"
+      },
+      "@has_value_type_of": {
+        "@id": "Organisation"
+      }
+    },
+    {
+      "@id": "date_time_of_entry",
+      "@name": "date and time of entry",
+      "@description": "date and time of the original entry into the source record, not the current record",
+      "@is_subtype_of": {
+        "@id": "@data_property"
+      },
+      "@has_value_type": {
+        "@id": "@DateTime"
+      }
+    },
+    {
+      "@id": "effective_date",
+      "@name": "effective date",
+      "@description": "the relevant start date and time of this entry",
+      "@is_subtype_of": {
+        "@id": "data_property"
+      },
+      "@has_value_type": {
+        "@id": "@DateTime"
+      }
+    },
+    {
+      "@id": "entered_by_person",
+      "@name": "entered by person",
+      "@description": "person who entered the data into the record",
+      "@is_subtype_of": {
+        "@id": "@object_property"
+      },
+      "@has_value_type": {
+        "@id": "HealthCareWorker"
+      }
+    },
+    {
+      "@id": "entered_by_device",
+      "@name": "entered by device",
+      "@description": "the device that created the entry",
+      "@is_subtype_of": {
+        "@id": "@object_property"
+      },
+      "@has_value_type": {
+        "@id": "Device"
+      }
+    },
+    {
+      "@id": "transaction",
+      "@name": "transaction",
+      "@description": "the update transaction associated with this entry",
+      "@is_subtype_of": "@object_property",
+      "@has_value_type": {
+        "@id": "Transaction"
+      }
+    },
+    {
+      "@id": "TransactionHistory",
+      "@name": "Transaction history",
+      "@description": "A historical entry for a transaction",
+      "@is_subtype_of": {"@id": "@Concept"},
+      "update_mode": {
+        "@has_value_type": {
+          "@id": "UpdateMode"
+        }
+      },
+      "replaced": {
+        "@has_value_type": {
+          "@id": "@uuid"
+        }
+      },
+      "owner": {
+        "@has_value_type": {
+          "@id": "Organisation"
+        }
+      },
+      "date_time": {
+        "@has_value_type": {
+          "@id": "@DateTime"
+        }
+      },
+      "person": {
+        "@has_value_type": {
+          "@id": "HealthCareWorker"
+        }
+      },
+      "device": {
+        "@has_value_type": {
+          "@id": "Device"
+        }
+      },
+      "system": {
+        "@has_value_type": {
+          "@id": "System"
+        }
+      },
+      "transaction_history": {
+        "@has_value_type": {
+          "@id": "TransactionHistory"
+        }
       }
     }
   ]

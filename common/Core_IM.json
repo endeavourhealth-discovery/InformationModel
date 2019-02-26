@@ -1,11 +1,39 @@
 {
   "@document": "http/DiscoveryDataService/InformationModel/dm/core/1.0.1",
   "Concepts": [
-
+    {
+      "@id": "@Concept",
+      "@name": "Concept",
+      "@description": "A concept of some kind",
+      "@status": {
+        "@has_value_type": {
+          "@id": "@ConceptStatus"
+        }
+      },
+      "@short": {
+        "@has_value_type": {
+          "@id": "@text"
+        }
+      },
+      "@code": {
+        "@has_value_type": {
+          "@id": "@text"
+        }
+      },
+      "@code_scheme": {
+        "@has_value_type": {
+          "@id": "@CodeScheme"
+        }
+      }
+    },
     {
       "@id": "@Expression",
       "@name": "Expression",
-      "@description": "Free form expression"
+      "@description": "Free form expression",
+      "@is_subtype_of": {
+        "@id": "@Concept"
+      },
+      "@any_property": null
     },
     {
       "@id": "@has_up_to_one",
@@ -25,8 +53,8 @@
     },
     {
       "@id": "@name",
-      "@name": "@name",
-      "@description": "the name of the concept preferably unambiguous",
+      "@name": "name",
+      "@description": "the name of the concept preferrably unambiguous",
       "@is_subtype_of": {
         "@id": "@data_property"
       },
@@ -36,7 +64,7 @@
     },
     {
       "@id": "@description",
-      "@name": "@description",
+      "@name": "description",
       "@description": "the description of the concept to make the meaning unambigous",
       "@is_subtype_of": {
         "@id": "@data_property"
@@ -50,10 +78,18 @@
       "@name": "code scheme",
       "@description": "The code scheme the concept came from",
       "@is_subtype_of": {
-        "@id": "@data_property"
+        "@id": "@object_property"
       },
       "@has_value_type": {
-        "@id": "@text"
+        "@id": "@CodeScheme"
+      }
+    },
+    {
+      "@id": "@CodeScheme",
+      "@name": "CodeScheme",
+      "@description": "a source code scheme may be a local scheme or national scheme",
+      "@is_subtype_of": {
+        "@id": "@Concept"
       }
     },
     {
@@ -100,7 +136,7 @@
     {
       "@id": "@has_descendant",
       "@name": "has descendants",
-      "@description": "@Concept has descendants recursively",
+      "@description": "Concept has descendants recursively",
       "@is_subtype_of": {
         "@id": "@relationship"
       }
@@ -118,7 +154,7 @@
     },
     {
       "@id": "@object_property",
-      "@name": "@Concept property",
+      "@name": "Concept property",
       "@description": "a property whose value or target is a concept",
       "@is_subtype_of": {
         "@id": "@Concept"
@@ -139,8 +175,8 @@
       }
     },
     {
-      "@id": "@text",
-      "@name": "text",
+      "@id": "@Text",
+      "@name": "Text",
       "@description": "a text value",
       "@is_subtype_of": {
         "@id": "@SimpleDataType"
@@ -161,6 +197,52 @@
       "@is_subtype_of": {
         "@id": "@Concept"
       }
+    },
+    {
+      "@id": "@View",
+      "@is_subtype_of": {"@id" :  "@Concept" },
+      "@name": "View",
+      "@description": "A configured view of the data model",
+      "node": {
+        "@has_value_type": {
+          "@id": "@TreeNode"
+        }
+      }
+    },
+    {
+      "@id": "@TreeNode",
+      "@name": "A node for a tree containing concept objects",
+      "node_name": {
+        "@has_value_type": "@text"
+      },
+      "object": {
+        "@has_value_type": "@Concept"
+      },
+      "child_node": {
+        "@has_value_type": "@TreeNode",
+        "@cardinality": "@has_up_to_many"
+      }
+    },
+    {
+      "@id": "any_property",
+      "@name": "any property",
+      "@description": "a reserved property to indicate any property value arrangement can follow from this point",
+      "@is_subtype_of": {
+        "@id": "@Concept"
+      }
+    },
+    {
+      "@id": "@DateTime",
+      "@name": "Date and time",
+      "@description": "approximate or exact date and optionally a time",
+      "@is_subtype_of": {
+        "@id": "@SimpleDataType"
+      }
+    },
+    {"@id":"@uuid",
+      "@name": "UUID",
+      "@description" :"Universal identifier",
+      "@is_subtype_of": {"@id": "@SimpleDataType"}
     }
   ]
 }
