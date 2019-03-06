@@ -4,7 +4,6 @@ import {Router} from '@angular/router';
 import {ConceptService} from './concept.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConceptCreateComponent} from './concept-create/concept-create.component';
-import {ConceptSummary} from 'im-common/dist/models/ConceptSummary';
 import {Concept} from '../models/Concept';
 import {StatusHelper} from '../models/Status';
 
@@ -18,7 +17,6 @@ export class ConceptLibraryComponent implements OnInit {
 
   listTitle = 'Most recently used';
   summaryList: Concept[];
-  codeSchemes: ConceptSummary[];
   searchTerm: string;
 
 
@@ -44,7 +42,6 @@ export class ConceptLibraryComponent implements OnInit {
   }
 
   getCodeSchemes() {
-    this.codeSchemes = null;
     // this.conceptService.getSubtypes(5300, true) // 5300 = Code scheme supertype
     //   .subscribe(
     //     (result) => this.codeSchemes = result,
