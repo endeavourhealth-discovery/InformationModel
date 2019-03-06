@@ -12,20 +12,25 @@ export class ConceptRawComponent implements AfterViewInit {
   public static open(modal: NgbModal, concept: any) {
     const modalRef = modal.open(ConceptRawComponent, { backdrop: 'static', size: 'lg'});
 
+    // Edit a copy
     let clone = Object.assign({}, concept);
+
+    // Remove @id and @document to prevent manual overwriting
+    modalRef.componentInstance.id = clone['@id'];
     modalRef.componentInstance.document = clone['@document'];
+    delete clone['@id'];
     delete clone['@document'];
 
     let json = JSON.stringify(clone, null, 4);
 
     modalRef.componentInstance.json = json;
 
-    console.log(modalRef.componentInstance.json);
     return modalRef;
   }
 
   @ViewChild('textarea') textarea: ElementRef;
   json: string;
+  id: string;
   document: string;
   documents: string[] = [];
 
@@ -57,7 +62,6 @@ export class ConceptRawComponent implements AfterViewInit {
       let concept = JSON.parse(this.json);
       let ids: string[] = [];
       this.getIds(ids, concept);
-      console.log('validating ids [' + ids.toString() + ']');
       this.validateIds(ids, validCallback, invalidCallback);
     } catch (e) {
       this.logger.error(e);
@@ -108,6 +112,9 @@ export class ConceptRawComponent implements AfterViewInit {
     this.validate(
       () => {
         let result = JSON.parse(this.json);
+
+        // Add @id and @document back in
+        result['@id'] = this.id;
         result['@document'] = this.document;
         this.activeModal.close(result);
       },

@@ -2,15 +2,8 @@ import {Injectable} from '@angular/core';
 import {AbstractMenuProvider} from 'eds-angular4';
 import {MenuOption} from 'eds-angular4/dist/layout/models/MenuOption';
 import {Routes} from '@angular/router';
-import {WorkflowManagerComponent} from './workflow-manager/workflow-manager.component';
 import {ConceptLibraryComponent} from './concept/concept-library.component';
-import {TermMappingsComponent} from './term-mappings/term-mappings.component';
-import {TermMappingsEditorComponent} from './term-mappings/term-mappings-editor/term-mappings-editor.component';
 import {ConceptEditorComponent} from './concept/concept-editor/concept-editor.component';
-import {ViewLibraryComponent} from './views/view-library.component';
-import {ViewEditorComponent} from './views/view-editor/view-editor.component';
-import {SchemaMappingsComponent} from './schema-mappings/schema-mappings.component';
-import {SchemaMappingsEditorComponent} from './schema-mappings/schema-mappings-editor/schema-mappings-editor.component';
 
 export class DummyComponent {}
 
@@ -21,15 +14,6 @@ export class AppMenuService implements  AbstractMenuProvider {
       { path: '', redirectTo : 'conceptLibrary', pathMatch: 'full' },  // Default route
       { path: 'conceptLibrary', component: ConceptLibraryComponent },
       { path: 'concept/:id', component: ConceptEditorComponent },
-      { path: 'concept/:id/:context', component: ConceptEditorComponent },
-      { path: 'viewLibrary', component: ViewLibraryComponent },
-      { path: 'view/:id', component: ViewEditorComponent },
-      // { path: 'view/:id/:name', component: ViewEditorComponent },
-      { path: 'workflowManager', component: WorkflowManagerComponent },
-      { path: 'termMappings', component: TermMappingsComponent },
-      { path: 'termMappings/:id', component: TermMappingsEditorComponent },
-      { path: 'schemaMappings', component: SchemaMappingsComponent },
-      { path: 'schemaMappings/:id', component: SchemaMappingsEditorComponent },
       { path: 'eds-user-manager', component: DummyComponent },
 
     ];
@@ -46,10 +30,6 @@ export class AppMenuService implements  AbstractMenuProvider {
   getMenuOptions(): MenuOption[] {
     return [
       {caption: 'Concept library', state: 'conceptLibrary', icon: 'fa fa-lightbulb-o', role: 'eds-info-manager:conceptLibrary'},
-      {caption: 'Views library', state: 'viewLibrary', icon: 'fa fa-eye', role: 'eds-info-manager:viewLibrary'},
-      {caption: 'Workflow manager', state: 'workflowManager', icon: 'fa fa-code-fork', role: 'eds-info-manager:workflow'},
-      {caption: 'Term mappings', state: 'termMappings', icon: 'fa fa-code', role: 'eds-info-manager:termMappings'},
-      {caption: 'Schema mappings', state: 'schemaMappings', icon: 'fa fa-database', role: 'eds-info-manager:schemaMappings'}
     ];
   }
 

@@ -33,15 +33,21 @@
                         <thead>
                           <tr class="d-flex">
                             <th class="col-2">Id</th>
-                            <th class="col-2">Name</th>
-                            <th class="col-8">Description</th>
+                            <th class="col-5">Name</th>
+                            <th class="col-1">Scheme</th>
+                            <th class="col-1">Code</th>
+                            <th class="col-1">Status</th>
+                            <th class="col-2">Updated</th>
                           </tr>
                         </thead>
                         <tbody>
-                          <tr class="d-flex" *ngFor="let item of summaryList" (click)="editConcept(item)" [class.text-warning]="item.status == 2">
+                          <tr class="d-flex" *ngFor="let item of summaryList" (click)="editConcept(item)" [class.text-warning]="item.status == 3">
                             <td class="col-2">{{item.id}}</td>
-                            <td class="col-2">{{item.name}}</td>
-                            <td class="col-8">{{item.description}}</td>
+                            <td class="col-5">{{item.name}}</td>
+                            <td class="col-1">{{item.scheme}}</td>
+                            <td class="col-1">{{item.code}}</td>
+                            <td class="col-1">{{getStatusName(item.status)}}</td>
+                            <td class="col-2">{{item.updated | date:'dd-MMM-yyyy hh:mm:ss'}}</td>
                           </tr>
                         </tbody>
                       </table>

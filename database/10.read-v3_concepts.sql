@@ -1,26 +1,52 @@
-/*
-SELECT c.code, ifnull(t.term_62, t.term_31) as term, ifnull(y.term_62, y.term_31) as caegory
-FROM read_v3_concept c
-JOIN read_v3_desc d ON d.code = c.code AND d.type = 'P'
-JOIN read_v3_terms t ON t.termId = d.termId AND t.status = 'C'
-JOIN read_v3_desc yd ON yd.code = c.categoryId AND yd.type = 'P'
-JOIN read_v3_terms y ON y.termId = yd.termId AND y.status = 'C'
-WHERE c.status = 'C';
- */
+-- Reset auto-increment
 
-INSERT INTO concept
-(superclass, short_name, full_name, description, context, status, version, last_update, code_scheme, code)
+SELECT @max := MAX(dbid)+ 1 FROM concept;
+SET @qry = concat('ALTER TABLE concept AUTO_INCREMENT = ', @max);
+PREPARE stmt FROM @qry;
+EXECUTE stmt;
+
+DEALLOCATE PREPARE stmt;
+
+INSERT INTO document
+(data)
+VALUES
+(JSON_OBJECT('@document', 'http/DiscoveryDataService/InformationModel/dm/CTV3/1.0.1'));
+
+CREATE TABLE read_v3_current
 SELECT
-    2, term_31, ifnull(term_62, term_31), term, concat('CTV3.',c.code), 1, 1.0, now(), 5303, c.code
+    c.code, ifnull(term_62, term_31) as name, term as description
 FROM read_v3_concept c
          JOIN read_v3_desc d ON d.code = c.code AND d.type = 'P'
          JOIN read_v3_terms t ON t.termId = d.termId AND t.status = 'C'
 WHERE c.status = 'C';
 
+INSERT INTO concept (data)
+SELECT JSON_OBJECT(
+           '@document', 'http/DiscoveryDataService/InformationModel/dm/CTV3/1.0.1',
+           '@id', concat('R3-',code),
+           '@name', if(length(name) > 60, concat(left(name, 57), '...'), name),
+           '@description', ifnull(description, name),
+           '@code_scheme', 'CTV3',
+           '@code', code,
+           '@is_subtype_of', JSON_OBJECT(
+               '@id','@codeable_concept'
+               )
+           )
+FROM read_v3_current;
 
-INSERT INTO concept_attribute
-(concept, attribute, value_concept, status)
-SELECT c.id AS concept, 100 AS attribute, p.id AS value_concept, 1 AS status
-FROM read_v3_hier r
-         JOIN concept c ON c.code = r.code AND c.code_scheme = 5303
-         JOIN concept p ON p.code = r.parent AND p.code_scheme = 5303;
+UPDATE concept c
+    INNER JOIN (
+        SELECT id, JSON_OBJECTAGG(prop, val) as rel
+        FROM
+            (SELECT concat('R3-', rel.code) as id, '@has_parent' as prop,
+                    JSON_ARRAYAGG(
+                        JSON_OBJECT(
+                            '@id', concat('R3-', rel.parent)
+                            )
+                        ) as val
+             FROM read_v3_hier rel
+             GROUP BY rel.code) t1
+        GROUP BY id) t2
+    ON t2.id = c.id
+SET data=JSON_MERGE(c.data, t2.rel);
+

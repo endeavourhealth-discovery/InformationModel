@@ -8,10 +8,10 @@ import static java.sql.Types.*;
 
 public class DALHelper {
 
-    public static Long getGeneratedKey(PreparedStatement stmt) {
+    public static int getGeneratedKey(PreparedStatement stmt) {
         try (ResultSet rs = stmt.getGeneratedKeys()) {
             rs.next();
-            return rs.getLong(1);
+            return rs.getInt(1);
         } catch (SQLException e) {
             throw new DALException("Error fetching generated key", e);
         }

@@ -2,8 +2,12 @@ package org.endeavourhealth.im;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringUtils;
 import org.endeavourhealth.common.cache.ObjectMapperPool;
+import org.endeavourhealth.im.dal.InformationModelDAL;
+import org.endeavourhealth.im.dal.InformationModelJDBCDAL;
+import org.endeavourhealth.im.models.Status;
 import org.junit.Test;
 
 import java.io.*;
@@ -30,12 +34,12 @@ public class DocumentImport {
     @Test
     public void importCore() throws Exception {
         try (DataOutputStream w = new DataOutputStream(new FileOutputStream("IM-dat.bin"))) {
-            importFile("Core_IM.json", "http/DiscoveryDataService/InformationModel/dm/core/1.0.1", 24, w);
+            importFile("Core_IM.json", "http/DiscoveryDataService/InformationModel/dm/core/1.0.1", 23, w);
             importFile("Working example-3.json", "http/DiscoveryDataService/InformationModel/dm/HealthData/1.0.1", 33, w);
             importFile("Expression.json", "http/DiscoveryDataService/InformationModel/dm/Snomed/1.0.1", 1, w);
             w.flush();
         }
-
+/*
         System.out.println("Compressed size " + compressionBytes);
 
         try (FileWriter writer = new FileWriter("IM-ids.bin")) {
@@ -77,8 +81,9 @@ public class DocumentImport {
                 System.out.println(ids.get(id));
                 readFields(dis, 1);
             }
-        }
+        }*/
     }
+/*
 
     private void readFields(DataInputStream dis, int indent) throws IOException {
         byte fields = dis.readByte();
@@ -133,6 +138,7 @@ public class DocumentImport {
         System.out.print(StringUtils.repeat("\t", indent));
         System.out.println("}");
     }
+*/
 
     private void importFile(String filename, String iri, int expectedItems, DataOutputStream w) throws Exception {
         byte[] encoded = Files.readAllBytes(Paths.get(filename));
@@ -146,96 +152,96 @@ public class DocumentImport {
         assertEquals(expectedItems, concepts.size());
 
         // Save document
-//        InformationModelDAL db = new InformationModelJDBCDAL();
-//        db.saveDocument(JSON);
+        InformationModelDAL db = new InformationModelJDBCDAL();
+        db.insertDocument(JSON);
 
         // Save concepts
-//        for(JsonNode concept: concepts) {
-//            ((ObjectNode) concept).put("@document", document);
-//            db.saveConcept(concept.toString());
-//        }
+        for(JsonNode concept: concepts) {
+            ((ObjectNode) concept).put("@document", document);
+            db.insertConcept(concept.toString(), Status.ACTIVE);
+        }
 
         // Export concepts to data file
 
-        for (JsonNode concept : concepts) {
-            w.writeInt(idIndex(concept.get("@id").textValue()));    // Int id
-            writeProperties(w, concept, new String[] {"@id", "@description"});
-        }
+//        for (JsonNode concept : concepts) {
+//            w.writeInt(idIndex(concept.get("@id").textValue()));    // Int id
+//            writeProperties(w, concept, new String[] {"@id", "@description"});
+//        }
     }
-
-    private void writeProperties(DataOutputStream w, JsonNode node, String[] ignore) throws IOException {
-        List<String> skip = Arrays.asList(ignore);
-
-        List<Map.Entry<String, JsonNode>> fields = new ArrayList<>();
-        node.fields().forEachRemaining((f) -> { if (!skip.contains(f.getKey())) fields.add(f);});
-
-        w.writeByte(fields.size());
-
-        for(Map.Entry<String, JsonNode> field: fields) {
-            w.writeInt(idIndex(field.getKey()));
-            writeProperty(w, field.getValue());
-        }
-
-    }
-
-    private void writeProperty(DataOutputStream w, JsonNode node) throws IOException {
-        if (node.isNull()) {
-            w.writeByte(NULL);
-        } else if (node.isIntegralNumber()) {
-            w.writeByte(NUMERIC);
-            w.writeInt(node.asInt());
-        } else if (node.isFloatingPointNumber()) {
-            w.writeByte(FLOAT);
-            w.writeDouble(node.asDouble());
-        } else if (node.isTextual()) {
-            w.writeByte(TEXT);
-            writeSentence(w, node.textValue());
-        } else if (node.has("@id")) {
-            w.writeByte(REFERENCE);
-            w.writeInt(idIndex(node.get("@id").textValue()));
-        } else if (node.isArray()) {
-            w.writeByte(ARRAY);
-            writeArray(w, (ArrayNode)node);
-        } else {
-            w.writeByte(SUBTYPE);
-            writeProperties(w, node, new String[0]);
-        }
-    }
-
-    private void writeArray(DataOutputStream w, ArrayNode nodes) throws IOException {
-        w.writeByte(nodes.size());
-        for(JsonNode n : nodes) {
-            writeProperty(w, n);
-        }
-    }
-
-    private void writeSentence(DataOutputStream w, String sentence) throws IOException {
-        String[] words = sentence.split(" ");
-        w.writeByte(words.length);
-
-        for(String word: words) {
-            w.writeInt(wordIndex(word));
-        }
-    }
-
-    private int idIndex(String id) {
-        id = id.trim().toLowerCase().replace("@","").replace("_", "");
-        int idx = ids.indexOf(id);
-        if (idx < 0) {
-            idx = ids.size();
-            ids.add(id);
-        }
-
-        return idx;
-    }
-
-    private int wordIndex(String word) {
-        int idx = dictionary.indexOf(word.trim());
-        if (idx < 0) {
-            idx = dictionary.size();
-            dictionary.add(word.trim());
-        }
-
-        return idx;
-    }
+//
+//    private void writeProperties(DataOutputStream w, JsonNode node, String[] ignore) throws IOException {
+//        List<String> skip = Arrays.asList(ignore);
+//
+//        List<Map.Entry<String, JsonNode>> fields = new ArrayList<>();
+//        node.fields().forEachRemaining((f) -> { if (!skip.contains(f.getKey())) fields.add(f);});
+//
+//        w.writeByte(fields.size());
+//
+//        for(Map.Entry<String, JsonNode> field: fields) {
+//            w.writeInt(idIndex(field.getKey()));
+//            writeProperty(w, field.getValue());
+//        }
+//
+//    }
+//
+//    private void writeProperty(DataOutputStream w, JsonNode node) throws IOException {
+//        if (node.isNull()) {
+//            w.writeByte(NULL);
+//        } else if (node.isIntegralNumber()) {
+//            w.writeByte(NUMERIC);
+//            w.writeInt(node.asInt());
+//        } else if (node.isFloatingPointNumber()) {
+//            w.writeByte(FLOAT);
+//            w.writeDouble(node.asDouble());
+//        } else if (node.isTextual()) {
+//            w.writeByte(TEXT);
+//            writeSentence(w, node.textValue());
+//        } else if (node.has("@id")) {
+//            w.writeByte(REFERENCE);
+//            w.writeInt(idIndex(node.get("@id").textValue()));
+//        } else if (node.isArray()) {
+//            w.writeByte(ARRAY);
+//            writeArray(w, (ArrayNode)node);
+//        } else {
+//            w.writeByte(SUBTYPE);
+//            writeProperties(w, node, new String[0]);
+//        }
+//    }
+//
+//    private void writeArray(DataOutputStream w, ArrayNode nodes) throws IOException {
+//        w.writeByte(nodes.size());
+//        for(JsonNode n : nodes) {
+//            writeProperty(w, n);
+//        }
+//    }
+//
+//    private void writeSentence(DataOutputStream w, String sentence) throws IOException {
+//        String[] words = sentence.split(" ");
+//        w.writeByte(words.length);
+//
+//        for(String word: words) {
+//            w.writeInt(wordIndex(word));
+//        }
+//    }
+//
+//    private int idIndex(String id) {
+//        id = id.trim().toLowerCase().replace("@","").replace("_", "");
+//        int idx = ids.indexOf(id);
+//        if (idx < 0) {
+//            idx = ids.size();
+//            ids.add(id);
+//        }
+//
+//        return idx;
+//    }
+//
+//    private int wordIndex(String word) {
+//        int idx = dictionary.indexOf(word.trim());
+//        if (idx < 0) {
+//            idx = dictionary.size();
+//            dictionary.add(word.trim());
+//        }
+//
+//        return idx;
+//    }
 }

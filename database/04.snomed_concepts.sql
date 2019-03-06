@@ -1,7 +1,14 @@
+-- Reset auto-increment
+
+SELECT @max := MAX(dbid)+ 1 FROM concept;
+SET @qry = concat('ALTER TABLE concept AUTO_INCREMENT = ', @max);
+PREPARE stmt FROM @qry;
+EXECUTE stmt;
+
+DEALLOCATE PREPARE stmt;
+
 -- Create concepts
 SET GLOBAL innodb_buffer_pool_size=512 * 1024 * 1024;
-
-SELECT @@innodb_buffer_pool_size/1024/1024;
 
 CREATE TABLE snomed_refset_clinical_active_preferred_component
 SELECT referencedComponentId
@@ -22,16 +29,33 @@ WHERE d.active = 1
 
 ALTER TABLE snomed_description_active_fully_specified ADD UNIQUE INDEX snomed_description_active_fully_specified_pk (id);
 
-INSERT INTO concept
-(superclass, short_name, full_name, context, status, version, last_update, code_scheme, code)
-SELECT 2, '', f.term, concat('SNOMED.',f.conceptId), 1 as status, 1.0, now(), 5301, f.conceptId
+INSERT INTO concept (data)
+SELECT JSON_OBJECT(
+           '@document', 'http/DiscoveryDataService/InformationModel/dm/Snomed/1.0.1',
+           '@id', concat('SN-',f.conceptId),
+           '@name', IF(LENGTH(f.term) > 60, CONCAT(LEFT(f.term, 57), '...'), f.term),
+           '@description', f.term,
+           '@code_scheme', 'SNOMED',
+           '@code', f.conceptId,
+           '@is_subtype_of', JSON_OBJECT(
+               '@id','@codeable_concept'
+               )
+           )
 FROM snomed_refset_clinical_active_preferred_component r
          JOIN snomed_description_active_fully_specified f ON f.id = r.referencedComponentId;
 
--- Create relationships
-INSERT INTO concept_attribute
-(concept, attribute, value_concept, status)
-SELECT s.id, 100, t.id, r.active
-FROM snomed_relationship r
-JOIN concept s ON s.code = r.sourceId AND s.code_scheme = 5301
-JOIN concept t ON t.code = r.destinationId AND t.code_scheme = 5301;
+UPDATE concept c
+    INNER JOIN (
+        SELECT id, JSON_OBJECTAGG(prop, val) as rel
+        FROM
+            (SELECT concat('SN-', sourceId) as id, concat('SN-', rel.typeId) as prop,
+                    JSON_ARRAYAGG(
+                        JSON_OBJECT(
+                            '@id', concat('SN-', rel.destinationId)
+                            )
+                        ) as val
+             FROM snomed_relationship rel
+             GROUP BY rel.sourceId, rel.typeId) t1
+        GROUP BY id) t2
+    ON t2.id = c.id
+SET data=JSON_MERGE(c.data, t2.rel);

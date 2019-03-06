@@ -1,20 +1,50 @@
--- CONCEPTS
+-- Reset auto-increment
 
-INSERT INTO concept
-(superclass, full_name, context, status, version, last_update, code_scheme, code)
-SELECT
-    2, term, concat('READV2.',code), 1, 1.0, now(), 5302, code
+SELECT @max := MAX(dbid)+ 1 FROM concept;
+SET @qry = concat('ALTER TABLE concept AUTO_INCREMENT = ', @max);
+PREPARE stmt FROM @qry;
+EXECUTE stmt;
+
+DEALLOCATE PREPARE stmt;
+
+INSERT INTO document
+(data)
+VALUES
+(JSON_OBJECT('@document', 'http/DiscoveryDataService/InformationModel/dm/READ2/1.0.1'));
+
+-- CONCEPTS
+INSERT INTO concept (data)
+SELECT JSON_OBJECT(
+           '@document', 'http/DiscoveryDataService/InformationModel/dm/READ2/1.0.1',
+           '@id', concat('R2-',code),
+           '@name', if(length(term) > 60, concat(left(term, 57), '...'), term),
+           '@description', term,
+           '@code_scheme', 'READ2',
+           '@code', code,
+           '@is_subtype_of', JSON_OBJECT(
+               '@id','@codeable_concept'
+               )
+           )
 FROM read_v2;
 
 -- ATTRIBUTES
 
 CREATE TABLE read_v2_hierarchy
 SELECT r.code AS code, @code:=REPLACE(r.code,'.','') AS code_trimmed, @parent:=RPAD(SUBSTRING(@code, 1, LENGTH(@code)-1), 5, '.') AS parent
-from read_v2 r;
+FROM read_v2 r;
 
-INSERT INTO concept_attribute
-(concept, attribute, value_concept, status)
-SELECT c.id AS concept, 100 AS attribute, p.id AS value_concept, 1 AS status
-FROM read_v2_hierarchy r
-         JOIN concept c ON c.code = r.code AND c.code_scheme = 5302
-         JOIN concept p ON p.code = r.parent AND p.code_scheme = 5302;
+UPDATE concept c
+    INNER JOIN (
+        SELECT id, JSON_OBJECTAGG(prop, val) as rel
+        FROM
+            (SELECT concat('R2-', rel.code) as id, '@has_parent' as prop,
+                    JSON_ARRAYAGG(
+                        JSON_OBJECT(
+                            '@id', concat('R2-', rel.parent)
+                            )
+                        ) as val
+             FROM read_v2_hierarchy rel
+             GROUP BY rel.code) t1
+        GROUP BY id) t2
+    ON t2.id = c.id
+SET data=JSON_MERGE(c.data, t2.rel);

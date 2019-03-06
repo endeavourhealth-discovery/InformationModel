@@ -2,31 +2,6 @@
   "@document": "http/DiscoveryDataService/InformationModel/dm/core/1.0.1",
   "Concepts": [
     {
-      "@id": "@Concept",
-      "@name": "Concept",
-      "@description": "A concept of some kind",
-      "@status": {
-        "@has_value_type": {
-          "@id": "@ConceptStatus"
-        }
-      },
-      "@short": {
-        "@has_value_type": {
-          "@id": "@text"
-        }
-      },
-      "@code": {
-        "@has_value_type": {
-          "@id": "@text"
-        }
-      },
-      "@code_scheme": {
-        "@has_value_type": {
-          "@id": "@CodeScheme"
-        }
-      }
-    },
-    {
       "@id": "@Expression",
       "@name": "Expression",
       "@description": "Free form expression",
@@ -54,7 +29,7 @@
     {
       "@id": "@name",
       "@name": "name",
-      "@description": "the name of the concept preferrably unambiguous",
+      "@description": "the name of the concept preferably unambiguous",
       "@is_subtype_of": {
         "@id": "@data_property"
       },

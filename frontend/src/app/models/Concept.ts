@@ -1,7 +1,11 @@
+import {Status} from './Status';
+
 export class Concept {
-  token: string;
+  dbid: number;
+  id: string;
   name: string;
-  description: string;
   scheme: string;
   code: string;
+  status: Status;
+  updated: Date;
 }

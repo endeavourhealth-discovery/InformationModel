@@ -3,11 +3,10 @@ import {LoggerService} from 'eds-angular4';
 import {Router} from '@angular/router';
 import {ConceptService} from './concept.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {SearchResult} from 'im-common/dist/models/SearchResult';
 import {ConceptCreateComponent} from './concept-create/concept-create.component';
-import {ConceptStatusHelper} from 'im-common/dist/models/ConceptStatus';
-import {Concept} from 'im-common/dist/models/Concept';
 import {ConceptSummary} from 'im-common/dist/models/ConceptSummary';
+import {Concept} from '../models/Concept';
+import {StatusHelper} from '../models/Status';
 
 @Component({
   selector: 'app-concept-library',
@@ -15,14 +14,14 @@ import {ConceptSummary} from 'im-common/dist/models/ConceptSummary';
   styleUrls: ['./concept-library.component.css']
 })
 export class ConceptLibraryComponent implements OnInit {
-  getStatusName = ConceptStatusHelper.getName;
+  getStatusName = StatusHelper.getName;
 
   listTitle = 'Most recently used';
   summaryList: Concept[];
   codeSchemes: ConceptSummary[];
-  schemeFilter: number[];
   searchTerm: string;
-  includeDeprecated = false;
+
+
 
   constructor(private router: Router,
               private modal: NgbModal,
@@ -37,7 +36,7 @@ export class ConceptLibraryComponent implements OnInit {
 
   getMRU() {
     this.summaryList = null;
-    this.conceptService.getMRU(this.includeDeprecated)
+    this.conceptService.getMRU()
       .subscribe(
         (result) => this.summaryList = result,
         (error) => this.log.error(error)
@@ -56,7 +55,7 @@ export class ConceptLibraryComponent implements OnInit {
   search() {
     this.listTitle = 'Search results for "' + this.searchTerm + '"';
     this.summaryList = null;
-    this.conceptService.search(this.searchTerm, this.includeDeprecated, this.schemeFilter)
+    this.conceptService.search(this.searchTerm)
       .subscribe(
         (result) => this.summaryList = result,
         (error) => this.log.error(error)
@@ -92,7 +91,7 @@ export class ConceptLibraryComponent implements OnInit {
   gotoPage(page) {
     this.listTitle = 'Search results for "' + this.searchTerm + '"';
     this.summaryList = null;
-    this.conceptService.search(this.searchTerm, this.includeDeprecated, this.schemeFilter, page)
+    this.conceptService.search(this.searchTerm)
       .subscribe(
         (result) => this.summaryList = result,
         (error) => this.log.error(error)

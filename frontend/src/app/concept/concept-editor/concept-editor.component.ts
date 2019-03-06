@@ -6,11 +6,10 @@ import {ConceptService} from '../concept.service';
 import {Location} from '@angular/common';
 import {NodeGraphComponent} from 'eds-angular4/dist/node-graph/node-graph.component';
 import {NodeGraphDialogComponent} from '../node-graph-dialog/node-graph-dialog.component';
-import {Attribute} from '../../models/Attribute';
 import {GraphNode} from 'eds-angular4/dist/node-graph/GraphNode';
 import {ConceptSelectorComponent} from 'im-common/dist/concept-selector/concept-selector/concept-selector.component';
-import {Concept} from 'im-common/dist/models/Concept';
 import {ConceptRawComponent} from '../concept-raw/concept-raw.component';
+import {Concept} from '../../models/Concept';
 
 @Component({
   selector: 'app-concept-editor',
@@ -20,11 +19,13 @@ import {ConceptRawComponent} from '../concept-raw/concept-raw.component';
   ]
 })
 export class ConceptEditorComponent implements AfterViewInit {
-  concept: Concept;
+  concept: Concept = null;
   documents: string[] = [];
   nature: string;
   superclass: string;
   nameCache: any = {};
+  generatingRuntime: boolean = false;
+  loadingRuntime: boolean = false;
 
   @ViewChild('nodeGraph') graph: NodeGraphComponent;
 
@@ -47,7 +48,8 @@ export class ConceptEditorComponent implements AfterViewInit {
   }
 
   loadConcept(id: any) {
-    console.log(id);
+    this.concept = null;
+    this.nameCache = [];
     this.conceptService.getConcept(id)
       .subscribe(
         (result) => {
@@ -90,7 +92,7 @@ export class ConceptEditorComponent implements AfterViewInit {
     //   );
   }
 
-  updateDiagram(conceptId: number, attributes: Attribute[]) {
+  updateDiagram(conceptId: number) {
     // for (const item of related) {
     //   if (item.source.id === conceptId) {
     //     this.graph.addNodeData(item.target.id, item.target.name, 2, item);
@@ -101,10 +103,10 @@ export class ConceptEditorComponent implements AfterViewInit {
     //   }
     // }
 
-    for (const item of attributes) {
-      this.graph.addNodeData(item.attribute.id, item.attribute.name, 3, item);
-      this.graph.addEdgeData(conceptId, item.attribute.id, 'has', item);
-    }
+    // for (const item of attributes) {
+    //   this.graph.addNodeData(item.attribute.id, item.attribute.name, 3, item);
+    //   this.graph.addEdgeData(conceptId, item.attribute.id, 'has', item);
+    // }
 
     // Ensure graph isnt too big!
     if (this.graph.nodeData.length < 50) {
@@ -154,7 +156,7 @@ export class ConceptEditorComponent implements AfterViewInit {
     delete this.concept['@is_instance_of'];
     this.concept[this.nature] = { '@id' : this.superclass };
 
-     this.conceptService.save(this.concept)
+     this.conceptService.updateConcept(this.concept, 2)
        .subscribe(
          () => {
            this.logger.success('Concept saved', this.concept, 'Saved');
@@ -166,7 +168,7 @@ export class ConceptEditorComponent implements AfterViewInit {
   }
 
   promptDeleteConcept() {
-    MessageBoxDialog.open(this.modal, 'Delete concept', 'Delete the <b><i>' + this.concept.context + '</i></b> concept?', 'Delete', 'Cancel')
+    MessageBoxDialog.open(this.modal, 'Delete concept', 'Delete the <b><i>' + this.concept.id + '</i></b> concept?', 'Delete', 'Cancel')
       .result.then(
       (result) => this.deleteConcept()
     );
@@ -199,32 +201,28 @@ export class ConceptEditorComponent implements AfterViewInit {
     return Object.keys(this.concept).filter(k => ignore.indexOf(k) == -1);
   }
 
-  getValue(prop) {
-    return this.nodeValue(this.concept[prop]);
-  }
-
-  nodeValue(v) {
+  getValues(v): string[] {
     if (v instanceof Array) {
       let elem: string[] = [];
 
       for (let i of v) {
-        elem.push(Object.keys(i)[0]);
+        elem = elem.concat(this.getValues(i));
       }
 
-      return '[' + elem.join(", ") + ']';
+      return elem;
     }
 
     if (v instanceof Object) {
       if (v['@id'] != null)
-        return v['@id'];
+        return [v['@id']];
 
       if (v['@has_value_type'] != null)
-        return 'Value type: ' + this.nodeValue(v['@has_value_type']);
+        return this.getValues(v['@has_value_type']);
 
-      return JSON.stringify(v);
+      return [JSON.stringify(v)];
     }
 
-    return v;
+    return [v];
   }
 
   getName(id: string)  {
@@ -252,4 +250,39 @@ export class ConceptEditorComponent implements AfterViewInit {
     )
   }
 
+  generateRuntime() {
+    if (this.generatingRuntime)
+      return;
+
+    this.generatingRuntime = true;
+    this.conceptService.generateRuntime()
+      .subscribe(
+        (success) => {
+          this.generatingRuntime = false;
+          this.logger.success("Runtime file generated")
+        },
+        (error) => {
+          this.generatingRuntime = false;
+          this.logger.error(error);
+        }
+      );
+  }
+
+  loadRuntime() {
+    if (this.loadingRuntime)
+      return;
+
+    this.loadingRuntime = true;
+    this.conceptService.loadRuntime()
+      .subscribe(
+        (success) => {
+          this.loadingRuntime = false;
+          this.logger.success("Runtime file loaded")
+        },
+        (error) => {
+          this.loadingRuntime = false;
+          this.logger.error(error);
+        }
+      );
+  }
 }

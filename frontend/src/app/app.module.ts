@@ -13,11 +13,7 @@ import {ToastModule} from 'ng2-toastr/ng2-toastr';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {ConceptModule} from './concept/concept.module';
 import {ModuleStateService} from 'eds-angular4/dist/common';
-import {WorkflowManagerModule} from './workflow-manager/workflow-manager.module';
-import {TermMappingsModule} from './term-mappings/term-mappings.module';
-import {ViewsModule} from './views/views.module';
 import {GuidedHelpModule} from './guided-help/guided-help.module';
-import {SchemaMappingsModule} from './schema-mappings/schema-mappings.module';
 
 @NgModule({
   imports: [
@@ -31,10 +27,6 @@ import {SchemaMappingsModule} from './schema-mappings/schema-mappings.module';
     GuidedHelpModule,
 
     ConceptModule,
-    ViewsModule,
-    WorkflowManagerModule,
-    TermMappingsModule,
-    SchemaMappingsModule,
 
     RouterModule.forRoot(AppMenuService.getRoutes(), {useHash: true}),
     NgbModule.forRoot(),
