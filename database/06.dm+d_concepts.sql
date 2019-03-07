@@ -200,6 +200,24 @@ SET data=JSON_MERGE(c.data, t2.rel);
 
 
 -- ********************* VIRTUAL PRODUCT INGREDIENT *********************
+EXECUTE stmt;
+
+-- Create concepts
+INSERT INTO concept (data)
+SELECT JSON_OBJECT(
+           '@document', 'http/DiscoveryDataService/InformationModel/dm/DMD/1.0.1',
+           '@id', concat('DMD-',v.isid),
+           '@name', if(length(v.nm) > 60, concat(left(v.nm, 57), '...'), v.nm),
+           '@description', v.nm,
+           '@code_scheme', 'DM+D',
+           '@code', v.isid,
+           '@is_subtype_of', JSON_OBJECT(
+               '@id','@ingredient'
+               )
+           )
+FROM dmd_ingredient v
+WHERE v.invalid IS NULL;
+
 UPDATE concept c
     INNER JOIN (
         SELECT id, JSON_OBJECTAGG(prop, val) as rel

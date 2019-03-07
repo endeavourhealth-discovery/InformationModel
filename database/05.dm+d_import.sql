@@ -16,8 +16,9 @@ LOAD DATA LOCAL INFILE 'C:\\dmddataloader\\csv\\f_vtm.csv'
     INTO TABLE dmd_vtm
 FIELDS TERMINATED BY '|'
 LINES TERMINATED BY '\r\n'
-(vtmid, @invalid, nm, abbrevnm, @vtmidprev, @vtmiddt)
+(vtmid, @invalid, nm, @abbrevnm, @vtmidprev, @vtmiddt)
 SET invalid = nullif(@invalid, ''),
+    abbrevnm = nullif(@abbrevnm, ''),
     vtmidprev = nullif(@vtmidprev, ''),
     vtmiddt = STR_TO_DATE(nullif(@vtmiddt, ''), '%Y-%m-%d');
 
