@@ -15,7 +15,7 @@
 
     <swagger.version>1.5.15</swagger.version>
 
-    <jackson.version>2.5.4</jackson.version>
+    <jackson.version>2.9.8</jackson.version>
 
     <sonar.projectKey>endeavourhealth-discovery_InformationModel::models</sonar.projectKey>
 
