@@ -15,8 +15,8 @@
     <maven-surefire-plugin.version>2.12.4</maven-surefire-plugin.version>
     <maven-jacoco-plugin.version>0.7.5.201505241946</maven-jacoco-plugin.version>
 
-    <eds-cache.version>1.2-SNAPSHOT</eds-cache.version>
-    <eds-config-manager.version>1.23-SNAPSHOT</eds-config-manager.version>
+    <eds-cache.version>1.4-SNAPSHOT</eds-cache.version>
+    <eds-config-manager.version>1.25-SNAPSHOT</eds-config-manager.version>
 
     <sonar.projectKey>endeavourhealth-discovery_InformationModel::common</sonar.projectKey>
   </properties>

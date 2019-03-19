@@ -13,8 +13,8 @@
     <maven-compiler-plugin.version>3.1</maven-compiler-plugin.version>
     <maven-deploy-plugin.version>2.4</maven-deploy-plugin.version>
 
-    <swagger.version>1.5.15</swagger.version>
-
+    <eds-cache.version>1.4-SNAPSHOT</eds-cache.version>
+    <swagger.version>1.5.22</swagger.version>
     <jackson.version>2.9.8</jackson.version>
 
     <sonar.projectKey>endeavourhealth-discovery_InformationModel::models</sonar.projectKey>
@@ -25,7 +25,7 @@
     <dependency>
       <groupId>org.endeavourhealth.common</groupId>
       <artifactId>cache</artifactId>
-      <version>1.2-SNAPSHOT</version>
+      <version>${eds-cache.version}</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
