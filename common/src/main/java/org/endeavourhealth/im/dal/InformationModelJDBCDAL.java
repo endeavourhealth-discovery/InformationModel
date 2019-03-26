@@ -88,24 +88,37 @@ public class InformationModelJDBCDAL implements InformationModelDAL {
     }
 
     @Override
-    public List<Concept> search(String text) throws Exception {
+    public List<Concept> search(String text, String relationship, String target) throws Exception {
         List<Concept> result = new ArrayList<>();
 
-        String sql = "SELECT dbid, id, name, scheme, code, status, updated FROM concept\n";
+        Integer relId = (relationship == null) ? null : getConceptDbid(relationship);
+        Integer tgtId = (target == null) ? null : getConceptDbid(target);
+        boolean relFilter = (relId != null) && (tgtId != null);
 
-        if (text != null && !text.isEmpty())
-            sql += " WHERE id LIKE ?\n" +
-                "OR name LIKE ?\n" +
-                "ORDER BY LENGTH(name)";
 
-        sql += "LIMIT 20";
+        String sql = "SELECT c.dbid, c.id, c.name, c.scheme, c.code, c.status, c.updated " +
+            "FROM concept c\n";
+
+        if (relFilter)
+            sql += "JOIN concept_tct t ON t.source = c.dbid\n";
+
+        sql += "WHERE MATCH (id, name) AGAINST (? IN NATURAL LANGUAGE MODE)\n";
+
+        if (relFilter)
+            sql += "AND t.relationship = ? AND t.target = ?\n";
+
+        sql += "ORDER BY LENGTH(name)\n" +
+            "LIMIT 20";
 
         Connection conn = ConnectionPool.getInstance().pop();
         try (PreparedStatement statement = conn.prepareStatement(sql)) {
-            if (text != null && !text.isEmpty()) {
-                statement.setString(1, '%' + text + '%');
-                statement.setString(2, '%' + text + '%');
+            statement.setString(1, text);
+
+            if (relFilter) {
+                statement.setInt(2, relId);
+                statement.setInt(3, tgtId);
             }
+
             getConceptsFromResultSet(result, statement);
         } finally {
             ConnectionPool.getInstance().push(conn);
@@ -183,6 +196,22 @@ public class InformationModelJDBCDAL implements InformationModelDAL {
         }
 
         return null;
+    }
+
+    @Override
+    public Integer getConceptDbid(String id) throws Exception {
+        Connection conn = ConnectionPool.getInstance().pop();
+        try (PreparedStatement statement = conn.prepareStatement("SELECT dbid FROM concept WHERE id = ?")) {
+            statement.setString(1, id);
+            ResultSet rs = statement.executeQuery();
+            if (rs.next())
+                return rs.getInt("dbid");
+            else
+                return null;
+
+        } finally {
+            ConnectionPool.getInstance().push(conn);
+        }
     }
 
     @Override
@@ -326,8 +355,8 @@ public class InformationModelJDBCDAL implements InformationModelDAL {
 
     private byte[] compactData(String data) throws IOException {
         JsonNode root = ObjectMapperPool.getInstance().readTree(data);
-        ((ObjectNode)root).remove("@id");
-        ((ObjectNode)root).remove("@description");
+        ((ObjectNode)root).remove("id");
+        ((ObjectNode)root).remove("description");
 
         data = root.toString();
 

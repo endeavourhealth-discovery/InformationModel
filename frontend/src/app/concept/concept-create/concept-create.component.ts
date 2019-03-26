@@ -48,14 +48,14 @@ export class ConceptCreateComponent implements AfterViewInit {
   }
 
   exists() {
-    this.logger.error('A concept with this @id already exists!', this.id, 'Error creating concept');
+    this.logger.error('A concept with this id already exists!', this.id, 'Error creating concept');
   };
 
   save() {
     const concept = {
-      '@id' : this.id,
-      '@name' : this.name,
-      '@document' : this.document
+      'id' : this.id,
+      'name' : this.name,
+      'document' : this.document
     };
 
     this.conceptService.insertConcept(concept)

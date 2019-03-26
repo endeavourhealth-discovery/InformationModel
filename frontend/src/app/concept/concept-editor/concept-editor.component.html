@@ -1,7 +1,7 @@
 <div class="module">
   <div class="container-fluid">
     <div class="module-heading">
-      Concept editor : <span *ngIf="concept">{{concept["@id"]}}</span>
+      Concept editor : <span *ngIf="concept">{{concept["id"]}}</span>
         <div class="pull-right">
           <button class="btn btn-info" (click)="editRaw()">Edit RAW</button>
           <button class="btn btn-success" (click)="save(false)">Save</button>
@@ -22,14 +22,14 @@
                       <div class="col-md-4 form-group">
                         <div class="form-group">
                           <label class="control-label" for="token">Id</label>
-                          <input class="form-control" type="text" id="token" name="token" value="{{concept['@id']}}" readonly>
+                          <input class="form-control" type="text" id="token" name="token" value="{{concept['id']}}" readonly>
                         </div>
                       </div>
                       <div class="col-md-6 col-lg-2 form-group">
                         <label class="control-label required-field" for="nature">Nature</label>
                         <div class="input-group" id="nature">
                           <div class="custom-control custom-radio form-control-plaintext">
-                            <input type="radio" class="custom-control-input" id="rdoSubtype" name="defaultExampleRadios" value="@is_subtype_of" [(ngModel)]="nature">
+                            <input type="radio" class="custom-control-input" id="rdoSubtype" name="defaultExampleRadios" value="is_subtype_of" [(ngModel)]="nature">
                             <label class="custom-control-label" for="rdoSubtype">Subtype of</label>
                           </div>
                         </div>
@@ -38,7 +38,7 @@
                         <label class="control-label">&nbsp;</label>
                         <div class="input-group">
                           <div class="custom-control custom-radio form-control-plaintext">
-                            <input type="radio" class="custom-control-input" id="rdoInstance" name="defaultExampleRadios" value="@is_instance_of" [(ngModel)]="nature">
+                            <input type="radio" class="custom-control-input" id="rdoInstance" name="defaultExampleRadios" value="is_instance_of" [(ngModel)]="nature">
                             <label class="custom-control-label" for="rdoInstance">Instance of</label>
                           </div>
                         </div>
@@ -57,9 +57,9 @@
                         <div class="form-group">
                           <label class="control-label" for="description">Document</label>
                           <div class="dropdown" id="conceptDocument">
-                            <button class="dropdown-toggle dropdown-toggle-custom btn-block text-left form-control" id="statusDropdown" type="button" data-toggle="dropdown">{{concept['@document']}}<i class="fa fa-caret-down pull-right" aria-hidden="true"></i> </button>
+                            <button class="dropdown-toggle dropdown-toggle-custom btn-block text-left form-control" id="statusDropdown" type="button" data-toggle="dropdown">{{concept.document}}<i class="fa fa-caret-down pull-right" aria-hidden="true"></i> </button>
                             <div class="dropdown-menu"  aria-labelledby="statusDropdown">
-                              <button *ngFor="let item of documents" class="dropdown-item" (click)="concept['@document'] = item">{{item}}</button>
+                              <button *ngFor="let item of documents" class="dropdown-item" (click)="concept.document = item">{{item}}</button>
                             </div>
                           </div>
                         </div>
@@ -68,13 +68,13 @@
                       <div class="col-md-4 form-group">
                         <div class="form-group">
                           <label class="control-label" for="name">Name</label>
-                          <input class="form-control" type="text" id="name" name="name" [(ngModel)]="concept['@name']" >
+                          <input class="form-control" type="text" id="name" name="name" [(ngModel)]="concept.name" >
                         </div>
                       </div>
                       <div class="col-md-12 form-group">
                         <div class="form-group">
                           <label class="control-label" for="description">Description</label>
-                          <input class="form-control" type="text" id="description" name="description" [(ngModel)]="concept['@description']" >
+                          <input class="form-control" type="text" id="description" name="description" [(ngModel)]="concept.description" >
                         </div>
                       </div>
 <!--                    </div>
@@ -88,6 +88,7 @@
                     <div class="row">-->
                       <div class="col-md-12 form-group">
                         <label class="control-label" for="properties">Properties</label>
+                        <button type="button" class="btn btn-xs btn-success pull-right" (click)="promptAddProperty()">Add</button>
                         <div class="scroll-box" id="properties" style="max-height: 400px">
                           <table class="table table-striped table-sm table-hover">
                             <thead>

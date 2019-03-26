@@ -8,21 +8,24 @@
 
   <properties>
     <java.version>1.8</java.version>
-    <junit.version>4.12</junit.version>
     <maven-compiler-plugin.version>3.1</maven-compiler-plugin.version>
     <maven-deploy-plugin.version>2.4</maven-deploy-plugin.version>
     <maven-surefire-plugin.version>2.12.4</maven-surefire-plugin.version>
 
-    <eds-security.version>1.14-SNAPSHOT</eds-security.version>
-
-    <jackson.version>2.9.8</jackson.version>
-    <javax-ws-rs.version>2.0.1</javax-ws-rs.version>
-    <jersey.version>2.25.1</jersey.version>
-    <keycloak.version>4.8.3.Final</keycloak.version>
-
     <sonar.projectKey>endeavourhealth-discovery_InformationModel::client</sonar.projectKey>
-
   </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.endeavourhealth</groupId>
+        <artifactId>discovery-versions</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <dependencies>
     <dependency>
@@ -38,64 +41,53 @@
     <dependency>
       <groupId>org.endeavourhealth.common</groupId>
       <artifactId>security</artifactId>
-      <version>${eds-security.version}</version>
     </dependency>
 
     <!-- JAX-RS -->
     <dependency>
       <groupId>javax.ws.rs</groupId>
       <artifactId>javax.ws.rs-api</artifactId>
-      <version>${javax-ws-rs.version}</version>
     </dependency>
 
     <!-- Jackson -->
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-core</artifactId>
-      <version>${jackson.version}</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-annotations</artifactId>
-      <version>${jackson.version}</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.jaxrs</groupId>
       <artifactId>jackson-jaxrs-base</artifactId>
-      <version>${jackson.version}</version>
     </dependency>
 
     <!-- Jersey -->
     <dependency>
       <groupId>org.glassfish.jersey.core</groupId>
       <artifactId>jersey-server</artifactId>
-      <version>${jersey.version}</version>
     </dependency>
     <dependency>
       <groupId>org.glassfish.jersey.core</groupId>
       <artifactId>jersey-common</artifactId>
-      <version>${jersey.version}</version>
     </dependency>
     <dependency>
       <groupId>org.glassfish.jersey.core</groupId>
       <artifactId>jersey-client</artifactId>
-      <version>${jersey.version}</version>
     </dependency>
     <dependency>
       <groupId>org.glassfish.jersey.containers</groupId>
       <artifactId>jersey-container-servlet</artifactId>
-      <version>${jersey.version}</version>
     </dependency>
     <dependency>
       <groupId>org.glassfish.jersey.media</groupId>
       <artifactId>jersey-media-json-jackson</artifactId>
-      <version>${jersey.version}</version>
     </dependency>
     <!-- End Jersey -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>${junit.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

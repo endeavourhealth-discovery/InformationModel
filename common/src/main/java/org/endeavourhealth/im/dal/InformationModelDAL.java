@@ -13,9 +13,10 @@ public interface InformationModelDAL {
     void updateConcept(String id, String json, Status status) throws Exception;
 
     List<Concept> mru() throws Exception;
-    List<Concept> search(String text) throws Exception;
+    List<Concept> search(String text, String relationship, String target) throws Exception;
     String getConceptJSON(String id) throws Exception;
     String getConceptName(String id) throws Exception;
+    Integer getConceptDbid(String id) throws Exception;
 
     List<String> getDocuments() throws Exception;
 

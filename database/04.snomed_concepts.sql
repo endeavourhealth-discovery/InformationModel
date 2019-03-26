@@ -7,6 +7,7 @@ EXECUTE stmt;
 
 DEALLOCATE PREPARE stmt;
 
+
 -- Create concepts
 SET GLOBAL innodb_buffer_pool_size=512 * 1024 * 1024;
 
@@ -29,16 +30,30 @@ WHERE d.active = 1
 
 ALTER TABLE snomed_description_active_fully_specified ADD UNIQUE INDEX snomed_description_active_fully_specified_pk (id);
 
+INSERT INTO document
+(data)
+VALUES
+(JSON_OBJECT('document', 'http://DiscoveryDataService/InformationModel/dm/Snomed/1.0.0'));
+
+INSERT INTO concept(data)
+VALUES (JSON_OBJECT('document', 'http://DiscoveryDataService/InformationModel/dm/Snomed/1.0.0',
+                    'id', 'SNOMED',
+                    'name', 'SNOMED',
+                    'description', 'The SNOMED code scheme',
+                        'is_subtype_of', JSON_OBJECT(
+                        'id', 'code_scheme'
+                        )));
+
 INSERT INTO concept (data)
 SELECT JSON_OBJECT(
-           '@document', 'http/DiscoveryDataService/InformationModel/dm/Snomed/1.0.1',
-           '@id', concat('SN-',f.conceptId),
-           '@name', IF(LENGTH(f.term) > 60, CONCAT(LEFT(f.term, 57), '...'), f.term),
-           '@description', f.term,
-           '@code_scheme', 'SNOMED',
-           '@code', f.conceptId,
-           '@is_subtype_of', JSON_OBJECT(
-               '@id','@codeable_concept'
+           'document', 'http://DiscoveryDataService/InformationModel/dm/Snomed/1.0.0',
+           'id', concat('SN_',f.conceptId),
+           'name', IF(LENGTH(f.term) > 60, CONCAT(LEFT(f.term, 57), '...'), f.term),
+           'description', f.term,
+           'code_scheme', 'SNOMED',
+           'code', f.conceptId,
+           'is_subtype_of', JSON_OBJECT(
+               'id','codeable_concept'
                )
            )
 FROM snomed_refset_clinical_active_preferred_component r
@@ -48,10 +63,10 @@ UPDATE concept c
     INNER JOIN (
         SELECT id, JSON_OBJECTAGG(prop, val) as rel
         FROM
-            (SELECT concat('SN-', sourceId) as id, concat('SN-', rel.typeId) as prop,
+            (SELECT concat('SN_', sourceId) as id, concat('SN_', rel.typeId) as prop,
                     JSON_ARRAYAGG(
                         JSON_OBJECT(
-                            '@id', concat('SN-', rel.destinationId)
+                            'id', concat('SN_', rel.destinationId)
                             )
                         ) as val
              FROM snomed_relationship rel

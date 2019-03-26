@@ -62,11 +62,15 @@ export class ConceptSelectorComponent implements AfterViewInit {
     hide: boolean;
     criteria: string;
     selection: any;
+    relationship: string;
+    target: string;
     result: any;
 
-    public static open(modalService: NgbModal, selection: any = null): NgbModalRef {
+    public static open(modalService: NgbModal, selection: any = null, relationship: string = null, target: string = null): NgbModalRef {
         const modalRef = modalService.open(ConceptSelectorComponent, {backdrop: 'static', size: 'lg'});
         modalRef.componentInstance.selection = selection;
+        modalRef.componentInstance.relationship = relationship;
+        modalRef.componentInstance.target = target;
         return modalRef;
     }
 
@@ -92,7 +96,7 @@ export class ConceptSelectorComponent implements AfterViewInit {
     search() {
         this.result = null;
 
-        this.conceptService.search(this.criteria)
+        this.conceptService.search(this.criteria, this.relationship, this.target)
             .subscribe(
                 (result) => this.result = result,
                 (error) => this.logger.error(error)

@@ -54,17 +54,31 @@ export class ConceptEditorComponent implements AfterViewInit {
       .subscribe(
         (result) => {
           this.concept = result;
-          if (this.concept['@is_instance_of'] != null)
-            this.nature = '@is_instance_of';
+          if (this.concept['is_instance_of'] != null)
+            this.nature = 'is_instance_of';
           else
-            this.nature = '@is_subtype_of';
+            this.nature = 'is_subtype_of';
 
           if (this.concept[this.nature] == null)
-            this.concept[this.nature] = {'@id': 'Concept'};
+            this.concept[this.nature] = {'id': 'Concept'};
 
-          this.superclass = this.concept[this.nature]['@id'];
+          this.superclass = this.concept[this.nature]['id'];
         }
       );
+  }
+
+  promptAddProperty() {
+    ConceptSelectorComponent.open(this.modal)
+      .result.then(
+      (result) => this.addProperty(result),
+      () => {}
+    )
+  }
+
+  addProperty(property: any) {
+    if (this.concept[property] === undefined) {
+      this.concept[property] = '';
+    }
   }
 
   refreshDiagram() {
@@ -152,9 +166,9 @@ export class ConceptEditorComponent implements AfterViewInit {
 
   save(close: boolean) {
     // cleanup nature
-    delete this.concept['@is_subtype_of'];
-    delete this.concept['@is_instance_of'];
-    this.concept[this.nature] = { '@id' : this.superclass };
+    delete this.concept['is_subtype_of'];
+    delete this.concept['is_instance_of'];
+    this.concept[this.nature] = { 'id' : this.superclass };
 
      this.conceptService.updateConcept(this.concept, 2)
        .subscribe(
@@ -197,7 +211,7 @@ export class ConceptEditorComponent implements AfterViewInit {
   }
 
   getProperties() {
-    const ignore: string[] = ['@id', '@document', '@name', '@description', '@is_subtype_of', '@is_instance_of'];
+    const ignore: string[] = ['id', 'document', 'name', 'description', 'is_subtype_of', 'is_instance_of'];
     return Object.keys(this.concept).filter(k => ignore.indexOf(k) == -1);
   }
 
@@ -213,11 +227,11 @@ export class ConceptEditorComponent implements AfterViewInit {
     }
 
     if (v instanceof Object) {
-      if (v['@id'] != null)
-        return [v['@id']];
+      if (v['id'] != null)
+        return [v['id']];
 
-      if (v['@has_value_type'] != null)
-        return this.getValues(v['@has_value_type']);
+      if (v['has_value_type'] != null)
+        return this.getValues(v['has_value_type']);
 
       return [JSON.stringify(v)];
     }
@@ -226,6 +240,9 @@ export class ConceptEditorComponent implements AfterViewInit {
   }
 
   getName(id: string)  {
+    if (id == null)
+      return null;
+
     let result = this.nameCache[id];
 
     if (result == null) {

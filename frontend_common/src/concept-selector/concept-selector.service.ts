@@ -12,9 +12,11 @@ export class ConceptSelectorService {
             .map((result) => result.json());
     }
 
-    search(searchTerm: string): Observable<any> {
+    search(searchTerm: string, relationship: string = null, target: string = null): Observable<any> {
         const params = new URLSearchParams();
         params.append('term', searchTerm);
+        params.append('relationship', relationship);
+        params.append('target', target);
 
         return this.http.get('{information-model}/api/IM/Search', {search: params})
             .map((result) => result.json());

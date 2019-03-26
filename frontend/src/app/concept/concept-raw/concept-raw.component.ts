@@ -16,10 +16,10 @@ export class ConceptRawComponent implements AfterViewInit {
     let clone = Object.assign({}, concept);
 
     // Remove @id and @document to prevent manual overwriting
-    modalRef.componentInstance.id = clone['@id'];
-    modalRef.componentInstance.document = clone['@document'];
-    delete clone['@id'];
-    delete clone['@document'];
+    modalRef.componentInstance.id = clone.id;
+    modalRef.componentInstance.document = clone.document;
+    delete clone.id;
+    delete clone.document;
 
     let json = JSON.stringify(clone, null, 4);
 
@@ -78,8 +78,8 @@ export class ConceptRawComponent implements AfterViewInit {
     if (node instanceof Object) {
       let keys = Object.keys(node);
       for (let key of keys) {
-        if (node[key]['@id'] != null)
-          ids.push(node[key]['@id']);
+        if (node[key]['id'] != null)
+          ids.push(node[key]['id']);
         else
           this.getIds(ids, node[key]);
       }
@@ -100,7 +100,7 @@ export class ConceptRawComponent implements AfterViewInit {
   }
 
   highlightMissingId(missingId: string) {
-    this.logger.error('Referenced @id not known "' + missingId + '"')
+    this.logger.error('Referenced id not known "' + missingId + '"')
     let i = this.json.indexOf(missingId);
     if (i > -1) {
       this.textarea.nativeElement.focus();
@@ -113,9 +113,9 @@ export class ConceptRawComponent implements AfterViewInit {
       () => {
         let result = JSON.parse(this.json);
 
-        // Add @id and @document back in
-        result['@id'] = this.id;
-        result['@document'] = this.document;
+        // Add id and @document back in
+        result['id'] = this.id;
+        result['document'] = this.document;
         this.activeModal.close(result);
       },
       (missingId) => this.highlightMissingId(missingId)

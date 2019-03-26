@@ -10,19 +10,28 @@ DEALLOCATE PREPARE stmt;
 INSERT INTO document
 (data)
 VALUES
-(JSON_OBJECT('@document', 'http/DiscoveryDataService/InformationModel/dm/READ2/1.0.1'));
+(JSON_OBJECT('document', 'http://DiscoveryDataService/InformationModel/dm/READ2/1.0.0'));
+
+INSERT INTO concept(data)
+VALUES (JSON_OBJECT('document', 'http://DiscoveryDataService/InformationModel/dm/READ2/1.0.0',
+                    'id', 'READ2',
+                    'name', 'READ 2',
+                    'description', 'The READ2 code scheme',
+                        'is_subtype_of', JSON_OBJECT(
+                        'id', 'code_scheme'
+                        )));
 
 -- CONCEPTS
 INSERT INTO concept (data)
 SELECT JSON_OBJECT(
-           '@document', 'http/DiscoveryDataService/InformationModel/dm/READ2/1.0.1',
-           '@id', concat('R2-',code),
-           '@name', if(length(term) > 60, concat(left(term, 57), '...'), term),
-           '@description', term,
-           '@code_scheme', 'READ2',
-           '@code', code,
-           '@is_subtype_of', JSON_OBJECT(
-               '@id','@codeable_concept'
+           'document', 'http://DiscoveryDataService/InformationModel/dm/READ2/1.0.0',
+           'id', concat('R2_',code),
+           'name', if(length(term) > 60, concat(left(term, 57), '...'), term),
+           'description', term,
+           'code_scheme', 'READ2',
+           'code', code,
+           'is_subtype_of', JSON_OBJECT(
+               'id','codeable_concept'
                )
            )
 FROM read_v2;
@@ -37,10 +46,10 @@ UPDATE concept c
     INNER JOIN (
         SELECT id, JSON_OBJECTAGG(prop, val) as rel
         FROM
-            (SELECT concat('R2-', rel.code) as id, '@has_parent' as prop,
+            (SELECT concat('R2_', rel.code) as id, 'has_parent' as prop,
                     JSON_ARRAYAGG(
                         JSON_OBJECT(
-                            '@id', concat('R2-', rel.parent)
+                            'id', concat('R2_', rel.parent)
                             )
                         ) as val
              FROM read_v2_hierarchy rel

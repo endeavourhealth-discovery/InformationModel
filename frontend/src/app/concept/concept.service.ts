@@ -46,7 +46,7 @@ export class ConceptService {
   }
 
   updateConcept(concept: any, status: number): Observable<any> {
-    const id = concept['@id'];
+    const id = concept['id'];
     const params = new URLSearchParams();
     params.append('status', status.toString());
       return this.http.post('api/IM/'+id, concept, {search: params});

@@ -50,10 +50,12 @@ public class InformationModelEndpoint {
     @Timed(absolute = true, name = "InformationModel.ConceptEndpoint.Search.GET")
     @ApiOperation(value = "List of concepts matching the search term", response = Concept.class)
     public Response search(@Context SecurityContext sc,
-                           @ApiParam(value = "Term", required = true) @QueryParam("term") String term) throws Exception {
+                           @ApiParam(value = "Term", required = true) @QueryParam("term") String term,
+                           @ApiParam(value = "Relationship") @QueryParam("relationship") String relationship,
+                           @ApiParam(value = "Target") @QueryParam("target") String target) throws Exception {
         LOG.debug("Get concept by ID");
 
-        List<Concept> result = new InformationModelJDBCDAL().search(term);
+        List<Concept> result = new InformationModelJDBCDAL().search(term, relationship, target);
 
         return Response
             .ok()
