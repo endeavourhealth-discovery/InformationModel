@@ -1,432 +1,483 @@
 {
-  "@document": "http/DiscoveryDataService/InformationModel/dm/HealthData/1.0.1",
-  "@import": "http://DiscoveryDataService/InformationModel/dm/core/1.0.1",
-  "Concepts": [
-    {
-      "@id": "Duration",
-      "@name": "Duration of time",
-      "@description": "Duration of time measurement with units",
-      "@is_subtype_of": {
-        "@id": "Quantity"
-      }
-    },
-    {
-      "@id": "Quantity",
-      "@name": "Quantity",
-      "@description": "A measurement of quantity",
-      "@is_subtype_of": {
-        "@id": "ComplexDataType"
-      },
-      "value": {
-        "@id": "numeric"
-      },
-      "comparator": {
-        "@has_value_type": {
-          "@id": "comparator"
-        }
-      },
-      "unit_of_measure": {
-        "@has_value_type": {
-          "@id": "UnitsOfMeasure"
-        }
-      }
-    },
-    {
-      "@id": "UnitsOfMeasure",
-      "@name": "Units of measure",
-      "@description": "A concept that measures a value in units",
-      "@is_subtype_of": {
-        "@id": "Concept"
-      }
-    },
-    {
-      "@id": "GeneralPractice",
-      "@name": "General Practice",
-      "@description": "An organisation that provides General practice services",
-      "@is_subtype_of": {
-        "@id": "PrimaryCareOrganisation"
-      },
-      "is_commissioned_by": {
-        "@has_value_type": {
-          "@id": "ClinicalCommissioningGroup"
-        }
-      },
-      "branch_surgery": {
-        "@has_value_type": {
-          "@id": "Location"
-        },
-        "@cardinality": {
-          "@id": "@has_up_to many"
-        }
-      }
-    },
-    {
-      "@id": "PrimaryCareOrganisation",
-      "@name": "Primary Care Organisation",
-      "@description": "An organisation providing primary care services",
-      "@is_subtype_of": {
-        "@id": "Organisation"
-      },
-      "is_commissioned_by": {
-        "@has_value_type": {
-          "@id": "CommissioningOrganisation"
-        }
-      }
-    },
-    {
-      "@id": "Organisation",
-      "@name": "Organisation",
-      "@description": "an organised body of people with a particular purpose",
-      "@is_subtype_of": {
-        "@id": "Entity"
-      },
-      "organisation_name": {
-        "@has_value_type": "text"
-      },
-      "parent_organisation": {
-        "@has_value_type": {
-          "@id": "Organisation"
-        }
-      }
-    },
-    {
-      "@id": "ClinicalCommissioningGroup",
-      "@name": "Clinical Commissioning Group",
-      "@description": "An locality based organisation providing commissioning services",
-      "@is_subtype_of": {
-        "@id": "CommissioningOrganisation"
-      }
-    },
-    {
-      "@id": "CommissioningOrganisation",
-      "@name": "Clinical commissioning organisation",
-      "@is_subtype_of": {
-        "@id": "Organisation"
-      }
-    },
-    {
-      "@id": "Entity",
-      "@name": "Entity",
-      "@description": "A physical thing of some kind",
-      "@is_subtype_of": {
-        "@id": "Concept"
-      }
-    },
-    {
-      "@id": "is_commissioned_by",
-      "@name": "is commissioned by",
-      "@is_subtype_of": {
-        "@id": "@object_property"
-      },
-      "@has_value_type": {
-        "id ": "CommissioningOrganisation"
-      }
-    },
-    {
-      "@id": "parent_organisation",
-      "@name": "parent organisation",
-      "@description": "the parent organisation in an organisational hierarchy",
-      "@is_subtype_of": {
-        "@id": "@object_property"
-      },
-      "@has_value_type": {
-        "@id": "Organisation"
-      }
-    },
-    {
-      "@id": "duration_to_event",
-      "@name": "duration to event",
-      "@description": "duration between the before event and the after event",
-      "@is_subtype_of": {
-        "@id": "@object_property"
-      },
-      "@has_value_type": {
-        "id": "Duration"
-      }
-    },
-    {
-      "@id": "unit_of_measure",
-      "@name": "unit of measure",
-      "@description": "a property that has a unit of measure as its value",
-      "@is_subtype_of": {
-        "@id": "@data_property"
-      },
-      "@has_value_type": {
-        "@id": "UnitsOfMeasure"
-      }
-    },
-    {
-      "@id": "comparator",
-      "@name": "Comparator",
-      "@description": "comparators for a numeric value e.g. less than or greater than",
-      "@is_subtype_of": {
-        "@id": "@Concept"
-      }
-    },
-    {
-      "@id": "less_than",
-      "@name": "less than",
-      "@description": "less than the numeric value",
-      "@is_subtype_of": {
-        "@id": "comparator"
-      }
-    },
-    {
-      "@id": "less_than_or_equal",
-      "@name": "less than or equal",
-      "@description": "less than or equal to the numeric value",
-      "@is_subtype_of": {
-        "@id": "comparator"
-      }
-    },
-    {
-      "@id": "greater_than",
-      "@name": "greater than",
-      "@description": "greater than or the numeric value",
-      "@is_subtype_of": {
-        "@id": "comparator"
-      }
-    },
-    {
-      "@id": "greater_than_or_equal",
-      "@name": "greater than or equal",
-      "@description": "greater than or equal to the numeric value",
-      "@is_subtype_of": {
-        "@id": "comparator"
-      }
-    },
-    {
-      "@id": "ComplexDataType",
-      "@name": "Complex data type",
-      "@description": "Parent concept for complex data types which are data types with structure",
-      "@is_subtype_of": {
-        "@id": "@Concept"
-      }
-    },
-    {
-      "@id": "branch_surgery",
-      "@name": "branch surgery",
-      "@description": "banch surgery for a general practice organisation",
-      "@is_subtype_of": {
-        "@id": "@object_property"
-      },
-      "@has_value_type": {
-        "@id": "Location"
-      }
-    },
-    {
-      "@id": "Location",
-      "@is_subtype_of": {
-        "@id": "Entity"
-      },
-      "@name": "Location",
-      "@description": "A location with latitude and longitude"
-    },
-    {
-      "@id": "Folder",
-      "@name": "Folder",
-      "@description": "A folder containing other folders or concepts used as a node in a  view when no other concept is attached",
-      "@is_subtype_of": {
-        "@id": "@Concept"
-      }
-    },
-    {
-      "@id": "Heading",
-      "@name": "Heading",
-      "@description": "A heading or section in a record",
-      "@is_subtype_of": {
-        "@id": "@Concept"
-      },
-      "content": {
-        "has_value_type": {
-          "@id": "@Concept"
-        },
-        "@cardinality": {
-          "@id": "@has_up_to_many"
-        }
-      }
-    },
-    {
-      "@id": "CodeableConcept",
-      "@name": "Codeable Concept",
-      "@description": "a concept consisting of an expression and/ or an original code and term",
-      "expression": {
-        "@has_value_type": "@Expression"
-      },
-      "original_code": {
-        "code": {
-          "@has_value_type": {
-            "@id": "@Text"
-          }
-        },
-        "code_scheme": {
-          "@has_value_type": {
-            "@id": "@code_scheme"
-          }
-        },
-        "@cardinality": {
-          "@id": "@has_up_to_many"
-        }
-      }
-    },
-    {
-      "@id": "Observation",
-      "@name": "Observation",
-      "@description": "A general note of something heard, seen or measured about the patient",
-      "@is_subtype_of": {
-        "@id": "RecordEntry"
-      },
-      "effective_date": {
-        "@has_value_type": {
-          "@id": "@DateTime"
-        }
-      },
-      "observable_concept": {
-        "@has_value_type": {
-          "@id": "@Expression"
-        }
-      }
-    },
-    {
-      "@id": "Provenance",
-      "@name": "Provenance",
-      "@description": "The original entry date and time and current owner of the items linked to this item",
-      "@is_subtype_of": "HealthRecordEntry",
-      "current_owner": {
-        "@has_value_type": {
-          "@id": "Organisation"
-        }
-      },
-      "date_time_of_entry": {
-        "@has_value_type": {
-          "@id": "@DateTime"
-        }
-      },
-      "entered_by_person": {
-        "@has_value_type": {
-          "@id": "HealthCareWorker"
-        }
-      },
-      "entered_by_device": {
-        "@has_value_type": {
-          "@id": "Device"
-        }
-      },
-      "transaction_history": {
-        "@has_value_type": {
-          "@id": "TransactionHistory"
-        }
-      }
-    },
-    {
-      "@id": "current_owner",
-      "@name": "current owner",
-      "@description": "current owning organisation for an entry which is linked to a data controller",
-      "@is_subtype_of": {
-        "@id": "@object_property"
-      },
-      "@has_value_type_of": {
-        "@id": "Organisation"
-      }
-    },
-    {
-      "@id": "date_time_of_entry",
-      "@name": "date and time of entry",
-      "@description": "date and time of the original entry into the source record, not the current record",
-      "@is_subtype_of": {
-        "@id": "@data_property"
-      },
-      "@has_value_type": {
-        "@id": "@DateTime"
-      }
-    },
-    {
-      "@id": "effective_date",
-      "@name": "effective date",
-      "@description": "the relevant start date and time of this entry",
-      "@is_subtype_of": {
-        "@id": "data_property"
-      },
-      "@has_value_type": {
-        "@id": "@DateTime"
-      }
-    },
-    {
-      "@id": "entered_by_person",
-      "@name": "entered by person",
-      "@description": "person who entered the data into the record",
-      "@is_subtype_of": {
-        "@id": "@object_property"
-      },
-      "@has_value_type": {
-        "@id": "HealthCareWorker"
-      }
-    },
-    {
-      "@id": "entered_by_device",
-      "@name": "entered by device",
-      "@description": "the device that created the entry",
-      "@is_subtype_of": {
-        "@id": "@object_property"
-      },
-      "@has_value_type": {
-        "@id": "Device"
-      }
-    },
-    {
-      "@id": "transaction",
-      "@name": "transaction",
-      "@description": "the update transaction associated with this entry",
-      "@is_subtype_of": "@object_property",
-      "@has_value_type": {
-        "@id": "Transaction"
-      }
-    },
-    {
-      "@id": "TransactionHistory",
-      "@name": "Transaction history",
-      "@description": "A historical entry for a transaction",
-      "@is_subtype_of": {"@id": "@Concept"},
-      "update_mode": {
-        "@has_value_type": {
-          "@id": "UpdateMode"
-        }
-      },
-      "replaced": {
-        "@has_value_type": {
-          "@id": "@uuid"
-        }
-      },
-      "owner": {
-        "@has_value_type": {
-          "@id": "Organisation"
-        }
-      },
-      "date_time": {
-        "@has_value_type": {
-          "@id": "@DateTime"
-        }
-      },
-      "person": {
-        "@has_value_type": {
-          "@id": "HealthCareWorker"
-        }
-      },
-      "device": {
-        "@has_value_type": {
-          "@id": "Device"
-        }
-      },
-      "system": {
-        "@has_value_type": {
-          "@id": "System"
-        }
-      },
-      "transaction_history": {
-        "@has_value_type": {
-          "@id": "TransactionHistory"
-        }
-      }
-    }
-  ]
+	 "document": "http/DiscoveryDataService/InformationModel/dm/HealthData/1.0.1",
+	 "import": "http://DiscoveryDataService/InformationModel/dm/core/1.0.1",
+	 "Concepts": [
+		{
+			 "id": "Duration",
+			 "name": "Duration of time",
+			 "description": "Duration of time measurement with units",
+			 "is_subtype_of": {
+				 "id": "Quantity"
+			}
+		},
+		{
+			 "id": "Quantity",
+			 "name": "Quantity",
+			 "description": "A measurement of quantity",
+			 "is_subtype_of": {
+				 "id": "ComplexDataType"
+			},
+			 "value": {
+				 "id": "Numeric"
+			},
+			 "comparator": {
+				 "has_value_type": {
+					 "id": "comparator"
+				}
+			},
+			 "unit_of_measure": {
+				 "has_value_type": {
+					 "id": "UnitsOfMeasure"
+				}
+			}
+		},
+		{
+			 "id": "UnitsOfMeasure",
+			 "name": "Units of measure",
+			 "description": "A concept that measures a value in units",
+			 "is_subtype_of": {
+				 "id": "Concept"
+			}
+		},
+		{
+			 "id": "GeneralPractice",
+			 "name": "General Practice",
+			 "description": "An organisation that provides General practice services",
+			 "is_subtype_of": {
+				 "id": "PrimaryCareOrganisationType"
+			},
+			 "is_commissioned_by": {
+				 "has_value_type": {
+					 "id": "ClinicalCommissioningGroupType"
+				}
+			},
+			 "branch_surgery": {
+				 "has_value_type": {
+					 "id": "Location"
+				},
+				 "cardinality": {
+					 "id": "has_up_to many"
+				}
+			}
+		},
+		{
+			 "id": "PrimaryCareOrganisationType",
+			 "name": "Primary Care Organisation type",
+			 "description": "A type of organisation providing primary care services",
+			 "is_subtype_of": {
+				 "id": "OrganisationType"
+			},
+			 "is_commissioned_by": {
+				 "has_value_type": {
+					 "id": "CommissioningOrganisationType"
+				}
+			}
+		},
+		{
+			 "id": "Organisation",
+			 "name": "Organisation",
+			 "description": "an organised body of people with a particular purpose",
+			 "is_subtype_of": {
+				 "id": "Entity"
+			},
+			 "organisation_name": {
+				 "has_value_type": "Text"
+			},
+			 "organisation_type": {
+				 "has_value_type": {
+					 "id": "OrganisationType"
+				}
+			},
+			 "parent_organisation": {
+				 "has_value_type": {
+					 "id": "Organisation"
+				}
+			},
+			 "location": {
+				 "has_value_type": {
+					 "id": "Location"
+				}
+			}
+		},
+		{
+			 "id": "location",
+			 "name": "location",
+			 "description": "Property with  value that is a location",
+			 "is_subtype_of": {
+				 "id": "object_property"
+			},
+			 "has_value_type": {
+				 "id": "Location"
+			}
+		},
+		{
+			 "id": "Location",
+			 "name": "Location",
+			 "description": "A geographic location described by its properties",
+			 "is_subtype_of": {
+				 "id": "Entity"
+			},
+			 "is_anonymous": true,
+			 "address": {
+				 "has_value_type": {
+					 "id": "AddressType"
+				}
+			},
+			 "address_structured": {
+				 "has_value_type": {
+					 "id": "AddressStructuredType"
+				}
+			},
+			 "uprn": {
+				 "has_value_type": {
+					 "id": "Numeric"
+				}
+			}
+		},
+		{
+			 "id": "address",
+			 "name": "address",
+			 "description": "a property that has an address as a value",
+			 "is_subtype_of": {
+				 "id": "object_property"
+			},
+			 "has_value_type": {
+				 "id": "AddressType"
+			}
+		},
+		{
+			 "id": "address_structured",
+			 "name": "address sructured",
+			 "description": "a property that has an address which is structured according to the PAF address file",
+			 "is_subtype_of": {
+				 "id": "object_property"
+			},
+			 "has_value_type": {
+				 "id": "AddressStructuredType"
+			}
+		},
+		{
+			 "id": "AddressUnstructuredType",
+			 "name": "Unstructured Address type",
+			 "description": "An address in unstructured form ",
+			 "is_subtype_of": "AdministrationType",
+			 "address_line_1": {
+				 "has_value_type": "text"
+			},
+			 "address_line_2": {
+				 "has_value_type": "text"
+			},
+			 "address_line_3": {
+				 "has_value_type": "text"
+			},
+			 "address_line_4": {
+				 "has_value_type": "text"
+			},
+			 "address_line_5": {
+				 "has_value_type": "text"
+			},
+			 "postcode": {
+				 "has_value_type": "text"
+			}
+		},
+		{
+			 "id": "AdministrationType",
+			 "name": "Administration Type",
+			 "description": "a type used for administrative concepts",
+			 "is_subtype_of": {
+				 "id": "Concept"
+			}
+		},
+		{
+			 "id": "OrganisationType",
+			 "name": "OrganisationType",
+			 "description": "a type of organised body of people with a particular purpose",
+			 "is_subtype_of": {
+				 "id": "AdministrationType"
+			}
+		},
+		{
+			 "id": "ClinicalCommissioningGroupType",
+			 "name": "Clinical Commissioning Group",
+			 "description": "An locality based organisation providing commissioning services",
+			 "is_subtype_of": {
+				 "id": "CommissioningOrganisationType"
+			}
+		},
+		{
+			 "id": "CommissioningOrganisationType",
+			 "name": "Clinical commissioning organisation",
+			 "is_subtype_of": {
+				 "id": "OrganisationType"
+			}
+		},
+		{
+			 "id": "Entity",
+			 "name": "Entity",
+			 "description": "A physical thing of some kind",
+			 "is_subtype_of": {
+				 "id": "Concept"
+			}
+		},
+		{
+			 "id": "is_commissioned_by",
+			 "name": "is commissioned by",
+			 "is_subtype_of": {
+				 "id": "object_property"
+			},
+			 "has_value_type": {
+				 "id ": "Organisation"
+			}
+		},
+		{
+			 "id": "parent_organisation",
+			 "name": "parent organisation",
+			 "description": "the parent organisation in an organisational hierarchy",
+			 "is_subtype_of": {
+				 "id": "object_property"
+			},
+			 "has_value_type": {
+				 "id": "Organisation"
+			}
+		},
+		{
+			 "id": "duration_to_event",
+			 "name": "duration to event",
+			 "description": "duration between the before event and the after event",
+			 "is_subtype_of": {
+				 "id": "object_property"
+			},
+			 "has_value_type": {
+				 "id": "Duration"
+			}
+		},
+		{
+			 "id": "unit_of_measure",
+			 "name": "unit of measure",
+			 "description": "a property that has a unit of measure as its value",
+			 "is_subtype_of": {
+				 "id": "object_property"
+			},
+			 "has_value_type": {
+				 "id": "UnitsOfMeasure"
+			}
+		},
+		{
+			 "id": "ComplexDataType",
+			 "name": "Complex data type",
+			 "description": "Parent concept for complex data types which are data types with structure",
+			 "is_subtype_of": {
+				 "id": "Concept"
+			}
+		},
+		{
+			 "id": "branch_surgery",
+			 "name": "branch surgery",
+			 "description": "banch surgery for a general practice organisation",
+			 "is_subtype_of": {
+				 "id": "object_property"
+			},
+			 "has_value_type": {
+				 "id": "Location"
+			}
+		},
+		{
+			 "id": "Location",
+			 "is_subtype_of": {
+				 "id": "Entity"
+			},
+			 "name": "Location",
+			 "description": "A location with latitude and longitude"
+		},
+		{
+			 "id": "Folder",
+			 "name": "Folder",
+			 "description": "A folder containing other folders or concepts used as a node in a  view when no other concept is attached",
+			 "is_subtype_of": {
+				 "id": "Concept"
+			}
+		},
+		{
+			 "id": "Heading",
+			 "name": "Heading",
+			 "description": "A heading or section in a record",
+			 "is_subtype_of": {
+				 "id": "Concept"
+			},
+			 "content": {
+				 "has_value_type": {
+					 "id": "Concept"
+				},
+				 "cardinality": {
+					 "id": "has_up_to_many"
+				}
+			}
+		},
+		{
+			 "id": "CodeableConcept",
+			 "name": "Codeable Concept",
+			 "description": "a concept consisting of an expression and/ or an original code and term",
+			 "expression": {
+				 "has_value_type": "Expression"
+			},
+			 "original_code": {
+				 "code": {
+					 "has_value_type": {
+						 "id": "Text"
+					}
+				},
+				 "code_scheme": {
+					 "has_value_type": {
+						 "id": "code_scheme"
+					}
+				},
+				 "cardinality": {
+					 "id": "has_up_to_many"
+				}
+			}
+		},
+		{
+			 "id": "Provenance",
+			 "name": "Provenance",
+			 "description": "The original entry date and time and current owner of the items linked to this item",
+			 "is_subtype_of": "HealthRecordEntry",
+			 "current_owner": {
+				 "has_value_type": {
+					 "id": "Organisation"
+				}
+			},
+			 "date_time_of_entry": {
+				 "has_value_type": {
+					 "id": "DateTime"
+				}
+			},
+			 "entered_by_person": {
+				 "has_value_type": {
+					 "id": "HealthCareWorker"
+				}
+			},
+			 "entered_by_device": {
+				 "has_value_type": {
+					 "id": "Device"
+				}
+			},
+			 "transaction_history": {
+				 "has_value_type": {
+					 "id": "TransactionHistory"
+				}
+			}
+		},
+		{
+			 "id": "current_owner",
+			 "name": "current owner",
+			 "description": "current owning organisation for an entry which is linked to a data controller",
+			 "is_subtype_of": {
+				 "id": "object_property"
+			},
+			 "has_value_type_of": {
+				 "id": "Organisation"
+			}
+		},
+		{
+			 "id": "date_time_of_entry",
+			 "name": "date and time of entry",
+			 "description": "Property that has date and time of the original entry into the source record, not the current record",
+			 "is_subtype_of": {
+				 "id": "data_property"
+			},
+			 "has_value_type": {
+				 "id": "DateTime"
+			}
+		},
+		{
+			 "id": "effective_date",
+			 "name": "effective date",
+			 "description": "the relevant start date and time of this entry",
+			 "is_subtype_of": {
+				 "id": "data_property"
+			},
+			 "has_value_type": {
+				 "id": "DateTime"
+			}
+		},
+		{
+			 "id": "entered_by_person",
+			 "name": "entered by person",
+			 "description": "person who entered the data into the record",
+			 "is_subtype_of": {
+				 "id": "object_property"
+			},
+			 "has_value_type": {
+				 "id": "HealthCareWorker"
+			}
+		},
+		{
+			 "id": "entered_by_device",
+			 "name": "entered by device",
+			 "description": "the device that created the entry",
+			 "is_subtype_of": {
+				 "id": "object_property"
+			},
+			 "has_value_type": {
+				 "id": "Device"
+			}
+		},
+		{
+			 "id": "transaction",
+			 "name": "transaction",
+			 "description": "the update transaction associated with this entry",
+			 "is_subtype_of": "object_property",
+			 "has_value_type": {
+				 "id": "Transaction"
+			}
+		},
+		{
+			 "id": "Transaction",
+			 "name": "Transaction",
+			 "description": "A historical entry for a transaction",
+			 "is_subtype_of": {
+				 "id": "Concept"
+			},
+			 "update_mode": {
+				 "has_value_type": {
+					 "id": "UpdateMode"
+				}
+			},
+			 "replaced": {
+				 "has_value_type": {
+					 "id": "uuid"
+				}
+			},
+			 "owner": {
+				 "has_value_type": {
+					 "id": "Organisation"
+				}
+			},
+			 "date_time": {
+				 "has_value_type": {
+					 "id": "DateTime"
+				}
+			},
+			 "person": {
+				 "has_value_type": {
+					 "id": "HealthCareWorker"
+				}
+			},
+			 "device": {
+				 "has_value_type": {
+					 "id": "Device"
+				}
+			},
+			 "system": {
+				 "has_value_type": {
+					 "id": "System"
+				}
+			},
+			 "transaction_history": {
+				 "has_value_type": {
+					 "id": "Transaction"
+				}
+			}
+		}
+	]
 }

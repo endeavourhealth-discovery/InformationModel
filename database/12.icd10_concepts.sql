@@ -18,49 +18,49 @@ VALUES (JSON_OBJECT('document', 'http://DiscoveryDataService/InformationModel/dm
                     'name', 'ICD10',
                     'description', 'The ICD10 code scheme',
                         'is_subtype_of', JSON_OBJECT(
-                        'id', 'code_scheme'
+                        'id', 'CodeScheme'
                         ))),
        (JSON_OBJECT('document', 'http://DiscoveryDataService/InformationModel/dm/ICD10/1.0.0',
                     'id', 'I10_modifier4',
                     'name', 'IDC10 4th character modifier suffix',
                     'is_subtype_of', JSON_OBJECT(
-                        'id', 'codeable_concept'
+                        'id', 'CodeableConcept'
                         ))),
        (JSON_OBJECT('document', 'http://DiscoveryDataService/InformationModel/dm/ICD10/1.0.0',
                     'id', 'I10_modifier5',
                     'name', 'IDC10 5th character modifier suffix',
                     'is_subtype_of', JSON_OBJECT(
-                        'id', 'codeable_concept'
+                        'id', 'CodeableConcept'
                         ))),
        (JSON_OBJECT('document', 'http://DiscoveryDataService/InformationModel/dm/ICD10/1.0.0',
                     'id', 'I10_qualifiers',
                     'name', 'IDC10 dual classification (asterisk codes)',
                     'is_subtype_of', JSON_OBJECT(
-                        'id', 'codeable_concept'
+                        'id', 'CodeableConcept'
                         ))),
        (JSON_OBJECT('document', 'http://DiscoveryDataService/InformationModel/dm/ICD10/1.0.0',
                     'id', 'I10_gender_mask',
                     'name', 'IDC10 gender mask',
                     'is_subtype_of', JSON_OBJECT(
-                        'id', 'codeable_concept'
+                        'id', 'CodeableConcept'
                         ))),
        (JSON_OBJECT('document', 'http://DiscoveryDataService/InformationModel/dm/ICD10/1.0.0',
                     'id', 'I10_min_age',
                     'name', 'IDC10 minimum age',
                     'is_subtype_of', JSON_OBJECT(
-                        'id', 'codeable_concept'
+                        'id', 'CodeableConcept'
                         ))),
        (JSON_OBJECT('document', 'http://DiscoveryDataService/InformationModel/dm/ICD10/1.0.0',
                     'id', 'I10_max_age',
                     'name', 'IDC10 maximum age',
                     'is_subtype_of', JSON_OBJECT(
-                        'id', 'codeable_concept'
+                        'id', 'CodeableConcept'
                         ))),
        (JSON_OBJECT('document', 'http://DiscoveryDataService/InformationModel/dm/ICD10/1.0.0',
                     'id', 'I10_tree_description',
                     'name', 'IDC10 tree description',
                     'is_subtype_of', JSON_OBJECT(
-                        'id', 'codeable_concept'
+                        'id', 'CodeableConcept'
                         )));
 
 -- CONCEPTS
@@ -73,7 +73,7 @@ SELECT JSON_OBJECT(
            'code_scheme', 'ICD10',
            'code', code,
            'is_subtype_of', JSON_OBJECT(
-               'id', 'codeable_concept'
+               'id', 'CodeableConcept'
                ),
            'I10_modifier4', modifier_4,
            'I10_modifier5', modifier_5,

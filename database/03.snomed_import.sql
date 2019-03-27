@@ -111,3 +111,26 @@ LOAD DATA LOCAL INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 5.7\\Uploads\\uk_sc
     IGNORE 1 LINES;
 
 ALTER TABLE snomed_refset ADD INDEX snomed_refset_acceptabilityId_refsetId_active_idx (acceptabilityId, refsetId, active);
+
+
+-- ********************* OPTIMISED ACTIVE PREFERRED/SPECIFIED TABLES *********************
+SET GLOBAL innodb_buffer_pool_size=512 * 1024 * 1024;
+
+CREATE TABLE snomed_refset_clinical_active_preferred_component
+SELECT referencedComponentId
+FROM snomed_refset r
+WHERE r.acceptabilityId = 900000000000548007
+  AND r.refsetId = 999001261000000100
+  AND r.active = 1;
+
+ALTER TABLE snomed_refset_clinical_active_preferred_component ADD UNIQUE INDEX snomed_refset_clinical_active_preferred_component_pk (referencedComponentId);
+
+CREATE TABLE snomed_description_active_fully_specified
+SELECT d.id, d.conceptId, d.term
+FROM snomed_description d
+         JOIN snomed_concept c on c.id = d.conceptId
+WHERE d.active = 1
+  AND d.typeId = 900000000000003001
+  AND c.active = 1;
+
+ALTER TABLE snomed_description_active_fully_specified ADD UNIQUE INDEX snomed_description_active_fully_specified_pk (id);

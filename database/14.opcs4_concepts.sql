@@ -16,7 +16,7 @@ VALUES (JSON_OBJECT('document', 'http://DiscoveryDataService/InformationModel/dm
                     'name', 'OPCS4',
                     'description', 'The OPCS4 code scheme',
                         'is_subtype_of', JSON_OBJECT(
-                        'id', 'code_scheme'
+                        'id', 'CodeScheme'
                         )));
 
 -- CONCEPTS
@@ -29,7 +29,7 @@ SELECT JSON_OBJECT(
            'code_scheme', 'OPCS4',
            'code', code,
            'is_subtype_of', JSON_OBJECT(
-               'id','codeable_concept'
+               'id','CodeableConcept'
                )
            )
 FROM opcs4;

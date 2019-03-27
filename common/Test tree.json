@@ -1,0 +1,47 @@
+{
+	 "@id": "V1",
+	 "@is_type_of": {
+		 "@id": "@View"
+	},
+	 "root": {
+		 "object": {
+			 "@id": "@Concept"
+		},
+		 "child_node": [
+			{
+				 "object": {
+					 "@id": "@object_property"
+				},
+				 "child_node": [
+					{
+						 "object": {
+							 "@id": "relationship"
+						},
+						 "child_node": [
+							{
+								 "object": {
+									 "@id": "@is_subtype_of"
+								}
+							},
+							{
+								 "object": {
+									 "@id": "@is_type_of"
+								}
+							}
+						]
+					}
+				]
+			},
+			{
+				 "object": {
+					 "@id": "@data_property"
+				},
+				 "child_node": {
+					 "object": {
+						 "@id": "@text"
+					}
+				}
+			}
+		]
+	}
+}

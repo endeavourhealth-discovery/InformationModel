@@ -1,0 +1,59 @@
+[
+	{
+		 "@id": "standard_ehr_folders",
+		 "@is_type_of": {
+			 "@id": "@View"
+		},
+		 "node": {
+			 "node_name": "Health record folders",
+			 "child_node": [
+				{
+					 "node_name": "Person demographic entries"
+				},
+				{
+					 "node_name": "Health record entries"
+				}
+			]
+		}
+	},
+	{
+		 "@id": "VMP-Paracetamol_250mg-5 ml_oral_suspension",
+		 "@is_type_of": {
+			 "@id": "VirtualMedicinalProduct"
+		},
+		 "@name": "Paracetamol_250mg-5 ml_oral_suspension",
+		 "vmp_ingredient": {
+			 "@id": "vmpi-paracetamol"
+		}
+	},
+	{
+		 "@id": "VMPI-Paracetamol",
+		 "@is_type_of": {
+			 "@id": "VirtualMedicinalProductIngredient"
+		},
+		 "@name": "Paracetamol",
+		 "pharmaceutical_strength": {
+			 "@id": "ps-10001"
+		}
+	},
+	{
+		 "@id": "ps-10001",
+		 "@is_type_of": {
+			 "@id": "PharmaceuticalStrength"
+		},
+		 "value_numerator": 500,
+		 "value_unit": {
+			 "@id": "milligrams"
+		},
+		 "value_denominator": 1,
+		 "value_denominator_unit": {
+			 "@id": "ml"
+		}
+	},
+	{
+		 "@id": "PopulationHealth_Query_View",
+		 "@is_type_of": {
+			 "@id": "@View"
+		}
+	}
+]

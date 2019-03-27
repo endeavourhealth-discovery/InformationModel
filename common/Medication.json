@@ -1,0 +1,153 @@
+{
+  "document": "http://DiscoveryDataService/InformationModel/dm/HealthData/Medication/1.0.1",
+  "import": "http://DiscoveryDataService/InformationModel/dm/core/1.0.1",
+  "Concepts": [
+    {
+      "id": "BasicDoseForm",
+      "name": "Basic dose form",
+      "description": "?????",
+      "is_subtype_of": {
+        "id": "SimpleDataType"
+      }
+    },
+    {
+      "id": "Medicine_or_Device",
+      "name": "Medicine of device",
+      "description": "A drug applicance or device used in medication entries",
+      "is_subtype_of": {
+        "id": "CodeableConcept"
+      },
+      "ingredient": {
+        "has_value_type": {
+          "id": "Ingredient"
+        },
+        "cardinality": {
+          "id": "has_up_to_many"
+        }
+      },
+      "form": {
+        "has_value_type": {
+          "id": "BasicDoseForm"
+        }
+      }
+    },
+    {
+      "id": "Ingredient",
+      "name": "Ingredient",
+      "description": "A substance as part of a medicine with a strength",
+      "is_subtype_of": {
+        "id": "CodeableConcept"
+      },
+      "strength": {
+        "has_value_type": {
+          "id": "PharmaceuticalStrength"
+        }
+      }
+    },
+    {
+      "id": "PharmaceuticalStrength",
+      "name": "Pharmaceutical strength",
+      "description": "A strength of an ingredient in a particular medicine or device",
+      "is_subtype_of": {
+        "id": "ComplexDataType"
+      },
+      "strength_numerator_value": {
+        "has_value_type": {
+          "id": "Numeric"
+        }
+      },
+      "strength_numerator_unit": {
+        "has_value_type": {
+          "id": "UnitsOfMeasure"
+        }
+      },
+      "strength_denominator_value": {
+        "has_value_type": {
+          "id": "Numeric"
+        }
+      },
+      "strength_denominator_unit": {
+        "has_value_type": {
+          "id": "UnitsOfMeasure"
+        }
+      }
+    },
+    {
+      "id": "strength_numerator_value",
+      "name": "strength numerator value",
+      "description": "Property with  value that is a number",
+      "is_subtype_of": {
+        "id": "data_property"
+      },
+      "has_value_type": {
+        "id": "Numeric"
+      }
+    },
+    {
+      "id": "strength_numerator_unit",
+      "name": "strength numerator value",
+      "description": "Property with  value that is a unit of measure",
+      "is_subtype_of": {
+        "id": "object_property"
+      },
+      "has_value_type": {
+        "id": "UnitsOfMeasure"
+      }
+    },
+    {
+      "id": "strength_denominator_value",
+      "name": "strength denominator value",
+      "description": "Property with  value that is a number",
+      "is_subtype_of": {
+        "id": "data_property"
+      },
+      "has_value_type": {
+        "id": "Numeric"
+      }
+    },
+    {
+      "id": "strength_denominator_unit",
+      "name": "strength denominator unit",
+      "description": "Property with  value that is a unit of measure",
+      "is_subtype_of": {
+        "id": "object_property"
+      },
+      "has_value_type": {
+        "id": "UnitsOfMeasure"
+      }
+    },
+    {
+      "id": "ingredient",
+      "name": "ingredient",
+      "description": "Property with  value that is an ingredient",
+      "is_subtype_of": {
+        "id": "object_property"
+      },
+      "has_value_type": {
+        "id": "Ingredient"
+      }
+    },
+    {
+      "id": "form",
+      "name": "form",
+      "description": "Property with  value that is a basic dose form",
+      "is_subtype_of": {
+        "id": "object_property"
+      },
+      "has_value_type": {
+        "id": "BasicDoseForm"
+      }
+    },
+    {
+      "id": "strength",
+      "name": "strength",
+      "description": "Property with  value that is a pharmaceutical strength",
+      "is_subtype_of": {
+        "id": "object_property"
+      },
+      "has_value_type": {
+        "id": "BasicDoseForm"
+      }
+    }
+  ]
+}

@@ -1,223 +1,369 @@
 {
-  "@document": "http/DiscoveryDataService/InformationModel/dm/core/1.0.1",
+  "document": "http://DiscoveryDataService/InformationModel/dm/core/1.0.1",
   "Concepts": [
     {
-      "@id": "@Expression",
-      "@name": "Expression",
-      "@description": "Free form expression",
-      "@is_subtype_of": {
-        "@id": "@Concept"
+      "id": "Concept",
+      "name": "Concept",
+      "description": "A concept of some kind",
+      "status": {
+        "has_value_type": {
+          "id": "ConceptStatus"
+        }
       },
-      "@any_property": null
-    },
-    {
-      "@id": "@has_up_to_one",
-      "@name": "has up to one",
-      "@description": "property pointed to has a cardinality of zero or one with the subject",
-      "@is_subtype_of": {
-        "@id": "@cardinality"
-      }
-    },
-    {
-      "@id": "@has_one",
-      "@name": "has one",
-      "@description": "@Concept pointed to has a cardinality of one with the subject",
-      "@is_subtype_of": {
-        "@id": "@Cardinality"
-      }
-    },
-    {
-      "@id": "@name",
-      "@name": "name",
-      "@description": "the name of the concept preferably unambiguous",
-      "@is_subtype_of": {
-        "@id": "@data_property"
+      "short": {
+        "has_value_type": {
+          "id": "Text"
+        }
       },
-      "@has_value_type": {
-        "@id": "@text"
-      }
-    },
-    {
-      "@id": "@description",
-      "@name": "description",
-      "@description": "the description of the concept to make the meaning unambigous",
-      "@is_subtype_of": {
-        "@id": "@data_property"
+      "code": {
+        "has_value_type": {
+          "id": "Text"
+        }
       },
-      "@has_value_type": {
-        "@id": "@text"
-      }
-    },
-    {
-      "@id": "@code_scheme",
-      "@name": "code scheme",
-      "@description": "The code scheme the concept came from",
-      "@is_subtype_of": {
-        "@id": "@object_property"
-      },
-      "@has_value_type": {
-        "@id": "@CodeScheme"
-      }
-    },
-    {
-      "@id": "@CodeScheme",
-      "@name": "CodeScheme",
-      "@description": "a source code scheme may be a local scheme or national scheme",
-      "@is_subtype_of": {
-        "@id": "@Concept"
-      }
-    },
-    {
-      "@id": "@code",
-      "@name": "code",
-      "@description": "A code which was assigned to the concept in the code scheme",
-      "@is_subtype_of": {
-        "@id": "@data_property"
-      },
-      "@has_value_type": {
-        "@id": "text"
-      }
-    },
-    {
-      "@id": "@is_subtype_of",
-      "@name": "is a subtype of",
-      "@description": "a property that states that the subject is a subtype of the object",
-      "@is_subtype_of": {
-        "@id": "is_descendant_of"
-      }
-    },
-    {
-      "@id": "@id",
-      "@name": "identifier",
-      "@description": "an identifier",
-      "@is_subtype_of": {
-        "@id": "@data_property"
-      },
-      "@has_value_type": {
-        "@id": "@text"
-      }
-    },
-    {
-      "@id": "is_descendant_of",
-      "@name": "is a descendant of",
-      "@description": "An concept that is a descendant of another concept recursively",
-      "@is_subtype_of": {
-        "@id": "@relationship"
-      },
-      "inverse_property": {
-        "@id": "@has_descendant"
-      }
-    },
-    {
-      "@id": "@has_descendant",
-      "@name": "has descendants",
-      "@description": "Concept has descendants recursively",
-      "@is_subtype_of": {
-        "@id": "@relationship"
-      }
-    },
-    {
-      "@id": "@relationship",
-      "@name": "relationship",
-      "@description": "relationship between one property and another",
-      "@is_subtype_of": {
-        "@id": "@object_property"
-      },
-      "@has_value_type": {
-        "@id": "@Concept"
-      }
-    },
-    {
-      "@id": "@object_property",
-      "@name": "Concept property",
-      "@description": "a property whose value or target is a concept",
-      "@is_subtype_of": {
-        "@id": "@Concept"
-      },
-      "@has_value_type": {
-        "@id": "@Concept"
-      }
-    },
-    {
-      "@id": "@data_property",
-      "@name": "data property",
-      "@description": "the property is going to have a simple data type as a value",
-      "@is_subtype_of": {
-        "@id": "@Concept"
-      },
-      "@has_value_type": {
-        "@id": "@SimpleDataType"
-      }
-    },
-    {
-      "@id": "@Text",
-      "@name": "Text",
-      "@description": "a text value",
-      "@is_subtype_of": {
-        "@id": "@SimpleDataType"
-      }
-    },
-    {
-      "@id": "@SimpleDataType",
-      "@name": "simple data type",
-      "@description": "a text or numeric or date value",
-      "@is_subtype_of": {
-        "@id": "@Concept"
-      }
-    },
-    {
-      "@id": "@cardinality",
-      "@name": "Cardinality",
-      "@description": "whether something has zero one or many values for a relationship or attribute",
-      "@is_subtype_of": {
-        "@id": "@Concept"
-      }
-    },
-    {
-      "@id": "@View",
-      "@is_subtype_of": {"@id" :  "@Concept" },
-      "@name": "View",
-      "@description": "A configured view of the data model",
-      "node": {
-        "@has_value_type": {
-          "@id": "@TreeNode"
+      "code_scheme": {
+        "has_value_type": {
+          "id": "CodeScheme"
         }
       }
     },
     {
-      "@id": "@TreeNode",
-      "@name": "A node for a tree containing concept objects",
+      "id": "Expression",
+      "name": "Expression",
+      "description": "Free form expression",
+      "is_subtype_of": {
+        "id": "Concept"
+      },
+      "any_property": null
+    },
+    {
+      "id": "has_up_to_one",
+      "name": "has up to one",
+      "description": "property pointed to has a cardinality of zero or one with the subject",
+      "is_subtype_of": {
+        "id": "Cardinality"
+      }
+    },
+    {
+      "id": "has_one",
+      "name": "has one",
+      "description": "Concept pointed to has a cardinality of one with the subject",
+      "is_subtype_of": {
+        "id": "Cardinality"
+      }
+    },
+    {
+      "id": "name",
+      "name": "name",
+      "description": "the name of the concept preferrably unambiguous",
+      "is_subtype_of": {
+        "id": "data_property"
+      },
+      "has_value_type": {
+        "id": "Text"
+      }
+    },
+    {
+      "id": "description",
+      "name": "description",
+      "description": "the description of the concept to make the meaning unambigous",
+      "is_subtype_of": {
+        "id": "data_property"
+      },
+      "has_value_type": {
+        "id": "Text"
+      }
+    },
+    {
+      "id": "code_scheme",
+      "name": "code scheme",
+      "description": "The code scheme the concept came from",
+      "is_subtype_of": {
+        "id": "object_property"
+      },
+      "has_value_type": {
+        "id": "CodeScheme"
+      }
+    },
+    {
+      "id": "CodeScheme",
+      "name": "CodeScheme",
+      "description": "a source code scheme may be a local scheme or national scheme",
+      "is_subtype_of": {
+        "id": "Concept"
+      }
+    },
+    {
+      "id": "code",
+      "name": "code",
+      "description": "A code which was assigned to the concept in the code scheme",
+      "is_subtype_of": {
+        "id": "data_property"
+      },
+      "has_value_type": {
+        "id": "Text"
+      }
+    },
+    {
+      "id": "is_subtype_of",
+      "name": "is a subtype of",
+      "description": "a property that states that the subject is a subtype of the object",
+      "is_subtype_of": {
+        "id": "is_descendant_of"
+      }
+    },
+    {
+      "id": "id",
+      "name": "identifier",
+      "description": "an identifier",
+      "is_subtype_of": {
+        "id": "data_property"
+      },
+      "has_value_type": {
+        "id": "Text"
+      }
+    },
+    {
+      "id": "is_descendant_of",
+      "name": "is a descendant of",
+      "description": "An concept that is a descendant of another concept recursively",
+      "is_subtype_of": {
+        "id": "Relationship"
+      },
+      "inverse_property": {
+        "id": "has_descendant"
+      }
+    },
+    {
+      "id": "has_descendant",
+      "name": "has descendants",
+      "description": "Concept has descendants recursively",
+      "is_subtype_of": {
+        "id": "Relationship"
+      }
+    },
+    {
+      "id": "Relationship",
+      "name": "relationship",
+      "description": "relationship between one property and another",
+      "is_subtype_of": {
+        "id": "object_property"
+      },
+      "has_value_type": {
+        "id": "Concept"
+      }
+    },
+    {
+      "id": "object_property",
+      "name": "Concept property",
+      "description": "a property whose value or target is a concept",
+      "is_subtype_of": {
+        "id": "Concept"
+      },
+      "has_value_type": {
+        "id": "Concept"
+      }
+    },
+    {
+      "id": "data_property",
+      "name": "data property",
+      "description": "the property is going to have a simple data type as a value",
+      "is_subtype_of": {
+        "id": "Concept"
+      },
+      "has_value_type": {
+        "id": "SimpleDataType"
+      }
+    },
+    {
+      "id": "Text",
+      "name": "Text",
+      "description": "a text value",
+      "is_subtype_of": {
+        "id": "SimpleDataType"
+      }
+    },
+    {
+      "id": "Numeric",
+      "name": "Numeric",
+      "description": "a numeric value",
+      "is_subtype_of": {
+        "id": "SimpleDataType"
+      }
+    },
+    {
+      "id": "SimpleDataType",
+      "name": "simple data type",
+      "description": "a text or numeric or date value",
+      "is_subtype_of": {
+        "id": "Concept"
+      }
+    },
+    {
+      "id": "cardinality",
+      "name": "Cardinality property",
+      "description": "whether something has zero one or many values for a relationship or attribute",
+      "is_subtype_of": {
+        "id": "data_property"
+      },
+      "has_value_type": {
+        "id": "Cardinality"
+      }
+    },
+    {
+      "id": "Cardinality",
+      "name": "Cardinality values",
+      "description": "The cardinality of an item",
+      "is_subtype_of": {
+        "id": "Concept"
+      }
+    },
+    {
+      "id": "View",
+      "is_subtype_of": "Concept",
+      "name": "View",
+      "description": "A configured view of the data model",
+      "node": {
+        "has_value_type": {
+          "id": "TreeNode"
+        }
+      }
+    },
+    {
+      "id": "TreeNode",
+      "name": "A node for a tree containing concept objects",
       "node_name": {
-        "@has_value_type": "@text"
+        "has_value_type": "Text"
       },
       "object": {
-        "@has_value_type": "@Concept"
+        "has_value_type": "Concept"
       },
       "child_node": {
-        "@has_value_type": "@TreeNode",
-        "@cardinality": "@has_up_to_many"
+        "has_value_type": "TreeNode",
+        "cardinality": "has_up_to_many"
       }
     },
     {
-      "@id": "any_property",
-      "@name": "any property",
-      "@description": "a reserved property to indicate any property value arrangement can follow from this point",
-      "@is_subtype_of": {
-        "@id": "@Concept"
+      "id": "any_property",
+      "name": "any property",
+      "description": "a reserved property to indicate any property value arrangement can follow from this point",
+      "is_subtype_of": {
+        "id": "Concept"
       }
     },
     {
-      "@id": "@DateTime",
-      "@name": "Date and time",
-      "@description": "approximate or exact date and optionally a time",
-      "@is_subtype_of": {
-        "@id": "@SimpleDataType"
+      "id": "DateTime",
+      "name": "Date and time",
+      "description": "approximate or exact date and optionally a time",
+      "is_subtype_of": {
+        "id": "SimpleDataType"
       }
     },
-    {"@id":"@uuid",
-      "@name": "UUID",
-      "@description" :"Universal identifier",
-      "@is_subtype_of": {"@id": "@SimpleDataType"}
+    {
+      "id": "uuid",
+      "name": "UUID",
+      "description": "Universal identifier",
+      "is_subtype_of": {
+        "id": "SimpleDataType"
+      }
+    },
+    {
+      "id": "less_than",
+      "name": "less than",
+      "description": "less than the numeric value",
+      "is_subtype_of": {
+        "id": "comparator"
+      }
+    },
+    {
+      "id": "less_than_or_equal",
+      "name": "less than or equal",
+      "description": "less than or equal to the numeric value",
+      "is_subtype_of": {
+        "id": "comparator"
+      }
+    },
+    {
+      "id": "greater_than",
+      "name": "greater than",
+      "description": "greater than or the numeric value",
+      "is_subtype_of": {
+        "id": "comparator"
+      }
+    },
+    {
+      "id": "greater_than_or_equal",
+      "name": "greater than or equal",
+      "description": "greater than or equal to the numeric value",
+      "is_subtype_of": {
+        "id": "comparator"
+      }
+    },
+    {
+      "id": "comparator",
+      "name": "Comparator",
+      "description": "comparators for a numeric value e.g. less than or greater than",
+      "is_subtype_of": {
+        "id": "Concept"
+      }
+    },
+    {
+      "id": "is_anonymous",
+      "name": "anonymous",
+      "description": "indicates that this entity is anonymous i.e. has no name and must be identified by properties in a query",
+      "is_subtype_of": { "id": "data_property" },
+      "has_value_type": { "id": "Boolean" }
+    },
+    {
+      "id": "status",
+      "name": "Status",
+      "description": "Indicates the status of this entity",
+      "is_subtype_of": { "id": "data_property" },
+      "has_value_type": { "id": "ConceptStatus" }
+    },
+    {
+      "id": "ConceptStatus",
+      "name": "Concept status",
+      "description": "Concept status values",
+      "is_subtype_of": { "id": "SimpleDataType" },
+      "has_value_type": { "id": "Text" }
+    },
+    {
+      "id": "Boolean",
+      "name": "Boolean",
+      "description": "A yes/no or true/false value",
+      "is_subtype_of": { "id": "SimpleDataType" }
+    },
+    {
+      "id": "has_up_to_many",
+      "name": "Has up to many",
+      "description": "Concept pointed to has a cardinality of zero to many with the subject",
+      "is_subtype_of": { "id": "Cardinality" }
+    },
+    {
+      "id": "has_value_type",
+      "name": "Has value type",
+      "description": "Specifies the value type for this entity",
+      "is_subtype_of": { "id": "data_property" }
+    },
+    {
+      "id": "CodeableConcept",
+      "name": "Codeable concept",
+      "description": "A concept which may be used for coding a health record",
+      "is_subtype_of": { "id":  "Concept" }
+    },
+    {
+      "id": "ComplexDataType",
+      "name": "Complex data type",
+      "description": "A complex data type",
+      "is_subtype_of": { "id":  "Concept" }
+    },
+    {
+      "id": "UnitsOfMeasure",
+      "name": "Units of measure",
+      "description": "The unit of measure for the associated value",
+      "is_subtype_of": { "id":  "SimpleDataType" },
+      "has_value_type": { "id":  "Text" }
     }
+
   ]
 }

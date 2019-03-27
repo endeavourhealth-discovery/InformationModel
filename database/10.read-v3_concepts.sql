@@ -18,7 +18,7 @@ VALUES (JSON_OBJECT('document', 'http://DiscoveryDataService/InformationModel/dm
                     'name', 'READ 3',
                     'description', 'The READ (CTV) 3 code scheme',
                         'is_subtype_of', JSON_OBJECT(
-                        'id', 'code_scheme'
+                        'id', 'CodeScheme'
                         )));
 
 CREATE TABLE read_v3_current
@@ -38,7 +38,7 @@ SELECT JSON_OBJECT(
            'code_scheme', 'CTV3',
            'code', code,
            'is_subtype_of', JSON_OBJECT(
-               'id','codeable_concept'
+               'id','CodeableConcept'
                )
            )
 FROM read_v3_current;

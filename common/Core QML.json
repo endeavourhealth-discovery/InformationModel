@@ -1,0 +1,84 @@
+{
+	 "@document": "http/DiscoveryDataService/InformationModel/qm/core/1.0.1",
+	 "@prefix": {
+		 "dm": "http://DiscoveryDataService/InformationModel/dm/core#"
+	},
+	 "@import": "http://DiscoveryDataService/InformationModel/dm/core/1.0.1",
+	 "ValueSetDefinition": {
+		 "@definition": {
+			 "dm:name": "value set definition",
+			 "dm:description": "defines how to build a value set",
+			 "dm:is_subtype_of": "QueryLanguageConcept"
+		},
+		 "@structure": {
+			 "has_one": "query_subject",
+			 "has_up_to_many": "query_property_value"
+		}
+	},
+	"ExpressionQuery": {
+		 "dm:name": "Expression query",
+		 "dm:description": "Query language subset for expressions",
+		 "dm:is_subtype_of": "QueryLanguageConcept"
+	},
+	 "QueryLanguageConcept": {
+		 "@definition": {
+			 "dm:name": "Query language concept",
+			 "dm:description": "Concepts that describe the query language",
+			 "dm:is_subtype_of": "Concept"
+		}
+	},
+	 "query_subject": {
+		 "@definition": {
+			 "dm:name": "value set subject",
+			 "dm:description": "points to the concept that this the subject of this part of the query",
+			 "dm:is_subtype_of": "dm:object_property",
+			 "dm:has_value_type": "Concept"
+		}
+	},
+	 "query_property_value": {
+		 "@definition": {
+			 "dm:name": "value set property values",
+			 "dm:description": "points to the properties and values that must be included when querying the subject",
+			 "dm:is_subtype_of": "dm:object_property",
+			 "dm:has_value_type": "PropertyValueQuery"
+		}
+	},
+	 "PropertyValueQuery": {
+		 "@definition": {
+			 "dm:name": "Property value",
+			 "dm:description": "Property path and value list to be included in the query",
+			 "dm:is_subtype_of": "QueryLanguageConcept"
+		},
+		 "@structure": {
+			 "has_one": "query_property_path",
+			 "has_up_to_many": [
+				"include_value",
+				"exclude_value"
+			]
+		}
+	},
+	 "query_property_path": {
+		 "@definition": {
+			 "dm:name": "property path",
+			 "dm:description": "the relative path from the subject ..../xyz/abc.../def/ghi to get to a leaf property",
+			 "dm:is_subtype_of": "data_property",
+			 "dm:has_value_type": "text"
+		}
+	},
+	 "include_value": {
+		 "@definition": {
+			 "dm:name": "include value means values to be included in the value set",
+			 "dm:description": "concept and any refinement properterties to include",
+			 "dm:is_subtype_of": "concept_property",
+			 "dm:has_value_type": "ExpressionQuery"
+		}
+	},
+	 "exclude_value": {
+		 "@definition": {
+			 "dm:name": "exclude concept value",
+			 "dm:description": "value and properterty to exclude",
+			 "dm:is_subtype_of": "concept_property",
+			 "dm:has_value_type": "ExpressionQuery"
+		}
+	}
+}

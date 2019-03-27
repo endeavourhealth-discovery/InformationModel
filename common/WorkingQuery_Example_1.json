@@ -1,0 +1,431 @@
+{
+	 "QueryDocument": {
+		 "document": "http/DiscoveryDataService/InformationModel/QueryLibrary/1.0.1",
+		 "import": [
+			"http/DiscoveryDataService/InformationModel/dm/HealthData/1.0.1",
+			"http/DiscoveryDataService/InformationModel/QueryLanguage/1.0.1"
+		],
+		 "Query ": [
+			{
+				 "id": "London_Practices",
+				 "is_type_of": {
+					 "id": "GenericQuery"
+				},
+				 "name": "London General practices commissioned by NHS England",
+				 "label": "LONDON_GP",
+				 "authored_date": "02/02/2019",
+				 "authored_by": "David Stables",
+				 "subject": "Organisation",
+				 "result_sets": [
+					{
+						 "select": "Organisation.id",
+						 "from": "IM",
+						 "where": [
+							{
+								 "property": "organisation_type",
+								 "value": "GeneralPractive",
+								 "next_operator": "and"
+							},
+							{
+								 "property": "commissioned_by",
+								 "value": "<<NHS_London"
+							}
+						]
+					}
+				]
+			},
+			{
+				 "id": "Gms_reg_last_5y",
+				 "is_type_of": {
+					 "id": "GenericQuery"
+				},
+				 "name": "London GP patients in last 5 years",
+				 "label": "GMS_LONDON_5YR",
+				 "description": "Patients who have been registered for GMS services in London practices within the last 5 years at some point",
+				 "authored_date": "02/02/2019",
+				 "authored_by": "David Stables",
+				 "entity_normalisation_level": {
+					 "id": "Global"
+				},
+				 "subject": "Person",
+				 "result_sets": [
+					{
+						 "select": "Person.id",
+						 "from": "EHR",
+						 "where": [
+							{
+								 "property": "GMS_Registration.start_date",
+								 "value_range": {
+									 "relative_range": {
+										 "to": {
+											 "operator": "<",
+											 "value": 0,
+											 "units": "days",
+											 "null": false
+										}
+									}
+								},
+								 "next_operator": "and"
+							},
+							{
+								 "property": "GMSRegistration.end_date",
+								 "value_range": {
+									 "relative_range": {
+										 "from": {
+											 "operator": ">",
+											 "value": 5,
+											 "units": "years",
+											 "null": true
+										}
+									}
+								},
+								 "next_operator": "and"
+							},
+							{
+								 "property": "GMSRegistration.Organisation",
+								 "value_set": "London_Practices"
+							}
+						]
+					}
+				]
+			},
+			{
+				 "id": "Newish_London_Diabetics",
+				 "is_type_of": {
+					 "id": "GenericQuery"
+				},
+				 "name": "Diabetics diagnosed between 18 months and 6 months ago",
+				 "label": "DIABETICS",
+				 "description": "Patients whose first record of diabetes was betweeen 18 months and 6 months before the reference date",
+				 "authored_date": "08/02/2019",
+				 "authored_by": "David Stables",
+				 "entity_normalisation_level": {
+					 "id": "Global"
+				},
+				 "subject": "Person",
+				 "result_sets": [
+					{
+						 "select": [
+							"Person.id",
+							"Person.Observation.date"
+						],
+						 "from": "EHR",
+						 "where": [
+							{
+								 "property": "Observation.Concept",
+								 "value_set": "DiabetesMellitus",
+								 "restrict_on": {
+									 "property": "Observation.date",
+									 "order": "earliest",
+									 "count": 1
+								},
+								 "next_operator": "and"
+							},
+							{
+								 "property": "Observation.date",
+								 "value_range": {
+									 "relative_range": {
+										 "from": {
+											 "operator": ">=",
+											 "value": 24,
+											 "units": "months"
+										},
+										 "to": {
+											 "operator": "<=",
+											 "value": 9,
+											 "units": "months"
+										}
+									}
+								}
+							}
+						],
+						 "next_operator": "and"
+					},
+					{
+						 "select": [
+							"Person.id"
+						],
+						 "from": "GMS_LONDON_5Y"
+					}
+				]
+			},
+			{
+				 "id": "Diabetics_reg_9_month_after",
+				 "is_type_of": {
+					 "id": "GenericQuery"
+				},
+				 "name": "Patients continually registered with same practice for 9 months after diagnosis",
+				 "label": "DIABETICS_REG_9_M",
+				 "authored_date": "02/02/2019",
+				 "authored_by": "David Stables",
+				 "entity_normalisation_level": {
+					 "id": "Global"
+				},
+				 "subject": "Person",
+				 "result_sets": [
+					{
+						 "select": [
+							"Person.id",
+							"Person.Observation.date"
+						],
+						 "from": "DIABETICS",
+						 "next_operator": "not"
+					},
+					{
+						 "select": [
+							"Person.id"
+						],
+						 "from": "EHR",
+						 "where": {
+							 "property": "GMS_Registration.enddate",
+							 "value_range": {
+								 "relative_range": {
+									 "compare_with": "DIABETICS.Observation.date",
+									 "to": {
+										 "operator": "<=",
+										 "value": 9,
+										 "units": "months"
+									}
+								}
+							}
+						}
+					}
+				]
+			},
+			{
+				 "id": "Diabetics_referred_within_9_m",
+				 "is_type_of": {
+					 "id": "GenericQuery"
+				},
+				 "name": "Patients referred to educational service continually registered within 9 months after diagnosis",
+				 "label": "DIABETICS_REFED",
+				 "description": "Diabetics diagnosed between 9 months and 24 months ago, continutally registered and referred to educational service within 9 months of the diagnosis",
+				 "authored_date": "02/02/2019",
+				 "authored_by": "David Stables",
+				 "entity_normalisation_level": {
+					 "id": "Global"
+				},
+				 "subject": "Person",
+				 "result_sets": [
+					{
+						 "select": "Person.id",
+						 "from": "DIABETICS_REG_9_M",
+						 "next_operator": "and"
+					},
+					{
+						 "select": [
+							"Person.id",
+							"Person.Referral.date"
+						],
+						 "from": "EHR",
+						 "where": [
+							{
+								 "property": "Referral.Concept",
+								 "value_set": "Diabetes_Educational_Referral",
+								 "next_operator": "and"
+							},
+							{
+								 "property": "Referral.date",
+								 "value_range": {
+									 "relative_range": {
+										 "compare_with": "DIABETICS_REG_9_M.Observation.date",
+										 "to": {
+											 "operator": "<=",
+											 "value": 9,
+											 "units": "months"
+										}
+									}
+								}
+							}
+						]
+					}
+				]
+			},
+			{
+				 "id": "Diabetics_regisered_27_m",
+				 "is_type_of": {
+					 "id": "GenericQuery"
+				},
+				 "name": "New diabetics still registered in London and 90% of time in practice 27 months after diagnosis",
+				 "label": "DIABETICS_27M",
+				 "description": "Newish Diabetics registered in London 27 months ofter the diagnosis and spent at least 90% of time registered with London practices",
+				 "authored_date": "02/02/2019",
+				 "authored_by": "David Stables",
+				 "entity_normalisation_level": {
+					 "id": "Global"
+				},
+				 "subject": "Person",
+				 "result_sets": [
+					{
+						 "select": [
+							"Person.id",
+							"Person.Observation.date"
+						],
+						 "from": "DIABETICS",
+						 "where": {
+							 "property": "Observation.Date",
+							 "value_range": {
+								 "relative_range": {
+									 "to": {
+										 "operator": "<=",
+										 "value": 27,
+										 "units": "months"
+									}
+								}
+							}
+						},
+						 "next_operator": "and"
+					},
+					{
+						 "select": "Person.id",
+						 "from": "EHR",
+						 "where": {
+							 "function": "GMS_Registered_Days(\"DIABETICS.Person.Observation.Date\")",
+							 "value_range": {
+								 "from": {
+									 "operator": ">=",
+									 "value": 730
+								}
+							}
+						},
+						 "next_operator": "and"
+					},
+					{
+						 "select": "Person.id",
+						 "from": "EHR",
+						 "where": {
+							 "property": "GMSRegistration.Organisation",
+							 "value_set": "London_Practices"
+						}
+					}
+				]
+			},
+			{
+				 "id": "Diabetics_reerred_and_seen_27m",
+				 "is_type_of": {
+					 "id": "GenericQuery"
+				},
+				 "name": "New diabetics referred and seen still registered in London and 90% of time in practice 27 months after diagnosis",
+				 "label": "DIABETICS_REFED_SEEN",
+				 "description": "Newish Diabetics referred and seen, still registered in London 27 months ofter the diagnosis and spent at least 90% of time registered",
+				 "authored_date": "02/02/2019",
+				 "authored_by": "David Stables",
+				 "entity_normalisation_level": {
+					 "id": "Global"
+				},
+				 "subject": "Person",
+				 "result_sets": [
+					{
+						 "select": "Person.id",
+						 "from": "DIABETICS_REFED",
+						 "next_operator": "and"
+					},
+					{
+						 "select": "Person.id",
+						 "from": "DIABETICS_27M",
+						 "next_operator": "and"
+					},
+					{
+						 "select": "Person.id",
+						 "from": "EHR",
+						 "where": [
+							{
+								 "property": "Encounter.Service",
+								 "value_set": "Diabetic_Educational_Services",
+								 "next_operator": "and"
+							},
+							{
+								 "property": "Encounter.date",
+								 "value_range": {
+									 "relative_range": {
+										 "compare_with": "DIABETES_REFED.Referral.date",
+										 "to": {
+											 "operator": ">=",
+											 "value": 0,
+											 "units": "months"
+										}
+									}
+								}
+							}
+						]
+					}
+				]
+			},
+			{
+				 "id": "ModerateSevereFrailty",
+				 "is_type_of": {
+					 "id": "ValueSetDefinition"
+				},
+				 "name": "Moderate or severe frailty",
+				 "authored_date": "02/02/2019",
+				 "authored_by": "David Stables",
+				 "subject": "Expression",
+				 "value_set": {
+					 "expression": [
+						"<<925831000000107|Moderate frailty",
+						"<<925861000000102|Severe frailty"
+					],
+					 "numeric_expression": [
+						{
+							 "expression": "713636003|Frailty Index score (observable entity)",
+							 "range": {
+								 "from": {
+									 "operator": ">=",
+									 "value": 0.25
+								}
+							}
+						},
+						{
+							 "expression": "713636003|Frailty Index score (observable entity)",
+							 "range": {
+								 "from": {
+									 "operator": ">=",
+									 "value": 0.25
+								}
+							}
+						}
+					]
+				}
+			},
+			{
+				 "id": "AllFrailty",
+				 "is_type_of": {
+					 "id": "ValueSetDefinition"
+				},
+				 "name": "Frailty",
+				 "authored_date": "02/02/2019",
+				 "authored_by": "David Stables",
+				 "subject": "Expression",
+				 "value_set": [
+					{
+						 "expression": [
+							"<<925791000000100 |Mild frailty (finding)",
+							"<<925831000000107|Moderate frailty",
+							"<<925861000000102|Severe frailty"
+						],
+						 "numeric_expression": [
+							{
+								 "expression": "713636003|Frailty Index score (observable entity)",
+								 "range": {
+									 "from": {
+										 "operator": ">=",
+										 "value": 0.001
+									}
+								}
+							},
+							{
+								 "expression": "713636003|Frailty Index score (observable entity)",
+								 "range": {
+									 "from": {
+										 "operator": ">=",
+										 "value": 0.001
+									}
+								}
+							}
+						]
+					}
+				]
+			}
+		]
+	}
+}

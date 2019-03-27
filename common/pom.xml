@@ -8,20 +8,49 @@
 
   <properties>
     <java.version>1.8</java.version>
-    <junit.version>4.12</junit.version>
 
     <maven-compiler-plugin.version>3.1</maven-compiler-plugin.version>
     <maven-deploy-plugin.version>2.4</maven-deploy-plugin.version>
     <maven-surefire-plugin.version>2.12.4</maven-surefire-plugin.version>
     <maven-jacoco-plugin.version>0.7.5.201505241946</maven-jacoco-plugin.version>
 
-    <eds-cache.version>1.4-SNAPSHOT</eds-cache.version>
-    <eds-config-manager.version>1.25-SNAPSHOT</eds-config-manager.version>
-
     <sonar.projectKey>endeavourhealth-discovery_InformationModel::common</sonar.projectKey>
   </properties>
 
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.endeavourhealth</groupId>
+        <artifactId>discovery-versions</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
   <dependencies>
+    <dependency>
+      <groupId>org.endeavourhealth.im</groupId>
+      <artifactId>models</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.endeavourhealth.common</groupId>
+      <artifactId>cache</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.endeavourhealth.configmanager</groupId>
+      <artifactId>configmanager</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+    </dependency>
+
     <dependency>
       <groupId>net.sf.trove4j</groupId>
       <artifactId>trove4j</artifactId>
@@ -29,24 +58,8 @@
     </dependency>
 
     <dependency>
-      <groupId>org.endeavourhealth.im</groupId>
-      <artifactId>models</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.endeavourhealth.common</groupId>
-      <artifactId>cache</artifactId>
-      <version>${eds-cache.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.endeavourhealth.configmanager</groupId>
-      <artifactId>configmanager</artifactId>
-      <version>${eds-config-manager.version}</version>
-    </dependency>
-    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>${junit.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

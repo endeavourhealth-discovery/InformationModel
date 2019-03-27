@@ -1,0 +1,181 @@
+{
+	 "QueryDocument": {
+		 "document": "http/DiscoveryDataService/InformationModel/QueryLibrary/1.0.1",
+		 "import": [
+			"http/DiscoveryDataService/InformationModel/dm/HealthData/1.0.1",
+			"http/DiscoveryDataService/InformationModel/QueryLanguage/1.0.1"
+		],
+		 "Query ": [
+			{
+				 "id": "Gms_reg",
+				 "is_type_of": {
+					 "id": "GenericQuery"
+				},
+				 "name": "Currently registered in LHCRE",
+				 "label": "GMS_REG",
+				 "description": "Patients who areregistered for GMS services in LHCR",
+				 "authored_date": "01/08/2018",
+				 "authored_by": "David Stables/Darren sheavills",
+				 "entity_normalisation_level": {
+					 "id": "Global"
+				},
+				 "subject": "Person",
+				 "result_sets": [
+					{
+						 "select": "Person.id",
+						 "from": "EHR",
+						 "where": [
+							{
+								 "property": "GMS_Registration.start_date",
+								 "value_range": {
+									 "relative_range": {
+										 "to": {
+											 "operator": "<",
+											 "value": 0,
+											 "units": "days",
+											 "null": false
+										}
+									}
+								},
+								 "next_operator": "and"
+							},
+							{
+								 "property": "GMSRegistration.end_date",
+								 "value_range": {
+									 "relative_range": {
+										 "from": {
+											 "operator": ">",
+											 "value": 0,
+											 "units": "days",
+											 "null": true
+										}
+									}
+								}
+							}
+						]
+					}
+				]
+			},
+			{
+				 "id": "Probable_Frailty",
+				 "is_type_of": {
+					 "id": "GenericQuery"
+				},
+				 "name": "LHCR patients probable frailty",
+				 "label": "PROBABLE_FRAILTY",
+				 "description": "Persons registered with GP in LHCR probable frailty, all sources including hospital data",
+				 "authored_date": "02/08/2018",
+				 "authored_by": "David Stables/Darren Sheavills",
+				 "entity_normalisation_level": {
+					 "id": "Global"
+				},
+				 "subject": "Person",
+				 "result_sets": [
+					{
+						 "select": "Person.id",
+						 "from": "GMS_REG",
+						 "next_operator": "and"
+					},
+					{
+						 "select": "Person.id",
+						 "from": "EHR",
+						 "where": [
+							{
+								 "property": "Observation.Concept",
+								 "value_set": "ALL_FRAILTY",
+								 "restrict_on": {
+									 "property": "Observation.date",
+									 "order": "latest",
+									 "count": 1
+								},
+								 "next_operator": "and"
+							},
+							{
+								 "property": "Observation.Concept",
+								 "value_set": "MODERATE_SEVERE_FRAILTY"
+								
+							}
+						]
+					}
+				]
+			},
+			{
+				 "id": "ModerateSevereFrailty",
+				 "is_type_of": {
+					 "id": "ValueSetDefinition"
+				},
+				 "name": "Moderate or severe frailty",
+				 "label" :"MODERATE_SEVERE_FRAILTY",
+				 "authored_date": "02/02/2019",
+				 "authored_by": "David Stables",
+				 "subject": "Expression",
+				 "value_set": {
+					 "expression": [
+						"<<925831000000107|Moderate frailty",
+						"<<925861000000102|Severe frailty"
+					],
+					 "numeric_expression": [
+						{
+							 "expression": "713636003|Frailty Index score (observable entity)",
+							 "range": {
+								 "from": {
+									 "operator": ">=",
+									 "value": 0.25
+								}
+							}
+						},
+						{
+							 "expression": "713636003|Frailty Index score (observable entity)",
+							 "range": {
+								 "from": {
+									 "operator": ">=",
+									 "value": 0.25
+								}
+							}
+						}
+					]
+				}
+			},
+			{
+				 "id": "AllFrailty",
+				 "is_type_of": {
+					 "id": "ValueSetDefinition"
+				},
+				 "name": "Frailty",
+				 "label" :"ALL_FRAILTY",
+				 "authored_date": "02/02/2019",
+				 "authored_by": "David Stables",
+				 "subject": "Expression",
+				 "value_set": [
+					{
+						 "expression": [
+							"<<925791000000100 |Mild frailty (finding)",
+							"<<925831000000107|Moderate frailty",
+							"<<925861000000102|Severe frailty"
+						],
+						 "numeric_expression": [
+							{
+								 "expression": "713636003|Frailty Index score (observable entity)",
+								 "range": {
+									 "from": {
+										 "operator": ">=",
+										 "value": 0.001
+									}
+								}
+							},
+							{
+								 "expression": "713636003|Frailty Index score (observable entity)",
+								 "range": {
+									 "from": {
+										 "operator": ">=",
+										 "value": 0.001
+									}
+								}
+							}
+						]
+					}
+				]
+			}
+		]
+	}
+}

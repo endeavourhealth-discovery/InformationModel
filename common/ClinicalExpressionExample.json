@@ -1,0 +1,35 @@
+{
+	 "expression": {
+		 "sct_chest_pain": {
+			 "sct_radiating_to": {
+				 "@id": "sct-jaw"
+			},
+			 "sct_site": {
+				 "@id": "sct_central"
+			},
+			 "character": {
+				 "@id": "sct-crushing"
+			},
+			 "@has_occurence_after": [
+				{
+					 "walking_uphill": {
+						 "duration_to_event": {
+							 "numeric_value": 5,
+							 "units": {
+								 "@id": "ucum-minutes"
+							}
+						}
+					},
+					 "meals": {
+						 "duration_to_event": {
+							 "numeric_value": 10,
+							 "units": {
+								 "@id": "ucum-minutes"
+							}
+						}
+					}
+				}
+			]
+		}
+	}
+}

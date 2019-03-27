@@ -3,7 +3,6 @@ package org.endeavourhealth.im;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.apache.commons.lang3.StringUtils;
 import org.endeavourhealth.common.cache.ObjectMapperPool;
 import org.endeavourhealth.im.dal.InformationModelDAL;
 import org.endeavourhealth.im.dal.InformationModelJDBCDAL;
@@ -31,12 +30,15 @@ public class DocumentImport {
     List<String> dictionary = new ArrayList<>();
     int compressionBytes = 0;
 
+    private InformationModelDAL db = new InformationModelJDBCDAL();
+
     @Test
     public void importCore() throws Exception {
         try (DataOutputStream w = new DataOutputStream(new FileOutputStream("IM-dat.bin"))) {
-            importFile("Core_IM.json", "http/DiscoveryDataService/InformationModel/dm/core/1.0.1", 23, w);
-            importFile("Working example-3.json", "http/DiscoveryDataService/InformationModel/dm/HealthData/1.0.1", 33, w);
-            importFile("Expression.json", "http/DiscoveryDataService/InformationModel/dm/Snomed/1.0.1", 1, w);
+            importFile("Core_IM.json", "http://DiscoveryDataService/InformationModel/dm/core/1.0.1", 40, w);
+            importFile("Medication.json", "http://DiscoveryDataService/InformationModel/dm/HealthData/Medication/1.0.1", 11, w);
+            //importFile("Working example-3.json", "http/DiscoveryDataService/InformationModel/dm/HealthData/1.0.1", 33, w);
+            //importFile("Expression.json", "http/DiscoveryDataService/InformationModel/dm/Snomed/1.0.1", 1, w);
             w.flush();
         }
 /*
@@ -106,7 +108,7 @@ public class DocumentImport {
         else if (t==TEXT)
             readSentence(dis, indent + 1, dis.readByte());
         else if (t==REFERENCE)
-            System.out.println("{ \"@id\" : \"" + ids.get(dis.readInt()) + "\" }");
+            System.out.println("{ \"id\" : \"" + ids.get(dis.readInt()) + "\" }");
         else if (t==SUBTYPE)
             readObjectProperty(dis, indent+1);
         else if (t==ARRAY)
@@ -145,29 +147,75 @@ public class DocumentImport {
         String JSON = new String(encoded, Charset.defaultCharset()).trim();
         JsonNode root = ObjectMapperPool.getInstance().readTree(JSON);
 
-        String document = root.get("@document").asText();
+        String document = root.get("document").asText();
         assertEquals(iri, document);
 
         ArrayNode concepts = (ArrayNode) root.get("Concepts");
         assertEquals(expectedItems, concepts.size());
 
+        // Validate ids
+        validateConcepts(concepts);
+
         // Save document
-        InformationModelDAL db = new InformationModelJDBCDAL();
         db.insertDocument(JSON);
 
         // Save concepts
         for(JsonNode concept: concepts) {
-            ((ObjectNode) concept).put("@document", document);
-            db.insertConcept(concept.toString(), Status.ACTIVE);
+            if (!"Concept".equals(concept.get("id").textValue())) {
+                ((ObjectNode) concept).put("document", document);
+                db.insertConcept(concept.toString(), Status.ACTIVE);
+            }
         }
 
         // Export concepts to data file
 
 //        for (JsonNode concept : concepts) {
-//            w.writeInt(idIndex(concept.get("@id").textValue()));    // Int id
-//            writeProperties(w, concept, new String[] {"@id", "@description"});
+//            w.writeInt(idIndex(concept.get("id").textValue()));    // Int id
+//            writeProperties(w, concept, new String[] {"id", "description"});
 //        }
     }
+
+    private void validateConcepts(ArrayNode concepts) throws Exception {
+        Set<String> ids = new HashSet<>();
+
+        // Get ids defined in documents
+        for(JsonNode concept: concepts) {
+            ids.add(concept.get("id").textValue());
+        }
+
+        // Validate
+        for(JsonNode concept: concepts) {
+            validateIds(ids, concept);
+        }
+    }
+
+    private void validateIds(Set<String> ids, JsonNode concept) throws Exception {
+        Iterator<String> stringIterator = concept.fieldNames();
+        while (stringIterator.hasNext()) {
+            String field = stringIterator.next();
+            JsonNode node = concept.get(field);
+
+            if (node.has("id")) {
+                String id = node.get("id").textValue();
+                if (!ids.contains(id)) {
+                    Integer dbid = db.getConceptDbid(id);
+                    if (dbid == null)
+                        throw new ClassNotFoundException("id not found [" + id + "]");
+                    else
+                        ids.add(id);
+                }
+            }
+
+            if (node.isArray()) {
+                for(JsonNode child: (ArrayNode)node) {
+                    validateIds(ids, child);
+                }
+            } else if (node.isObject()) {
+                validateIds(ids, node);
+            }
+        }
+    }
+
 //
 //    private void writeProperties(DataOutputStream w, JsonNode node, String[] ignore) throws IOException {
 //        List<String> skip = Arrays.asList(ignore);
@@ -196,9 +244,9 @@ public class DocumentImport {
 //        } else if (node.isTextual()) {
 //            w.writeByte(TEXT);
 //            writeSentence(w, node.textValue());
-//        } else if (node.has("@id")) {
+//        } else if (node.has("id")) {
 //            w.writeByte(REFERENCE);
-//            w.writeInt(idIndex(node.get("@id").textValue()));
+//            w.writeInt(idIndex(node.get("id").textValue()));
 //        } else if (node.isArray()) {
 //            w.writeByte(ARRAY);
 //            writeArray(w, (ArrayNode)node);
@@ -225,7 +273,7 @@ public class DocumentImport {
 //    }
 //
 //    private int idIndex(String id) {
-//        id = id.trim().toLowerCase().replace("@","").replace("_", "");
+//        id = id.trim().toLowerCase();
 //        int idx = ids.indexOf(id);
 //        if (idx < 0) {
 //            idx = ids.size();
