@@ -1,6 +1,6 @@
 package org.endeavourhealth.im.dal;
 
-import org.endeavourhealth.im.models.Concept;
+import org.endeavourhealth.im.models.SearchResult;
 import org.endeavourhealth.im.models.Status;
 
 import java.util.List;
@@ -12,8 +12,8 @@ public interface InformationModelDAL {
     void insertConcept(String json, Status status) throws Exception;
     void updateConcept(String id, String json, Status status) throws Exception;
 
-    List<Concept> mru() throws Exception;
-    List<Concept> search(String text, String relationship, String target) throws Exception;
+    SearchResult mru() throws Exception;
+    SearchResult search(String text, Integer size, Integer page, String relationship, String target) throws Exception;
     String getConceptJSON(String id) throws Exception;
     String getConceptName(String id) throws Exception;
     Integer getConceptDbid(String id) throws Exception;

@@ -16,16 +16,17 @@ CREATE TABLE concept (
 
     id VARCHAR(50) COLLATE utf8_bin   GENERATED ALWAYS AS (`data` ->> '$.id') STORED NOT NULL,
     document VARCHAR(250)             GENERATED ALWAYS AS (`data` ->> '$.document') VIRTUAL NOT NULL,
-    name VARCHAR(60) COLLATE utf8_bin GENERATED ALWAYS AS (`data` ->> '$.name') STORED NOT NULL,
+    name VARCHAR(255)                 GENERATED ALWAYS AS (`data` ->> '$.name') STORED NOT NULL,
+    -- short_name VARCHAR(60)            GENERATED ALWAYS AS (`data` ->> '$.short_name') VIRTUAL,
     description VARCHAR(400)          GENERATED ALWAYS AS (`data` ->> '$.description') VIRTUAL,
     scheme VARCHAR(50)                GENERATED ALWAYS AS (`data` ->> '$.code_scheme') STORED,
     code VARCHAR(20) COLLATE utf8_bin GENERATED ALWAYS AS (`data` ->> '$.code') STORED,
 
     PRIMARY KEY concept_dbid_pk (dbid),
     UNIQUE KEY concept_id_uq (id),
-    UNIQUE KEY concept_scheme_code (scheme, code),
+    UNIQUE KEY concept_code_scheme (code, scheme),
     INDEX concept_updated_idx (updated),
-    FULLTEXT concept_id_name_ftx (id, name)
+    FULLTEXT concept_name_ftx (name)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS concept_tct;
@@ -44,7 +45,6 @@ CREATE TABLE concept_tct (
 DELIMITER //
 
 DROP PROCEDURE IF EXISTS proc_build_tct//
-DROP FUNCTION IF EXISTS hashId//
 
 -- EXAMPLE - Subtype hierarchy...
 -- CALL proc_build_tct(887292, '$."is_subtype_of"."id"');

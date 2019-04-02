@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import org.endeavourhealth.common.cache.ObjectMapperPool;
 import org.endeavourhealth.im.models.Concept;
+import org.endeavourhealth.im.models.SearchResult;
 import org.endeavourhealth.im.models.Status;
 
 import java.io.*;
@@ -70,59 +71,95 @@ public class InformationModelJDBCDAL implements InformationModelDAL {
     }
 
     @Override
-    public List<Concept> mru() throws Exception {
-        List<Concept> result = new ArrayList<>();
+    public SearchResult mru() throws Exception {
+        SearchResult result = new SearchResult();
 
         String sql = "SELECT dbid, id, name, scheme, code, status, updated " +
             "FROM concept " +
             "ORDER BY updated DESC " +
-            "LIMIT 20";
+            "LIMIT 15";
 
         Connection conn = ConnectionPool.getInstance().pop();
-        try (PreparedStatement statement = conn.prepareStatement(sql)) {
-            getConceptsFromResultSet(result, statement);
-        } finally {
+        try {
+            try (PreparedStatement statement = conn.prepareStatement(sql)) {
+                getConceptsFromResultSet(result.getResults(), statement);
+            }
+            try (PreparedStatement statement = conn.prepareStatement("SELECT FOUND_ROWS();")) {
+                ResultSet rs = statement.executeQuery();
+                rs.next();
+                result.setCount(rs.getInt(1));
+            }
+        }finally {
             ConnectionPool.getInstance().push(conn);
         }
         return result;
     }
 
     @Override
-    public List<Concept> search(String text, String relationship, String target) throws Exception {
-        List<Concept> result = new ArrayList<>();
+    public SearchResult search(String text, Integer size, Integer page, String relationship, String target) throws Exception {
+        page = (page == null) ? 1 : page;       // Default page to 1
+        size = (size == null) ? 15 : size;      // Default page size to 15
+        int offset = (page - 1) * size;         // Calculate offset from page & size
+
+        SearchResult result = new SearchResult()
+            .setPage(page);
 
         Integer relId = (relationship == null) ? null : getConceptDbid(relationship);
         Integer tgtId = (target == null) ? null : getConceptDbid(target);
         boolean relFilter = (relId != null) && (tgtId != null);
 
-
-        String sql = "SELECT c.dbid, c.id, c.name, c.scheme, c.code, c.status, c.updated " +
-            "FROM concept c\n";
+        String sql = "SELECT SQL_CALC_FOUND_ROWS *\n" +
+            "FROM (\n" +
+            "SELECT c.dbid, c.id, c.name, c.scheme, c.code, c.status, c.updated, LENGTH(c.name) as len\n" +
+            "FROM concept c\n" +
+            "WHERE MATCH (name) AGAINST (? IN BOOLEAN MODE)\n" +
+            "UNION\n" +
+            "SELECT c.dbid, c.id, c.name, c.scheme, c.code, c.status, c.updated, LENGTH(c.code) as len\n" +
+            "FROM concept c\n" +
+            "WHERE code LIKE ?\n" +
+            ") AS u\n";
 
         if (relFilter)
-            sql += "JOIN concept_tct t ON t.source = c.dbid\n";
+            sql += "JOIN concept_tct t ON t.source = u.dbid\n"
+                +"AND t.relationship = ? AND t.target = ?\n";
 
-        sql += "WHERE MATCH (id, name) AGAINST (? IN NATURAL LANGUAGE MODE)\n";
+        sql += "ORDER BY len\n" +
+            "LIMIT ?";
 
-        if (relFilter)
-            sql += "AND t.relationship = ? AND t.target = ?\n";
-
-        sql += "ORDER BY LENGTH(name)\n" +
-            "LIMIT 20";
+        if (page != null)
+            sql += ",?";
 
         Connection conn = ConnectionPool.getInstance().pop();
-        try (PreparedStatement statement = conn.prepareStatement(sql)) {
-            statement.setString(1, text);
+        try {
+            try (PreparedStatement statement = conn.prepareStatement(sql)) {
+                int i = 1;
+                statement.setString(i++, text);
+                statement.setString(i++, text + '%');
 
-            if (relFilter) {
-                statement.setInt(2, relId);
-                statement.setInt(3, tgtId);
+                if (relFilter) {
+                    statement.setInt(i++, relId);
+                    statement.setInt(i++, tgtId);
+                }
+
+                if (page != null)
+                    statement.setInt(i++, offset);
+
+                statement.setInt(i++, size);
+
+
+                getConceptsFromResultSet(result.getResults(), statement);
             }
 
-            getConceptsFromResultSet(result, statement);
+            try (PreparedStatement statement = conn.prepareStatement("SELECT FOUND_ROWS();")) {
+                ResultSet rs = statement.executeQuery();
+                rs.next();
+                result.setCount(rs.getInt(1));
+            }
+
         } finally {
             ConnectionPool.getInstance().push(conn);
         }
+
         return result;
     }
 

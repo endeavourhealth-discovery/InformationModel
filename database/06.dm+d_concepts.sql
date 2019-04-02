@@ -80,9 +80,7 @@ VALUES (JSON_OBJECT('document', 'http://DiscoveryDataService/InformationModel/dm
                     'description', 'Dictionary of Medicines & Devices',
                     'is_subtype_of', JSON_OBJECT(
                         'id', 'CodeScheme'
-                        )))
-
-    ,
+                        ))),
        (JSON_OBJECT('document', 'http://DiscoveryDataService/InformationModel/dm/DMD/1.0.0',
                     'id', 'DMD_UOM',
                     'name', 'Units of measure',

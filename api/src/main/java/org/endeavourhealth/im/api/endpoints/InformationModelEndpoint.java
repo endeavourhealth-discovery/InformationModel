@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiParam;
 import org.endeavourhealth.im.dal.InformationModelJDBCDAL;
 import org.endeavourhealth.im.logic.InformationModelLogic;
 import org.endeavourhealth.im.models.Concept;
+import org.endeavourhealth.im.models.SearchResult;
 import org.endeavourhealth.im.models.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +36,7 @@ public class InformationModelEndpoint {
     public Response MRU(@Context SecurityContext sc) throws Exception {
         LOG.debug("Get most recently used concepts");
 
-        List<Concept> result = new InformationModelJDBCDAL().mru();
+        SearchResult result = new InformationModelJDBCDAL().mru();
 
         return Response
             .ok()
@@ -50,12 +51,14 @@ public class InformationModelEndpoint {
     @Timed(absolute = true, name = "InformationModel.ConceptEndpoint.Search.GET")
     @ApiOperation(value = "List of concepts matching the search term", response = Concept.class)
     public Response search(@Context SecurityContext sc,
+                           @ApiParam(value = "Size") @QueryParam("size") Integer size,
+                           @ApiParam(value = "Page") @QueryParam("page") Integer page,
                            @ApiParam(value = "Term", required = true) @QueryParam("term") String term,
                            @ApiParam(value = "Relationship") @QueryParam("relationship") String relationship,
                            @ApiParam(value = "Target") @QueryParam("target") String target) throws Exception {
         LOG.debug("Get concept by ID");
 
-        List<Concept> result = new InformationModelJDBCDAL().search(term, relationship, target);
+        SearchResult result = new InformationModelJDBCDAL().search(term, size, page, relationship, target);
 
         return Response
             .ok()

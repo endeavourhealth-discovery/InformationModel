@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import {Http, URLSearchParams} from '@angular/http';
 import {Observable} from 'rxjs/Observable';
 import {Concept} from '../models/Concept';
+import {SearchResult} from '../models/SearchResult';
 
 @Injectable()
 export class ConceptService {
@@ -13,14 +14,18 @@ export class ConceptService {
       .map((result) => result.json());
   }
 
-  getMRU(): Observable<Concept[]> {
+  getMRU(): Observable<SearchResult> {
     return this.http.get('api/IM/MRU')
       .map((result) => result.json());
   }
 
-  search(searchTerm: string): Observable<Concept[]> {
+  search(searchTerm: string, size?: number, page?: number, relationship?: string, target?: string): Observable<SearchResult> {
     const params = new URLSearchParams();
     params.append('term', searchTerm);
+    if (size) params.append('size', size.toString());
+    if (page) params.append('page', page.toString());
+    if (relationship) params.append('relationship', relationship);
+    if (target) params.append('target', target);
 
     return this.http.get('api/IM/Search', {search: params})
       .map((result) => result.json());

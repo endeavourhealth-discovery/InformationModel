@@ -1,14 +1,21 @@
 <div class="module">
   <div class="container-fluid">
     <div class="module-heading">
-      <h2>Concept Library <small></small></h2>
+      <h2>Concept Library
+        <small></small>
+      </h2>
     </div>
     <div class="module-body">
       <form>
         <div class="row">
           <div class="col-md-12">
             <div class="card" id="taskCard">
-              <div class="card-header"><h4>Concepts <small> - {{listTitle}}</small><button type="button" (click)="addConcept()" class="btn btn-success pull-right" id="addConcept">Add</button></h4></div>
+              <div class="card-header">
+                <h4>Concepts
+                  <small> - {{listTitle}}</small>
+                  <button type="button" (click)="addConcept()" class="btn btn-success pull-right" id="addConcept">Add</button>
+                </h4>
+              </div>
               <div class="card-body">
                 <div class="row">
                   <div class="col-md-4">
@@ -25,32 +32,42 @@
                       </div>
                     </div>
                   </div>
-                 </div>
+                </div>
                 <div class="row">
                   <div class="col-md-12">
                     <loadingIndicator [done]="summaryList">
-                      <table class="table table-striped table-sm table-hover text">
-                        <thead>
-                          <tr class="d-flex">
-                            <th class="col-2">Id</th>
-                            <th class="col-5">Name</th>
-                            <th class="col-1">Scheme</th>
-                            <th class="col-1">Code</th>
-                            <th class="col-1">Status</th>
-                            <th class="col-2">Updated</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr class="d-flex" *ngFor="let item of summaryList" (click)="editConcept(item)" [class.text-warning]="item.status == 3">
-                            <td class="col-2">{{item.id}}</td>
-                            <td class="col-5">{{item.name}}</td>
-                            <td class="col-1">{{item.scheme}}</td>
-                            <td class="col-1">{{item.code}}</td>
-                            <td class="col-1">{{getStatusName(item.status)}}</td>
-                            <td class="col-2">{{item.updated | date:'dd-MMM-yyyy hh:mm:ss'}}</td>
-                          </tr>
-                        </tbody>
-                      </table>
+                      <div *ngIf="summaryList">
+                        <table class="table table-striped table-sm table-hover text">
+                          <thead>
+                            <tr class="d-flex">
+                              <th class="col-2">Id</th>
+                              <th class="col-5">Name</th>
+                              <th class="col-1">Scheme</th>
+                              <th class="col-1">Code</th>
+                              <th class="col-1">Status</th>
+                              <th class="col-2">Updated</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr class="d-flex" *ngFor="let item of summaryList.results" (click)="editConcept(item)" [class.text-warning]="item.status == 3">
+                              <td class="col-2">{{item.id}}</td>
+                              <td class="col-5">{{item.name}}</td>
+                              <td class="col-1">{{item.scheme}}</td>
+                              <td class="col-1">{{item.code}}</td>
+                              <td class="col-1">{{getStatusName(item.status)}}</td>
+                              <td class="col-2">{{item.updated | date:'dd-MMM-yyyy hh:mm:ss'}}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                        <ngb-pagination *ngIf="summaryList.count > 15"
+                          [page]="summaryList.page"
+                          (pageChange)="search($event)"
+                          [pageSize]="15"
+                          [collectionSize]="summaryList.count"
+                          [maxSize]="5"
+                          [rotate]="true"
+                          [boundaryLinks]="true"></ngb-pagination>
+                      </div>
                     </loadingIndicator>
                   </div>
                 </div>

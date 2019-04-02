@@ -1,6 +1,10 @@
 package org.endeavourhealth.im.logic;
 
 import org.endeavourhealth.im.dal.InformationModelDAL;
+import org.endeavourhealth.im.models.Concept;
+import org.endeavourhealth.im.models.SearchResult;
+
+import java.util.List;
 
 public class InformationModelLogic {
     private static boolean EXPORTING = false;

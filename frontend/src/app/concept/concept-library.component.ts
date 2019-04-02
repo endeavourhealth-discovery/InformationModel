@@ -4,8 +4,8 @@ import {Router} from '@angular/router';
 import {ConceptService} from './concept.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConceptCreateComponent} from './concept-create/concept-create.component';
-import {Concept} from '../models/Concept';
 import {StatusHelper} from '../models/Status';
+import {SearchResult} from '../models/SearchResult';
 
 @Component({
   selector: 'app-concept-library',
@@ -14,9 +14,8 @@ import {StatusHelper} from '../models/Status';
 })
 export class ConceptLibraryComponent implements OnInit {
   getStatusName = StatusHelper.getName;
-
   listTitle = 'Most recently used';
-  summaryList: Concept[];
+  summaryList: SearchResult;
   searchTerm: string;
 
 
@@ -49,14 +48,16 @@ export class ConceptLibraryComponent implements OnInit {
     //   )
   }
 
-  search() {
-    this.listTitle = 'Search results for "' + this.searchTerm + '"';
-    this.summaryList = null;
-    this.conceptService.search(this.searchTerm)
-      .subscribe(
-        (result) => this.summaryList = result,
-        (error) => this.log.error(error)
-      );
+  search(page: number = 1) {
+    // if (this.summaryList == null || this.summaryList.page != page) {
+      this.listTitle = 'Search results for "' + this.searchTerm + '"';
+      this.summaryList = null;
+      this.conceptService.search(this.searchTerm, 15, page)
+        .subscribe(
+          (result) => this.summaryList = result,
+          (error) => this.log.error(error)
+        );
+    // }
   }
 
   toggleDeprecated() {
