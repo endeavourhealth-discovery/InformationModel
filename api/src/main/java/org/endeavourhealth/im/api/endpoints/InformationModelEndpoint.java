@@ -53,7 +53,7 @@ public class InformationModelEndpoint {
     public Response search(@Context SecurityContext sc,
                            @ApiParam(value = "Size") @QueryParam("size") Integer size,
                            @ApiParam(value = "Page") @QueryParam("page") Integer page,
-                           @ApiParam(value = "Term", required = true) @QueryParam("term") String term,
+                           @ApiParam(value = "Term", required = true) @QueryParam("term") @Encoded String term,
                            @ApiParam(value = "Relationship") @QueryParam("relationship") String relationship,
                            @ApiParam(value = "Target") @QueryParam("target") String target) throws Exception {
         LOG.debug("Get concept by ID");

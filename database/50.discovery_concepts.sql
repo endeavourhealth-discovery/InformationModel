@@ -25,7 +25,7 @@ VALUES (JSON_OBJECT('document', 'http://DiscoveryDataService/InformationModel/dm
                     'is_subtype_of', JSON_OBJECT(
                         'id', 'CodeScheme'
                         )));
-*/
+
 INSERT INTO concept (data)
 SELECT JSON_OBJECT(
            'document', 'http://DiscoveryDataService/InformationModel/dm/Discovery/1.0.0',
@@ -56,3 +56,4 @@ UPDATE concept c
         GROUP BY id) t2
     ON t2.id = c.id
 SET data=JSON_MERGE(c.data, t2.rel);
+*/
