@@ -3,8 +3,6 @@ SET @qry = concat('ALTER TABLE concept AUTO_INCREMENT = ', @max);
 PREPARE stmt FROM @qry;
 EXECUTE stmt;
 
-DEALLOCATE PREPARE stmt;
-
 INSERT INTO document
 (data)
 VALUES
@@ -33,3 +31,7 @@ SELECT JSON_OBJECT(
                )
            )
 FROM opcs4;
+
+EXECUTE stmt;
+
+DEALLOCATE PREPARE stmt;

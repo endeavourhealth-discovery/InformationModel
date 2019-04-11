@@ -2,9 +2,10 @@ SELECT @max := MAX(dbid)+ 1 FROM concept;
 SET @bcstrt := @max;
 SET @qry = concat('ALTER TABLE concept AUTO_INCREMENT = ', @max);
 PREPARE stmt FROM @qry;
+
 EXECUTE stmt;
 
-/*-- DOCUMENT
+-- DOCUMENT
 INSERT INTO document
 (data)
 VALUES
@@ -19,7 +20,7 @@ VALUES (JSON_OBJECT('document', 'http://DiscoveryDataService/InformationModel/dm
                     'is_subtype_of', JSON_OBJECT(
                             'id', 'CodeScheme'
                         )));
-*/
+
 -- Barts/Cerner CONCEPTS
 INSERT INTO concept (data)
 SELECT JSON_OBJECT(
@@ -77,6 +78,8 @@ FROM (
          -- AND NOT EXISTS (SELECT 1 FROM concept e WHERE e.expression = b.snomed_expression)
      ) t;
 
+EXECUTE stmt;
+
 -- CREATE CORE COMBINED CONCEPTS
 INSERT INTO concept(data)
 SELECT JSON_MERGE(
@@ -116,5 +119,7 @@ UPDATE concept b
     ) t
     ON b.id = t.id
 SET data = JSON_MERGE(b.data, t.equiv);
+
+EXECUTE stmt;
 
 DEALLOCATE PREPARE stmt;
