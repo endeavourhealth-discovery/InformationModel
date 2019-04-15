@@ -164,6 +164,24 @@ public class InformationModelJDBCDAL implements InformationModelDAL {
     }
 
     @Override
+    public String getConceptJSON(int dbid) throws SQLException {
+        String sql = "SELECT data FROM concept WHERE dbid = ?";
+
+        Connection conn = ConnectionPool.getInstance().pop();
+        try (PreparedStatement statement = conn.prepareStatement(sql)) {
+            statement.setInt(1, dbid);
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next())
+                return resultSet.getString("data");
+            else
+                return null;
+        } finally {
+            ConnectionPool.getInstance().push(conn);
+        }
+    }
+
+    @Override
     public String getConceptJSON(String id) throws SQLException {
         String sql = "SELECT data FROM concept WHERE id = ?";
 
@@ -236,7 +254,7 @@ public class InformationModelJDBCDAL implements InformationModelDAL {
     }
 
     @Override
-    public Integer getConceptDbid(String id) throws Exception {
+    public Integer getConceptDbid(String id) throws SQLException {
         Connection conn = ConnectionPool.getInstance().pop();
         try (PreparedStatement statement = conn.prepareStatement("SELECT dbid FROM concept WHERE id = ?")) {
             statement.setString(1, id);
@@ -255,46 +273,35 @@ public class InformationModelJDBCDAL implements InformationModelDAL {
     public boolean generateRuntimeFiles() throws Exception {
         Date start = new Date();
         List<String> ids = new ArrayList<>(); // Arrays.asList("null"));
-        int conceptCount = 0;
 
         Connection conn = ConnectionPool.getInstance().pop();
         try {
-            // Get concept count
-            try (PreparedStatement statement = conn.prepareStatement("SELECT MAX(dbid) FROM concept")) {
-                ResultSet rs = statement.executeQuery();
-                if (rs.next())
-                    conceptCount = rs.getInt(1);
-                System.out.println("Exporting " + conceptCount + " concepts");
-            }
-
-            System.out.println("Generating file");
-            try (PreparedStatement statement = conn.prepareStatement("SELECT dbid, id, data FROM concept ORDER BY dbid")) {
+            System.out.println("Exporting data");
+            try (PreparedStatement statement = conn.prepareStatement("SELECT id, data FROM concept WHERE dbid = ?")) {
                 try (DataOutputStream w = new DataOutputStream(new FileOutputStream("c:\\temp\\IM-dat.bin"))) {
 
-                    w.writeInt(conceptCount);
+                    int dbid = 1;
+                    String data = null;
 
-                    ResultSet rs = statement.executeQuery();
-                    int i = 1;
-                    while (rs.next()) {
-                        String data = rs.getString("data");
-                        byte[] output = compactData(data);
-
-                        int size = output.length;
-                        int dbid = rs.getInt("dbid");
-                        if (dbid != i)
-                            throw new IndexOutOfBoundsException("Gap in dbids! [" + i + "-" + (dbid -1) + "]");
-                        else
-                            i++;
-
-                        if(dbid % 100 == 0) {
-                            System.out.print("\rExported " + dbid + "/" + conceptCount + " - " + data.length() + "->" + size);
+                    do {
+                        statement.setInt(1, dbid++);
+                        ResultSet rs = statement.executeQuery();
+                        if (rs.next()) {
+                            data = rs.getString("data");
+                            ids.add(rs.getString("id"));
+                            byte[] output = compactData(data);
+                            int size = output.length;
+                            w.writeInt(size);
+                            w.write(output, 0, size);
+                            if(dbid % 500 == 0) {
+                                System.out.print("\rExported " + dbid + " concepts...");
+                            }
+                        } else {
+                            data = null;
                         }
-
-                        ids.add(rs.getString("id"));
-                        w.writeInt(size);
-                        w.write(output, 0, size);
-                    }
+                    } while (data != null);
                     w.flush();
+                    System.out.println("\rExported " + dbid + " concepts");
                 }
             }
         } finally {
@@ -305,6 +312,7 @@ public class InformationModelJDBCDAL implements InformationModelDAL {
 
         System.out.println("Time " + (mid.getTime() - start.getTime())/1000 + "s");
 
+        System.out.println("Exporting ID index...");
         try (FileWriter writer = new FileWriter("c:\\temp\\IM-ids.bin")) {
             for (String str : ids) {
                 writer.write(str);
@@ -314,6 +322,8 @@ public class InformationModelJDBCDAL implements InformationModelDAL {
         }
 
         Date end = new Date();
+
+        System.out.println("...Done");
 
         System.out.println("Time " + (end.getTime() - start.getTime())/1000 + "s");
 
@@ -370,6 +380,52 @@ public class InformationModelJDBCDAL implements InformationModelDAL {
 
         conceptData = decompress(conceptData);
         System.out.println(new String(conceptData));
+    }
+
+    @Override
+    public Integer getConceptIdForSchemeCode(String scheme, String code) throws SQLException {
+        Connection conn = ConnectionPool.getInstance().pop();
+        try (PreparedStatement statement = conn.prepareStatement("SELECT dbid FROM concept WHERE scheme = ? AND code = ?")) {
+            statement.setString(1, scheme);
+            statement.setString(2, code);
+
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next())
+                return resultSet.getInt("dbid");
+            else
+                return null;
+        } finally {
+            ConnectionPool.getInstance().push(conn);
+        }
+    }
+
+    @Override
+    public Integer getMappedCoreConceptIdForSchemeCode(String scheme, String code) throws SQLException {
+        // SNOMED codes ARE core so dont have/need maps
+        if ("SNOMED".equals(scheme))
+            return this.getConceptIdForSchemeCode(scheme, code);
+
+
+        String sql =
+            "SELECT c.dbid\n" +
+            "FROM concept m\n" +
+            "JOIN concept c ON c.id = m.data ->> '$.is_equivalent_to.id'\n" +
+            "WHERE m.scheme = ? \n" +
+            "AND m.code = ?";
+
+        Connection conn = ConnectionPool.getInstance().pop();
+        try (PreparedStatement statement = conn.prepareStatement(sql)) {
+            statement.setString(1, scheme);
+            statement.setString(2, code);
+
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next())
+                return resultSet.getInt("dbid");
+            else
+                return null;
+        } finally {
+            ConnectionPool.getInstance().push(conn);
+        }
     }
 
 

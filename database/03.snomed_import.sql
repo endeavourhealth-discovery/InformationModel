@@ -11,13 +11,13 @@ CREATE TABLE snomed_concept (
     PRIMARY KEY snomed_concept_pk (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-LOAD DATA LOCAL INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 5.7\\Uploads\\uk_sct2cl_25.0.0_20180427000001\\SnomedCT_InternationalRF2_PRODUCTION_20180131T120000Z\\Snapshot\\Terminology\\sct2_Concept_Snapshot_INT_20180131.txt'
+LOAD DATA LOCAL INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 5.7\\Uploads\\SNOMED\\SnomedCT_InternationalRF2_PRODUCTION_20180731T120000Z\\Snapshot\\Terminology\\sct2_Concept_Snapshot_INT_20180731.txt'
     INTO TABLE snomed_concept
     FIELDS TERMINATED BY '\t'
     LINES TERMINATED BY '\r\n'
     IGNORE 1 LINES;
 
-LOAD DATA LOCAL INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 5.7\\Uploads\\uk_sct2cl_25.0.0_20180427000001\\SnomedCT_UKClinicalRF2_Production_20180427T000001Z\\Snapshot\\Terminology\\sct2_Concept_Snapshot_GB1000000_20180401.txt'
+LOAD DATA LOCAL INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 5.7\\Uploads\\SNOMED\\SnomedCT_UKClinicalRF2_Production_20181031T000001Z\\Snapshot\\Terminology\\sct2_Concept_Snapshot_GB1000000_20181031.txt'
     INTO TABLE snomed_concept
     FIELDS TERMINATED BY '\t'
     LINES TERMINATED BY '\r\n'
@@ -40,13 +40,13 @@ CREATE TABLE snomed_description (
     PRIMARY KEY snomed_description_pk (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-LOAD DATA LOCAL INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 5.7\\Uploads\\uk_sct2cl_25.0.0_20180427000001\\SnomedCT_InternationalRF2_PRODUCTION_20180131T120000Z\\Snapshot\\Terminology\\sct2_Description_Snapshot-en_INT_20180131.txt'
+LOAD DATA LOCAL INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 5.7\\Uploads\\SNOMED\\SnomedCT_InternationalRF2_PRODUCTION_20180731T120000Z\\Snapshot\\Terminology\\sct2_Description_Snapshot-en_INT_20180731.txt'
     INTO TABLE snomed_description
     FIELDS TERMINATED BY '\t'
     LINES TERMINATED BY '\r\n'
     IGNORE 1 LINES;
 
-LOAD DATA LOCAL INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 5.7\\Uploads\\uk_sct2cl_25.0.0_20180427000001\\SnomedCT_UKClinicalRF2_Production_20180427T000001Z\\Snapshot\\Terminology\\sct2_Description_Snapshot-en-GB_GB1000000_20180401.txt'
+LOAD DATA LOCAL INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 5.7\\Uploads\\SNOMED\\SnomedCT_UKClinicalRF2_Production_20181031T000001Z\\Snapshot\\Terminology\\sct2_Description_Snapshot-en-GB_GB1000000_20181031.txt'
     INTO TABLE snomed_description
     FIELDS TERMINATED BY '\t'
     LINES TERMINATED BY '\r\n'
@@ -72,13 +72,13 @@ CREATE TABLE snomed_relationship (
     PRIMARY KEY snomed_relationship_pk (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-LOAD DATA LOCAL INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 5.7\\Uploads\\uk_sct2cl_25.0.0_20180427000001\\SnomedCT_InternationalRF2_PRODUCTION_20180131T120000Z\\Snapshot\\Terminology\\sct2_Relationship_Snapshot_INT_20180131.txt'
+LOAD DATA LOCAL INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 5.7\\Uploads\\SNOMED\\SnomedCT_InternationalRF2_PRODUCTION_20180731T120000Z\\Snapshot\\Terminology\\sct2_Relationship_Snapshot_INT_20180731.txt'
     INTO TABLE snomed_relationship
     FIELDS TERMINATED BY '\t'
     LINES TERMINATED BY '\r\n'
     IGNORE 1 LINES;
 
-LOAD DATA LOCAL INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 5.7\\Uploads\\uk_sct2cl_25.0.0_20180427000001\\SnomedCT_UKClinicalRF2_Production_20180427T000001Z\\Snapshot\\Terminology\\sct2_Relationship_Snapshot_GB1000000_20180401.txt'
+LOAD DATA LOCAL INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 5.7\\Uploads\\SNOMED\\SnomedCT_UKClinicalRF2_Production_20181031T000001Z\\Snapshot\\Terminology\\sct2_Relationship_Snapshot_GB1000000_20181031.txt'
     INTO TABLE snomed_relationship
     FIELDS TERMINATED BY '\t'
     LINES TERMINATED BY '\r\n'
@@ -98,13 +98,13 @@ CREATE TABLE snomed_refset (
     PRIMARY KEY snomed_refset_pk (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-LOAD DATA LOCAL INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 5.7\\Uploads\\uk_sct2cl_25.0.0_20180427000001\\SnomedCT_InternationalRF2_PRODUCTION_20180131T120000Z\\Snapshot\\Refset\\Language\\der2_cRefset_LanguageSnapshot-en_INT_20180131.txt'
+LOAD DATA LOCAL INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 5.7\\Uploads\\SNOMED\\SnomedCT_InternationalRF2_PRODUCTION_20180731T120000Z\\Snapshot\\Refset\\Language\\der2_cRefset_LanguageSnapshot-en_INT_20180731.txt'
     INTO TABLE snomed_refset
     FIELDS TERMINATED BY '\t'
     LINES TERMINATED BY '\r\n'
     IGNORE 1 LINES;
 
-LOAD DATA LOCAL INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 5.7\\Uploads\\uk_sct2cl_25.0.0_20180427000001\\SnomedCT_UKClinicalRF2_Production_20180427T000001Z\\Snapshot\\Refset\\Language\\der2_cRefset_LanguageSnapshot-en-GB_GB1000000_20180401.txt'
+LOAD DATA LOCAL INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 5.7\\Uploads\\SNOMED\\SnomedCT_UKClinicalRF2_Production_20181031T000001Z\\Snapshot\\Refset\\Language\\der2_cRefset_LanguageSnapshot-en-GB_GB1000000_20181031.txt'
     INTO TABLE snomed_refset
     FIELDS TERMINATED BY '\t'
     LINES TERMINATED BY '\r\n'

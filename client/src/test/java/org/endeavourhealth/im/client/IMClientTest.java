@@ -1,44 +1,54 @@
-/*
 package org.endeavourhealth.im.client;
 
-import org.endeavourhealth.common.config.ConfigManager;
-import org.endeavourhealth.common.config.ConfigManagerException;
-import org.endeavourhealth.im.models.CodeScheme;
-import org.endeavourhealth.im.models.Concept;
-import org.junit.BeforeClass;
 import org.junit.Test;
-
-import java.io.IOException;
 
 import static org.junit.Assert.*;
 
 public class IMClientTest {
-    @BeforeClass
-    public static void setup() throws ConfigManagerException {
-        ConfigManager.Initialize("information-model");
+
+    @Test
+    public void getConceptIdForSchemeCode_SNOMED() throws Exception {
+        Integer dbid = IMClient.getConceptIdForSchemeCode("SNOMED", "195967001");
+        assertNotNull(dbid);
+        assertEquals(16452, dbid.intValue());
     }
 
     @Test
-    public void getConcept() throws Exception {
-        Concept concept = IMClient.getConcept(CodeScheme.SNOMED.getValue(), "195967001");
-        assertEquals("Asthma (disorder)", concept.getFullName());
+    public void getConceptIdForSchemeCode_Known() throws Exception {
+        Integer dbid = IMClient.getConceptIdForSchemeCode("READ2", "H33..");
+        assertNotNull(dbid);
+        assertEquals(754594, dbid.intValue());
     }
 
     @Test
-    public void getConceptId() throws Exception {
-        Long conceptId = IMClient.getConceptId(CodeScheme.SNOMED.getValue(), "195967001");
-        assertEquals(21034L, conceptId.longValue());
+    public void getConceptIdForSchemeCode_Unknown() throws Exception {
+        Integer dbid = IMClient.getConceptIdForSchemeCode("INVALID", "INVALID");
+        assertNull(dbid);
     }
 
     @Test
-    public void getConceptByContext() throws Exception {
-        Long conceptId = IMClient.getConceptId("DM+D.VMP");
-        assertEquals(5326L, conceptId.longValue());
+    public void getMappedCoreConceptIdForSchemeCode_SNOMED() throws Exception {
+        Integer dbid = IMClient.getMappedCoreConceptIdForSchemeCode("SNOMED", "195967001");
+        assertNotNull(dbid);
+        assertEquals(16452, dbid.intValue());
     }
 
     @Test
-    public void getMissingConceptByContext() throws Exception {
-        Long conceptId = IMClient.getOrCreateConceptId("MadeUpStatus.Temporary");
-        assertNotNull(conceptId);
+    public void getMappedCoreConceptIdForSchemeCode_Known() throws Exception {
+        Integer dbid = IMClient.getMappedCoreConceptIdForSchemeCode("BartsCerner", "162592560");
+        assertNotNull(dbid);
+        assertEquals(991317, dbid.intValue());
     }
-}*/
+
+    @Test
+    public void getMappedCoreConceptIdForSchemeCode_NoMap() throws Exception {
+        Integer dbid = IMClient.getMappedCoreConceptIdForSchemeCode("OPCS4", "A01");
+        assertNull(dbid);
+    }
+
+    @Test
+    public void getMappedCoreConceptIdForSchemeCode_Unknown() throws Exception {
+        Integer dbid = IMClient.getMappedCoreConceptIdForSchemeCode("INVALID", "INVALID");
+        assertNull(dbid);
+    }
+}
