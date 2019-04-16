@@ -30,7 +30,7 @@
                         <div class="input-group" id="nature">
                           <div class="custom-control custom-radio form-control-plaintext">
                             <input type="radio" class="custom-control-input" id="rdoSubtype" name="defaultExampleRadios" value="is_subtype_of" [(ngModel)]="nature">
-                            <label class="custom-control-label" for="rdoSubtype">Subtype of</label>
+                            <label class="custom-control-label" for="rdoSubtype">Subtype</label>
                           </div>
                         </div>
                       </div>
@@ -39,7 +39,7 @@
                         <div class="input-group">
                           <div class="custom-control custom-radio form-control-plaintext">
                             <input type="radio" class="custom-control-input" id="rdoInstance" name="defaultExampleRadios" value="is_instance_of" [(ngModel)]="nature">
-                            <label class="custom-control-label" for="rdoInstance">Instance of</label>
+                            <label class="custom-control-label" for="rdoInstance">Instance</label>
                           </div>
                         </div>
                       </div>
@@ -53,7 +53,7 @@
                         </div>
                       </div>
 
-                      <div class="col-md-8 form-group">
+                      <div class="col-md-12 form-group">
                         <div class="form-group">
                           <label class="control-label" for="description">Document</label>
                           <div class="dropdown" id="conceptDocument">
@@ -65,7 +65,7 @@
                         </div>
                       </div>
 
-                      <div class="col-md-4 form-group">
+                      <div class="col-md-12 form-group">
                         <div class="form-group">
                           <label class="control-label" for="name">Name</label>
                           <input class="form-control" type="text" id="name" name="name" [(ngModel)]="concept.name" >
@@ -123,19 +123,24 @@
           </div>
           <div class="col-md-6 mb-4">
             <div class="card h-100" id="diagramCard" *ngIf="concept">
-              <div class="card-header"><h4>Diagram</h4> </div>
+              <div class="card-header"><h4>Diagram
+              <div class="pull-right">
+                <button type="button" class="btn btn-sm btn-info" (click)="refreshDiagram()">Refresh</button>
+              </div>
+              </h4> </div>
               <div class="card-body">
-                <div class="row">
-                  <div class="col-md-12 form-group">
-                    [Node graph diagram]
-<!--                    <loadingIndicator [done]="!generatingRuntime">
-                      <button type="button" class="btn btn-success" (click)="generateRuntime()">Generate runtime</button>
-                    </loadingIndicator>
-                    <loadingIndicator [done]="!loadingRuntime">
-                      <button type="button" class="btn btn-success" (click)="loadRuntime()">Load runtime</button>
-                    </loadingIndicator>-->
-                  </div>
-                </div>
+                <!--<div class="row">-->
+                  <!--<div class="col-md-12 form-group">-->
+                    <nodeGraph #nodeGraph (nodeClick)="nodeClick($event)" (nodeDblClick)="nodeDblClick($event)" ></nodeGraph>
+
+                    <!--                    <loadingIndicator [done]="!generatingRuntime">
+                                          <button type="button" class="btn btn-success" (click)="generateRuntime()">Generate runtime</button>
+                                        </loadingIndicator>
+                                        <loadingIndicator [done]="!loadingRuntime">
+                                          <button type="button" class="btn btn-success" (click)="loadRuntime()">Load runtime</button>
+                                        </loadingIndicator>-->
+                    <!--</div>-->
+                <!--</div>-->
               </div>
             </div>
           </div>

@@ -82,17 +82,29 @@ export class ConceptEditorComponent implements AfterViewInit {
   }
 
   refreshDiagram() {
-    // if (this.concept && this.attributes) {
-    //   this.data = null;
-    //   this.graph.clear();
-    //   this.graph.assignColours([1, 2, 3, 0]);
-    //   this.graph.addNodeData(this.concept.id, this.concept.fullName, 1, this.concept, this.getAttributeTable(this.attributes));
-    //
-    //   // this.graph.addNodeData(this.concept.superclass.id, this.concept.superclass.name, 0, this.concept.superclass);
-    //   // this.graph.addEdgeData(this.concept.id, this.concept.superclass.id, 'inherits from', this.concept.superclass);
-    //
-    //   this.updateDiagram(this.concept.id, this.attributes);
-    // }
+    if (this.concept) {
+      this.graph.clear();
+      this.graph.assignColours([1, 2, 3, 0]);
+      this.graph.addNodeData(this.concept.dbid, this.concept.name, 1, this.concept);
+
+      for(let key of Object.keys(this.concept)) {
+        let prop = this.concept[key];
+
+        if (prop.id) {
+          this.graph.addNodeData(prop.id, prop.id, 0, prop);
+          this.graph.addEdgeData(this.concept.dbid, prop.id, key, prop);
+        } else {
+          this.graph.addNodeData(prop, prop, 0, prop);
+          this.graph.addEdgeData(this.concept.dbid, prop, key, prop);
+        }
+      }
+
+      // this.graph.addNodeData(this.concept.superclass.id, this.concept.superclass.name, 0, this.concept.superclass);
+      // this.graph.addEdgeData(this.concept.id, this.concept.superclass.id, 'inherits from', this.concept.superclass);
+
+      // this.updateDiagram(this.concept.id, this.attributes);
+      this.graph.start();
+    }
   }
 
   expandNode(node: GraphNode) {

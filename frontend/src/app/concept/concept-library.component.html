@@ -13,7 +13,10 @@
               <div class="card-header">
                 <h4>Concepts
                   <small> - {{listTitle}}</small>
-                  <button type="button" (click)="addConcept()" class="btn btn-success pull-right" id="addConcept">Add</button>
+                  <div class="pull-right">
+                  <button type="button" (click)="addConcept()" class="btn btn-success" id="addConcept">Add</button>
+                  <button type="button" (click)="searchOnto()" class="btn btn-success" id="searchOnto">Onto</button>
+                  </div>
                 </h4>
               </div>
               <div class="card-body">

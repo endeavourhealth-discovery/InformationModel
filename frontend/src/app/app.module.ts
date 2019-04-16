@@ -14,6 +14,7 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {ConceptModule} from './concept/concept.module';
 import {ModuleStateService} from 'eds-angular4/dist/common';
 import {GuidedHelpModule} from './guided-help/guided-help.module';
+import {OntoSelectorModule} from './onto-selector/onto-selector.module';
 
 @NgModule({
   imports: [
@@ -27,6 +28,7 @@ import {GuidedHelpModule} from './guided-help/guided-help.module';
     GuidedHelpModule,
 
     ConceptModule,
+    OntoSelectorModule,
 
     RouterModule.forRoot(AppMenuService.getRoutes(), {useHash: true}),
     NgbModule.forRoot(),
