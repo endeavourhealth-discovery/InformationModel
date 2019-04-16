@@ -188,7 +188,7 @@ INSERT INTO concept
 (data)
 SELECT JSON_OBJECT(
     'document', 'http://DiscoveryDataService/InformationModel/dm/core/1.0.1',
-    'id', concat('DM_', scheme, '_', code),
+    'id', concat('DS_', scheme, '_', code),
     'name', term,
     'description', term,
     'is_subtype_of', JSON_OBJECT(
@@ -213,7 +213,7 @@ INSERT INTO concept
                 'id', 'CodeableConcept'
             ),
         'is_equivalent_to', JSON_OBJECT(
-                'id', concat('DM_', scheme, '_', code)
+                'id', concat('DS_', scheme, '_', code)
             )
     )
     FROM fhir_scheme_value;
