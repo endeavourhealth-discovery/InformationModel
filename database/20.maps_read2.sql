@@ -92,6 +92,7 @@ UPDATE concept c
 SET data = JSON_MERGE(data, JSON_OBJECT('is_equivalent_to', JSON_OBJECT('id', CONCAT('SN_', t2.conceptId))));
 
 -- Create multi-map table
+DROP TABLE IF EXISTS read_v2_multi_map;
 CREATE TABLE read_v2_multi_map
 SELECT DISTINCT r.readCode, r.conceptId
 FROM read_v2_map r
@@ -129,7 +130,7 @@ SELECT DISTINCT JSON_OBJECT(
                'name', c.name,
                'description', c.description,
                'is_subtype_of', JSON_OBJECT(
-                       'id', 'CodeScheme'
+                       'id', 'CodeableConcept'
                    ),
                'is_related_to', JSON_ARRAYAGG(JSON_OBJECT('id', CONCAT('SN_', m.conceptId)))
            ) AS data
