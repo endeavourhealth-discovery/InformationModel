@@ -428,6 +428,27 @@ public class InformationModelJDBCDAL implements InformationModelDAL {
         }
     }
 
+    @Override
+    public Integer getMappedConceptIdForTypeTerm(String type, String term) throws SQLException {
+        Integer typeId = getConceptDbid(type);
+        if (typeId == null)
+            return null;
+
+        Connection conn = ConnectionPool.getInstance().pop();
+        try (PreparedStatement statement = conn.prepareStatement("SELECT target FROM concept_term_map WHERE type = ? AND term = ?")) {
+            statement.setInt(1, typeId);
+            statement.setString(2, term);
+
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next())
+                return resultSet.getInt("target");
+            else
+                return null;
+        } finally {
+            ConnectionPool.getInstance().push(conn);
+        }
+    }
+
 
     private void getConceptsFromResultSet(List<Concept> result, PreparedStatement statement) throws SQLException {
         ResultSet resultSet = statement.executeQuery();

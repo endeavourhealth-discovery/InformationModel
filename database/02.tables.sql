@@ -42,6 +42,17 @@ CREATE TABLE concept_tct (
     KEY concept_tct_target_relationship_idx (target, relationship)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS concept_term_map;
+CREATE TABLE concept_term_map (
+    dbid INT AUTO_INCREMENT,
+    type INT NOT NULL,
+    term VARCHAR(250) COLLATE utf8_bin NOT NULL,
+    target INT NOT NULL,
+
+    PRIMARY KEY concept_term_map_pk (dbid),
+    UNIQUE KEY concept_term_map_type_term_idx (type, term)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 DELIMITER //
 
 DROP PROCEDURE IF EXISTS proc_build_tct//

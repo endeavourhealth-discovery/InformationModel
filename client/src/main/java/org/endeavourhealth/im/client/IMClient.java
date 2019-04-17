@@ -13,4 +13,8 @@ public class IMClient {
     public static Integer getMappedCoreConceptIdForSchemeCode(String scheme, String code) throws Exception {
         return db.getMappedCoreConceptIdForSchemeCode(scheme, code);
     }
+
+    public static Integer getMappedConceptIdForTypeTerm(String type, String term) throws Exception {
+        return db.getMappedConceptIdForTypeTerm(type, term);
+    }
 }
