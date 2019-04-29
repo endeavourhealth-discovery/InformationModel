@@ -36,7 +36,7 @@
     </servlet-mapping>
 
   <!-- ===== PRIVATE API SERVLET ===== -->
-  <servlet>
+<!--  <servlet>
     <servlet-name>Information Model internal (private) API</servlet-name>
     <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
     <init-param>
@@ -58,7 +58,7 @@
   <servlet-mapping>
     <servlet-name>Information Model internal (private) API</servlet-name>
     <url-pattern>/internal/api/*</url-pattern>
-  </servlet-mapping>
+  </servlet-mapping>-->
 
   <!-- ===== PUBLIC ENDPOINTS SERVLET ===== -->
     <servlet>
@@ -66,7 +66,7 @@
         <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
         <init-param>
             <param-name>jersey.config.server.provider.packages</param-name>
-            <param-value>org.endeavourhealth.coreui.endpoints_public</param-value>
+            <param-value>org.endeavourhealth.coreui.endpoints_public,org.endeavourhealth.im.api.publicendpoints</param-value>
         </init-param>
         <init-param>
             <param-name>jersey.config.server.provider.classnames</param-name>

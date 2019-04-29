@@ -3,7 +3,7 @@
 
   <groupId>org.endeavourhealth.im</groupId>
   <artifactId>client</artifactId>
-  <version>1.5-SNAPSHOT</version>
+  <version>1.6-SNAPSHOT</version>
   <modelVersion>4.0.0</modelVersion>
 
   <properties>
@@ -94,7 +94,7 @@
 
   <repositories>
     <repository>
-      <snapshots/>
+      <snapshots />
       <id>snapshots</id>
       <name>libs-snapshot</name>
       <url>http://maven.endeavourhealth.net:8081/artifactory/libs-snapshot</url>
