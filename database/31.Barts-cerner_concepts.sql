@@ -38,7 +38,7 @@ FROM barts_cerner;
 
 EXECUTE stmt;
 
-SELECT @max := MAX(dbid)+ 1 FROM concept;
+SELECT @max := MAX(dbid) FROM concept;
 
 -- ADD DIRECT (1:1) MAPS
 UPDATE concept b
