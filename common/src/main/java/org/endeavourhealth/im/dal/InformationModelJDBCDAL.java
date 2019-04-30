@@ -449,6 +449,21 @@ public class InformationModelJDBCDAL implements InformationModelDAL {
         }
     }
 
+    @Override
+    public String getCodeForConceptId(Integer dbid) throws SQLException {
+        Connection conn = ConnectionPool.getInstance().pop();
+        try (PreparedStatement statement = conn.prepareStatement("SELECT code FROM concept WHERE dbid = ?")) {
+            statement.setInt(1, dbid);
+
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next())
+                return resultSet.getString("code");
+            else
+                return null;
+        } finally {
+            ConnectionPool.getInstance().push(conn);
+        }
+    }
 
     private void getConceptsFromResultSet(List<Concept> result, PreparedStatement statement) throws SQLException {
         ResultSet resultSet = statement.executeQuery();
@@ -503,4 +518,6 @@ public class InformationModelJDBCDAL implements InformationModelDAL {
         byte[] output = outputStream.toByteArray();
         return output;
     }
+
+
 }

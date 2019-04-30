@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class IMClient {
-    private static InformationModelDAL db = new InformationModelJDBCDAL();
+    // private static InformationModelDAL db = new InformationModelJDBCDAL();
     private static final String base = "/public/Client";
 
     public static Integer getConceptIdForSchemeCode(String scheme, String code) throws Exception {
@@ -43,9 +43,21 @@ public class IMClient {
             throw new IOException(response.readEntity(String.class));
     }
 
+    public static String getCodeForConceptId(Integer conceptId) throws Exception {
+        Map<String, String> params = new HashMap<>();
+        params.put("dbid", conceptId.toString());
+
+        Response response = get(base + "/Concept/Code", params);
+
+        if (response.getStatus() == 200)
+            return response.readEntity(String.class);
+        else
+            throw new IOException(response.readEntity(String.class));
+    }
+/*
     public static Integer getMappedConceptIdForTypeTerm(String type, String term) throws Exception {
         return db.getMappedConceptIdForTypeTerm(type, term);
-    }
+    }*/
 
     private static Response get(String path, Map<String, String> params) {
         String address = ConfigManager.getConfiguration("api-internal", "information-model");

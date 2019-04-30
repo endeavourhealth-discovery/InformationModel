@@ -31,4 +31,6 @@ public interface InformationModelDAL {
     Integer getConceptIdForSchemeCode(String scheme, String code) throws Exception;
     Integer getMappedCoreConceptIdForSchemeCode(String scheme, String code) throws Exception;
     Integer getMappedConceptIdForTypeTerm(String type, String term) throws Exception;
+
+    String getCodeForConceptId(Integer dbid) throws Exception;
 }

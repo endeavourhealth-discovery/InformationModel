@@ -60,4 +60,22 @@ public class ClientEndpoint {
             .build();
     }
 
+    @GET
+    @Path("/Concept/Code")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.TEXT_PLAIN)
+    @Timed(absolute = true, name = "InformationModel.ClientEndpoint.ConceptCode.GET")
+    @ApiOperation(value = "Get code for given concept id", response = Integer.class)
+    public Response getCodeForConceptId(@Context SecurityContext sc,
+                                                        @ApiParam(value = "Concept DBID", required = true) @QueryParam("dbid") Integer dbid) throws Exception {
+        LOG.debug("getCodeForConceptId");
+
+        String result = new InformationModelJDBCDAL().getCodeForConceptId(dbid);
+
+        return Response
+            .ok()
+            .entity(result)
+            .build();
+    }
+
 }

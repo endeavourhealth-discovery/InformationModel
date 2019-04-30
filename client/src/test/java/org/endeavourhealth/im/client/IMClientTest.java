@@ -53,6 +53,21 @@ public class IMClientTest {
     }
 
     @Test
+    public void getCodeForConceptId_SNOMED() throws Exception {
+        String code = IMClient.getCodeForConceptId(16452);
+        assertNotNull(code);
+        assertEquals("195967001", code);
+    }
+
+    @Test
+    public void getCodeForConceptId_READ() throws Exception {
+        String code = IMClient.getCodeForConceptId(754594);
+        assertNotNull(code);
+        assertEquals("H33..", code);
+    }
+
+
+/*    @Test
     public void getMappedConceptIdForTypeTerm_Known() throws Exception {
         Integer dbid = IMClient.getMappedConceptIdForTypeTerm("EncounterType", "practice nurse clinic");
         assertNotNull(dbid);
@@ -69,5 +84,5 @@ public class IMClientTest {
     public void getMappedConceptIdForTypeTerm_TermKnown() throws Exception {
         Integer dbid = IMClient.getMappedConceptIdForTypeTerm("EncounterType", "This is an unknown term");
         assertNull(dbid);
-    }
+    }*/
 }
