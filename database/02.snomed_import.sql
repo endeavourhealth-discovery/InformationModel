@@ -84,6 +84,8 @@ LOAD DATA LOCAL INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 5.7\\Uploads\\SNOME
     LINES TERMINATED BY '\r\n'
     IGNORE 1 LINES;
 
+ALTER TABLE snomed_relationship ADD INDEX snomed_relationship_active_idx (active);
+
 -- ********************* REFSET *********************
 
 DROP TABLE IF EXISTS snomed_refset;
@@ -134,3 +136,4 @@ WHERE d.active = 1
   AND c.active = 1;
 
 ALTER TABLE snomed_description_active_fully_specified ADD UNIQUE INDEX snomed_description_active_fully_specified_pk (id);
+ALTER TABLE snomed_description_active_fully_specified ADD INDEX snomed_description_active_fully_specified_moduleId_idx (moduleId);

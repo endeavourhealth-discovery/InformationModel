@@ -66,3 +66,48 @@ LOAD DATA LOCAL INFILE 'C:\\read\\v3\\V3hier.v3'
     FIELDS TERMINATED BY '|'
     LINES TERMINATED BY '\r\n'
     (code, parent, `order`);
+
+-- MAPS
+
+DROP TABLE IF EXISTS read_v3_map;
+CREATE TABLE read_v3_map (
+                             id VARCHAR(40) NOT NULL,
+                             ctv3Concept VARCHAR(6) COLLATE utf8_bin NOT NULL,
+                             ctv3Term VARCHAR(6) COLLATE utf8_bin NOT NULL,
+                             ctv3Type VARCHAR(1),
+                             conceptId BIGINT,
+                             descriptionId BIGINT,
+                             status BOOLEAN NOT NULL,
+                             effectiveDate VARCHAR(10) NOT NULL,
+                             assured BOOLEAN NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+LOAD DATA LOCAL INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 5.7\\Uploads\\nhs_datamigration\\Mapping Tables\\Updated\\Clinically Assured\\ctv3sctmap2_uk_20181031000001.txt'
+    INTO TABLE read_v3_map
+    FIELDS TERMINATED BY '\t'
+    LINES TERMINATED BY '\r\n'
+    IGNORE 1 LINES
+    (id, ctv3Concept, ctv3Term, @ctv3Type, @conceptId, @descriptionId, status, effectiveDate, assured)
+    SET ctv3Type = nullif(@ctv3Type, ''),
+        conceptId = nullif(@conceptId, '_DRUG'),
+        descriptionId = nullif(@descriptionId, '');
+
+DROP TABLE IF EXISTS read_v3_alt_map;
+CREATE TABLE read_v3_alt_map (
+                                 ctv3Concept VARCHAR(6) COLLATE utf8_bin NOT NULL,
+                                 ctv3Term VARCHAR(6) COLLATE utf8_bin NOT NULL,
+                                 conceptId BIGINT,
+                                 descriptionId BIGINT,
+                                 useAlt VARCHAR(1),
+                                 PRIMARY KEY read_v3_alt_map_pk (ctv3Concept, ctv3Term)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+LOAD DATA LOCAL INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 5.7\\Uploads\\SNOMED\\codesWithValues_AlternateMaps_CTV3_20180401000001.txt'
+    INTO TABLE read_v3_alt_map
+    FIELDS TERMINATED BY '\t'
+    LINES TERMINATED BY '\r\n'
+    IGNORE 1 LINES
+    (ctv3Concept, ctv3Term, @conceptId, @descriptionId, @use)
+    SET conceptId = nullif(@conceptId, ''),
+        descriptionId = nullif(@descriptionId, ''),
+        useAlt = nullif(@use, '');

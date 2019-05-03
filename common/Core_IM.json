@@ -74,6 +74,17 @@
       }
     },
     {
+      "id": "short",
+      "name": "short",
+      "description": "the short name of the concept preferrably unambiguous",
+      "is_subtype_of": {
+        "id": "data_property"
+      },
+      "has_value_type": {
+        "id": "Text"
+      }
+    },
+    {
       "id": "code_scheme",
       "name": "code scheme",
       "description": "The code scheme the concept came from",
@@ -123,6 +134,13 @@
       }
     },
     {
+      "id": "inverse_property",
+      "name": "inverse property",
+      "description": "The reciprocal relationship",
+      "is_subtype_of": {
+        "id": "Relationship"
+      }
+    },    {
       "id": "is_descendant_of",
       "name": "is a descendant of",
       "description": "An concept that is a descendant of another concept recursively",
@@ -344,6 +362,18 @@
       "name": "Has value type",
       "description": "Specifies the value type for this entity",
       "is_subtype_of": { "id": "data_property" }
+    },
+    {
+      "id": "is_equivalent_to",
+      "name": "Is equivalent to relationship",
+      "description": "Specifies that one concept is equivalent to another",
+      "is_subtype_of": { "id": "Relationship" }
+    },
+    {
+      "id": "is_related_to",
+      "name": "Is related to relationship",
+      "description": "Specifies that one concept is related to another but not equivalent",
+      "is_subtype_of": { "id": "Relationship" }
     },
     {
       "id": "CodeableConcept",

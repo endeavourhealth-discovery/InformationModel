@@ -27,7 +27,7 @@ LOAD DATA LOCAL INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 5.7\\Uploads\\Encou
 
 DROP TABLE IF EXISTS encounter_maps;
 CREATE TABLE encounter_maps (
-    sourceTerm VARCHAR(150) NOT NULL,
+    sourceTerm VARCHAR(150) COLLATE utf8_bin NOT NULL,
     count INTEGER NOT NULL,
     targetTerm VARCHAR(50) NOT NULL,
     supplier VARCHAR(10) NOT NULL

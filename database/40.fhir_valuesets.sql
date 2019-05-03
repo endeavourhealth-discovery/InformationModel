@@ -1,8 +1,3 @@
-SELECT @max := MAX(dbid)+ 1 FROM concept;
-SET @qry = concat('ALTER TABLE concept AUTO_INCREMENT = ', @max);
-PREPARE stmt FROM @qry;
-EXECUTE stmt;
-
 DROP TABLE IF EXISTS fhir_scheme;
 CREATE TABLE fhir_scheme (
     id VARCHAR(50) NOT NULL,
@@ -165,60 +160,61 @@ VALUES
 -- Create the document
 
 INSERT INTO document
-(data)
-VALUES (JSON_OBJECT('document', 'http://DiscoveryDataService/InformationModel/dm/FHIR/1.0.0'));
+(iri)
+VALUES
+('http://DiscoveryDataService/InformationModel/dm/FHIR/1.0.0');
 
--- Create the code schemes
+SELECT @doc := LAST_INSERT_ID();
+
+-- Create the schemes
+-- Pre-allocate the concept IDs
 INSERT INTO concept
-(data)
-SELECT JSON_OBJECT('document', 'http://DiscoveryDataService/InformationModel/dm/FHIR/1.0.0',
-                   'id', id,
-                   'name', name,
-                   'description', name,
-                   'is_subtype_of', JSON_OBJECT(
-                           'id', 'CodeScheme'
-                       ))
+(document, id)
+SELECT @doc, id
+FROM fhir_scheme;
+
+-- Set the scheme properties
+INSERT INTO concept_property_data
+(dbid, property, value)
+SELECT get_dbid(id), get_dbid('name'), name
+FROM fhir_scheme;
+
+INSERT INTO concept_property_object
+(dbid, property, value)
+SELECT get_dbid(id), get_dbid('is_subtype_of'), get_dbid('CodeScheme')
 FROM fhir_scheme;
 
 -- Create the core concept equivalents
-
-EXECUTE stmt;
-
+SELECT @doc := dbid FROM document WHERE iri = 'http://DiscoveryDataService/InformationModel/dm/Discovery/1.0.1';
 INSERT INTO concept
-(data)
-SELECT JSON_OBJECT(
-    'document', 'http://DiscoveryDataService/InformationModel/dm/core/1.0.1',
-    'id', concat('DS_', scheme, '_', code),
-    'name', term,
-    'description', term,
-    'is_subtype_of', JSON_OBJECT(
-        'id', 'CodeableConcept'
-    )
-)
+(document, id)
+SELECT @doc, concat('DS_', scheme, '_', code)
 FROM fhir_scheme_value;
 
-EXECUTE stmt;
+INSERT INTO concept_property_data
+(dbid, property, value)
+SELECT get_dbid(concat('DS_', scheme, '_', code)), get_dbid('name'), term
+FROM fhir_scheme_value;
+
+INSERT INTO concept_property_object
+(dbid, property, value)
+SELECT get_dbid(concat('DS_', scheme, '_', code)), get_dbid('is_subtype_of'), get_dbid('CodeableConcept')
+FROM fhir_scheme_value;
 
 -- Create the (mapped) fhir entries
+SELECT @doc := dbid FROM document WHERE iri = 'http://DiscoveryDataService/InformationModel/dm/FHIR/1.0.1';
 INSERT INTO concept
-(data)
-    SELECT JSON_OBJECT(
-        'document', 'http://DiscoveryDataService/InformationModel/dm/FHIR/1.0.1',
-        'id', concat(scheme, '_', code),
-        'name', term,
-        'description', term,
-        'code_scheme', scheme,
-        'code', code,
-        'is_subtype_of', JSON_OBJECT(
-                'id', 'CodeableConcept'
-            ),
-        'is_equivalent_to', JSON_OBJECT(
-                'id', concat('DS_', scheme, '_', code)
-            )
-    )
-    FROM fhir_scheme_value;
+(document, id)
+SELECT @doc, concat(scheme, '_', code)
+FROM fhir_scheme_value;
 
+INSERT INTO concept_property_data
+(dbid, property, value)
+SELECT get_dbid(concat(scheme, '_', code)), get_dbid('name'), term FROM fhir_scheme_value
+UNION SELECT get_dbid(concat(scheme, '_', code)), get_dbid('code'), code FROM fhir_scheme_value;
 
-EXECUTE stmt;
-
-DEALLOCATE PREPARE stmt;
+INSERT INTO concept_property_object
+(dbid, property, value)
+SELECT get_dbid(concat(scheme, '_', code)), get_dbid('is_subtype_of'), get_dbid('CodeableConcept') FROM fhir_scheme_value
+UNION SELECT get_dbid(concat(scheme, '_', code)), get_dbid('code_scheme'), get_dbid(scheme) FROM fhir_scheme_value
+UNION SELECT get_dbid(concat(scheme, '_', code)), get_dbid('is_equivalent_to'), get_dbid(concat('DS_', scheme, '_', code)) FROM fhir_scheme_value;

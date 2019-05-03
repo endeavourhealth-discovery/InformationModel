@@ -1,8 +1,6 @@
 package org.endeavourhealth.im.client;
 
 import org.endeavourhealth.common.config.ConfigManager;
-import org.endeavourhealth.im.dal.InformationModelDAL;
-import org.endeavourhealth.im.dal.InformationModelJDBCDAL;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -54,6 +52,35 @@ public class IMClient {
         else
             throw new IOException(response.readEntity(String.class));
     }
+
+    public static Integer getConceptIdForTypeTerm(String type, String term) throws Exception {
+        Map<String, String> params = new HashMap<>();
+        params.put("type", type);
+        params.put("term", term);
+
+        Response response = get(base + "/Term", params);
+
+        if (response.getStatus() == 200)
+            return response.readEntity(Integer.class);
+        else
+            throw new IOException(response.readEntity(String.class));
+
+    }
+
+    public static Integer getMappedCoreConceptIdForTypeTerm(String type, String term) throws Exception {
+        Map<String, String> params = new HashMap<>();
+        params.put("type", type);
+        params.put("term", term);
+
+        Response response = get(base + "/Term/Core", params);
+
+        if (response.getStatus() == 200)
+            return response.readEntity(Integer.class);
+        else
+            throw new IOException(response.readEntity(String.class));
+
+    }
+
 /*
     public static Integer getMappedConceptIdForTypeTerm(String type, String term) throws Exception {
         return db.getMappedConceptIdForTypeTerm(type, term);

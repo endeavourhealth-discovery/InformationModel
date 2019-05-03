@@ -21,9 +21,9 @@ LOAD DATA LOCAL INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 5.7\\Uploads\\Barts
     LINES TERMINATED BY '\r\n'
     IGNORE 1 LINES
     (count, code, term, algorithm, @snomed_expression, @snomed_term, @author)
-    SET snomed_expression = nullif(@snomed_expression, ""),
-        snomed_term = nullif(@snomed_term, ""),
-        author = nullif(@author, "");
+    SET snomed_expression = nullif(@snomed_expression, ''),
+        snomed_term = nullif(@snomed_term, ''),
+        author = nullif(@author, '');
 
 
 UPDATE barts_cerner

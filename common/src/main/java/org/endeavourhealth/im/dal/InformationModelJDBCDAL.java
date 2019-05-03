@@ -22,10 +22,24 @@ public class InformationModelJDBCDAL implements InformationModelDAL {
     private static byte[][] concepts;
 
     @Override
-    public int insertDocument(String documentJson) throws SQLException, IOException {
+    public int getOrCreateDocumentDBId(String iri) throws SQLException {
         Connection conn = ConnectionPool.getInstance().pop();
-        try (PreparedStatement stmt = conn.prepareStatement("INSERT INTO document (data) VALUES (?)", Statement.RETURN_GENERATED_KEYS)) {
-            stmt.setString(1, documentJson);
+        try (PreparedStatement stmt = conn.prepareStatement("SELECT dbid FROM document WHERE iri = ?")) {
+            stmt.setString(1, iri);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next())
+                return rs.getInt("dbid");
+            else
+                return createDocumentDBId(iri);
+        } finally {
+            ConnectionPool.getInstance().push(conn);
+        }
+    }
+
+    private int createDocumentDBId(String iri) throws SQLException {
+        Connection conn = ConnectionPool.getInstance().pop();
+        try (PreparedStatement stmt = conn.prepareStatement("INSERT INTO document (iri) VALUES (?)", Statement.RETURN_GENERATED_KEYS)) {
+            stmt.setString(1, iri);
             stmt.execute();
             return DALHelper.getGeneratedKey(stmt);
         } finally {
@@ -34,16 +48,77 @@ public class InformationModelJDBCDAL implements InformationModelDAL {
     }
 
     @Override
-    public void updateDocument(int dbid, String documentJson) throws SQLException, IOException {
+    public int insertConcept(int docId, String id) throws SQLException {
         Connection conn = ConnectionPool.getInstance().pop();
-        try (PreparedStatement stmt = conn.prepareStatement("UPDATE document SET data = ? WHERE dbid = ?")) {
-            stmt.setString(1, documentJson);
-            stmt.setInt(2, dbid);
+        try (PreparedStatement stmt = conn.prepareStatement("INSERT INTO concept (document, id) VALUES (?, ?)", Statement.RETURN_GENERATED_KEYS)) {
+            stmt.setInt(1, docId);
+            stmt.setString(2, id);
+            stmt.execute();
+            return DALHelper.getGeneratedKey(stmt);
+        } finally {
+            ConnectionPool.getInstance().push(conn);
+        }
+    }
+
+
+    @Override
+    public void insertConceptPropertyData(int dbid, int property, String value) throws SQLException {
+        insertConceptPropertyData(dbid, null, property, value);
+    }
+
+    @Override
+    public void insertConceptPropertyData(int dbid, Integer group, int property, String value) throws SQLException {
+        if (group == null)
+            group = 0;
+
+        Connection conn = ConnectionPool.getInstance().pop();
+        try (PreparedStatement stmt = conn.prepareStatement("INSERT INTO concept_property_data (dbid, `group`, property, value) VALUES (?, ?, ?, ?)")) {
+            stmt.setInt(1, dbid);
+            stmt.setInt(2, group);
+            stmt.setInt(3, property);
+            stmt.setString(4, value);
             stmt.execute();
         } finally {
             ConnectionPool.getInstance().push(conn);
         }
     }
+
+    @Override
+    public void insertConceptPropertyValue(int dbid, int property, int value) throws SQLException {
+        insertConceptPropertyValue(dbid, null, property, value);
+    }
+
+    @Override
+    public void insertConceptPropertyValue(int dbid, Integer group, int property, int value) throws SQLException {
+        if (group == null)
+            group = 0;
+
+        Connection conn = ConnectionPool.getInstance().pop();
+        try (PreparedStatement stmt = conn.prepareStatement("INSERT INTO concept_property_object (dbid, `group`, property, value) VALUES (?, ?, ?, ?)")) {
+            stmt.setInt(1, dbid);
+            stmt.setInt(2, group);
+            stmt.setInt(3, property);
+            stmt.setInt(4, value);
+            stmt.execute();
+        } finally {
+            ConnectionPool.getInstance().push(conn);
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     @Override
     public void insertConcept(String conceptJson, Status status) throws SQLException, IOException {
@@ -385,13 +460,21 @@ public class InformationModelJDBCDAL implements InformationModelDAL {
     @Override
     public Integer getConceptIdForSchemeCode(String scheme, String code) throws SQLException {
         Connection conn = ConnectionPool.getInstance().pop();
-        try (PreparedStatement statement = conn.prepareStatement("SELECT dbid FROM concept WHERE scheme = ? AND code = ?")) {
+
+        String sql = "SELECT o.dbid\n" +
+            "FROM concept_property_object o\n" +
+            "JOIN concept s ON s.dbid = o.property AND s.id = 'code_scheme'\n" +
+            "JOIN concept v ON v.dbid = o.value AND v.id = ?\n" +
+            "JOIN concept_property_data d ON d.dbid = o.dbid AND d.value = ?\n" +
+            "JOIN concept c ON c.dbid = d.property AND c.id = 'code'";
+
+        try (PreparedStatement statement = conn.prepareStatement(sql)) {
             statement.setString(1, scheme);
             statement.setString(2, code);
 
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next())
-                return resultSet.getInt("dbid");
+                return resultSet.getInt(1);
             else
                 return null;
         } finally {
@@ -407,11 +490,14 @@ public class InformationModelJDBCDAL implements InformationModelDAL {
 
 
         String sql =
-            "SELECT c.dbid\n" +
-            "FROM concept m\n" +
-            "JOIN concept c ON c.id = m.data ->> '$.is_equivalent_to.id'\n" +
-            "WHERE m.scheme = ? \n" +
-            "AND m.code = ?";
+            "SELECT t.value\n" +
+                "FROM concept_property_object o\n" +
+                "JOIN concept s ON s.dbid = o.property AND s.id = 'code_scheme'\n" +
+                "JOIN concept v ON v.dbid = o.value AND v.id = ?\n" +
+                "JOIN concept_property_data d ON d.dbid = o.dbid AND d.value = ?\n" +
+                "JOIN concept c ON c.dbid = d.property AND c.id = 'code'\n" +
+                "JOIN concept_property_object t ON t.dbid = o.dbid\n" +
+                "JOIN concept p ON p.dbid = t.property AND p.id = 'is_equivalent_to'";
 
         Connection conn = ConnectionPool.getInstance().pop();
         try (PreparedStatement statement = conn.prepareStatement(sql)) {
@@ -420,7 +506,7 @@ public class InformationModelJDBCDAL implements InformationModelDAL {
 
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next())
-                return resultSet.getInt("dbid");
+                return resultSet.getInt(1);
             else
                 return null;
         } finally {
@@ -429,7 +515,28 @@ public class InformationModelJDBCDAL implements InformationModelDAL {
     }
 
     @Override
-    public Integer getMappedConceptIdForTypeTerm(String type, String term) throws SQLException {
+    public Integer getConceptIdForTypeTerm(String type, String term) throws SQLException {
+        Integer typeId = getConceptDbid(type);
+        if (typeId == null)
+            return null;
+
+        Connection conn = ConnectionPool.getInstance().pop();
+        try (PreparedStatement statement = conn.prepareStatement("SELECT target FROM concept_term_map WHERE type = ? AND term = ?")) {
+            statement.setInt(1, typeId);
+            statement.setString(2, term);
+
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next())
+                return resultSet.getInt("target");
+            else
+                return null;
+        } finally {
+            ConnectionPool.getInstance().push(conn);
+        }
+    }
+
+    @Override
+    public Integer getMappedCoreConceptIdForTypeTerm(String type, String term) throws SQLException {
         Integer typeId = getConceptDbid(type);
         if (typeId == null)
             return null;
@@ -452,12 +559,18 @@ public class InformationModelJDBCDAL implements InformationModelDAL {
     @Override
     public String getCodeForConceptId(Integer dbid) throws SQLException {
         Connection conn = ConnectionPool.getInstance().pop();
-        try (PreparedStatement statement = conn.prepareStatement("SELECT code FROM concept WHERE dbid = ?")) {
+
+        String sql = "SELECT d.value\n" +
+            "FROM concept_property_data d\n" +
+            "JOIN concept p ON p.dbid = d.property AND p.id = 'code'\n" +
+            "WHERE d.dbid = ?";
+
+        try (PreparedStatement statement = conn.prepareStatement(sql)) {
             statement.setInt(1, dbid);
 
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next())
-                return resultSet.getString("code");
+                return resultSet.getString(1);
             else
                 return null;
         } finally {

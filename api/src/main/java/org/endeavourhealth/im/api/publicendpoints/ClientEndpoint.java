@@ -78,4 +78,41 @@ public class ClientEndpoint {
             .build();
     }
 
+    @GET
+    @Path("/Term")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.TEXT_PLAIN)
+    @Timed(absolute = true, name = "InformationModel.ClientEndpoint.Term.GET")
+    @ApiOperation(value = "Get concept id for given type and term", response = Integer.class)
+    public Response getConceptIdForTypeTerm(@Context SecurityContext sc,
+                                        @ApiParam(value = "Term type", required = true) @QueryParam("type") String type,
+                                            @ApiParam(value = "Term", required = true) @QueryParam("term") String term) throws Exception {
+        LOG.debug("getConceptIdForTypeTerm");
+
+        Integer result = new InformationModelJDBCDAL().getConceptIdForTypeTerm(type, term);
+
+        return Response
+            .ok()
+            .entity(result)
+            .build();
+    }
+
+    @GET
+    @Path("/Term/Core")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.TEXT_PLAIN)
+    @Timed(absolute = true, name = "InformationModel.ClientEndpoint.TermCore.GET")
+    @ApiOperation(value = "Get (mapped) core concept id for given type and term", response = Integer.class)
+    public Response getMappedCoreConceptIdForTypeTerm(@Context SecurityContext sc,
+                                            @ApiParam(value = "Term type", required = true) @QueryParam("type") String type,
+                                            @ApiParam(value = "Term", required = true) @QueryParam("term") String term) throws Exception {
+        LOG.debug("getMappedCoreConceptIdForTypeTerm");
+
+        Integer result = new InformationModelJDBCDAL().getMappedCoreConceptIdForTypeTerm(type, term);
+
+        return Response
+            .ok()
+            .entity(result)
+            .build();
+    }
 }

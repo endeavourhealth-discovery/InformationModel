@@ -21,34 +21,68 @@ public class DocumentImport {
     private static InformationModelDAL db = new InformationModelJDBCDAL();
 
     public static void main(String argv[]) throws Exception {
-        importFile("Core_IM.json", "http://DiscoveryDataService/InformationModel/dm/core/1.0.1", 40);
-        importFile("Medication.json", "http://DiscoveryDataService/InformationModel/dm/HealthData/Medication/1.0.1", 11);
+        importFile("Core_IM.json");
+        importFile("Medication.json");
         //importFile("Working example-3.json", "http/DiscoveryDataService/InformationModel/dm/HealthData/1.0.1", 33);
         //importFile("Expression.json", "http/DiscoveryDataService/InformationModel/dm/Snomed/1.0.1", 1);
     }
 
-    private static void importFile(String filename, String iri, int expectedItems) throws Exception {
+    private static void importFile(String filename) throws Exception {
+        System.out.println("Processing " + filename);
+
         byte[] encoded = Files.readAllBytes(Paths.get(filename));
         String JSON = new String(encoded, Charset.defaultCharset()).trim();
         JsonNode root = ObjectMapperPool.getInstance().readTree(JSON);
 
         String document = root.get("document").asText();
-        assertEquals(iri, document);
-
         ArrayNode concepts = (ArrayNode) root.get("Concepts");
-        assertEquals(expectedItems, concepts.size());
 
         // Validate ids
         validateConcepts(concepts);
 
         // Save document
-        db.insertDocument(JSON);
+        int docId = db.getOrCreateDocumentDBId(document);
 
-        // Save concepts
+        // Generate the concept IDs
         for(JsonNode concept: concepts) {
-            if (!"Concept".equals(concept.get("id").textValue())) {
-                ((ObjectNode) concept).put("document", document);
-                db.insertConcept(concept.toString(), Status.ACTIVE);
+            String id = concept.get("id").textValue();
+//            if (!"Concept".equals(id))      // Dont add root "Concept" concept
+                db.insertConcept(docId, id);
+        }
+
+        // Add the properties
+        for(JsonNode concept: concepts) {
+//            if (!"Concept".equals(concept.get("id").textValue()))      // Dont add root "Concept" concept
+                insertConceptProperties(concept);
+        }
+
+        System.out.println("Finished processing " + filename + "\n");
+    }
+
+    private static void insertConceptProperties(JsonNode concept) throws Exception {
+        String id = concept.get("id").asText();
+        System.out.println("\tAdding the " + id);
+
+        int dbid = db.getConceptDbid(id);
+
+        Iterator<Map.Entry<String, JsonNode>> fields = concept.fields();
+        while(fields.hasNext()) {
+            Map.Entry<String, JsonNode> property = fields.next();
+            if (!"id".equals(property.getKey())) {
+                JsonNode value = property.getValue();
+                if (value.isValueNode()) {
+                    System.out.println("\t\t" + property.getKey() + " = " + value.toString());
+                    int propertyId = db.getConceptDbid(property.getKey());
+                    db.insertConceptPropertyData(dbid, propertyId, value.toString());
+                } else if (value.isObject() && value.has("id")) {
+                    System.out.println("\t\t" + property.getKey() + " = (Object)" + value.toString());
+                    int valueId = db.getConceptDbid(value.get("id").asText());
+                    int propertyId = db.getConceptDbid(property.getKey());
+                    db.insertConceptPropertyValue(dbid, propertyId, valueId);
+                } else if (value.isObject()) {
+                    System.out.println("\t\t" + property.getKey() + " = (Anon)" + value.toString());
+                } else
+                    throw new IllegalArgumentException("\t\t" + property.getKey() + " is of an invalid type - " + value.toString());
             }
         }
     }

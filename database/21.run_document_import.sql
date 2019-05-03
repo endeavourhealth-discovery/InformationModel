@@ -1,0 +1,3 @@
+--
+-- RUN THE DOCUMENT IMPORT APPLICATION TO
+-- Imports the base/core concepts
