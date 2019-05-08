@@ -1,6 +1,7 @@
 package org.endeavourhealth.im.dal;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import org.endeavourhealth.common.cache.ObjectMapperPool;
@@ -10,6 +11,8 @@ import org.endeavourhealth.im.models.Status;
 
 import java.io.*;
 import java.sql.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Date;
 import java.util.concurrent.ThreadLocalRandom;
@@ -149,20 +152,67 @@ public class InformationModelJDBCDAL implements InformationModelDAL {
     public SearchResult mru() throws Exception {
         SearchResult result = new SearchResult();
 
-        String sql = "SELECT dbid, id, name, scheme, code, status, updated " +
-            "FROM concept " +
-            "ORDER BY updated DESC " +
-            "LIMIT 15";
+        String sql = "SELECT c.id, p.id as property, d.value\n" +
+            "FROM concept c\n" +
+            "JOIN concept_property_data d ON d.dbid = c.dbid\n" +
+            "JOIN concept p ON p.dbid = d.property AND p.id IN ('name', 'code')\n" +
+            "INNER JOIN (\n" +
+            "\tSELECT i.dbid\n" +
+            "    FROM concept_property_info i\n" +
+            "    JOIN concept updt ON updt.dbid = i.property AND updt.id = 'last_updated'\n" +
+            "    ORDER BY i.value DESC\n" +
+            "    LIMIT 1000\n" +
+            ") t ON c.dbid = t.dbid\n" +
+            "UNION\n" +
+            "SELECT c.id, p.id, v.id\n" +
+            "FROM concept c\n" +
+            "JOIN concept_property_object d ON d.dbid = c.dbid\n" +
+            "JOIN concept p ON p.dbid = d.property AND p.id = 'code_scheme'\n" +
+            "JOIN concept v ON v.dbid = d.value\n" +
+            "INNER JOIN (\n" +
+            "\tSELECT i.dbid\n" +
+            "    FROM concept_property_info i\n" +
+            "    JOIN concept updt ON updt.dbid = i.property AND updt.id = 'last_updated'\n" +
+            "    ORDER BY i.value DESC\n" +
+            "    LIMIT 1000\n" +
+            ") t ON c.dbid = t.dbid\n" +
+            "UNION\n" +
+            "SELECT c.id, p.id, d.value\n" +
+            "FROM concept c\n" +
+            "JOIN concept_property_info d ON d.dbid = c.dbid\n" +
+            "JOIN concept p ON p.dbid = d.property AND p.id IN ('status', 'last_updated')\n" +
+            "INNER JOIN (\n" +
+            "\tSELECT i.dbid\n" +
+            "    FROM concept_property_info i\n" +
+            "    JOIN concept updt ON updt.dbid = i.property AND updt.id = 'last_updated'\n" +
+            "    ORDER BY i.value DESC\n" +
+            "    LIMIT 20\n" +
+            ") t ON c.dbid = t.dbid\n" +
+            "ORDER BY 1, 2;";
 
         Connection conn = ConnectionPool.getInstance().pop();
         try {
             try (PreparedStatement statement = conn.prepareStatement(sql)) {
-                getConceptsFromResultSet(result.getResults(), statement);
-            }
-            try (PreparedStatement statement = conn.prepareStatement("SELECT FOUND_ROWS();")) {
                 ResultSet rs = statement.executeQuery();
-                rs.next();
-                result.setCount(rs.getInt(1));
+
+                SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss");
+                String id = "";
+                Concept c = null;
+                while(rs.next()) {
+                    if (!rs.getString("id").equals(id)) {
+                        id = rs.getString("id");
+                        c = new Concept().setId(id);
+                        result.getResults().add(c);
+                    }
+                    String v = rs.getString("value");
+                    switch(rs.getString("property")) {
+                        case "name": c.setName(v); break;
+                        case "code": c.setCode(v); break;
+                        case "code_scheme": c.setScheme(v); break;
+                        case "status": c.setStatus((short)0); break;       // TODO: Correct status flag
+                        case "last_update": c.setUpdated(df.parse(v));
+                    }
+                }
             }
         }finally {
             ConnectionPool.getInstance().push(conn);
@@ -258,17 +308,66 @@ public class InformationModelJDBCDAL implements InformationModelDAL {
 
     @Override
     public String getConceptJSON(String id) throws SQLException {
-        String sql = "SELECT data FROM concept WHERE id = ?";
+        String sql = "SELECT 'document' AS property, 0 AS `group`, d.iri AS value, 1 AS type\n" +
+            "FROM concept c\n" +
+            "JOIN document d ON d.dbid = c.document\n" +
+            "WHERE c.id = ?\n" +
+            "UNION\n" +
+            "SELECT p.id AS property, d.group, d.value, 1 as type\n" +
+            "FROM concept c\n" +
+            "JOIN concept_property_data d ON d.dbid = c.dbid\n" +
+            "JOIN concept p ON p.dbid = d.property\n" +
+            "WHERE c.id = ?\n" +
+            "UNION\n" +
+            "SELECT p.id AS property, d.group, d.value, 2 as type\n" +
+            "FROM concept c\n" +
+            "JOIN concept_property_info d ON d.dbid = c.dbid\n" +
+            "JOIN concept p ON p.dbid = d.property\n" +
+            "WHERE c.id = ?\n" +
+            "UNION\n" +
+            "SELECT p.id AS property, d.group, v.id as value, 3 as type\n" +
+            "FROM concept c\n" +
+            "JOIN concept_property_object d ON d.dbid = c.dbid\n" +
+            "JOIN concept p ON p.dbid = d.property\n" +
+            "JOIN concept v ON v.dbid = d.value\n" +
+            "WHERE c.id = ?";
 
         Connection conn = ConnectionPool.getInstance().pop();
         try (PreparedStatement statement = conn.prepareStatement(sql)) {
             statement.setString(1, id);
+            statement.setString(2, id);
+            statement.setString(3, id);
+            statement.setString(4, id);
             ResultSet resultSet = statement.executeQuery();
 
-            if (resultSet.next())
-                return resultSet.getString("data");
-            else
-                return null;
+            ObjectNode root = JsonNodeFactory.instance.objectNode();
+            ObjectNode meta = JsonNodeFactory.instance.objectNode();
+            root.put("id", id);
+            // root.set("meta", meta);
+            int group = 0;
+            while (resultSet.next()) {
+                int grp = resultSet.getInt("group");
+                int typ = resultSet.getInt("type");
+
+                ObjectNode tgt = (grp == 0) ? root : root;
+
+                switch(typ) {
+                    case 1: // Value
+                        tgt.put(resultSet.getString("property"), resultSet.getString("value"));
+                        break;
+                    case 2: // Meta
+                        meta.put(resultSet.getString("property"), resultSet.getString("value"));
+                        break;
+                    case 3: // Object
+                        ObjectNode obj = JsonNodeFactory.instance.objectNode();
+                        obj.put("id", resultSet.getString("value"));
+                        tgt.set(resultSet.getString("property"), obj);
+                        break;
+                }
+            }
+
+            return root.toString();
+
         } finally {
             ConnectionPool.getInstance().push(conn);
         }
@@ -276,7 +375,11 @@ public class InformationModelJDBCDAL implements InformationModelDAL {
 
     @Override
     public String getConceptName(String id) throws SQLException {
-        String sql = "SELECT name FROM concept WHERE id = ?\n";
+        String sql = "SELECT d.value AS name\n" +
+            "FROM concept c\n" +
+            "JOIN concept_property_data d ON d.dbid = c.dbid\n" +
+            "JOIN concept p ON p.dbid = d.property AND p.id = 'name'\n" +
+            "WHERE c.id = ?\n";
 
         Connection conn = ConnectionPool.getInstance().pop();
         try (PreparedStatement statement = conn.prepareStatement(sql)) {

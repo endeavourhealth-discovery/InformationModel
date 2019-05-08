@@ -30,4 +30,13 @@ public enum Status {
 
         return null;
     }
+
+    public static Status byName(String name) {
+        for (Status t: Status.values()) {
+            if (t.name.equals(name))
+                return t;
+        }
+
+        return null;
+    }
 }

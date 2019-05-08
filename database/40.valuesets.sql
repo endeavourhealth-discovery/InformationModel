@@ -25,7 +25,11 @@ VALUES
     ('FHIR_MSAT', 'FHIR Medication statement authorisation type'),
     ('FHIR_PRS', 'FHIR Procedure request status'),
     ('FHIR_RFP', 'FHIR Referral priority'),
-    ('FHIR_RFT', 'FHIR Referral type')
+    ('FHIR_RFT', 'FHIR Referral type'),
+
+    ('FHIR_AU', ' FHIR Address use'),
+    ('FHIR_CPS', 'FHIR Contact point system'),
+    ('FHIR_CPU', 'FHIR Contact point use')
 ;
 
 -- Create the scheme values
@@ -155,7 +159,26 @@ VALUES
     ('FHIR_RFT', 'R', 'Patient assurance'),
     ('FHIR_RFT', 'S', 'Self referral'),
     ('FHIR_RFT', 'T', 'Treatment'),
-    ('FHIR_RFT', 'U', 'Unknown');
+    ('FHIR_RFT', 'U', 'Unknown'),
+
+    ('FHIR_AU', 'home', 'Home'),
+    ('FHIR_AU', 'work', 'Work'),
+    ('FHIR_AU', 'temp', 'Temporary'),
+    ('FHIR_AU', 'old', 'Old / Incorrect'),
+
+    ('FHIR_CPS', 'phone', 'Phone'),
+    ('FHIR_CPS', 'fax', 'Fax'),
+    ('FHIR_CPS', 'email', 'Email'),
+    ('FHIR_CPS', 'pager', 'Pager'),
+    ('FHIR_CPS', 'other', 'URL'),
+
+    ('FHIR_CPU', 'home', 'Home'),
+    ('FHIR_CPU', 'work', 'Work'),
+    ('FHIR_CPU', 'temp', 'Temporary'),
+    ('FHIR_CPU', 'old', 'Old'),
+    ('FHIR_CPU', 'mobile', 'Mobile')
+
+    ;
 
 -- Create the document
 
@@ -185,7 +208,7 @@ SELECT get_dbid(id), get_dbid('is_subtype_of'), get_dbid('CodeScheme')
 FROM fhir_scheme;
 
 -- Create the core concept equivalents
-SELECT @doc := dbid FROM document WHERE iri = 'http://DiscoveryDataService/InformationModel/dm/Discovery/1.0.1';
+SELECT @doc := dbid FROM document WHERE iri = 'http://DiscoveryDataService/InformationModel/dm/Discovery/1.0.0';
 INSERT INTO concept
 (document, id)
 SELECT @doc, concat('DS_', scheme, '_', code)

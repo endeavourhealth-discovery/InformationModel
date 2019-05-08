@@ -85,7 +85,7 @@
     },
     {
       "id": "strength_numerator_unit",
-      "name": "strength numerator value",
+      "name": "strength numerator unit",
       "description": "Property with  value that is a unit of measure",
       "is_subtype_of": {
         "id": "object_property"

@@ -73,7 +73,7 @@ public class DocumentImport {
                 if (value.isValueNode()) {
                     System.out.println("\t\t" + property.getKey() + " = " + value.toString());
                     int propertyId = db.getConceptDbid(property.getKey());
-                    db.insertConceptPropertyData(dbid, propertyId, value.toString());
+                    db.insertConceptPropertyData(dbid, propertyId, value.textValue());
                 } else if (value.isObject() && value.has("id")) {
                     System.out.println("\t\t" + property.getKey() + " = (Object)" + value.toString());
                     int valueId = db.getConceptDbid(value.get("id").asText());

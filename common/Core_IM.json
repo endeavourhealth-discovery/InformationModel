@@ -393,7 +393,60 @@
       "description": "The unit of measure for the associated value",
       "is_subtype_of": { "id":  "SimpleDataType" },
       "has_value_type": { "id":  "Text" }
+    },
+    {
+      "id": "last_updated",
+      "name": "Last updated",
+      "description": "The date/time a concept was last updated",
+      "is_subtype_of": { "id":  "data_property" },
+      "has_value_type": { "id":  "Date" }
+    },
+    {
+      "id": "DS_DATE_PREC",
+      "name": "Date time precision codes",
+      "is_subtype_of": { "id":  "CodeScheme" }
+    },
+    {
+      "id": "DS_DATE_PREC_year",
+      "name": "Year",
+      "is_subtype_of": { "id":  "CodeableConcept" },
+      "code": "year",
+      "code_scheme": "DS_DATE_PREC"
+    },
+    {
+      "id": "DS_DATE_PREC_month",
+      "name": "Month",
+      "is_subtype_of": { "id":  "CodeableConcept" },
+      "code": "month",
+      "code_scheme": "DS_DATE_PREC"
+    },
+    {
+      "id": "DS_DATE_PREC_day",
+      "name": "Day",
+      "is_subtype_of": { "id":  "CodeableConcept" },
+      "code": "day",
+      "code_scheme": "DS_DATE_PREC"
+    },
+    {
+      "id": "DS_DATE_PREC_minute",
+      "name": "Minute",
+      "is_subtype_of": { "id":  "CodeableConcept" },
+      "code": "minute",
+      "code_scheme": "DS_DATE_PREC"
+    },
+    {
+      "id": "DS_DATE_PREC_second",
+      "name": "Second",
+      "is_subtype_of": { "id":  "CodeableConcept" },
+      "code": "Second",
+      "code_scheme": "DS_DATE_PREC"
+    },
+    {
+      "id": "DS_DATE_PREC_millisecond",
+      "name": "Millisecond",
+      "is_subtype_of": { "id":  "CodeableConcept" },
+      "code": "millisecond",
+      "code_scheme": "DS_DATE_PREC"
     }
-
-  ]
+    ]
 }
