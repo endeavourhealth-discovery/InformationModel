@@ -24,11 +24,10 @@ CREATE TABLE read_v2_map_summary (
     INDEX read_v2_map_summary_multi_idx (multi)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-INSERT INTO read_v2_map_summary
-(readCode, multi, altConceptId)
-SELECT t.readCode, COUNT(DISTINCT t.conceptId) > 1 as multi, a.conceptId
+SELECT t.readCode, COUNT(DISTINCT c.dbid) > 1 as multi, c.dbid, IF(c.dbid is null, null, a.conceptId) as conceptId
 FROM read_v2_map_tmp t
 LEFT JOIN read_v2_alt_map a ON a.readCode = t.readCode AND a.termCode = '00' AND a.conceptId IS NOT NULL AND a.useAlt = 'Y'
+LEFT JOIN concept c ON c.id = CONCAT('SN_', a.conceptId)
 GROUP BY t.readCode;
 
 -- Add 1:1 maps

@@ -1,127 +1,301 @@
 package org.endeavourhealth.im.dal;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import gnu.trove.map.hash.TObjectIntHashMap;
 import org.endeavourhealth.common.cache.ObjectMapperPool;
-import org.endeavourhealth.im.models.Concept;
-import org.endeavourhealth.im.models.SearchResult;
-import org.endeavourhealth.im.models.Status;
+import org.endeavourhealth.im.models.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.sql.*;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Date;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.zip.DataFormatException;
-import java.util.zip.Deflater;
-import java.util.zip.Inflater;
+
 
 public class InformationModelJDBCDAL implements InformationModelDAL {
-    private static TObjectIntHashMap<String> idMap;
-    private static byte[][] concepts;
+    private static Logger LOG = LoggerFactory.getLogger(InformationModelJDBCDAL.class);
+    private static String status = "Running";
+    private HashMap<String, Integer> idMap = new HashMap<>();
 
     @Override
-    public int getOrCreateDocumentDBId(String iri) throws SQLException {
+    public String getStatus() {
+        return status;
+    }
+
+    @Override
+    public String importDocument(String documentJson) throws Exception {
+        if (!"Running".equals(status)) {
+            LOG.warn("Import already in progress, aborting");
+            return status;
+        }
+
+        status = "Importing ";
+
         Connection conn = ConnectionPool.getInstance().pop();
-        try (PreparedStatement stmt = conn.prepareStatement("SELECT dbid FROM document WHERE iri = ?")) {
-            stmt.setString(1, iri);
+        // conn.setAutoCommit(false);
+
+        try {
+            LOG.debug("Deserialising document...");
+            JsonNode root = ObjectMapperPool.getInstance().readTree(documentJson);
+
+            LOG.debug("Extracting document meta data...");
+            String docIri = root.get("document").asText();
+            String docPath = docIri.substring(0, docIri.lastIndexOf("/"));
+            String docVer = docIri.substring(docIri.lastIndexOf("/") + 1);
+
+            status += docIri;
+
+            LOG.debug("Ensuring document exists...");
+            int docDbid = getOrCreateDocumentDBId(conn, docPath);
+
+            importConcepts(root, conn, docDbid);
+            importTermMaps(root, conn);
+
+            status = "Updating document version";
+            LOG.debug("Updating document...");
+            // Set new document version
+            updateDocumentVersion(conn, docDbid, docVer);
+
+//            conn.commit();
+        } catch (Exception e) {
+            LOG.error(e.getMessage());
+//            conn.rollback();
+            throw e;
+        } finally {
+            status = "Running";
+            ConnectionPool.getInstance().push(conn);
+        }
+        LOG.debug("Document import complete");
+        return "Import complete";
+    }
+    private void importTermMaps(JsonNode root, Connection conn) throws SQLException {
+        if (root.has("TermMaps")) {
+            LOG.debug("Importing term maps");
+            ArrayNode maps = (ArrayNode) root.get("TermMaps");
+
+            Iterator<JsonNode> iterator = maps.iterator();
+            try (PreparedStatement stmt = conn.prepareStatement("REPLACE INTO concept_term_map (term, type, target) VALUES (?, ?, ?)")) {
+                int i = 0;
+                int s = maps.size();
+                while (iterator.hasNext()) {
+                    JsonNode map = iterator.next();
+                    stmt.setString(1, map.get("term").asText());
+                    stmt.setInt(2, getConceptDbid(map.get("type").asText()));
+                    stmt.setInt(3, getConceptDbid(map.get("target").asText()));
+                    stmt.execute();
+
+                    if (i % 1000 == 0) {
+                        status = "Updating term maps " + i + "/" + s;
+                        LOG.debug(status);
+                    }
+                    i++;
+                }
+            }
+        }
+    }
+    private void importConcepts(JsonNode root, Connection conn, int docDbid) throws Exception {
+        if (root.has("Concepts")) {
+            ArrayNode concepts = (ArrayNode) root.get("Concepts");
+
+            LOG.debug("Checking " + concepts.size() + " concepts...");
+            // Allocate concept ids first as necessary
+            getOrCreateConceptDbids(conn, docDbid, concepts);
+            updateConceptDefinitions(conn, concepts);
+        }
+    }
+    private int getOrCreateDocumentDBId(Connection conn, String docPath) throws SQLException {
+        try (PreparedStatement stmt = conn.prepareStatement("SELECT dbid FROM document WHERE path = ?")) {
+            stmt.setString(1, docPath);
             ResultSet rs = stmt.executeQuery();
             if (rs.next())
                 return rs.getInt("dbid");
-            else
-                return createDocumentDBId(iri);
-        } finally {
-            ConnectionPool.getInstance().push(conn);
+        }
+
+        try (PreparedStatement statement = conn.prepareStatement("INSERT INTO document (path, version) VALUES (?, '0.0.1')", Statement.RETURN_GENERATED_KEYS)) {
+            statement.setString(1, docPath);
+            statement.execute();
+
+            return DALHelper.getGeneratedKey(statement);
         }
     }
+    private void getOrCreateConceptDbids(Connection conn, int docDbid, ArrayNode concepts) throws SQLException {
+        // Prepare statements in advance for performance
+        try (PreparedStatement getDbid = conn.prepareStatement("SELECT dbid FROM concept WHERE id = ?");
+             PreparedStatement addId = conn.prepareStatement("INSERT INTO concept (document, id) VALUES (?, ?)", Statement.RETURN_GENERATED_KEYS)) {
+            idMap.clear();
+            Iterator<JsonNode> elements = concepts.elements();
+            // Iterate elements of concepts array
+            int s = concepts.size();
+            int i = 0;
+            while (elements.hasNext()) {
+                JsonNode concept = elements.next();
+                String conceptId = concept.get("id").asText();
+                if (!idMap.containsKey(conceptId)) {
+                    // Not in the map, look in db
+                    getDbid.setString(1, conceptId);
+                    ResultSet rs = getDbid.executeQuery();
+                    if (rs.next()) {
+                        idMap.put(conceptId, rs.getInt("dbid"));
+                    } else {
+                        addId.setInt(1, docDbid);
+                        addId.setString(2, conceptId);
+                        addId.execute();
+                        idMap.put(conceptId, DALHelper.getGeneratedKey(addId));
+                    }
+                }
 
-    private int createDocumentDBId(String iri) throws SQLException {
-        Connection conn = ConnectionPool.getInstance().pop();
-        try (PreparedStatement stmt = conn.prepareStatement("INSERT INTO document (iri) VALUES (?)", Statement.RETURN_GENERATED_KEYS)) {
-            stmt.setString(1, iri);
-            stmt.execute();
-            return DALHelper.getGeneratedKey(stmt);
-        } finally {
-            ConnectionPool.getInstance().push(conn);
+                if (i % 1000 == 0) {
+                    status = "Checking concept " + i + "/" + s;
+                    LOG.debug(status);
+                }
+                i++;
+            }
         }
+    }
+    private void updateConceptDefinitions(Connection conn, ArrayNode concepts) throws Exception {
+        LOG.debug("Defining concepts...");
+
+        Iterator<JsonNode> iterator = concepts.iterator();
+        int s = concepts.size();
+        int i = 0;
+
+        // Prepare statements in advance for performance
+        try (PreparedStatement delData = conn.prepareStatement("DELETE FROM concept_property_data WHERE dbid = ?");
+             PreparedStatement delObj = conn.prepareStatement("DELETE FROM concept_property_object WHERE dbid = ?");
+             PreparedStatement insData = conn.prepareStatement("INSERT INTO concept_property_data (dbid, `group`, property, value) VALUES (?, ?, ?, ?)");
+             PreparedStatement insObj = conn.prepareStatement("INSERT INTO concept_property_object (dbid, `group`, property, value) VALUES (?, ?, ?, ?)")
+        ) {
+            while (iterator.hasNext()) {
+                JsonNode concept = iterator.next();
+
+                String conceptId = concept.get("id").asText();
+                int conceptDbid = idMap.get(conceptId);
+
+                delData.setInt(1, conceptDbid);
+                delData.execute();
+                delObj.setInt(1, conceptDbid);
+                delObj.execute();
+
+                Iterator<Map.Entry<String, JsonNode>> fields = concept.fields();
+                while (fields.hasNext()) {
+                    Map.Entry<String, JsonNode> property = fields.next();
+                    String propertyId = property.getKey();
+                    if (!"id".equals(propertyId)) {
+                        JsonNode value = property.getValue();
+                        insertConceptProperty(conn, insData, insObj, conceptDbid, propertyId, value);
+                    }
+                }
+
+                if (i % 1000 == 0) {
+                    status = "Defining concept " + i + "/" + s;
+                    LOG.debug(status);
+                }
+                i++;
+            }
+        }
+    }
+    private void updateDocumentVersion(Connection conn, int docDbid, String docVer) throws SQLException {
+        try (PreparedStatement stmt = conn.prepareStatement("UPDATE document SET version = ? WHERE dbid = ?")) {
+            stmt.setString(1, docVer);
+            stmt.setInt(2, docDbid);
+            stmt.execute();
+        }
+    }
+    private void insertConceptProperty(Connection conn, PreparedStatement insData, PreparedStatement insObj, int conceptDbid, String propertyId, JsonNode value) throws SQLException {
+        Integer propertyDbid = getConceptDbid(conn, propertyId);
+        if (propertyDbid == null)
+            throw new IllegalArgumentException("\t\t[" + propertyId + "] does not exist!");
+
+        if (value.isValueNode()) {
+            insertConceptPropertyData(insData, conceptDbid, 0, propertyDbid, value.asText());
+        } else if (value.isObject() && value.has("id")) {
+            String valueId = value.get("id").asText();
+            Integer valueDbid = getConceptDbid(conn, valueId);
+            if (valueDbid == null)
+                throw new IllegalArgumentException("\t\t Property [" + propertyId + "] Value [" + valueId + "] does not exist!");
+
+            insertConceptPropertyObject(insObj, conceptDbid, 0, propertyDbid, valueDbid);
+        } else if (value.isArray()) {
+            ArrayNode arr = (ArrayNode)value;
+            for (int i=0; i<arr.size(); i++) {
+                JsonNode item = arr.get(i);
+                insertConceptProperty(conn, insData, insObj, conceptDbid, propertyId, item);
+            }
+        } else if (value.isObject()) {
+            System.out.println("\t\t" + " = (Anon)" + value.toString());
+        } else
+            throw new IllegalArgumentException("\t\t[" + propertyId + "] is of an invalid type - [" + value.toString() +"]");
     }
 
     @Override
     public int insertConcept(int docId, String id) throws SQLException {
         Connection conn = ConnectionPool.getInstance().pop();
-        try (PreparedStatement stmt = conn.prepareStatement("INSERT INTO concept (document, id) VALUES (?, ?)", Statement.RETURN_GENERATED_KEYS)) {
-            stmt.setInt(1, docId);
-            stmt.setString(2, id);
-            stmt.execute();
-            return DALHelper.getGeneratedKey(stmt);
+        try {
+            return insertConcept(conn, docId, id);
         } finally {
             ConnectionPool.getInstance().push(conn);
         }
     }
+    private int insertConcept(Connection conn, int docDbid, String conceptId) throws SQLException {
+        try (PreparedStatement stmt = conn.prepareStatement("INSERT INTO concept (document, id) VALUES (?, ?)", Statement.RETURN_GENERATED_KEYS)) {
+            stmt.setInt(1, docDbid);
+            stmt.setString(2, conceptId);
+            stmt.execute();
 
+            int dbid = DALHelper.getGeneratedKey(stmt);
+            idMap.put(conceptId, dbid);
+
+            return dbid;
+        }
+    }
 
     @Override
     public void insertConceptPropertyData(int dbid, int property, String value) throws SQLException {
-        insertConceptPropertyData(dbid, null, property, value);
+        insertConceptPropertyData(dbid, 0, property, value);
     }
 
     @Override
-    public void insertConceptPropertyData(int dbid, Integer group, int property, String value) throws SQLException {
-        if (group == null)
-            group = 0;
-
+    public void insertConceptPropertyData(int dbid, int group, int property, String value) throws SQLException {
         Connection conn = ConnectionPool.getInstance().pop();
         try (PreparedStatement stmt = conn.prepareStatement("INSERT INTO concept_property_data (dbid, `group`, property, value) VALUES (?, ?, ?, ?)")) {
-            stmt.setInt(1, dbid);
-            stmt.setInt(2, group);
-            stmt.setInt(3, property);
-            stmt.setString(4, value);
-            stmt.execute();
+            insertConceptPropertyData(stmt, dbid, group, property, value);
         } finally {
             ConnectionPool.getInstance().push(conn);
         }
+    }
+    private void insertConceptPropertyData(PreparedStatement stmt, int dbid, int group, int property, String value) throws SQLException {
+        stmt.setInt(1, dbid);
+        stmt.setInt(2, group);
+        stmt.setInt(3, property);
+        stmt.setString(4, value);
+        stmt.execute();
     }
 
     @Override
     public void insertConceptPropertyValue(int dbid, int property, int value) throws SQLException {
-        insertConceptPropertyValue(dbid, null, property, value);
+        insertConceptPropertyValue(dbid, 0, property, value);
     }
 
     @Override
-    public void insertConceptPropertyValue(int dbid, Integer group, int property, int value) throws SQLException {
-        if (group == null)
-            group = 0;
-
+    public void insertConceptPropertyValue(int dbid, int group, int property, int value) throws SQLException {
         Connection conn = ConnectionPool.getInstance().pop();
         try (PreparedStatement stmt = conn.prepareStatement("INSERT INTO concept_property_object (dbid, `group`, property, value) VALUES (?, ?, ?, ?)")) {
-            stmt.setInt(1, dbid);
-            stmt.setInt(2, group);
-            stmt.setInt(3, property);
-            stmt.setInt(4, value);
-            stmt.execute();
+            insertConceptPropertyObject(stmt, dbid, group, property, value);
         } finally {
             ConnectionPool.getInstance().push(conn);
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    private void insertConceptPropertyObject(PreparedStatement stmt, int dbid, int group, int property, int value) throws SQLException {
+        stmt.setInt(1, dbid);
+        stmt.setInt(2, group);
+        stmt.setInt(3, property);
+        stmt.setInt(4, value);
+        stmt.execute();
+    }
 
     @Override
     public void insertConcept(String conceptJson, Status status) throws SQLException, IOException {
@@ -396,15 +570,20 @@ public class InformationModelJDBCDAL implements InformationModelDAL {
     }
 
     @Override
-    public List<String> getDocuments() throws SQLException {
-        List<String> result = new ArrayList<>();
+    public List<Document> getDocuments() throws SQLException {
+        List<Document> result = new ArrayList<>();
 
         Connection conn = ConnectionPool.getInstance().pop();
-        try (PreparedStatement statement = conn.prepareStatement("SELECT iri FROM document")) {
+        try (PreparedStatement statement = conn.prepareStatement("SELECT dbid, path, version FROM document")) {
             ResultSet resultSet = statement.executeQuery();
 
             while (resultSet.next()) {
-                result.add(resultSet.getString("iri"));
+                result.add(
+                    new Document()
+                    .setDbid(resultSet.getInt("dbid"))
+                    .setPath(resultSet.getString("path"))
+                    .setVersion(Version.fromString(resultSet.getString("version")))
+                );
             }
         } finally {
             ConnectionPool.getInstance().push(conn);
@@ -434,134 +613,35 @@ public class InformationModelJDBCDAL implements InformationModelDAL {
     @Override
     public Integer getConceptDbid(String id) throws SQLException {
         Connection conn = ConnectionPool.getInstance().pop();
+        try {
+            return getConceptDbid(conn, id);
+        } finally {
+            ConnectionPool.getInstance().push(conn);
+        }
+    }
+    private Integer getConceptDbid(Connection conn, String id) throws SQLException {
+        Integer conceptDbid = idMap.get(id);
+
+        if (conceptDbid != null)
+            return conceptDbid;
+
         try (PreparedStatement statement = conn.prepareStatement("SELECT dbid FROM concept WHERE id = ?")) {
             statement.setString(1, id);
             ResultSet rs = statement.executeQuery();
-            if (rs.next())
-                return rs.getInt("dbid");
-            else
+            if (rs.next()) {
+                conceptDbid = rs.getInt("dbid");
+                idMap.put(id, conceptDbid);
+                return conceptDbid;
+            } else {
                 return null;
-
-        } finally {
-            ConnectionPool.getInstance().push(conn);
+            }
         }
+
     }
 
     @Override
-    public boolean generateRuntimeFiles() throws Exception {
-        Date start = new Date();
-        List<String> ids = new ArrayList<>(); // Arrays.asList("null"));
-
-        Connection conn = ConnectionPool.getInstance().pop();
-        try {
-            System.out.println("Exporting data");
-            try (PreparedStatement statement = conn.prepareStatement("SELECT id, data FROM concept WHERE dbid = ?")) {
-                try (DataOutputStream w = new DataOutputStream(new FileOutputStream("c:\\temp\\IM-dat.bin"))) {
-
-                    int dbid = 1;
-                    String data = null;
-
-                    do {
-                        statement.setInt(1, dbid++);
-                        ResultSet rs = statement.executeQuery();
-                        if (rs.next()) {
-                            data = rs.getString("data");
-                            ids.add(rs.getString("id"));
-                            byte[] output = compactData(data);
-                            int size = output.length;
-                            w.writeInt(size);
-                            w.write(output, 0, size);
-                            if(dbid % 500 == 0) {
-                                System.out.print("\rExported " + dbid + " concepts...");
-                            }
-                        } else {
-                            data = null;
-                        }
-                    } while (data != null);
-                    w.flush();
-                    System.out.println("\rExported " + dbid + " concepts");
-                }
-            }
-        } finally {
-            ConnectionPool.getInstance().push(conn);
-        }
-
-        Date mid = new Date();
-
-        System.out.println("Time " + (mid.getTime() - start.getTime())/1000 + "s");
-
-        System.out.println("Exporting ID index...");
-        try (FileWriter writer = new FileWriter("c:\\temp\\IM-ids.bin")) {
-            for (String str : ids) {
-                writer.write(str);
-                writer.write('\n');
-            }
-            writer.flush();
-        }
-
-        Date end = new Date();
-
-        System.out.println("...Done");
-
-        System.out.println("Time " + (end.getTime() - start.getTime())/1000 + "s");
-
-        return true;
-    }
-
-    @Override
-    public void loadRuntimeFiles() throws Exception {
-        Runtime runtime=Runtime.getRuntime();
-
-        System.out.println("Loading ids...");
-        System.out.println("Memory use: " + (runtime.totalMemory() - runtime.freeMemory())/(1024*1024));
-
-        // Load id => dbid map
-        idMap = new TObjectIntHashMap<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader("c:\\temp\\IM-ids.bin"))) {
-            int i = 0;
-            String id;
-            while((id = reader.readLine()) != null) {
-                if (idMap.containsKey(id))
-                    System.err.println("Id clash!!");
-                else
-                    idMap.put(id, i++);
-            }
-        }
-
-        System.out.println("Memory use: " + (runtime.totalMemory() - runtime.freeMemory())/(1024*1024));
-        System.out.println("Loading concepts...");
-
-        try (DataInputStream in = new DataInputStream(new FileInputStream("c:\\temp\\IM-dat.bin"))) {
-            int count = in.readInt();
-            concepts = new byte[count][];
-            concepts[0] = null;
-            int i = 0;
-            while (i < count) {
-                int size = in.readInt();
-                concepts[i] = new byte[size];
-                in.read(concepts[i], 0, size);
-
-                if(i % 100 == 0) {
-                    System.out.print("\rLoaded " + i + " of " + count + " - Mem:" + (runtime.totalMemory() - runtime.freeMemory())/(1024*1024));
-                }
-                i++;
-            }
-        }
-        System.out.println();
-        System.out.println("Memory use: " + (runtime.totalMemory() - runtime.freeMemory())/(1024*1024));
-        System.out.println("Done...");
-
-        System.out.println("Verifying data...");
-        int i = ThreadLocalRandom.current().nextInt(0, concepts.length);
-        System.out.println("DBID: " + (i+1));
-        byte[] conceptData = concepts[i];
-
-        conceptData = decompress(conceptData);
-        System.out.println(new String(conceptData));
-    }
-
-    @Override
-    public Integer getConceptIdForSchemeCode(String scheme, String code) throws SQLException {
+    public Integer getConceptIdForSchemeCode(String scheme, String code, Boolean autoCreate) throws SQLException {
+        Integer conceptId = null;
         Connection conn = ConnectionPool.getInstance().pop();
 
         String sql = "SELECT o.dbid\n" +
@@ -571,15 +651,22 @@ public class InformationModelJDBCDAL implements InformationModelDAL {
             "JOIN concept_property_data d ON d.dbid = o.dbid AND d.value = ?\n" +
             "JOIN concept c ON c.dbid = d.property AND c.id = 'code'";
 
+        conn.setAutoCommit(false);
         try (PreparedStatement statement = conn.prepareStatement(sql)) {
             statement.setString(1, scheme);
             statement.setString(2, code);
 
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next())
-                return resultSet.getInt(1);
-            else
-                return null;
+                conceptId = resultSet.getInt(1);
+            else if (autoCreate)
+                conceptId = createCodeableConcept(conn, scheme, code);
+
+            conn.commit();
+            return conceptId;
+        } catch (Exception e) {
+            conn.rollback();
+            throw e;
         } finally {
             ConnectionPool.getInstance().push(conn);
         }
@@ -589,7 +676,7 @@ public class InformationModelJDBCDAL implements InformationModelDAL {
     public Integer getMappedCoreConceptIdForSchemeCode(String scheme, String code) throws SQLException {
         // SNOMED codes ARE core so dont have/need maps
         if ("SNOMED".equals(scheme))
-            return this.getConceptIdForSchemeCode(scheme, code);
+            return this.getConceptIdForSchemeCode(scheme, code, false);
 
 
         String sql =
@@ -618,21 +705,29 @@ public class InformationModelJDBCDAL implements InformationModelDAL {
     }
 
     @Override
-    public Integer getConceptIdForTypeTerm(String type, String term) throws SQLException {
+    public Integer getConceptIdForTypeTerm(String type, String term, Boolean autoCreate) throws SQLException {
+        Integer conceptId = null;
         Integer typeId = getConceptDbid(type);
         if (typeId == null)
             return null;
 
         Connection conn = ConnectionPool.getInstance().pop();
+        conn.setAutoCommit(false);
         try (PreparedStatement statement = conn.prepareStatement("SELECT target FROM concept_term_map WHERE type = ? AND term = ?")) {
             statement.setInt(1, typeId);
             statement.setString(2, term);
 
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next())
-                return resultSet.getInt("target");
-            else
-                return null;
+                conceptId = resultSet.getInt("target");
+            else if (autoCreate)
+                conceptId = createTypeTermConcept(conn, type, term);
+
+            conn.commit();
+            return conceptId;
+        } catch (Exception e) {
+            conn.rollback();
+            throw e;
         } finally {
             ConnectionPool.getInstance().push(conn);
         }
@@ -680,7 +775,6 @@ public class InformationModelJDBCDAL implements InformationModelDAL {
             ConnectionPool.getInstance().push(conn);
         }
     }
-
     private void getConceptsFromResultSet(List<Concept> result, PreparedStatement statement) throws SQLException {
         ResultSet resultSet = statement.executeQuery();
 
@@ -697,43 +791,85 @@ public class InformationModelJDBCDAL implements InformationModelDAL {
             );
         }
     }
+    private int createCodeableConcept(Connection conn, String scheme, String code) throws SQLException {
+        int schemeDbid;
+        int docDbid;
+        String prefix;
+        int conceptId;
 
-    private byte[] compactData(String data) throws IOException {
-        JsonNode root = ObjectMapperPool.getInstance().readTree(data);
-        ((ObjectNode)root).remove("id");
-        ((ObjectNode)root).remove("description");
+        String sql = "SELECT c.dbid, c.document, d.value\n" +
+            "FROM concept c\n" +
+            "JOIN concept_property_data d ON d.dbid = c.dbid\n" +
+            "WHERE c.id = ?\n" +
+            "AND d.property = get_dbid('code_prefix')";
 
-        data = root.toString();
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, scheme);
+            ResultSet rs = stmt.executeQuery();
+            if (!rs.next())
+                throw new IllegalArgumentException("Unknown code scheme [" + scheme + "]");
 
-        return compress(data.getBytes());
-    }
-    public static byte[] compress(byte[] data) throws IOException {
-        Deflater deflater = new Deflater(Deflater.BEST_COMPRESSION);
-        deflater.setInput(data);
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(data.length);
-        deflater.finish();
-        byte[] buffer = new byte[1024];
-        while (!deflater.finished()) {
-            int count = deflater.deflate(buffer); // returns the generated code... index
-            outputStream.write(buffer, 0, count);
+            schemeDbid = rs.getInt("dbid");
+            docDbid = rs.getInt("document");
+            prefix = rs.getString("value");
         }
-        outputStream.close();
-        byte[] output = outputStream.toByteArray();
-        return output;
-    }
-    public static byte[] decompress(byte[] data) throws IOException, DataFormatException {
-        Inflater inflater = new Inflater();
-        inflater.setInput(data);
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(data.length);
-        byte[] buffer = new byte[1024];
-        while (!inflater.finished()) {
-            int count = inflater.inflate(buffer);
-            outputStream.write(buffer, 0, count);
+
+        try (PreparedStatement stmt = conn.prepareStatement("INSERT INTO concept (document, id, draft) VALUES (?, ?, TRUE)", Statement.RETURN_GENERATED_KEYS)) {
+            stmt.setInt(1, docDbid);
+            stmt.setString(2, prefix + code);
+            stmt.execute();
+            conceptId = DALHelper.getGeneratedKey(stmt);
         }
-        outputStream.close();
-        byte[] output = outputStream.toByteArray();
-        return output;
+
+        try (PreparedStatement stmt = conn.prepareStatement("INSERT INTO concept_property_object (dbid, property, value) VALUES (?, get_dbid('code_scheme'), ?)")) {
+            stmt.setInt(1, conceptId);
+            stmt.setInt(2, schemeDbid);
+            stmt.execute();
+        }
+
+        try (PreparedStatement stmt = conn.prepareStatement("INSERT INTO concept_property_data (dbid, property, value) VALUES (?, get_dbid('code'), ?)")) {
+            stmt.setInt(1, conceptId);
+            stmt.setString(2, code);
+            stmt.execute();
+        }
+
+        try (PreparedStatement stmt = conn.prepareStatement("INSERT INTO concept_property_data (dbid, property, value) VALUES (?, get_dbid('name'), ?)")) {
+            stmt.setInt(1, conceptId);
+            stmt.setString(2, "Draft/Unknown code [" + scheme + "]/[" + code + "]");
+            stmt.execute();
+        }
+        return conceptId;
     }
+    private int createTypeTermConcept(Connection conn, String type, String term) throws SQLException {
+        int typDbid;
+        int docDbid;
+        int mapDbid;
 
+        // Get term type ids
+        try (PreparedStatement stmt = conn.prepareStatement("SELECT dbid, document FROM concept WHERE id = ?")) {
+            stmt.setString(1, type);
+            ResultSet rs = stmt.executeQuery();
+            if (!rs.next())
+                throw new IllegalArgumentException("Unknown term type [" + type + "]");
+            typDbid = rs.getInt("dbid");
+            docDbid = rs.getInt("document");
+        }
 
+        // Create the draft concept
+        try (PreparedStatement stmt = conn.prepareStatement("INSERT INTO concept (document, id, draft) SELECT ?, CONCAT(?, '_', MAX(dbid) + 1), TRUE FROM concept", Statement.RETURN_GENERATED_KEYS)) {
+            stmt.setInt(1, docDbid);
+            stmt.setString(2, type);
+            stmt.execute();
+            mapDbid = DALHelper.getGeneratedKey(stmt);
+        }
+
+        try (PreparedStatement stmt = conn.prepareStatement("INSERT INTO concept_term_map (term, type, target, draft) VALUES (?, ?, ?, TRUE)")) {
+            stmt.setString(1, term);
+            stmt.setInt(2, typDbid);
+            stmt.setInt(3, mapDbid);
+            stmt.execute();
+        }
+
+        return mapDbid;
+    }
 }

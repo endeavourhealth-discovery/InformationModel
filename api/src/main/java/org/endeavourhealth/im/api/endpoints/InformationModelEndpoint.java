@@ -6,8 +6,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.endeavourhealth.im.dal.InformationModelJDBCDAL;
-import org.endeavourhealth.im.logic.InformationModelLogic;
 import org.endeavourhealth.im.models.Concept;
+import org.endeavourhealth.im.models.Document;
 import org.endeavourhealth.im.models.SearchResult;
 import org.endeavourhealth.im.models.Status;
 import org.slf4j.Logger;
@@ -145,7 +145,7 @@ public class InformationModelEndpoint {
     public Response getDocuments(@Context SecurityContext sc) throws Exception {
         LOG.debug("Get documents");
 
-        List<String> result = new InformationModelJDBCDAL().getDocuments();
+        List<Document> result = new InformationModelJDBCDAL().getDocuments();
 
         return Response
             .ok()
@@ -172,39 +172,4 @@ public class InformationModelEndpoint {
             .entity(result)
             .build();
     }
-
-    @GET
-    @Path("/runtime/generate")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    @Timed(absolute = true, name = "InformationModel.ConceptEndpoint.runtime.generate.GET")
-    @ApiOperation(value = "Generates the in-memory IM data")
-    public Response generateRuntime(@Context SecurityContext sc) throws Exception {
-        LOG.debug("Generate runtime files");
-
-        new InformationModelLogic().generateRuntimeFiles(new InformationModelJDBCDAL());
-
-        return Response
-            .ok()
-            //.entity(result)
-            .build();
-    }
-
-    @GET
-    @Path("/runtime/load")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    @Timed(absolute = true, name = "InformationModel.ConceptEndpoint.runtime.load.GET")
-    @ApiOperation(value = "Loads the in-memory IM data")
-    public Response loadRuntime(@Context SecurityContext sc) throws Exception {
-        LOG.debug("Load runtime files");
-
-        new InformationModelLogic().loadRuntimeFiles(new InformationModelJDBCDAL());
-
-        return Response
-            .ok()
-            //.entity(result)
-            .build();
-    }
-
 }

@@ -9,7 +9,8 @@ CREATE TABLE fhir_scheme_value
 (
     scheme VARCHAR(50)  NOT NULL,
     code   VARCHAR(20) COLLATE utf8_bin,
-    term   VARCHAR(255) NOT NULL
+    term   VARCHAR(255) NOT NULL,
+    map    VARCHAR(50)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Define the schemes
@@ -29,7 +30,8 @@ VALUES
 
     ('FHIR_AU', ' FHIR Address use'),
     ('FHIR_CPS', 'FHIR Contact point system'),
-    ('FHIR_CPU', 'FHIR Contact point use')
+    ('FHIR_CPU', 'FHIR Contact point use'),
+    ('FHIR_CEP', 'FHIR Condition episodicity')
 ;
 
 -- Create the scheme values
@@ -176,9 +178,22 @@ VALUES
     ('FHIR_CPU', 'work', 'Work'),
     ('FHIR_CPU', 'temp', 'Temporary'),
     ('FHIR_CPU', 'old', 'Old'),
-    ('FHIR_CPU', 'mobile', 'Mobile')
+    ('FHIR_CPU', 'mobile', 'Mobile'),
 
+    ('FHIR_CEP', 'First', 'First'),
+    ('FHIR_CEP', 'New', 'New'),
+    ('FHIR_CEP', 'Other', 'Other'),
+    ('FHIR_CEP', 'Cause of Death', 'Cause of Death'),
+    ('FHIR_CEP', 'Ongoing Episode', 'Ongoing Episode')
     ;
+
+-- Create the scheme values with map overrides
+INSERT INTO fhir_scheme_value
+(scheme, code, term, map)
+VALUES
+('FHIR_CEP', 'New Episode', 'New Episode', 'DS_FHIR_CEP_New'),
+('FHIR_CEP', 'Other Episode', 'Other Episode', 'DS_FHIR_CEP_Other')
+;
 
 -- Create the document
 
@@ -240,4 +255,4 @@ INSERT INTO concept_property_object
 (dbid, property, value)
 SELECT get_dbid(concat(scheme, '_', code)), get_dbid('is_subtype_of'), get_dbid('CodeableConcept') FROM fhir_scheme_value
 UNION SELECT get_dbid(concat(scheme, '_', code)), get_dbid('code_scheme'), get_dbid(scheme) FROM fhir_scheme_value
-UNION SELECT get_dbid(concat(scheme, '_', code)), get_dbid('is_equivalent_to'), get_dbid(concat('DS_', scheme, '_', code)) FROM fhir_scheme_value;
+UNION SELECT get_dbid(concat(scheme, '_', code)), get_dbid('is_equivalent_to'), get_dbid(IFNULL(map, concat('DS_', scheme, '_', code))) FROM fhir_scheme_value;

@@ -45,7 +45,7 @@ public class ConnectionPool extends GenericCache<Connection> {
     @Override
     protected Connection create() {
         try {
-            JsonNode json = ConfigManager.getConfigurationAsJson("information-model-database");
+            JsonNode json = ConfigManager.getConfigurationAsJson("database");
             String url = json.get("url").asText();
             String user = json.get("username").asText();
             String pass = json.get("password").asText();

@@ -11,14 +11,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class IMClient {
-    // private static InformationModelDAL db = new InformationModelJDBCDAL();
     private static final String base = "/public/Client";
 
     public static Integer getConceptIdForSchemeCode(String scheme, String code) throws Exception {
+        return getConceptIdForSchemeCode(scheme, code, false);
+    }
 
+    public static Integer getConceptIdForSchemeCode(String scheme, String code, Boolean autoCreate) throws Exception {
         Map<String, String> params = new HashMap<>();
         params.put("scheme", scheme);
         params.put("code", code);
+        params.put("autoCreate", autoCreate.toString());
 
         Response response = get(base + "/Concept", params);
 
@@ -54,9 +57,14 @@ public class IMClient {
     }
 
     public static Integer getConceptIdForTypeTerm(String type, String term) throws Exception {
+        return getConceptIdForTypeTerm(type, term, false);
+    }
+
+    public static Integer getConceptIdForTypeTerm(String type, String term, Boolean autoCreate) throws Exception {
         Map<String, String> params = new HashMap<>();
         params.put("type", type);
         params.put("term", term);
+        params.put("autoCreate", autoCreate.toString());
 
         Response response = get(base + "/Term", params);
 
