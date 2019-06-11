@@ -574,7 +574,7 @@ public class InformationModelJDBCDAL implements InformationModelDAL {
         List<Document> result = new ArrayList<>();
 
         Connection conn = ConnectionPool.getInstance().pop();
-        try (PreparedStatement statement = conn.prepareStatement("SELECT dbid, path, version FROM document")) {
+        try (PreparedStatement statement = conn.prepareStatement("SELECT dbid, path, version, draft FROM document")) {
             ResultSet resultSet = statement.executeQuery();
 
             while (resultSet.next()) {
@@ -583,6 +583,7 @@ public class InformationModelJDBCDAL implements InformationModelDAL {
                     .setDbid(resultSet.getInt("dbid"))
                     .setPath(resultSet.getString("path"))
                     .setVersion(Version.fromString(resultSet.getString("version")))
+                    .setDraft(resultSet.getBoolean("draft"))
                 );
             }
         } finally {
@@ -660,7 +661,7 @@ public class InformationModelJDBCDAL implements InformationModelDAL {
             if (resultSet.next())
                 conceptId = resultSet.getInt(1);
             else if (autoCreate)
-                conceptId = createCodeableConcept(conn, scheme, code);
+                conceptId = createDraftCodeableConcept(conn, scheme, code);
 
             conn.commit();
             return conceptId;
@@ -791,7 +792,7 @@ public class InformationModelJDBCDAL implements InformationModelDAL {
             );
         }
     }
-    private int createCodeableConcept(Connection conn, String scheme, String code) throws SQLException {
+    private int createDraftCodeableConcept(Connection conn, String scheme, String code) throws SQLException {
         int schemeDbid;
         int docDbid;
         String prefix;
@@ -836,6 +837,11 @@ public class InformationModelJDBCDAL implements InformationModelDAL {
         try (PreparedStatement stmt = conn.prepareStatement("INSERT INTO concept_property_data (dbid, property, value) VALUES (?, get_dbid('name'), ?)")) {
             stmt.setInt(1, conceptId);
             stmt.setString(2, "Draft/Unknown code [" + scheme + "]/[" + code + "]");
+            stmt.execute();
+        }
+
+        try (PreparedStatement stmt = conn.prepareStatement("UPDATE document SET draft = TRUE WHERE dbid = ?")) {
+            stmt.setInt(1, docDbid);
             stmt.execute();
         }
         return conceptId;

@@ -64,7 +64,7 @@ public class IMClientTest {
     public void getMappedCoreConceptIdForSchemeCode_Known() throws Exception {
         Integer dbid = IMClient.getMappedCoreConceptIdForSchemeCode("BartsCerner", "162592560");
         assertNotNull(dbid);
-        assertEquals(1473192, dbid.intValue());
+        assertEquals(1473193, dbid.intValue());
     }
 
     @Test
@@ -104,7 +104,7 @@ public class IMClientTest {
     public void getConceptIdForTypeTerm_Known() throws Exception {
         Integer dbid = IMClient.getConceptIdForTypeTerm("DCE_type_of_encounter", "practice nurse clinic");
         assertNotNull(dbid);
-        assertEquals(1473372, dbid.intValue());
+        assertEquals(1473373, dbid.intValue());
     }
 
     @Test
@@ -135,7 +135,7 @@ public class IMClientTest {
     public void getMappedCoreConceptIdForTypeTerm_Known() throws Exception {
         Integer dbid = IMClient.getMappedCoreConceptIdForTypeTerm("DCE_type_of_encounter", "practice nurse clinic");
         assertNotNull(dbid);
-        assertEquals(1473372, dbid.intValue());
+        assertEquals(1473373, dbid.intValue());
     }
 
     @Test

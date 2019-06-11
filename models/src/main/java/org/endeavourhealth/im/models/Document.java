@@ -4,6 +4,7 @@ public class Document {
     private int dbid;
     private String path;
     private Version version;
+    private Boolean draft;
 
     public int getDbid() {
         return dbid;
@@ -29,6 +30,15 @@ public class Document {
 
     public Document setVersion(Version version) {
         this.version = version;
+        return this;
+    }
+
+    public Boolean getDraft() {
+        return draft;
+    }
+
+    public Document setDraft(Boolean draft) {
+        this.draft = draft;
         return this;
     }
 }
