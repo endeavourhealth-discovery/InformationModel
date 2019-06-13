@@ -19,7 +19,7 @@ public interface InformationModelDAL {
     void insertConceptPropertyValue(int dbid, int propertyId, int valueId) throws Exception;
     void insertConceptPropertyValue(int dbid, int group, int propertyId, int valueId) throws Exception;
 
-    Integer getConceptIdForSchemeCode(String scheme, String code, Boolean autoCreate) throws Exception;
+    Integer getConceptIdForSchemeCode(String scheme, String code, Boolean autoCreate, String term) throws Exception;
     Integer getMappedCoreConceptIdForSchemeCode(String scheme, String code) throws Exception;
     Integer getConceptIdForTypeTerm(String type, String term, Boolean autoCreate) throws Exception;
     Integer getMappedCoreConceptIdForTypeTerm(String type, String term) throws Exception;

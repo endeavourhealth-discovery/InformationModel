@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.endeavourhealth.common.cache.ObjectMapperPool;
+import org.endeavourhealth.im.cache.SchemeCodePrefixCache;
 import org.endeavourhealth.im.models.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +21,7 @@ public class InformationModelJDBCDAL implements InformationModelDAL {
     private static Logger LOG = LoggerFactory.getLogger(InformationModelJDBCDAL.class);
     private static String status = "Running";
     private HashMap<String, Integer> idMap = new HashMap<>();
+    private static SchemeCodePrefixCache schemeCodePrefixMap = new SchemeCodePrefixCache();
 
     @Override
     public String getStatus() {
@@ -641,27 +643,32 @@ public class InformationModelJDBCDAL implements InformationModelDAL {
     }
 
     @Override
-    public Integer getConceptIdForSchemeCode(String scheme, String code, Boolean autoCreate) throws SQLException {
+    public Integer getConceptIdForSchemeCode(String scheme, String code, Boolean autoCreate, String term) throws SQLException {
         Integer conceptId = null;
+
+        if (autoCreate && term == null)
+            throw new IllegalArgumentException("Term must be supplied if AutoCreate is TRUE");
+
+        String prefix = schemeCodePrefixMap.get(scheme);
+
+        if (prefix == null)
+            throw new IllegalArgumentException("No prefix set for code scheme [" + scheme + "]");
+
         Connection conn = ConnectionPool.getInstance().pop();
 
-        String sql = "SELECT o.dbid\n" +
-            "FROM concept_property_object o\n" +
-            "JOIN concept s ON s.dbid = o.property AND s.id = 'code_scheme'\n" +
-            "JOIN concept v ON v.dbid = o.value AND v.id = ?\n" +
-            "JOIN concept_property_data d ON d.dbid = o.dbid AND d.value = ?\n" +
-            "JOIN concept c ON c.dbid = d.property AND c.id = 'code'";
+        String sql = "SELECT c.dbid\n" +
+            "FROM concept c\n" +
+            "WHERE id = ?";
 
         conn.setAutoCommit(false);
         try (PreparedStatement statement = conn.prepareStatement(sql)) {
-            statement.setString(1, scheme);
-            statement.setString(2, code);
+            statement.setString(1, prefix + code);
 
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next())
                 conceptId = resultSet.getInt(1);
             else if (autoCreate)
-                conceptId = createDraftCodeableConcept(conn, scheme, code);
+                conceptId = createDraftCodeableConcept(conn, scheme, code, term);
 
             conn.commit();
             return conceptId;
@@ -677,7 +684,7 @@ public class InformationModelJDBCDAL implements InformationModelDAL {
     public Integer getMappedCoreConceptIdForSchemeCode(String scheme, String code) throws SQLException {
         // SNOMED codes ARE core so dont have/need maps
         if ("SNOMED".equals(scheme))
-            return this.getConceptIdForSchemeCode(scheme, code, false);
+            return this.getConceptIdForSchemeCode(scheme, code, false, null);
 
 
         String sql =
@@ -792,7 +799,7 @@ public class InformationModelJDBCDAL implements InformationModelDAL {
             );
         }
     }
-    private int createDraftCodeableConcept(Connection conn, String scheme, String code) throws SQLException {
+    private int createDraftCodeableConcept(Connection conn, String scheme, String code, String term) throws SQLException {
         int schemeDbid;
         int docDbid;
         String prefix;
@@ -836,7 +843,13 @@ public class InformationModelJDBCDAL implements InformationModelDAL {
 
         try (PreparedStatement stmt = conn.prepareStatement("INSERT INTO concept_property_data (dbid, property, value) VALUES (?, get_dbid('name'), ?)")) {
             stmt.setInt(1, conceptId);
-            stmt.setString(2, "Draft/Unknown code [" + scheme + "]/[" + code + "]");
+            stmt.setString(2, term);
+            stmt.execute();
+        }
+
+        try (PreparedStatement stmt = conn.prepareStatement("INSERT INTO concept_property_data (dbid, property, value) VALUES (?, get_dbid('description'), ?)")) {
+            stmt.setInt(1, conceptId);
+            stmt.setString(2, term);
             stmt.execute();
         }
 

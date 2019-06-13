@@ -30,10 +30,11 @@ public class ClientEndpoint {
     public Response getConceptIdForSchemeCode(@Context SecurityContext sc,
                                               @ApiParam(value = "Scheme", required = true) @QueryParam("scheme") String scheme,
                                               @ApiParam(value = "Code", required = true) @QueryParam("code") String code,
-                                              @ApiParam(value = "AutoCreate", required = false) @QueryParam("autoCreate") Boolean autoCreate) throws Exception {
+                                              @ApiParam(value = "AutoCreate", required = false) @QueryParam("autoCreate") Boolean autoCreate,
+                                              @ApiParam(value = "Term", required = false) @QueryParam("term") String term) throws Exception {
         LOG.debug("getConceptIdForSchemeCode");
 
-        Integer result = new InformationModelJDBCDAL().getConceptIdForSchemeCode(scheme, code, autoCreate);
+        Integer result = new InformationModelJDBCDAL().getConceptIdForSchemeCode(scheme, code, autoCreate, term);
 
         return Response
             .ok()

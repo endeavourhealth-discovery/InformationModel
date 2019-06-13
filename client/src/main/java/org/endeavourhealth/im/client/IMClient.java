@@ -14,14 +14,15 @@ public class IMClient {
     private static final String base = "/public/Client";
 
     public static Integer getConceptIdForSchemeCode(String scheme, String code) throws Exception {
-        return getConceptIdForSchemeCode(scheme, code, false);
+        return getConceptIdForSchemeCode(scheme, code, false, null);
     }
 
-    public static Integer getConceptIdForSchemeCode(String scheme, String code, Boolean autoCreate) throws Exception {
+    public static Integer getConceptIdForSchemeCode(String scheme, String code, Boolean autoCreate, String term) throws Exception {
         Map<String, String> params = new HashMap<>();
         params.put("scheme", scheme);
         params.put("code", code);
         params.put("autoCreate", autoCreate.toString());
+        params.put("term", term);
 
         Response response = get(base + "/Concept", params);
 

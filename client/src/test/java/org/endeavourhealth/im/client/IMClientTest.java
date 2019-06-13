@@ -37,7 +37,7 @@ public class IMClientTest {
 
     @Test
     public void getConceptIdForSchemeCode_CodeUnknown_AutoCreate() throws Exception {
-        Integer dbid = IMClient.getConceptIdForSchemeCode("EMIS_LOCAL", "NewCode2", true);
+        Integer dbid = IMClient.getConceptIdForSchemeCode("EMIS_LOCAL", "NewCode2", true, "New emis local code");
         assertNotNull(dbid);
     }
 
@@ -49,7 +49,7 @@ public class IMClientTest {
 
     @Test(expected = IOException.class)
     public void getConceptIdForSchemeCode_BothUnknown_AutoCreate() throws Exception {
-        Integer dbid = IMClient.getConceptIdForSchemeCode("INVALID", "INVALID", true);
+        Integer dbid = IMClient.getConceptIdForSchemeCode("INVALID", "INVALID", true, "New emis local code");
         assertNull(dbid);
     }
 
