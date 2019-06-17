@@ -13,6 +13,9 @@ public interface InformationModelDAL {
     //    int getOrCreateDocumentDBId(String url) throws Exception;
 
     Integer getConceptDbid(String id) throws Exception;
+
+    String getDocumentDrafts(String documentPath) throws Exception;
+
     int insertConcept(int docId, String id) throws Exception;
     void insertConceptPropertyData(int dbid, int property, String value) throws Exception;
     void insertConceptPropertyData(int dbid, int group, int property, String value) throws Exception;

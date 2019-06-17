@@ -21,7 +21,7 @@ import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 
-@Path("Management")
+@Path("management")
 @Metrics(registry = "ManagementMetricRegistry")
 @Api(tags = {"Management"})
 public class ManagementEndpoint {
@@ -62,7 +62,7 @@ public class ManagementEndpoint {
     }
 
     @POST
-    @Path("/document")
+    @Path("/documents")
     @Consumes(MediaType.APPLICATION_OCTET_STREAM)
     @Produces(MediaType.TEXT_PLAIN)
     @Timed(absolute = true, name = "InformationModel.ManagementEndpoint.Document.POST")
@@ -81,17 +81,17 @@ public class ManagementEndpoint {
     }
 
     @GET
-    @Path("/document")
+    @Path("/documents/{part: .*}/drafts")
     @Consumes(MediaType.APPLICATION_OCTET_STREAM)
     @Produces(MediaType.TEXT_PLAIN)
-    @Timed(absolute = true, name = "InformationModel.ManagementEndpoint.Document.POST")
+    @Timed(absolute = true, name = "InformationModel.ManagementEndpoint.Documents.{path}.Drafts.GET")
     @ApiOperation(value = "Imports a document from master", response = Integer.class)
-    public Response getDocumentDrafts(@Context SecurityContext sc, byte[] documentData) throws Exception {
-        LOG.debug("importDocument");
+    public Response getDocumentDrafts(@Context SecurityContext sc,
+                                      @PathParam("part") String documentPath) throws Exception {
+        LOG.debug("getDrafts [" + documentPath + "]");
 
-        String document = new String(decompress(documentData));
-
-        String result = new InformationModelJDBCDAL().importDocument(document);
+        String json = new InformationModelJDBCDAL().getDocumentDrafts(documentPath);
+        byte[] result = compress(json.getBytes());
 
         return Response
             .ok()

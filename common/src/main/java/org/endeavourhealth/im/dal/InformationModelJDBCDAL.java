@@ -1,6 +1,8 @@
 package org.endeavourhealth.im.dal;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -110,12 +112,10 @@ public class InformationModelJDBCDAL implements InformationModelDAL {
         }
     }
     private int getOrCreateDocumentDBId(Connection conn, String docPath) throws SQLException {
-        try (PreparedStatement stmt = conn.prepareStatement("SELECT dbid FROM document WHERE path = ?")) {
-            stmt.setString(1, docPath);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next())
-                return rs.getInt("dbid");
-        }
+        Integer dbid = getDocumentDbid(conn, docPath);
+
+        if (dbid != null)
+            return dbid;
 
         try (PreparedStatement statement = conn.prepareStatement("INSERT INTO document (path, version) VALUES (?, '0.0.1')", Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, docPath);
@@ -231,6 +231,91 @@ public class InformationModelJDBCDAL implements InformationModelDAL {
             System.out.println("\t\t" + " = (Anon)" + value.toString());
         } else
             throw new IllegalArgumentException("\t\t[" + propertyId + "] is of an invalid type - [" + value.toString() +"]");
+    }
+
+    @Override
+    public String getDocumentDrafts(String documentPath) throws SQLException, JsonProcessingException {
+        Connection conn = ConnectionPool.getInstance().pop();
+
+        try {
+            Integer dbid = getDocumentDbid(conn, documentPath);
+
+            if (dbid == null)
+                throw new IllegalArgumentException("Document [" + documentPath + "] not known");
+
+            ObjectMapper om = new ObjectMapper();
+            ObjectNode root = om.createObjectNode();
+            root.put("Document", documentPath);
+
+
+            if (dbid == 0) {
+                addTermMaps(conn, root);
+            } else {
+                addDraftConcepts(conn, dbid, root);
+            }
+
+            return om.writeValueAsString(root);
+        } finally {
+            ConnectionPool.getInstance().push(conn);
+        }
+
+    }
+    private Integer getDocumentDbid(Connection conn, String documentPath) throws SQLException {
+        try (PreparedStatement stmt = conn.prepareStatement("SELECT dbid FROM document WHERE path = ?")) {
+            stmt.setString(1, documentPath);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next())
+                return rs.getInt("dbid");
+            else
+                return null;
+        }
+    }
+    private void addTermMaps(Connection conn, ObjectNode root) throws SQLException {
+        ArrayNode terms = root.putArray("TermMaps");
+        String sql = "SELECT m.term, typ.id as type, tgt.id as target\n" +
+            "FROM concept_term_map m\n" +
+            "JOIN concept typ ON typ.dbid = m.type\n" +
+            "JOIN concept tgt ON tgt.dbid = m.target\n" +
+            "WHERE m.draft = TRUE";
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                ObjectNode term = terms.addObject();
+                term.put("term", rs.getString("term"));
+                term.put("type", rs.getString("type"));
+                term.put("target", rs.getString("target"));
+            }
+        }
+    }
+    private void addDraftConcepts(Connection conn, Integer dbid, ObjectNode root) throws SQLException {
+        ArrayNode concepts = root.putArray("Concepts");
+        String sql = "SELECT c.id, n.value as name, cd.value as code, sid.id as code_scheme, d.value as description\n" +
+            "FROM concept c\n" +
+            "LEFT JOIN concept_property_data n ON n.dbid = c.dbid AND n.property = get_dbid('name')\n" +
+            "LEFT JOIN concept_property_data cd ON cd.dbid = c.dbid AND cd.property = get_dbid('code')\n" +
+            "LEFT JOIN concept_property_object s ON s.dbid = c.dbid AND s.property = get_dbid('code_scheme')\n" +
+            "LEFT JOIN concept sid ON sid.dbid = s.value\n" +
+            "LEFT JOIN concept_property_data d ON d.dbid = c.dbid AND d.property = get_dbid('description')\n" +
+            "WHERE c.draft = TRUE\n" +
+            "AND c.document = ?";
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, dbid);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                ObjectNode concept = concepts.addObject();
+                concept.put("id", rs.getString("id"));
+                if (rs.getString("name") != null) concept.put("name", rs.getString("name"));
+                if (rs.getString("description") != null) concept.put("description", rs.getString("description"));
+                if (rs.getString("code") != null) concept.put("code", rs.getString("code"));
+                if (rs.getString("code_scheme") != null) {
+                    ObjectNode scheme = concept.putObject("code_scheme");
+                    scheme.put("id", rs.getString("code_scheme"));
+                }
+            }
+        }
     }
 
     @Override
@@ -835,21 +920,20 @@ public class InformationModelJDBCDAL implements InformationModelDAL {
             stmt.execute();
         }
 
-        try (PreparedStatement stmt = conn.prepareStatement("INSERT INTO concept_property_data (dbid, property, value) VALUES (?, get_dbid('code'), ?)")) {
+        try (PreparedStatement stmt = conn.prepareStatement("INSERT INTO concept_property_data (dbid, property, value) VALUES (?, get_dbid(?), ?)")) {
             stmt.setInt(1, conceptId);
-            stmt.setString(2, code);
+            stmt.setString(2, "code");
+            stmt.setString(3, code);
             stmt.execute();
-        }
 
-        try (PreparedStatement stmt = conn.prepareStatement("INSERT INTO concept_property_data (dbid, property, value) VALUES (?, get_dbid('name'), ?)")) {
             stmt.setInt(1, conceptId);
-            stmt.setString(2, term);
+            stmt.setString(2, "name");
+            stmt.setString(3, term);
             stmt.execute();
-        }
 
-        try (PreparedStatement stmt = conn.prepareStatement("INSERT INTO concept_property_data (dbid, property, value) VALUES (?, get_dbid('description'), ?)")) {
             stmt.setInt(1, conceptId);
-            stmt.setString(2, term);
+            stmt.setString(2, "description");
+            stmt.setString(3, term);
             stmt.execute();
         }
 
@@ -882,10 +966,27 @@ public class InformationModelJDBCDAL implements InformationModelDAL {
             mapDbid = DALHelper.getGeneratedKey(stmt);
         }
 
+        // Add name & description
+        try (PreparedStatement stmt = conn.prepareStatement("INSERT INTO concept_property_data (dbid, property, value) VALUES (?, get_dbid(?), ?)")) {
+            stmt.setInt(1, mapDbid);
+            stmt.setString(2, "name");
+            stmt.setString(3, term);
+            stmt.execute();
+
+            stmt.setInt(1, mapDbid);
+            stmt.setString(2, "description");
+            stmt.setString(3, term);
+            stmt.execute();
+        }
+
         try (PreparedStatement stmt = conn.prepareStatement("INSERT INTO concept_term_map (term, type, target, draft) VALUES (?, ?, ?, TRUE)")) {
             stmt.setString(1, term);
             stmt.setInt(2, typDbid);
             stmt.setInt(3, mapDbid);
+            stmt.execute();
+        }
+
+        try (PreparedStatement stmt = conn.prepareStatement("UPDATE document SET draft = TRUE WHERE dbid = 0")) {
             stmt.execute();
         }
 
