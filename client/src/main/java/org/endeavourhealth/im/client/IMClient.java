@@ -90,11 +90,6 @@ public class IMClient {
 
     }
 
-/*
-    public static Integer getMappedConceptIdForTypeTerm(String type, String term) throws Exception {
-        return db.getMappedConceptIdForTypeTerm(type, term);
-    }*/
-
     private static Response get(String path, Map<String, String> params) {
         String address = ConfigManager.getConfiguration("api-internal", "information-model");
 

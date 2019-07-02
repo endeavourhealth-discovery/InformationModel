@@ -5,7 +5,7 @@ import io.astefanutti.metrics.aspectj.Metrics;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.endeavourhealth.im.dal.InformationModelJDBCDAL;
+import org.endeavourhealth.im.dal.IMClientJDBCDAL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,13 +28,14 @@ public class ClientEndpoint {
     @Timed(absolute = true, name = "InformationModel.ClientEndpoint.SchemeCode.GET")
     @ApiOperation(value = "Get concept id for given scheme and code", response = Integer.class)
     public Response getConceptIdForSchemeCode(@Context SecurityContext sc,
+                                              @ApiParam(value = "Context", required = false) @QueryParam("context") String context,
                                               @ApiParam(value = "Scheme", required = true) @QueryParam("scheme") String scheme,
                                               @ApiParam(value = "Code", required = true) @QueryParam("code") String code,
                                               @ApiParam(value = "AutoCreate", required = false) @QueryParam("autoCreate") Boolean autoCreate,
                                               @ApiParam(value = "Term", required = false) @QueryParam("term") String term) throws Exception {
         LOG.debug("getConceptIdForSchemeCode");
 
-        Integer result = new InformationModelJDBCDAL().getConceptIdForSchemeCode(scheme, code, autoCreate, term);
+        Integer result = new IMClientJDBCDAL().getConceptIdForSchemeCode(context, scheme, code, autoCreate, term);
 
         return Response
             .ok()
@@ -53,7 +54,7 @@ public class ClientEndpoint {
                                               @ApiParam(value = "Code", required = true) @QueryParam("code") String code) throws Exception {
         LOG.debug("getMappedCoreConceptIdForSchemeCode");
 
-        Integer result = new InformationModelJDBCDAL().getMappedCoreConceptIdForSchemeCode(scheme, code);
+        Integer result = new IMClientJDBCDAL().getMappedCoreConceptIdForSchemeCode(scheme, code);
 
         return Response
             .ok()
@@ -71,7 +72,7 @@ public class ClientEndpoint {
                                                         @ApiParam(value = "Concept DBID", required = true) @QueryParam("dbid") Integer dbid) throws Exception {
         LOG.debug("getCodeForConceptId");
 
-        String result = new InformationModelJDBCDAL().getCodeForConceptId(dbid);
+        String result = new IMClientJDBCDAL().getCodeForConceptId(dbid);
 
         return Response
             .ok()
@@ -91,7 +92,7 @@ public class ClientEndpoint {
                                             @ApiParam(value = "AutoCreate", required = false) @QueryParam("autoCreate") Boolean autoCreate) throws Exception {
         LOG.debug("getConceptIdForTypeTerm");
 
-        Integer result = new InformationModelJDBCDAL().getConceptIdForTypeTerm(type, term, autoCreate);
+        Integer result = new IMClientJDBCDAL().getConceptIdForTypeTerm(type, term, autoCreate);
 
         return Response
             .ok()
@@ -110,7 +111,7 @@ public class ClientEndpoint {
                                             @ApiParam(value = "Term", required = true) @QueryParam("term") String term) throws Exception {
         LOG.debug("getMappedCoreConceptIdForTypeTerm");
 
-        Integer result = new InformationModelJDBCDAL().getMappedCoreConceptIdForTypeTerm(type, term);
+        Integer result = new IMClientJDBCDAL().getMappedCoreConceptIdForTypeTerm(type, term);
 
         return Response
             .ok()

@@ -4,7 +4,7 @@ import com.codahale.metrics.annotation.Timed;
 import io.astefanutti.metrics.aspectj.Metrics;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.endeavourhealth.im.dal.InformationModelJDBCDAL;
+import org.endeavourhealth.im.dal.IMManagementJDBCDAL;
 import org.endeavourhealth.im.models.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +36,7 @@ public class ManagementEndpoint {
     public Response getStatus(@Context SecurityContext sc) throws Exception {
         LOG.debug("getStatus");
 
-        String result = new InformationModelJDBCDAL().getStatus();
+        String result = new IMManagementJDBCDAL().getStatus();
 
         return Response
             .ok()
@@ -53,7 +53,7 @@ public class ManagementEndpoint {
     public Response getDocuments(@Context SecurityContext sc) throws Exception {
         LOG.debug("getDocuments");
 
-        List<Document> result = new InformationModelJDBCDAL().getDocuments();
+        List<Document> result = new IMManagementJDBCDAL().getDocuments();
 
         return Response
             .ok()
@@ -72,7 +72,7 @@ public class ManagementEndpoint {
 
         String document = new String(decompress(documentData));
 
-        String result = new InformationModelJDBCDAL().importDocument(document);
+        String result = new IMManagementJDBCDAL().importDocument(document);
 
         return Response
             .ok()
@@ -90,7 +90,7 @@ public class ManagementEndpoint {
                                       @PathParam("part") String documentPath) throws Exception {
         LOG.debug("getDrafts [" + documentPath + "]");
 
-        String json = new InformationModelJDBCDAL().getDocumentDrafts(documentPath);
+        String json = new IMManagementJDBCDAL().getDocumentDrafts(documentPath);
         byte[] result = compress(json.getBytes());
 
         return Response
