@@ -355,7 +355,7 @@ public class IMManagementJDBCDAL {
 
         String sql = "SELECT c.id, c.name, c.description, c.code, s.id as code_scheme\n" +
             "FROM concept c\n" +
-            "LEFT JOIN concept s ON s.id = c.scheme\n" +
+            "LEFT JOIN concept s ON s.dbid = c.scheme\n" +
             "WHERE c.draft = TRUE\n" +
             "AND c.document = ?\n";
 
