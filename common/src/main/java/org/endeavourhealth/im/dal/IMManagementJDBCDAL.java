@@ -26,8 +26,13 @@ public class IMManagementJDBCDAL {
     public List<Document> getDocuments() throws SQLException {
         List<Document> result = new ArrayList<>();
 
+        String sql = "SELECT d.dbid, d.path, d.version, COUNT(c.dbid) AS drafts\n" +
+            "FROM document d\n" +
+            "LEFT JOIN concept c ON c.document = d.dbid AND c.draft = TRUE\n" +
+            "GROUP BY d.dbid";
+
         Connection conn = ConnectionPool.getInstance().pop();
-        try (PreparedStatement statement = conn.prepareStatement("SELECT dbid, path, version, draft FROM document")) {
+        try (PreparedStatement statement = conn.prepareStatement(sql)) {
             ResultSet resultSet = statement.executeQuery();
 
             while (resultSet.next()) {
@@ -36,7 +41,7 @@ public class IMManagementJDBCDAL {
                         .setDbid(resultSet.getInt("dbid"))
                         .setPath(resultSet.getString("path"))
                         .setVersion(Version.fromString(resultSet.getString("version")))
-                        .setDraft(resultSet.getBoolean("draft"))
+                        .setDrafts(resultSet.getInt("drafts"))
                 );
             }
         } finally {
