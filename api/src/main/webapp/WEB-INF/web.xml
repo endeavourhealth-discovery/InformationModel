@@ -4,44 +4,17 @@
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
          version="3.1">
 
-    <!-- ===== MAIN API SERVLET ===== -->
-    <servlet>
-        <servlet-name>Information Model API</servlet-name>
-        <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
-        <init-param>
-            <param-name>jersey.config.server.provider.packages</param-name>
-            <param-value>io.swagger.jaxrs.listing,org.endeavourhealth.coreui.endpoints,org.endeavourhealth.im.api.endpoints</param-value>
-        </init-param>
-        <init-param>
-            <param-name>jersey.config.server.provider.classnames</param-name>
-            <param-value>org.glassfish.jersey.jackson.JacksonFeature,
-                org.glassfish.jersey.media.multipart.MultiPartFeature,
-                org.endeavourhealth.common.security.CustomRolesAllowedFeature,
-                org.endeavourhealth.im.api.framework.exceptions.BaseExceptionMapper,
-            </param-value>
-        </init-param>
-
-        <!-- enable directory listings -->
-        <init-param>
-            <param-name>listings</param-name>
-            <param-value>true</param-value>
-        </init-param>
-
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>Information Model API</servlet-name>
-        <url-pattern>/api/*</url-pattern>
-    </servlet-mapping>
-
-  <!-- ===== PRIVATE API SERVLET ===== -->
-<!--  <servlet>
-    <servlet-name>Information Model internal (private) API</servlet-name>
+  <!-- ===== APPLICATION API SERVLET ===== -->
+  <servlet>
+    <servlet-name>Information Model API</servlet-name>
     <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
     <init-param>
       <param-name>jersey.config.server.provider.packages</param-name>
-      <param-value>io.swagger.jaxrs.listing,org.endeavourhealth.coreui.endpoints,org.endeavourhealth.im.api.endpoints</param-value>
+      <param-value>
+        io.swagger.jaxrs.listing,
+        org.endeavourhealth.coreui.endpoints,
+        org.endeavourhealth.im.api.endpoints
+      </param-value>
     </init-param>
     <init-param>
       <param-name>jersey.config.server.provider.classnames</param-name>
@@ -52,120 +25,171 @@
       </param-value>
     </init-param>
 
+    <init-param>
+      <param-name>listings</param-name>
+      <param-value>true</param-value>
+    </init-param>
+
     <load-on-startup>1</load-on-startup>
   </servlet>
 
   <servlet-mapping>
-    <servlet-name>Information Model internal (private) API</servlet-name>
-    <url-pattern>/internal/api/*</url-pattern>
-  </servlet-mapping>-->
+    <servlet-name>Information Model API</servlet-name>
+    <url-pattern>/api/*</url-pattern>
+  </servlet-mapping>
 
-  <!-- ===== PUBLIC ENDPOINTS SERVLET ===== -->
-    <servlet>
-        <servlet-name>Public Resources</servlet-name>
-        <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
-        <init-param>
-            <param-name>jersey.config.server.provider.packages</param-name>
-            <param-value>org.endeavourhealth.coreui.endpoints_public,org.endeavourhealth.im.api.publicendpoints</param-value>
-        </init-param>
-        <init-param>
-            <param-name>jersey.config.server.provider.classnames</param-name>
-            <param-value>org.glassfish.jersey.jackson.JacksonFeature,
-                org.endeavourhealth.ui.framework.exceptions.BaseExceptionMapper</param-value>
-        </init-param>
+  <security-constraint>
+    <web-resource-collection>
+      <web-resource-name>api</web-resource-name>
+      <url-pattern>/api/*</url-pattern>
+    </web-resource-collection>
+    <auth-constraint>
+      <role-name>information-model:api</role-name>
+    </auth-constraint>
+  </security-constraint>
 
-        <load-on-startup>1</load-on-startup>
-    </servlet>
+  <security-role>
+    <role-name>information-model:api</role-name>
+  </security-role>
 
-    <servlet-mapping>
-        <servlet-name>Public Resources</servlet-name>
-        <url-pattern>/public/*</url-pattern>
-    </servlet-mapping>
+  <!-- ===== MANAGEMENT API SERVLET ===== -->
+  <servlet>
+    <servlet-name>Information Model Management API</servlet-name>
+    <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
+    <init-param>
+      <param-name>jersey.config.server.provider.classnames</param-name>
+      <param-value>
+        org.endeavourhealth.im.api.protectedendpoints.ManagementEndpoint,
+        org.glassfish.jersey.jackson.JacksonFeature,
+        org.glassfish.jersey.media.multipart.MultiPartFeature,
+        org.endeavourhealth.common.security.CustomRolesAllowedFeature,
+        org.endeavourhealth.im.api.framework.exceptions.BaseExceptionMapper,
+      </param-value>
+    </init-param>
 
+    <load-on-startup>1</load-on-startup>
+  </servlet>
 
-    <!-- ===== SWAGGER SERVLET ===== -->
-    <servlet>
-        <servlet-name>Jersey2Config</servlet-name>
-        <servlet-class>io.swagger.jersey.config.JerseyJaxrsConfig</servlet-class>
-        <init-param>
-            <param-name>api.version</param-name>
-            <param-value>1.0.0</param-value>
-        </init-param>
-        <init-param>
-            <param-name>swagger.api.basepath</param-name>
-            <param-value>/api</param-value>
-        </init-param>
-        <load-on-startup>2</load-on-startup>
-    </servlet>
+  <servlet-mapping>
+    <servlet-name>Information Model Management API</servlet-name>
+    <url-pattern>/management/*</url-pattern>
+  </servlet-mapping>
 
-    <!-- ===== STARTUP ===== -->
-    <context-param>
-        <param-name>app_id</param-name>
-        <param-value>information-model</param-value>
-    </context-param>
+  <security-constraint>
+    <web-resource-collection>
+      <web-resource-name>management</web-resource-name>
+      <url-pattern>/management/*</url-pattern>
+    </web-resource-collection>
+    <auth-constraint>
+      <role-name>information-model:management</role-name>
+    </auth-constraint>
+  </security-constraint>
 
-    <listener>
-        <listener-class>
-            org.endeavourhealth.coreui.framework.StartupConfig
-        </listener-class>
-    </listener>
+  <security-role>
+    <role-name>information-model:management</role-name>
+  </security-role>
+  <!-- ===== CLIENT API SERVLET ===== -->
+  <servlet>
+    <servlet-name>Information Model Client API</servlet-name>
+    <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
+    <init-param>
+      <param-name>jersey.config.server.provider.classnames</param-name>
+      <param-value>
+        org.endeavourhealth.im.api.protectedendpoints.ClientEndpoint,
+        org.glassfish.jersey.jackson.JacksonFeature,
+        org.glassfish.jersey.media.multipart.MultiPartFeature,
+        org.endeavourhealth.common.security.CustomRolesAllowedFeature,
+        org.endeavourhealth.im.api.framework.exceptions.BaseExceptionMapper,
+      </param-value>
+    </init-param>
 
-    <!-- ============================================ -->
-    <!-- JEE security settings - Keycloak integration -->
-    <!-- ============================================ -->
+    <load-on-startup>1</load-on-startup>
+  </servlet>
 
-    <!-- set the class to provide keycloak.json -->
-    <context-param>
-        <param-name>keycloak.config.resolver</param-name>
-        <param-value>org.endeavourhealth.common.security.keycloak.KeycloakConfigResolverImpl</param-value>
-    </context-param>
+  <servlet-mapping>
+    <servlet-name>Information Model Client API</servlet-name>
+    <url-pattern>/client/*</url-pattern>
+  </servlet-mapping>
 
-    <!-- API docs json is public -->
-    <security-constraint>
-        <web-resource-collection>
-            <web-resource-name>api</web-resource-name>
-            <url-pattern>/api/swagger.json</url-pattern>
-        </web-resource-collection>
-    </security-constraint>
+  <security-constraint>
+    <web-resource-collection>
+      <web-resource-name>client</web-resource-name>
+      <url-pattern>/client/*</url-pattern>
+    </web-resource-collection>
+    <auth-constraint>
+      <role-name>information-model:client</role-name>
+    </auth-constraint>
+  </security-constraint>
 
-    <!-- API is private and requires the user to authenticate and be an EDS user -->
-    <security-constraint>
-        <web-resource-collection>
-            <web-resource-name>api</web-resource-name>
-            <url-pattern>/api/*</url-pattern>
-        </web-resource-collection>
-        <auth-constraint>
-            <role-name>eds-info-manager:api</role-name>
-        </auth-constraint>
-    </security-constraint>
+  <security-role>
+    <role-name>information-model:client</role-name>
+  </security-role>
+  <!-- ===== SWAGGER SERVLET ===== -->
+  <servlet>
+    <servlet-name>Jersey2Config</servlet-name>
+    <servlet-class>io.swagger.jersey.config.JerseyJaxrsConfig</servlet-class>
+    <init-param>
+      <param-name>api.version</param-name>
+      <param-value>1.0.0</param-value>
+    </init-param>
+    <init-param>
+      <param-name>swagger.api.basepath</param-name>
+      <param-value>/api</param-value>
+    </init-param>
+    <load-on-startup>2</load-on-startup>
+  </servlet>
 
-    <!-- use Keycloak authentication valve installed in the container -->
-    <login-config>
-        <auth-method>KEYCLOAK</auth-method>
-        <realm-name>Endeavour</realm-name>
-    </login-config>
+  <security-constraint>
+    <web-resource-collection>
+      <web-resource-name>api</web-resource-name>
+      <url-pattern>/api/swagger.json</url-pattern>
+    </web-resource-collection>
+  </security-constraint>
 
-    <!-- all roles in the system MUST be specified here -->
-    <security-role>
-        <role-name>eds-info-manager:api</role-name>
-    </security-role>
+  <!-- ===== STARTUP ===== -->
+  <context-param>
+    <param-name>app_id</param-name>
+    <param-value>information-model</param-value>
+  </context-param>
 
-    <session-config>
-        <session-timeout>60</session-timeout>
-        <cookie-config>
-            <http-only>true</http-only>
-            <secure>true</secure>
-        </cookie-config>
-        <tracking-mode>COOKIE</tracking-mode>
-    </session-config>
+  <listener>
+    <listener-class>
+      org.endeavourhealth.coreui.framework.StartupConfig
+    </listener-class>
+  </listener>
 
-    <!-- ===== CORS FILTERING ===== -->
-    <filter>
-        <filter-name>CorsFilter</filter-name>
-        <filter-class>org.endeavourhealth.coreui.framework.CORSFilter</filter-class>
-    </filter>
-    <filter-mapping>
-        <filter-name>CorsFilter</filter-name>
-        <url-pattern>/*</url-pattern>
-    </filter-mapping>
+  <!-- ============================================ -->
+  <!-- JEE security settings - Keycloak integration -->
+  <!-- ============================================ -->
+
+  <!-- set the class to provide keycloak.json -->
+  <context-param>
+    <param-name>keycloak.config.resolver</param-name>
+    <param-value>org.endeavourhealth.common.security.keycloak.KeycloakConfigResolverImpl</param-value>
+  </context-param>
+
+  <!-- use Keycloak authentication valve installed in the container -->
+  <login-config>
+    <auth-method>KEYCLOAK</auth-method>
+    <realm-name>Endeavour</realm-name>
+  </login-config>
+
+  <session-config>
+    <session-timeout>60</session-timeout>
+    <cookie-config>
+      <http-only>true</http-only>
+      <secure>true</secure>
+    </cookie-config>
+    <tracking-mode>COOKIE</tracking-mode>
+  </session-config>
+
+  <!-- ===== CORS FILTERING ===== -->
+  <filter>
+    <filter-name>CorsFilter</filter-name>
+    <filter-class>org.endeavourhealth.coreui.framework.CORSFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>CorsFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
 </web-app>

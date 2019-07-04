@@ -1,4 +1,4 @@
-package org.endeavourhealth.im.api.publicendpoints;
+package org.endeavourhealth.im.api.protectedendpoints;
 
 import com.codahale.metrics.annotation.Timed;
 import io.astefanutti.metrics.aspectj.Metrics;
@@ -15,7 +15,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
-@Path("Client")
+@Path("/")
 @Metrics(registry = "ClientMetricRegistry")
 @Api(tags = {"Client"})
 public class ClientEndpoint {

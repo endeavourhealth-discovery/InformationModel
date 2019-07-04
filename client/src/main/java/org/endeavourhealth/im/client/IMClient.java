@@ -1,6 +1,10 @@
 package org.endeavourhealth.im.client;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import org.endeavourhealth.common.cache.ObjectMapperPool;
 import org.endeavourhealth.common.config.ConfigManager;
+import org.endeavourhealth.common.security.keycloak.client.KeycloakClient;
+
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -11,7 +15,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class IMClient {
-    private static final String base = "/public/Client";
+    private static final String base = "/client";
+    private static JsonNode config;
+    private static KeycloakClient kcClient;
 
     public static Integer getConceptIdForSchemeCode(String scheme, String code) throws Exception {
         return getConceptIdForSchemeCode(scheme, code, false, null);
@@ -90,11 +96,20 @@ public class IMClient {
 
     }
 
-    private static Response get(String path, Map<String, String> params) {
-        String address = ConfigManager.getConfiguration("api-internal", "information-model");
+    private static Response get(String path, Map<String, String> params) throws IOException {
+        if (config == null)
+            config = ObjectMapperPool.getInstance().readTree(ConfigManager.getConfiguration("api-internal", "information-model"));
+
+        if (kcClient == null)
+            kcClient = new KeycloakClient(
+              config.get("auth-server-url").asText(),
+              config.get("realm").asText(),
+              config.get("username").asText(),
+              config.get("password").asText(),
+              "information-model");
 
         Client client = ClientBuilder.newClient();
-        WebTarget target = client.target(address).path(path);
+        WebTarget target = client.target(config.get("im-url").asText()).path(path);
 
         if (params != null && !params.isEmpty()) {
             for (Map.Entry<String, String> entry: params.entrySet()) {
@@ -104,6 +119,7 @@ public class IMClient {
 
         return target
             .request()
+            .header("Authorization", "Bearer " + kcClient.getToken().getToken())
             .get();
     }
 }

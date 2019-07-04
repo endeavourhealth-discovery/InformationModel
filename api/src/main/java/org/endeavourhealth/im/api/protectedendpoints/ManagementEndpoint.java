@@ -1,4 +1,4 @@
-package org.endeavourhealth.im.api.publicendpoints;
+package org.endeavourhealth.im.api.protectedendpoints;
 
 import com.codahale.metrics.annotation.Timed;
 import io.astefanutti.metrics.aspectj.Metrics;
@@ -21,7 +21,7 @@ import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 
-@Path("management")
+@Path("/")
 @Metrics(registry = "ManagementMetricRegistry")
 @Api(tags = {"Management"})
 public class ManagementEndpoint {
