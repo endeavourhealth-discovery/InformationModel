@@ -151,7 +151,7 @@ public class IMClientJDBCDAL {
         try (PreparedStatement statement = conn.prepareStatement("SELECT target FROM concept_term_map WHERE type = ? AND term = ?")) {
             Integer typeId = getConceptDbid(conn, type);
             if (typeId == null)
-                return null;
+                throw new IllegalArgumentException("Unknown term type [" + type + "]");
 
             statement.setInt(1, typeId);
             statement.setString(2, term);
