@@ -4,6 +4,29 @@
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
          version="3.1">
 
+  <!-- ===== PUBLIC API SERVLET ===== -->
+  <servlet>
+    <servlet-name>Public Resources</servlet-name>
+    <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
+    <init-param>
+      <param-name>jersey.config.server.provider.packages</param-name>
+      <param-value>org.endeavourhealth.coreui.endpoints_public</param-value>
+    </init-param>
+    <init-param>
+      <param-name>jersey.config.server.provider.classnames</param-name>
+      <param-value>org.glassfish.jersey.jackson.JacksonFeature,
+        org.endeavourhealth.ui.framework.exceptions.BaseExceptionMapper</param-value>
+    </init-param>
+
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>Public Resources</servlet-name>
+    <url-pattern>/public/*</url-pattern>
+  </servlet-mapping>
+
+
   <!-- ===== APPLICATION API SERVLET ===== -->
   <servlet>
     <servlet-name>Information Model API</servlet-name>
@@ -88,6 +111,7 @@
   <security-role>
     <role-name>information-model:management</role-name>
   </security-role>
+
   <!-- ===== CLIENT API SERVLET ===== -->
   <servlet>
     <servlet-name>Information Model Client API</servlet-name>
@@ -124,6 +148,7 @@
   <security-role>
     <role-name>information-model:client</role-name>
   </security-role>
+
   <!-- ===== SWAGGER SERVLET ===== -->
   <servlet>
     <servlet-name>Jersey2Config</servlet-name>

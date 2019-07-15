@@ -1,7 +1,5 @@
 package org.endeavourhealth.im.api.protectedendpoints;
 
-import com.codahale.metrics.annotation.Timed;
-import io.astefanutti.metrics.aspectj.Metrics;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -16,7 +14,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
 @Path("/")
-@Metrics(registry = "ClientMetricRegistry")
 @Api(tags = {"Client"})
 public class ClientEndpoint {
     private static final Logger LOG = LoggerFactory.getLogger(ClientEndpoint.class);
@@ -25,7 +22,6 @@ public class ClientEndpoint {
     @Path("/Concept")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.TEXT_PLAIN)
-    @Timed(absolute = true, name = "InformationModel.ClientEndpoint.SchemeCode.GET")
     @ApiOperation(value = "Get concept id for given scheme and code", response = Integer.class)
     public Response getConceptIdForSchemeCode(@Context SecurityContext sc,
                                               @ApiParam(value = "Context", required = false) @QueryParam("context") String context,
@@ -47,7 +43,6 @@ public class ClientEndpoint {
     @Path("/Concept/Core")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.TEXT_PLAIN)
-    @Timed(absolute = true, name = "InformationModel.ClientEndpoint.SchemeCodeCore.GET")
     @ApiOperation(value = "Get core concept id for given scheme and code", response = Integer.class)
     public Response getMappedCoreConceptIdForSchemeCode(@Context SecurityContext sc,
                                               @ApiParam(value = "Scheme", required = true) @QueryParam("scheme") String scheme,
@@ -66,7 +61,6 @@ public class ClientEndpoint {
     @Path("/Concept/Code")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.TEXT_PLAIN)
-    @Timed(absolute = true, name = "InformationModel.ClientEndpoint.ConceptCode.GET")
     @ApiOperation(value = "Get code for given concept id", response = Integer.class)
     public Response getCodeForConceptId(@Context SecurityContext sc,
                                                         @ApiParam(value = "Concept DBID", required = true) @QueryParam("dbid") Integer dbid) throws Exception {
@@ -84,7 +78,6 @@ public class ClientEndpoint {
     @Path("/Term")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.TEXT_PLAIN)
-    @Timed(absolute = true, name = "InformationModel.ClientEndpoint.Term.GET")
     @ApiOperation(value = "Get concept id for given type and term", response = Integer.class)
     public Response getConceptIdForTypeTerm(@Context SecurityContext sc,
                                         @ApiParam(value = "Term type", required = true) @QueryParam("type") String type,
@@ -104,7 +97,6 @@ public class ClientEndpoint {
     @Path("/Term/Core")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.TEXT_PLAIN)
-    @Timed(absolute = true, name = "InformationModel.ClientEndpoint.TermCore.GET")
     @ApiOperation(value = "Get (mapped) core concept id for given type and term", response = Integer.class)
     public Response getMappedCoreConceptIdForTypeTerm(@Context SecurityContext sc,
                                             @ApiParam(value = "Term type", required = true) @QueryParam("type") String type,

@@ -3,3 +3,6 @@
 @import "~ng2-toastr/ng2-toastr.css";
 @import "~angular-tree-component/dist/angular-tree-component.css";
 
+#toast-container > div {
+  opacity:1;
+}

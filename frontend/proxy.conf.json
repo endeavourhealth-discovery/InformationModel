@@ -1,17 +1,17 @@
 {
   "/api": {
-    "target": "http://localhost:8080/im",
+    "target": "http://localhost:8080/im_slave1",
     "secure": false
   },
   "/public": {
-    "target": "http://localhost:8080/im",
+    "target": "http://localhost:8080/im_slave1",
     "secure": false
   },
   "/docs": {
-    "target": "http://localhost:8080/im",
+    "target": "http://localhost:8080/im_slave1",
     "secure": false
   },
-  "/im": {
+  "/im_slave1": {
     "target": "http://localhost:8080",
     "secure": false
   }

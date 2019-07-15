@@ -9,10 +9,10 @@
     <version>1.11-SNAPSHOT</version>
   </parent>
 
-  <artifactId>frontend</artifactId>
+  <artifactId>frontend_common</artifactId>
 
   <properties>
-    <sonar.projectKey>endeavourhealth-discovery_InformationModel::frontend</sonar.projectKey>
+    <sonar.projectKey>endeavourhealth-discovery_InformationModel::frontend_common</sonar.projectKey>
     <sonar.sources>src</sonar.sources>
     <sonar.typescript.tsconfigPath>tsconfig.json</sonar.typescript.tsconfigPath>
     <sonar.ts.tslint.configPath>tslint.json</sonar.ts.tslint.configPath>
