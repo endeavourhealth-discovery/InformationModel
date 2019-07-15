@@ -3,7 +3,6 @@ import {LoggerService} from 'eds-angular4';
 import {Router} from '@angular/router';
 import {ConceptService} from './concept.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {ConceptCreateComponent} from './concept-create/concept-create.component';
 import {StatusHelper} from '../models/Status';
 import {SearchResult} from '../models/SearchResult';
 import {OntoSelectorComponent} from '../onto-selector/onto-selector/onto-selector.component';
@@ -48,4 +47,8 @@ export class ConceptLibraryComponent implements OnInit {
       }
     );
   }
+
+  search() {}
+
+  clear() {}
 }

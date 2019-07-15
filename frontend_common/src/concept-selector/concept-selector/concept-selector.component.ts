@@ -141,17 +141,17 @@ import {Related} from '../../models/Related';
     providers: [LoggerService]
 })
 export class ConceptSelectorComponent implements AfterViewInit {
-    private codeSchemes: KVP[];
-    private selectedCodeSchemes: number[];
-    private term: string;
+    codeSchemes: KVP[];
+    selectedCodeSchemes: number[];
+    term: string;
 
-    private searchResult: SearchResult = {} as SearchResult;
+    searchResult: SearchResult = {} as SearchResult;
     private searchSelection: CodeableConcept;
-    private parents: Related[];
-    private children: Related[];
-    private maps: Related[];
+    parents: Related[];
+    children: Related[];
+    maps: Related[];
 
-    private selection: ConceptSelection[] = [];
+    selection: ConceptSelection[] = [];
 
     public static open(modalService: NgbModal, selection: any = null): NgbModalRef {
         const modalRef = modalService.open(ConceptSelectorComponent, {backdrop: 'static', size: 'lg'});
