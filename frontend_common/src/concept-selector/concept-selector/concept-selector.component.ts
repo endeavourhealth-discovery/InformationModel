@@ -7,6 +7,7 @@ import {CodeableConcept} from '../../models/CodeableConcept';
 import {ConceptSelection} from '../../models/ConceptSelection';
 import {SearchResult} from '../../models/SearchResult';
 import {Related} from '../../models/Related';
+import {ITreeOptions, TreeComponent} from "angular-tree-component";
 
 @Component({
     selector: 'app-concept-selector',
@@ -43,14 +44,22 @@ import {Related} from '../../models/Related';
                         <tr class="d-flex">
                           <th class="col-2">Scheme</th>
                           <th class="col-2">Code</th>
-                          <th class="col-8">Name</th>
+                          <th class="col-6">Name</th>
+                          <th class="col-2"></th>
                         </tr>
                       </thead>
                       <tbody>
-                        <tr class="d-flex" *ngFor="let item of searchResult?.results" (click)="select(item)" (dblclick)="addSelection(item, true)" [class.selection]="searchSelection==item" [class.text-warning]="item.status == 2">
+                        <tr class="d-flex show-child-on-hover" *ngFor="let item of searchResult?.results" (click)="highlightSearch(item)" [class.selection]="searchHighlight==item"
+                            [class.text-warning]="item.status == 2">
                           <td class="col-2">{{item.scheme}}</td>
                           <td class="col-2">{{item.code}}</td>
-                          <td class="col-8">{{item.name}}</td>
+                          <td class="col-6">{{item.name}}</td>
+                          <td class="col-2">
+                            <div class="pull-right child-to-show">
+                              <button class="btn btn-xs btn-success" (click)="include(item)">Inc</button>
+                              <button class="btn btn-xs btn-danger" (click)="exclude(item)">Exc</button>
+                            </div>
+                          </td>
                         </tr>
                       </tbody>
                     </table>
@@ -62,35 +71,35 @@ import {Related} from '../../models/Related';
                 <div class="scroll-box-300 bordered-box">
                   <table class="w-100">
                     <tbody>
-                      <tr class="d-flex">
+                      <tr class="d-flex" *ngIf="parents && parents.length > 0">
                         <th class="col-12">Parents</th>
                       </tr>
                       <ng-container *ngFor="let item of parents">
                         <ng-container *ngFor="let value of item.concepts">
-                          <tr class="d-flex">
-                            <td class="col-12">{{value}}</td>
+                          <tr class="d-flex" (click)="viewRelated(value)">
+                            <td class="col-12">{{value.name}}</td>
                           </tr>
                         </ng-container>
                       </ng-container>
 
-                      <tr class="d-flex">
+                      <tr class="d-flex" *ngIf="children && children.length > 0">
                         <th class="col-12">Children</th>
                       </tr>
                       <ng-container *ngFor="let item of children">
                         <ng-container *ngFor="let value of item.concepts">
-                          <tr class="d-flex">
-                            <td class="col-12">{{value}}</td>
+                          <tr class="d-flex" (click)="viewRelated(value)">
+                            <td class="col-12">{{value.name}}</td>
                           </tr>
                         </ng-container>
                       </ng-container>
 
-                      <tr class="d-flex">
+                      <tr class="d-flex" *ngIf="maps && maps.length > 0">
                         <th class="col-12">Maps</th>
                       </tr>
                       <ng-container *ngFor="let item of maps">
                         <ng-container *ngFor="let value of item.concepts">
-                          <tr class="d-flex">
-                            <td class="col-12">{{value}}</td>
+                          <tr class="d-flex" (click)="viewRelated(value)">
+                            <td class="col-12">{{value.name}}</td>
                           </tr>
                         </ng-container>
                       </ng-container>
@@ -100,40 +109,57 @@ import {Related} from '../../models/Related';
               </div>
             </div>
             <div class="row">
-              <div class="form-group col-md-8">
-                <label class="control-label">Selection</label>
+              <div class="form-group col-md-6">
+                <label class="control-label">Inclusions</label>
                 <div class="scroll-box-250">
                   <table class="table table-striped table-hover table-sm">
                     <thead>
                       <tr class="d-flex">
                         <th class="col-2">Scheme</th>
                         <th class="col-2">Code</th>
-                        <th class="col-7">Name</th>
-                        <th class="col-1">Children</th>
+                        <th class="col-6">Name</th>
+                        <th class="col-2">+ Children</th>
                       </tr>
                     </thead>
                     <tbody>
-                      <tr class="d-flex" *ngFor="let item of selection">
+                      <tr class="d-flex" *ngFor="let item of inclusions" (click)="highlightSelected(item)" [class.selection]="selectionHighlight==item">
                         <td class="col-2">{{item.scheme}}</td>
                         <td class="col-2">{{item.code}}</td>
-                        <td class="col-7">{{item.name}}</td>
-                        <td class="col-1"><span class="badge badge-success">{{getChildText(item)}}</span></td>
+                        <td class="col-6">{{item.name}}</td>
+                        <td class="col-2">{{getChildText(item)}}</td>
                       </tr>
                     </tbody>
                   </table>
                 </div>
               </div>
-              <div class="form-group col-md-4" *ngIf="parents || children || maps">
-                <label class="control-label">Inclusions/Exclusions</label>
-                <div class="scroll-box-250 bordered-box">
-                  [ CHILD INC/EXC DETAIL TREE]
+              <div class="form-group col-md-6">
+                <label class="control-label">Exclusions</label>
+                <div class="scroll-box-250">
+                  <table class="table table-striped table-hover table-sm">
+                    <thead>
+                      <tr class="d-flex">
+                        <th class="col-2">Scheme</th>
+                        <th class="col-2">Code</th>
+                        <th class="col-6">Name</th>
+                        <th class="col-2">+ Children</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr class="d-flex" *ngFor="let item of exclusions" (click)="highlightSelected(item)" [class.selection]="selectionHighlight==item">
+                        <td class="col-2">{{item.scheme}}</td>
+                        <td class="col-2">{{item.code}}</td>
+                        <td class="col-6">{{item.name}}</td>
+                        <td class="col-2">{{getChildText(item)}}</td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
               </div>
             </div>
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-success" (click)="ok()" name="selectConcept" [disabled]="selection==null || selection.length == 0">OK</button>
+          <button type="button" class="btn btn-success" (click)="ok()" name="selectConcept" [disabled]="inclusions==null || inclusions.length == 0">OK</button>
           <button type="button" class="btn btn-danger" (click)="cancel()" name="cancelConcept">Cancel</button>
         </div>
       </div>
@@ -141,26 +167,47 @@ import {Related} from '../../models/Related';
     providers: [LoggerService]
 })
 export class ConceptSelectorComponent implements AfterViewInit {
+    @ViewChild('exclusionTree') tree: TreeComponent;
+
     codeSchemes: KVP[];
     selectedCodeSchemes: number[];
     term: string;
 
     searchResult: SearchResult = {} as SearchResult;
-    private searchSelection: CodeableConcept;
     parents: Related[];
     children: Related[];
     maps: Related[];
 
-    selection: ConceptSelection[] = [];
+    inclusions: ConceptSelection[] = [];
+    exclusions: ConceptSelection[] = [];
+
+    treeData: any[] = [];
+    treeOptions: ITreeOptions;
+
+    private searchHighlight: CodeableConcept;
+    private selectionHighlight: ConceptSelection;
+
 
     public static open(modalService: NgbModal, selection: any = null): NgbModalRef {
         const modalRef = modalService.open(ConceptSelectorComponent, {backdrop: 'static', size: 'lg'});
-        if (selection)
-            modalRef.componentInstance.selection = selection;
+        if (selection) {
+            if (selection.inclusions)
+                modalRef.componentInstance.inclusions = selection.inclusions;
+            if (selection.exclusions)
+                modalRef.componentInstance.exclusions = selection.exclusions;
+        }
         return modalRef;
     }
 
-    constructor(public modal: NgbModal, public activeModal: NgbActiveModal, private logger: LoggerService, private conceptService: ConceptSelectorService) {
+    constructor(public activeModal: NgbActiveModal, private logger: LoggerService, private conceptService: ConceptSelectorService) {
+        this.treeOptions = {
+            displayField : 'name',
+            childrenField: 'nodes',
+            hasChildrenField : 'hasChildren',
+            idField : 'id',
+            isExpandedField : 'isExpanded',
+            getChildren : (node) => { this.loadChildTree(node) }
+        }
     }
 
     @ViewChild('focus') focusField: ElementRef;
@@ -190,17 +237,17 @@ export class ConceptSelectorComponent implements AfterViewInit {
             );
     }
 
-    select(item) {
-        if (item != this.searchSelection) {
-            this.searchSelection = item;
+    highlightSearch(item: CodeableConcept) {
+        if (item != this.searchHighlight) {
+            this.searchHighlight = item;
             this.getDetails(item);
         }
     }
 
-    getDetails(item) {
-        this.parents = [{concepts: ['Loading...']} as Related];
-        this.children = [{concepts: ['Loading...']} as Related];
-        this.maps = [{concepts: ['Loading...']} as Related];
+    getDetails(item: CodeableConcept) {
+        this.parents = [{concepts: [{name: 'Loading...'}]} as Related];
+        this.children = [{concepts: [{name: 'Loading...'}]} as Related];
+        this.maps = [{concepts: [{name: 'Loading...'}]} as Related];
         this.conceptService.getForwardRelated(item.id, ['has_parent'])
             .subscribe(
                 (result) => this.parents = result,
@@ -219,23 +266,70 @@ export class ConceptSelectorComponent implements AfterViewInit {
 
     }
 
-    addSelection(item, includeChildren: boolean) {
-        if (this.selection.indexOf(item) == -1) {
-            this.selection.push(item);
+    viewRelated(item: CodeableConcept) {
+        this.searchResult.results = [item];
+        this.getDetails(item);
+    }
+
+    include(item: CodeableConcept) {
+        if (this.inclusions.findIndex(i => i.id === item.id) == -1) {
+            this.inclusions.push({
+                id: item.id,
+                name: item.name,
+                scheme: item.scheme,
+                code: item.code
+            } as ConceptSelection);
+        }
+    }
+
+    exclude(item: CodeableConcept) {
+        if (this.exclusions.findIndex(i => i.id === item.id) == -1) {
+            this.exclusions.push({
+                id: item.id,
+                name: item.name,
+                scheme: item.scheme,
+                code: item.code
+            } as ConceptSelection);
         }
     }
 
     getChildText(item: ConceptSelection) {
-        if (!item.excludeChildren)
-            return 'All';
-        if (item.exclusions && item.exclusions.length > 0)
-            return 'Some';
-        return 'None';
+        return item.single ? 'No' : 'Yes';
+    }
+
+    highlightSelected(item) {
+        this.selectionHighlight = item;
+        this.treeData = null;
+        this.conceptService.getBackwardRelated(item.id, ['has_parent'])
+            .subscribe(
+                (result) => {
+                    this.treeData = result.reduce((acc, rel) => acc.concat(rel.concepts), []);
+                    this.treeData.forEach(c => c.hasChildren = true);
+                    this.tree.treeModel.update();
+                },
+                (error) => this.logger.error(error)
+            );
+    }
+
+    loadChildTree(node) {
+        this.conceptService.getBackwardRelated(node.data.id, ['has_parent'])
+            .subscribe(
+                (result) => {
+                    node.data.nodes = result.reduce((acc, rel) => acc.concat(rel.concepts), []);
+                    node.data.nodes.forEach(c => c.hasChildren = true);
+                    node.data.hasChildren = (node.data.nodes.size > 0);
+                    this.tree.treeModel.update();
+                },
+                (error) => this.logger.error(error)
+            );
     }
 
     ok() {
-        if (this.selection) {
-            this.activeModal.close(this.selection);
+        if (this.inclusions) {
+            this.activeModal.close({
+                inclusions: this.inclusions,
+                exclusions: this.exclusions
+            });
         }
     }
 

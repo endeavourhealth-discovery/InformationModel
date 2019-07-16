@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 import {Http, URLSearchParams} from '@angular/http';
 import {Observable} from 'rxjs';
 import {KVP} from '../models/KVP';
+import {Related} from '../models/Related';
 
 @Injectable()
 export class ConceptSelectorService {
@@ -28,7 +29,7 @@ export class ConceptSelectorService {
             .map((result) => result.json());
     }
 
-    getForwardRelated(id: string, relationships: string[]): Observable<any> {
+    getForwardRelated(id: string, relationships: string[]): Observable<Related[]> {
         const params = new URLSearchParams();
 
         for (let rel of relationships)
@@ -38,7 +39,7 @@ export class ConceptSelectorService {
             .map((result) => result.json());
     }
 
-    getBackwardRelated(id: string, relationships: string[]): Observable<any> {
+    getBackwardRelated(id: string, relationships: string[]): Observable<Related[]> {
         const params = new URLSearchParams();
 
         for (let rel of relationships)

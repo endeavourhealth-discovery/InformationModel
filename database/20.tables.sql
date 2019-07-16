@@ -35,7 +35,8 @@ CREATE TABLE concept_property_object (
     value INT NOT NULL                      COMMENT 'Property value concept dbid',
 
     INDEX concept_property_object_idx (dbid),
-    INDEX concept_property_object_property_value (property, value)
+    INDEX concept_property_object_property_value (property, value),
+    INDEX concept_property_object_value_idx (value)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS concept_property_data;

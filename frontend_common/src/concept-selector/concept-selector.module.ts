@@ -6,6 +6,7 @@ import {FormsModule} from '@angular/forms';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {ControlsModule} from 'eds-angular4/dist/controls';
 import {LoggerModule} from 'eds-angular4';
+import {TreeModule} from "angular-tree-component";
 
 @NgModule({
     imports: [
@@ -13,7 +14,8 @@ import {LoggerModule} from 'eds-angular4';
         ControlsModule,
         NgbModule,
         CommonModule,
-        LoggerModule
+        LoggerModule,
+        TreeModule
     ],
     declarations: [ConceptSelectorComponent],
     providers: [ConceptSelectorService],

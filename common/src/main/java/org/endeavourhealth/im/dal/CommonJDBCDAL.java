@@ -1,9 +1,6 @@
 package org.endeavourhealth.im.dal;
 
-import org.endeavourhealth.im.models.Concept;
-import org.endeavourhealth.im.models.KVP;
-import org.endeavourhealth.im.models.Related;
-import org.endeavourhealth.im.models.SearchResult;
+import org.endeavourhealth.im.models.*;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -73,14 +70,14 @@ public class CommonJDBCDAL {
 
                 ResultSet rs = stmt.executeQuery();
                 while (rs.next()) {
-                    result.getResults().add(
-                        new Concept()
-                            .setDbid(rs.getInt("dbid"))
-                            .setId(rs.getString("id"))
-                            .setName(rs.getString("name"))
-                            .setScheme(rs.getString("scheme"))
-                            .setCode(rs.getString("code"))
-                    );
+                    CodeableConcept concept = new CodeableConcept();
+                    concept
+                        .setScheme(rs.getString("scheme"))
+                        .setCode(rs.getString("code"))
+                        .setDbid(rs.getInt("dbid"))
+                        .setId(rs.getString("id"))
+                        .setName(rs.getString("name"));
+                    result.getResults().add(concept);
                 }
             }
             try (PreparedStatement statement = conn.prepareStatement("SELECT FOUND_ROWS()")) {
@@ -98,17 +95,12 @@ public class CommonJDBCDAL {
     public List<Related> getRelated(String id, List<String> relationships) throws SQLException {
         List<Related> result = new ArrayList<>();
 
-        String sql = "SELECT dp.id AS rel_id, dp.name AS rel_name, d.value as value\n" +
-            "FROM concept c\n" +
-            "JOIN concept_property_data d ON d.dbid = c.dbid\n" +
-            "JOIN concept dp ON dp.dbid = d.property\n" +
-            "WHERE c.id = ?\n" +
-            "UNION\n" +
-            "SELECT op.id AS rel_id, op.name AS rel_name, ov.name as value\n" +
+        String sql = "SELECT op.id AS rel_id, op.name AS rel_name, ov.id, ov.name, s.id as scheme, ov.code\n" +
             "FROM concept c\n" +
             "JOIN concept_property_object o ON o.dbid = c.dbid\n" +
             "JOIN concept op ON op.dbid = o.property\n" +
             "JOIN concept ov ON ov.dbid = o.value\n" +
+            "JOIN concept s ON s.dbid = ov.scheme\n" +
             "WHERE c.id = ?";
 
         String lastRelId = "";
@@ -117,7 +109,6 @@ public class CommonJDBCDAL {
         Connection conn = ConnectionPool.getInstance().pop();
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, id);
-            stmt.setString(2, id);
 
             ResultSet rs = stmt.executeQuery();
 
@@ -137,7 +128,13 @@ public class CommonJDBCDAL {
                     );
                 }
 
-                rel.getConcepts().add(rs.getString("value"));
+                CodeableConcept cc = new CodeableConcept();
+                cc.setScheme(rs.getString("scheme"))
+                    .setCode(rs.getString("code"))
+                    .setId(rs.getString("id"))
+                    .setName(rs.getString("name"));
+
+                rel.getConcepts().add(cc);
             }
 
         } finally {
@@ -150,11 +147,12 @@ public class CommonJDBCDAL {
     public List<Related> getReverseRelated(String id, List<String> relationships) throws SQLException {
         List<Related> result = new ArrayList<>();
 
-        String sql = "SELECT op.id AS rel_id, op.name AS rel_name, c.name as value\n" +
+        String sql = "SELECT op.id AS rel_id, op.name AS rel_name, c.id, c.name, s.id as scheme, c.code\n" +
             "FROM concept c\n" +
             "JOIN concept_property_object o ON o.dbid = c.dbid\n" +
             "JOIN concept op ON op.dbid = o.property\n" +
             "JOIN concept ov ON ov.dbid = o.value\n" +
+            "JOIN concept s ON s.dbid = c.scheme\n" +
             "WHERE ov.id = ?";
 
         String lastRelId = "";
@@ -182,7 +180,13 @@ public class CommonJDBCDAL {
                     );
                 }
 
-                rel.getConcepts().add(rs.getString("value"));
+                CodeableConcept cc = new CodeableConcept();
+                cc.setScheme(rs.getString("scheme"))
+                    .setCode(rs.getString("code"))
+                    .setId(rs.getString("id"))
+                    .setName(rs.getString("name"));
+
+                rel.getConcepts().add(cc);
             }
 
         } finally {

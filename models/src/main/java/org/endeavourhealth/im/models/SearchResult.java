@@ -6,7 +6,7 @@ import java.util.List;
 public class SearchResult {
     private int page = 1;
     private int count = 0;
-    private List<Concept> results = new ArrayList<>();
+    private List<CodeableConcept> results = new ArrayList<>();
 
     public int getPage() {
         return page;
@@ -26,11 +26,11 @@ public class SearchResult {
         return this;
     }
 
-    public List<Concept> getResults() {
+    public List<CodeableConcept> getResults() {
         return results;
     }
 
-    public SearchResult setResults(List<Concept> results) {
+    public SearchResult setResults(List<CodeableConcept> results) {
         this.results = results;
         return this;
     }

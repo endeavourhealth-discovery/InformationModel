@@ -6,7 +6,7 @@ import java.util.List;
 public class Related {
     private String id;
     private String name;
-    private List<String> concepts = new ArrayList<>();
+    private List<CodeableConcept> concepts = new ArrayList<>();
 
     public String getId() {
         return id;
@@ -26,11 +26,11 @@ public class Related {
         return this;
     }
 
-    public List<String> getConcepts() {
+    public List<CodeableConcept> getConcepts() {
         return concepts;
     }
 
-    public Related setConcepts(List<String> concepts) {
+    public Related setConcepts(List<CodeableConcept> concepts) {
         this.concepts = concepts;
         return this;
     }
