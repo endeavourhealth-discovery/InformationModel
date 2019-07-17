@@ -27,7 +27,7 @@ public class IMClient {
     }
 
     public static Integer getConceptIdForSchemeCode(String scheme, String code, Boolean autoCreate, String term) throws Exception {
-        try (MetricsTimer timer =MetricsHelper.recordTime("getConceptIdForSchemeCode")) {
+        try (MetricsTimer timer =MetricsHelper.recordTime("IMClient.getConceptIdForSchemeCode")) {
             Map<String, String> params = new HashMap<>();
             params.put("scheme", scheme);
             params.put("code", code);
@@ -44,7 +44,7 @@ public class IMClient {
     }
 
     public static Integer getMappedCoreConceptIdForSchemeCode(String scheme, String code) throws Exception {
-        try (MetricsTimer timer =MetricsHelper.recordTime("getMappedCoreConceptIdForSchemeCode")) {
+        try (MetricsTimer timer =MetricsHelper.recordTime("IMClient.getMappedCoreConceptIdForSchemeCode")) {
             Map<String, String> params = new HashMap<>();
             params.put("scheme", scheme);
             params.put("code", code);
@@ -59,7 +59,7 @@ public class IMClient {
     }
 
     public static String getCodeForConceptId(Integer conceptId) throws Exception {
-        try (MetricsTimer timer =MetricsHelper.recordTime("getCodeForConceptId")) {
+        try (MetricsTimer timer =MetricsHelper.recordTime("IMClient.getCodeForConceptId")) {
             Map<String, String> params = new HashMap<>();
             params.put("dbid", conceptId.toString());
 
@@ -77,7 +77,7 @@ public class IMClient {
     }
 
     public static Integer getConceptIdForTypeTerm(String type, String term, Boolean autoCreate) throws Exception {
-        try (MetricsTimer timer =MetricsHelper.recordTime("getConceptIdForTypeTerm")) {
+        try (MetricsTimer timer =MetricsHelper.recordTime("IMClient.getConceptIdForTypeTerm")) {
             Map<String, String> params = new HashMap<>();
             params.put("type", type);
             params.put("term", term);
@@ -93,7 +93,7 @@ public class IMClient {
     }
 
     public static Integer getMappedCoreConceptIdForTypeTerm(String type, String term) throws Exception {
-        try (MetricsTimer timer =MetricsHelper.recordTime("getConceptIdForTypeTerm")) {
+        try (MetricsTimer timer =MetricsHelper.recordTime("IMClient.getConceptIdForTypeTerm")) {
             Map<String, String> params = new HashMap<>();
             params.put("type", type);
             params.put("term", term);

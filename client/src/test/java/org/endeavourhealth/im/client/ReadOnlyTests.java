@@ -1,12 +1,18 @@
 package org.endeavourhealth.im.client;
 
+import org.endeavourhealth.common.config.ConfigManager;
+import org.endeavourhealth.common.config.ConfigManagerException;
+import org.junit.BeforeClass;
 import org.junit.Test;
-
-import java.io.IOException;
 
 import static org.junit.Assert.*;
 
-public class IMClientTest {
+public class ReadOnlyTests {
+
+    @BeforeClass
+    public static void initialize() throws ConfigManagerException {
+        ConfigManager.Initialize("information-model");
+    }
 
     @Test
     public void getConceptIdForSchemeCode_SNOMED() throws Exception {
@@ -27,30 +33,6 @@ public class IMClientTest {
         Integer dbid = IMClient.getConceptIdForSchemeCode("FHIR_AS", "noshow");
         assertNotNull(dbid);
         assertEquals(1210928, dbid.intValue());
-    }
-
-    @Test
-    public void getConceptIdForSchemeCode_CodeUnknown() throws Exception {
-        Integer dbid = IMClient.getConceptIdForSchemeCode("EMIS_LOCAL", "NewCode1");
-        assertNull(dbid);
-    }
-
-    @Test
-    public void getConceptIdForSchemeCode_CodeUnknown_AutoCreate() throws Exception {
-        Integer dbid = IMClient.getConceptIdForSchemeCode("EMIS_LOCAL", "NewCode2", true, "New emis local code");
-        assertNotNull(dbid);
-    }
-
-    @Test
-    public void getConceptIdForSchemeCode_BothUnknown() throws Exception {
-        Integer dbid = IMClient.getConceptIdForSchemeCode("INVALID", "INVALID");
-        assertNull(dbid);
-    }
-
-    @Test(expected = IOException.class)
-    public void getConceptIdForSchemeCode_BothUnknown_AutoCreate() throws Exception {
-        Integer dbid = IMClient.getConceptIdForSchemeCode("INVALID", "INVALID", true, "New emis local code");
-        assertNull(dbid);
     }
 
     @Test
@@ -81,12 +63,6 @@ public class IMClientTest {
     }
 
     @Test
-    public void getMappedCoreConceptIdForSchemeCode_Unknown() throws Exception {
-        Integer dbid = IMClient.getMappedCoreConceptIdForSchemeCode("INVALID", "INVALID");
-        assertNull(dbid);
-    }
-
-    @Test
     public void getCodeForConceptId_SNOMED() throws Exception {
         String code = IMClient.getCodeForConceptId(16452);
         assertNotNull(code);
@@ -108,45 +84,9 @@ public class IMClientTest {
     }
 
     @Test
-    public void getConceptIdForTypeTerm_TypeUnknown() throws Exception {
-        Integer dbid = IMClient.getConceptIdForTypeTerm("UnknownType", "practice nurse clinic");
-        assertNull(dbid);
-    }
-
-    @Test
-    public void getConceptIdForTypeTerm_TypeUnknown_AutoCreate() throws Exception {
-        Integer dbid = IMClient.getConceptIdForTypeTerm("UnknownType", "practice nurse clinic", true);
-        assertNull(dbid);
-    }
-
-    @Test
-    public void getConceptIdForTypeTerm_TermUnknown() throws Exception {
-        Integer dbid = IMClient.getConceptIdForTypeTerm("DCE_type_of_encounter", "This is an unknown term");
-        assertNull(dbid);
-    }
-
-    @Test
-    public void getConceptIdForTypeTerm_TermUnknownAutoCreate() throws Exception {
-        Integer dbid = IMClient.getConceptIdForTypeTerm("DCE_type_of_encounter", "This is an unknown term", true);
-        assertNotNull(dbid);
-    }
-
-    @Test
     public void getMappedCoreConceptIdForTypeTerm_Known() throws Exception {
         Integer dbid = IMClient.getMappedCoreConceptIdForTypeTerm("DCE_type_of_encounter", "practice nurse clinic");
         assertNotNull(dbid);
         assertEquals(1473373, dbid.intValue());
-    }
-
-    @Test
-    public void getMappedCoreConceptIdForTypeTerm_TypeUnknown() throws Exception {
-        Integer dbid = IMClient.getMappedCoreConceptIdForTypeTerm("UnknownType", "practice nurse clinic");
-        assertNull(dbid);
-    }
-
-    @Test
-    public void getMappedCoreConceptIdForTypeTerm_TermUnknown() throws Exception {
-        Integer dbid = IMClient.getMappedCoreConceptIdForTypeTerm("DCE_type_of_encounter", "This is an unknown term");
-        assertNull(dbid);
     }
 }

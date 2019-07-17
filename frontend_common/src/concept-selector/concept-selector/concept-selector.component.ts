@@ -7,7 +7,7 @@ import {CodeableConcept} from '../../models/CodeableConcept';
 import {ConceptSelection} from '../../models/ConceptSelection';
 import {SearchResult} from '../../models/SearchResult';
 import {Related} from '../../models/Related';
-import {ITreeOptions, TreeComponent} from "angular-tree-component";
+import {CodeSet} from '../../models/CodeSet';
 
 @Component({
     selector: 'app-concept-selector',
@@ -122,7 +122,7 @@ import {ITreeOptions, TreeComponent} from "angular-tree-component";
                       </tr>
                     </thead>
                     <tbody>
-                      <tr class="d-flex" *ngFor="let item of inclusions" (click)="highlightSelected(item)" [class.selection]="selectionHighlight==item">
+                      <tr class="d-flex" *ngFor="let item of inclusions" [class.selection]="selectionHighlight==item">
                         <td class="col-2">{{item.scheme}}</td>
                         <td class="col-2">{{item.code}}</td>
                         <td class="col-6">{{item.name}}</td>
@@ -145,7 +145,7 @@ import {ITreeOptions, TreeComponent} from "angular-tree-component";
                       </tr>
                     </thead>
                     <tbody>
-                      <tr class="d-flex" *ngFor="let item of exclusions" (click)="highlightSelected(item)" [class.selection]="selectionHighlight==item">
+                      <tr class="d-flex" *ngFor="let item of exclusions" [class.selection]="selectionHighlight==item">
                         <td class="col-2">{{item.scheme}}</td>
                         <td class="col-2">{{item.code}}</td>
                         <td class="col-6">{{item.name}}</td>
@@ -167,7 +167,7 @@ import {ITreeOptions, TreeComponent} from "angular-tree-component";
     providers: [LoggerService]
 })
 export class ConceptSelectorComponent implements AfterViewInit {
-    @ViewChild('exclusionTree') tree: TreeComponent;
+    @ViewChild('focus') focusField: ElementRef;
 
     codeSchemes: KVP[];
     selectedCodeSchemes: number[];
@@ -181,14 +181,11 @@ export class ConceptSelectorComponent implements AfterViewInit {
     inclusions: ConceptSelection[] = [];
     exclusions: ConceptSelection[] = [];
 
-    treeData: any[] = [];
-    treeOptions: ITreeOptions;
-
     private searchHighlight: CodeableConcept;
     private selectionHighlight: ConceptSelection;
 
 
-    public static open(modalService: NgbModal, selection: any = null): NgbModalRef {
+    public static open(modalService: NgbModal, selection: CodeSet = null): NgbModalRef {
         const modalRef = modalService.open(ConceptSelectorComponent, {backdrop: 'static', size: 'lg'});
         if (selection) {
             if (selection.inclusions)
@@ -200,17 +197,7 @@ export class ConceptSelectorComponent implements AfterViewInit {
     }
 
     constructor(public activeModal: NgbActiveModal, private logger: LoggerService, private conceptService: ConceptSelectorService) {
-        this.treeOptions = {
-            displayField : 'name',
-            childrenField: 'nodes',
-            hasChildrenField : 'hasChildren',
-            idField : 'id',
-            isExpandedField : 'isExpanded',
-            getChildren : (node) => { this.loadChildTree(node) }
-        }
     }
-
-    @ViewChild('focus') focusField: ElementRef;
 
     ngAfterViewInit(): void {
         if (this.focusField != null)
@@ -295,33 +282,6 @@ export class ConceptSelectorComponent implements AfterViewInit {
 
     getChildText(item: ConceptSelection) {
         return item.single ? 'No' : 'Yes';
-    }
-
-    highlightSelected(item) {
-        this.selectionHighlight = item;
-        this.treeData = null;
-        this.conceptService.getBackwardRelated(item.id, ['has_parent'])
-            .subscribe(
-                (result) => {
-                    this.treeData = result.reduce((acc, rel) => acc.concat(rel.concepts), []);
-                    this.treeData.forEach(c => c.hasChildren = true);
-                    this.tree.treeModel.update();
-                },
-                (error) => this.logger.error(error)
-            );
-    }
-
-    loadChildTree(node) {
-        this.conceptService.getBackwardRelated(node.data.id, ['has_parent'])
-            .subscribe(
-                (result) => {
-                    node.data.nodes = result.reduce((acc, rel) => acc.concat(rel.concepts), []);
-                    node.data.nodes.forEach(c => c.hasChildren = true);
-                    node.data.hasChildren = (node.data.nodes.size > 0);
-                    this.tree.treeModel.update();
-                },
-                (error) => this.logger.error(error)
-            );
     }
 
     ok() {
