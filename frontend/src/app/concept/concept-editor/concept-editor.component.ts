@@ -149,7 +149,7 @@ export class ConceptEditorComponent implements AfterViewInit {
   // }
 
   selectSupertype() {
-    ConceptSelectorComponent.open(this.modal, this.superclass)
+    ConceptSelectorComponent.open(this.modal, null)
       .result.then(
       (result) => this.superclass = result.id,
       () => {}
