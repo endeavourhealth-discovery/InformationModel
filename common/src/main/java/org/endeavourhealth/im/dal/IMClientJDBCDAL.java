@@ -7,7 +7,6 @@ import java.util.HashMap;
 
 public class IMClientJDBCDAL {
     private static SchemeCodePrefixCache schemeCodePrefixMap = new SchemeCodePrefixCache();
-    private HashMap<String, Integer> idMap = new HashMap<>();
 
     public Integer getConceptIdForSchemeCode(String context, String scheme, String code, Boolean autoCreate, String term) throws SQLException {
         Integer conceptId = null;
@@ -28,9 +27,10 @@ public class IMClientJDBCDAL {
             try (PreparedStatement statement = conn.prepareStatement("SELECT c.dbid FROM concept c WHERE id = ?")) {
                 statement.setString(1, prefix + code);
 
-                ResultSet resultSet = statement.executeQuery();
-                if (resultSet.next())
-                    conceptId = resultSet.getInt(1);
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    if (resultSet.next())
+                        conceptId = resultSet.getInt(1);
+                }
             }
 
             if (conceptId != null) {
@@ -68,13 +68,14 @@ public class IMClientJDBCDAL {
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, scheme);
-            ResultSet rs = stmt.executeQuery();
-            if (!rs.next())
-                throw new IllegalArgumentException("Unknown code scheme [" + scheme + "]");
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (!rs.next())
+                    throw new IllegalArgumentException("Unknown code scheme [" + scheme + "]");
 
-            schemeDbid = rs.getInt("dbid");
-            docDbid = rs.getInt("document");
-            prefix = rs.getString("value");
+                schemeDbid = rs.getInt("dbid");
+                docDbid = rs.getInt("document");
+                prefix = rs.getString("value");
+            }
         }
 
         try (PreparedStatement stmt = conn.prepareStatement("INSERT INTO concept (document, id, name, description, code, scheme, draft) VALUES (?, ?, ?, ?, ?, ?, TRUE)", Statement.RETURN_GENERATED_KEYS)) {
@@ -113,11 +114,12 @@ public class IMClientJDBCDAL {
             statement.setString(1, scheme);
             statement.setString(2, code);
 
-            ResultSet resultSet = statement.executeQuery();
-            if (resultSet.next())
-                return resultSet.getInt(1);
-            else
-                return null;
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next())
+                    return resultSet.getInt(1);
+                else
+                    return null;
+            }
         } finally {
             ConnectionPool.getInstance().push(conn);
         }
@@ -133,11 +135,12 @@ public class IMClientJDBCDAL {
         try (PreparedStatement statement = conn.prepareStatement(sql)) {
             statement.setInt(1, dbid);
 
-            ResultSet resultSet = statement.executeQuery();
-            if (resultSet.next())
-                return resultSet.getString(1);
-            else
-                return null;
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next())
+                    return resultSet.getString(1);
+                else
+                    return null;
+            }
         } finally {
             ConnectionPool.getInstance().push(conn);
         }
@@ -145,22 +148,24 @@ public class IMClientJDBCDAL {
 
     public Integer getConceptIdForTypeTerm(String type, String term, Boolean autoCreate) throws SQLException {
         Integer conceptId = null;
+        String sql = "SELECT m.target \n" +
+            "FROM concept c\n" +
+            "JOIN concept_term_map m ON m.type = c.dbid\n" +
+            "WHERE c.id = ? \n" +
+            "AND m.term = ?";
 
         Connection conn = ConnectionPool.getInstance().pop();
         conn.setAutoCommit(false);
-        try (PreparedStatement statement = conn.prepareStatement("SELECT target FROM concept_term_map WHERE type = ? AND term = ?")) {
-            Integer typeId = getConceptDbid(conn, type);
-            if (typeId == null)
-                throw new IllegalArgumentException("Unknown term type [" + type + "]");
-
-            statement.setInt(1, typeId);
+        try (PreparedStatement statement = conn.prepareStatement(sql)) {
+            statement.setString(1, type);
             statement.setString(2, term);
 
-            ResultSet resultSet = statement.executeQuery();
-            if (resultSet.next())
-                conceptId = resultSet.getInt("target");
-            else if (autoCreate)
-                conceptId = createTypeTermConcept(conn, type, term);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next())
+                    conceptId = resultSet.getInt("target");
+                else if (autoCreate)
+                    conceptId = createTypeTermConcept(conn, type, term);
+            }
 
             conn.commit();
             return conceptId;
@@ -179,11 +184,12 @@ public class IMClientJDBCDAL {
         // Get term type ids
         try (PreparedStatement stmt = conn.prepareStatement("SELECT dbid, document FROM concept WHERE id = ?")) {
             stmt.setString(1, type);
-            ResultSet rs = stmt.executeQuery();
-            if (!rs.next())
-                throw new IllegalArgumentException("Unknown term type [" + type + "]");
-            typDbid = rs.getInt("dbid");
-            docDbid = rs.getInt("document");
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (!rs.next())
+                    throw new IllegalArgumentException("Unknown term type [" + type + "]");
+                typDbid = rs.getInt("dbid");
+                docDbid = rs.getInt("document");
+            }
         }
 
         // Create the draft concept
@@ -211,43 +217,24 @@ public class IMClientJDBCDAL {
     }
 
     public Integer getMappedCoreConceptIdForTypeTerm(String type, String term) throws SQLException {
-
+        String sql = "SELECT m.target \n" +
+            "FROM concept c\n" +
+            "JOIN concept_term_map m ON m.type = c.dbid\n" +
+            "WHERE c.id = ? \n" +
+            "AND m.term = ?";
         Connection conn = ConnectionPool.getInstance().pop();
-        try (PreparedStatement statement = conn.prepareStatement("SELECT target FROM concept_term_map WHERE type = ? AND term = ?")) {
-            Integer typeId = getConceptDbid(conn, type);
-            if (typeId == null)
-                return null;
-            statement.setInt(1, typeId);
+        try (PreparedStatement statement = conn.prepareStatement(sql)) {
+            statement.setString(1, type);
             statement.setString(2, term);
 
-            ResultSet resultSet = statement.executeQuery();
-            if (resultSet.next())
-                return resultSet.getInt("target");
-            else
-                return null;
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next())
+                    return resultSet.getInt("target");
+                else
+                    return null;
+            }
         } finally {
             ConnectionPool.getInstance().push(conn);
         }
-    }
-
-    // ********** TO DO - REMOVE **********
-    private Integer getConceptDbid(Connection conn, String id) throws SQLException {
-        Integer conceptDbid = idMap.get(id);
-
-        if (conceptDbid != null)
-            return conceptDbid;
-
-        try (PreparedStatement statement = conn.prepareStatement("SELECT dbid FROM concept WHERE id = ?")) {
-            statement.setString(1, id);
-            ResultSet rs = statement.executeQuery();
-            if (rs.next()) {
-                conceptDbid = rs.getInt("dbid");
-                idMap.put(id, conceptDbid);
-                return conceptDbid;
-            } else {
-                return null;
-            }
-        }
-
     }
 }

@@ -3,6 +3,8 @@ package org.endeavourhealth.im.api.protectedendpoints;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.endeavourhealth.common.utility.MetricsHelper;
+import org.endeavourhealth.common.utility.MetricsTimer;
 import org.endeavourhealth.im.dal.IMClientJDBCDAL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,14 +31,16 @@ public class ClientEndpoint {
                                               @ApiParam(value = "Code", required = true) @QueryParam("code") String code,
                                               @ApiParam(value = "AutoCreate", required = false) @QueryParam("autoCreate") Boolean autoCreate,
                                               @ApiParam(value = "Term", required = false) @QueryParam("term") String term) throws Exception {
-        LOG.debug("getConceptIdForSchemeCode");
+        try(MetricsTimer t = MetricsHelper.recordTime("Client.getConceptIdForSchemeCode")) {
+            LOG.debug("getConceptIdForSchemeCode");
 
-        Integer result = new IMClientJDBCDAL().getConceptIdForSchemeCode(context, scheme, code, autoCreate, term);
+            Integer result = new IMClientJDBCDAL().getConceptIdForSchemeCode(context, scheme, code, autoCreate, term);
 
-        return Response
-            .ok()
-            .entity(result)
-            .build();
+            return Response
+                .ok()
+                .entity(result)
+                .build();
+        }
     }
 
     @GET
@@ -47,14 +51,16 @@ public class ClientEndpoint {
     public Response getMappedCoreConceptIdForSchemeCode(@Context SecurityContext sc,
                                               @ApiParam(value = "Scheme", required = true) @QueryParam("scheme") String scheme,
                                               @ApiParam(value = "Code", required = true) @QueryParam("code") String code) throws Exception {
-        LOG.debug("getMappedCoreConceptIdForSchemeCode");
+        try(MetricsTimer t = MetricsHelper.recordTime("Client.getMappedCoreConceptIdForSchemeCode")) {
+            LOG.debug("getMappedCoreConceptIdForSchemeCode");
 
-        Integer result = new IMClientJDBCDAL().getMappedCoreConceptIdForSchemeCode(scheme, code);
+            Integer result = new IMClientJDBCDAL().getMappedCoreConceptIdForSchemeCode(scheme, code);
 
-        return Response
-            .ok()
-            .entity(result)
-            .build();
+            return Response
+                .ok()
+                .entity(result)
+                .build();
+        }
     }
 
     @GET
@@ -64,14 +70,16 @@ public class ClientEndpoint {
     @ApiOperation(value = "Get code for given concept id", response = Integer.class)
     public Response getCodeForConceptId(@Context SecurityContext sc,
                                                         @ApiParam(value = "Concept DBID", required = true) @QueryParam("dbid") Integer dbid) throws Exception {
-        LOG.debug("getCodeForConceptId");
+        try(MetricsTimer t = MetricsHelper.recordTime("Client.getCodeForConceptId")) {
+            LOG.debug("getCodeForConceptId");
 
-        String result = new IMClientJDBCDAL().getCodeForConceptId(dbid);
+            String result = new IMClientJDBCDAL().getCodeForConceptId(dbid);
 
-        return Response
-            .ok()
-            .entity(result)
-            .build();
+            return Response
+                .ok()
+                .entity(result)
+                .build();
+        }
     }
 
     @GET
@@ -83,14 +91,16 @@ public class ClientEndpoint {
                                         @ApiParam(value = "Term type", required = true) @QueryParam("type") String type,
                                             @ApiParam(value = "Term", required = true) @QueryParam("term") String term,
                                             @ApiParam(value = "AutoCreate", required = false) @QueryParam("autoCreate") Boolean autoCreate) throws Exception {
-        LOG.debug("getConceptIdForTypeTerm");
+        try(MetricsTimer t = MetricsHelper.recordTime("Client.getConceptIdForTypeTerm")) {
+            LOG.debug("getConceptIdForTypeTerm");
 
-        Integer result = new IMClientJDBCDAL().getConceptIdForTypeTerm(type, term, autoCreate);
+            Integer result = new IMClientJDBCDAL().getConceptIdForTypeTerm(type, term, autoCreate);
 
-        return Response
-            .ok()
-            .entity(result)
-            .build();
+            return Response
+                .ok()
+                .entity(result)
+                .build();
+        }
     }
 
     @GET
@@ -101,13 +111,15 @@ public class ClientEndpoint {
     public Response getMappedCoreConceptIdForTypeTerm(@Context SecurityContext sc,
                                             @ApiParam(value = "Term type", required = true) @QueryParam("type") String type,
                                             @ApiParam(value = "Term", required = true) @QueryParam("term") String term) throws Exception {
-        LOG.debug("getMappedCoreConceptIdForTypeTerm");
+        try(MetricsTimer t = MetricsHelper.recordTime("Client.getMappedCoreConceptIdForTypeTerm")) {
+            LOG.debug("getMappedCoreConceptIdForTypeTerm");
 
-        Integer result = new IMClientJDBCDAL().getMappedCoreConceptIdForTypeTerm(type, term);
+            Integer result = new IMClientJDBCDAL().getMappedCoreConceptIdForTypeTerm(type, term);
 
-        return Response
-            .ok()
-            .entity(result)
-            .build();
+            return Response
+                .ok()
+                .entity(result)
+                .build();
+        }
     }
 }

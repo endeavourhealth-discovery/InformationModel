@@ -2,6 +2,8 @@ package org.endeavourhealth.im.api.protectedendpoints;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.endeavourhealth.common.utility.MetricsHelper;
+import org.endeavourhealth.common.utility.MetricsTimer;
 import org.endeavourhealth.im.dal.IMManagementJDBCDAL;
 import org.endeavourhealth.im.models.Document;
 import org.slf4j.Logger;
@@ -30,14 +32,16 @@ public class ManagementEndpoint {
     @Produces(MediaType.TEXT_PLAIN)
     @ApiOperation(value = "Get the current status of this instance", response = Integer.class)
     public Response getStatus(@Context SecurityContext sc) throws Exception {
-        LOG.debug("getStatus");
+        try(MetricsTimer t = MetricsHelper.recordTime("Management.getStatus")) {
+            LOG.debug("getStatus");
 
-        String result = new IMManagementJDBCDAL().getStatus();
+            String result = new IMManagementJDBCDAL().getStatus();
 
-        return Response
-            .ok()
-            .entity(result)
-            .build();
+            return Response
+                .ok()
+                .entity(result)
+                .build();
+        }
     }
 
     @GET
@@ -46,14 +50,16 @@ public class ManagementEndpoint {
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Get the current documents of this instance", response = Integer.class)
     public Response getDocuments(@Context SecurityContext sc) throws Exception {
-        LOG.debug("getDocuments");
+        try(MetricsTimer t = MetricsHelper.recordTime("Management.getDocuments")) {
+            LOG.debug("getDocuments");
 
-        List<Document> result = new IMManagementJDBCDAL().getDocuments();
+            List<Document> result = new IMManagementJDBCDAL().getDocuments();
 
-        return Response
-            .ok()
-            .entity(result)
-            .build();
+            return Response
+                .ok()
+                .entity(result)
+                .build();
+        }
     }
 
     @POST
@@ -62,16 +68,18 @@ public class ManagementEndpoint {
     @Produces(MediaType.TEXT_PLAIN)
     @ApiOperation(value = "Imports a document from master", response = Integer.class)
     public Response importDocument(@Context SecurityContext sc, byte[] documentData) throws Exception {
-        LOG.debug("importDocument");
+        try(MetricsTimer t = MetricsHelper.recordTime("Management.importDocument")) {
+            LOG.debug("importDocument");
 
-        String document = new String(decompress(documentData));
+            String document = new String(decompress(documentData));
 
-        String result = new IMManagementJDBCDAL().importDocument(document);
+            String result = new IMManagementJDBCDAL().importDocument(document);
 
-        return Response
-            .ok()
-            .entity(result)
-            .build();
+            return Response
+                .ok()
+                .entity(result)
+                .build();
+        }
     }
 
     @GET
@@ -81,15 +89,17 @@ public class ManagementEndpoint {
     @ApiOperation(value = "Imports a document from master", response = Integer.class)
     public Response getDocumentDrafts(@Context SecurityContext sc,
                                       @PathParam("part") String documentPath) throws Exception {
-        LOG.debug("getDrafts [" + documentPath + "]");
+        try(MetricsTimer t = MetricsHelper.recordTime("Management.getDocumentDrafts")) {
+            LOG.debug("getDrafts [" + documentPath + "]");
 
-        String json = new IMManagementJDBCDAL().getDocumentDrafts(documentPath);
-        byte[] result = compress(json.getBytes());
+            String json = new IMManagementJDBCDAL().getDocumentDrafts(documentPath);
+            byte[] result = compress(json.getBytes());
 
-        return Response
-            .ok()
-            .entity(result)
-            .build();
+            return Response
+                .ok()
+                .entity(result)
+                .build();
+        }
     }
 
     public static byte[] compress(byte[] data) throws IOException {

@@ -3,6 +3,8 @@ package org.endeavourhealth.im.api.endpoints;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.endeavourhealth.common.utility.MetricsHelper;
+import org.endeavourhealth.common.utility.MetricsTimer;
 import org.endeavourhealth.im.dal.CommonJDBCDAL;
 import org.endeavourhealth.im.models.KVP;
 import org.endeavourhealth.im.models.Related;
@@ -28,15 +30,16 @@ public class CommonEndpoint {
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Get list of known code schemes", response = Integer.class)
     public Response getCodeSchemes(@Context SecurityContext sc) throws Exception {
-        LOG.debug("getCodeScheme");
+        try(MetricsTimer t = MetricsHelper.recordTime("Common.getCodeSchemes")) {
+            LOG.debug("getCodeScheme");
 
-        List<KVP> result = new CommonJDBCDAL().getCodeSchemes();
+            List<KVP> result = new CommonJDBCDAL().getCodeSchemes();
 
-        return Response
-            .ok()
-            .entity(result)
-            .build();
-
+            return Response
+                .ok()
+                .entity(result)
+                .build();
+        }
     }
 
     @GET
@@ -49,15 +52,16 @@ public class CommonEndpoint {
                            @ApiParam(value = "Schemes") @QueryParam("scheme") List<Integer> schemes,
                            @ApiParam(value = "Page") @QueryParam("page") Integer page,
                            @ApiParam(value = "Page size") @QueryParam("pageSize") Integer pageSize) throws Exception {
-        LOG.debug("Search");
+        try(MetricsTimer t = MetricsHelper.recordTime("Common.search")) {
+            LOG.debug("Search");
 
-        SearchResult result = new CommonJDBCDAL().search(term, schemes, page, pageSize);
+            SearchResult result = new CommonJDBCDAL().search(term, schemes, page, pageSize);
 
-        return Response
-            .ok()
-            .entity(result)
-            .build();
-
+            return Response
+                .ok()
+                .entity(result)
+                .build();
+        }
     }
 
     @GET
@@ -68,15 +72,16 @@ public class CommonEndpoint {
     public Response getRelated(@Context SecurityContext sc,
                            @ApiParam(value = "Dbid") @PathParam("id") String id,
                            @ApiParam(value = "Relationships") @QueryParam("relationship") List<String> relationships) throws Exception {
-        LOG.debug("Search");
+        try(MetricsTimer t = MetricsHelper.recordTime("Common.getRelated")) {
+            LOG.debug("Search");
 
-        List<Related> result = new CommonJDBCDAL().getRelated(id, relationships);
+            List<Related> result = new CommonJDBCDAL().getRelated(id, relationships);
 
-        return Response
-            .ok()
-            .entity(result)
-            .build();
-
+            return Response
+                .ok()
+                .entity(result)
+                .build();
+        }
     }
 
     @GET
@@ -87,14 +92,15 @@ public class CommonEndpoint {
     public Response getReverseRelated(@Context SecurityContext sc,
                                @ApiParam(value = "Dbid") @PathParam("id") String id,
                                @ApiParam(value = "Relationships") @QueryParam("relationship") List<String> relationships) throws Exception {
-        LOG.debug("Search");
+        try(MetricsTimer t = MetricsHelper.recordTime("Common.getReverseRelated")) {
+            LOG.debug("Search");
 
-        List<Related> result = new CommonJDBCDAL().getReverseRelated(id, relationships);
+            List<Related> result = new CommonJDBCDAL().getReverseRelated(id, relationships);
 
-        return Response
-            .ok()
-            .entity(result)
-            .build();
-
+            return Response
+                .ok()
+                .entity(result)
+                .build();
+        }
     }
 }

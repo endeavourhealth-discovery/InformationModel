@@ -32,8 +32,8 @@ public class IMManagementJDBCDAL {
             "GROUP BY d.dbid";
 
         Connection conn = ConnectionPool.getInstance().pop();
-        try (PreparedStatement statement = conn.prepareStatement(sql)) {
-            ResultSet resultSet = statement.executeQuery();
+        try (PreparedStatement statement = conn.prepareStatement(sql);
+             ResultSet resultSet = statement.executeQuery()) {
 
             while (resultSet.next()) {
                 result.add(
@@ -170,20 +170,21 @@ public class IMManagementJDBCDAL {
                 if (!idMap.containsKey(conceptId)) {
                     // Not in the map, look in db
                     getDbid.setString(1, conceptId);
-                    ResultSet rs = getDbid.executeQuery();
-                    if (rs.next()) {
-                        idMap.put(conceptId, rs.getInt("dbid"));
-                    } else {
-                        addConcept.setInt(1, docDbid);
-                        addConcept.setString(2, conceptId);
+                    try (ResultSet rs = getDbid.executeQuery()) {
+                        if (rs.next()) {
+                            idMap.put(conceptId, rs.getInt("dbid"));
+                        } else {
+                            addConcept.setInt(1, docDbid);
+                            addConcept.setString(2, conceptId);
 
-                        DALHelper.setString(addConcept, 3, concept.get("name").asText());
-                        DALHelper.setString(addConcept, 4, concept.get("description").asText());
-                        DALHelper.setString(addConcept, 5, concept.get("code").asText());
-                        DALHelper.setString(addConcept, 6, concept.get("scheme").asText());
+                            DALHelper.setString(addConcept, 3, concept.get("name").asText());
+                            DALHelper.setString(addConcept, 4, concept.get("description").asText());
+                            DALHelper.setString(addConcept, 5, concept.get("code").asText());
+                            DALHelper.setString(addConcept, 6, concept.get("scheme").asText());
 
-                        addConcept.execute();
-                        idMap.put(conceptId, DALHelper.getGeneratedKey(addConcept));
+                            addConcept.execute();
+                            idMap.put(conceptId, DALHelper.getGeneratedKey(addConcept));
+                        }
                     }
                 }
 
@@ -314,11 +315,12 @@ public class IMManagementJDBCDAL {
     private Integer getDocumentDbid(Connection conn, String documentPath) throws SQLException {
         try (PreparedStatement stmt = conn.prepareStatement("SELECT dbid FROM document WHERE path = ?")) {
             stmt.setString(1, documentPath);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next())
-                return rs.getInt("dbid");
-            else
-                return null;
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next())
+                    return rs.getInt("dbid");
+                else
+                    return null;
+            }
         }
     }
     private void addTermMaps(Connection conn, ObjectNode root) throws SQLException {
@@ -329,8 +331,8 @@ public class IMManagementJDBCDAL {
             "JOIN concept tgt ON tgt.dbid = m.target\n" +
             "WHERE m.draft = TRUE";
 
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            ResultSet rs = stmt.executeQuery();
+        try (PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
                 ObjectNode term = terms.addObject();
                 term.put("term", rs.getString("term"));
@@ -361,17 +363,18 @@ public class IMManagementJDBCDAL {
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, dbid);
-            ResultSet rs = stmt.executeQuery();
+            try (ResultSet rs = stmt.executeQuery()) {
 
-            while (rs.next()) {
-                ObjectNode concept = concepts.addObject();
-                concept.put("id", rs.getString("id"));
-                if (rs.getString("name") != null) concept.put("name", rs.getString("name"));
-                if (rs.getString("description") != null) concept.put("description", rs.getString("description"));
-                if (rs.getString("code") != null) concept.put("code", rs.getString("code"));
-                if (rs.getString("code_scheme") != null) {
-                    ObjectNode scheme = concept.putObject("code_scheme");
-                    scheme.put("id", rs.getString("code_scheme"));
+                while (rs.next()) {
+                    ObjectNode concept = concepts.addObject();
+                    concept.put("id", rs.getString("id"));
+                    if (rs.getString("name") != null) concept.put("name", rs.getString("name"));
+                    if (rs.getString("description") != null) concept.put("description", rs.getString("description"));
+                    if (rs.getString("code") != null) concept.put("code", rs.getString("code"));
+                    if (rs.getString("code_scheme") != null) {
+                        ObjectNode scheme = concept.putObject("code_scheme");
+                        scheme.put("id", rs.getString("code_scheme"));
+                    }
                 }
             }
         }
@@ -386,13 +389,14 @@ public class IMManagementJDBCDAL {
 
         try (PreparedStatement statement = conn.prepareStatement("SELECT dbid FROM concept WHERE id = ?")) {
             statement.setString(1, id);
-            ResultSet rs = statement.executeQuery();
-            if (rs.next()) {
-                conceptDbid = rs.getInt("dbid");
-                idMap.put(id, conceptDbid);
-                return conceptDbid;
-            } else {
-                return null;
+            try (ResultSet rs = statement.executeQuery()) {
+                if (rs.next()) {
+                    conceptDbid = rs.getInt("dbid");
+                    idMap.put(id, conceptDbid);
+                    return conceptDbid;
+                } else {
+                    return null;
+                }
             }
         }
 

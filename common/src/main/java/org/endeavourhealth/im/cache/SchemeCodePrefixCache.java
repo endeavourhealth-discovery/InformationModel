@@ -45,10 +45,11 @@ public class SchemeCodePrefixCache implements ICache {
                 "AND p.id = 'code_prefix'";
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setString(1, scheme);
-                ResultSet rs = stmt.executeQuery();
-                if (rs.next()) {
-                    prefix = rs.getString(1);
-                    map.put(scheme, prefix);
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        prefix = rs.getString(1);
+                        map.put(scheme, prefix);
+                    }
                 }
             } finally {
                 ConnectionPool.getInstance().push(conn);

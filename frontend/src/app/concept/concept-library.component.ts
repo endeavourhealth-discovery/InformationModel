@@ -30,8 +30,8 @@ export class ConceptLibraryComponent implements OnInit {
   ngOnInit() {
   }
 
-  addConcept() {
-    ConceptSelectorComponent.open(this.modal)
+  addConcept(multiSelect: boolean) {
+    ConceptSelectorComponent.open(this.modal, null, multiSelect)
       .result.then(
       (result) => {
         this.log.success(result, result, 'IM concept selected')

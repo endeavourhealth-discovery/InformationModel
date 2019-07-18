@@ -20,8 +20,8 @@ public class CommonJDBCDAL {
             "JOIN concept cs ON cs.id = 'CodeScheme'\n" +
             "JOIN concept_property_object o ON c.dbid = o.dbid  AND o.property = st.dbid AND o.value = cs.dbid\n";
 
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            ResultSet rs = stmt.executeQuery();
+        try (PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
                 result.add(new KVP()
                     .setKey(rs.getInt("dbid"))
@@ -68,20 +68,21 @@ public class CommonJDBCDAL {
                 stmt.setInt(i++, offset);
                 stmt.setInt(i++, pageSize);
 
-                ResultSet rs = stmt.executeQuery();
-                while (rs.next()) {
-                    CodeableConcept concept = new CodeableConcept();
-                    concept
-                        .setScheme(rs.getString("scheme"))
-                        .setCode(rs.getString("code"))
-                        .setDbid(rs.getInt("dbid"))
-                        .setId(rs.getString("id"))
-                        .setName(rs.getString("name"));
-                    result.getResults().add(concept);
+                try (ResultSet rs = stmt.executeQuery()) {
+                    while (rs.next()) {
+                        CodeableConcept concept = new CodeableConcept();
+                        concept
+                            .setScheme(rs.getString("scheme"))
+                            .setCode(rs.getString("code"))
+                            .setDbid(rs.getInt("dbid"))
+                            .setId(rs.getString("id"))
+                            .setName(rs.getString("name"));
+                        result.getResults().add(concept);
+                    }
                 }
             }
-            try (PreparedStatement statement = conn.prepareStatement("SELECT FOUND_ROWS()")) {
-                ResultSet rs = statement.executeQuery();
+            try (PreparedStatement statement = conn.prepareStatement("SELECT FOUND_ROWS()");
+                 ResultSet rs = statement.executeQuery()) {
                 rs.next();
                 result.setCount(rs.getInt(1));
             }
@@ -110,31 +111,32 @@ public class CommonJDBCDAL {
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, id);
 
-            ResultSet rs = stmt.executeQuery();
+            try (ResultSet rs = stmt.executeQuery()) {
 
-            while(rs.next()) {
-                String relId = rs.getString("rel_id");
+                while (rs.next()) {
+                    String relId = rs.getString("rel_id");
 
-                if (relationships != null && !relationships.contains(relId))
-                    continue;
+                    if (relationships != null && !relationships.contains(relId))
+                        continue;
 
-                if (!relId.equals(lastRelId)) {
-                    lastRelId = relId;
+                    if (!relId.equals(lastRelId)) {
+                        lastRelId = relId;
 
-                    result.add(
-                        rel = new Related()
-                            .setId(relId)
-                            .setName(rs.getString("rel_name"))
-                    );
+                        result.add(
+                            rel = new Related()
+                                .setId(relId)
+                                .setName(rs.getString("rel_name"))
+                        );
+                    }
+
+                    CodeableConcept cc = new CodeableConcept();
+                    cc.setScheme(rs.getString("scheme"))
+                        .setCode(rs.getString("code"))
+                        .setId(rs.getString("id"))
+                        .setName(rs.getString("name"));
+
+                    rel.getConcepts().add(cc);
                 }
-
-                CodeableConcept cc = new CodeableConcept();
-                cc.setScheme(rs.getString("scheme"))
-                    .setCode(rs.getString("code"))
-                    .setId(rs.getString("id"))
-                    .setName(rs.getString("name"));
-
-                rel.getConcepts().add(cc);
             }
 
         } finally {
@@ -162,31 +164,32 @@ public class CommonJDBCDAL {
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, id);
 
-            ResultSet rs = stmt.executeQuery();
+            try (ResultSet rs = stmt.executeQuery()) {
 
-            while(rs.next()) {
-                String relId = rs.getString("rel_id");
+                while (rs.next()) {
+                    String relId = rs.getString("rel_id");
 
-                if (relationships != null && !relationships.contains(relId))
-                    continue;
+                    if (relationships != null && !relationships.contains(relId))
+                        continue;
 
-                if (!relId.equals(lastRelId)) {
-                    lastRelId = relId;
+                    if (!relId.equals(lastRelId)) {
+                        lastRelId = relId;
 
-                    result.add(
-                        rel = new Related()
-                            .setId(relId)
-                            .setName(rs.getString("rel_name"))
-                    );
+                        result.add(
+                            rel = new Related()
+                                .setId(relId)
+                                .setName(rs.getString("rel_name"))
+                        );
+                    }
+
+                    CodeableConcept cc = new CodeableConcept();
+                    cc.setScheme(rs.getString("scheme"))
+                        .setCode(rs.getString("code"))
+                        .setId(rs.getString("id"))
+                        .setName(rs.getString("name"));
+
+                    rel.getConcepts().add(cc);
                 }
-
-                CodeableConcept cc = new CodeableConcept();
-                cc.setScheme(rs.getString("scheme"))
-                    .setCode(rs.getString("code"))
-                    .setId(rs.getString("id"))
-                    .setName(rs.getString("name"));
-
-                rel.getConcepts().add(cc);
             }
 
         } finally {

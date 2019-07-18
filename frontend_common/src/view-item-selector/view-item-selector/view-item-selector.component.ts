@@ -1,7 +1,7 @@
 import {AfterViewInit, Component, ElementRef, ViewChild} from '@angular/core';
 import {NgbActiveModal, NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {LoggerService} from 'eds-angular4';
-import {ConceptSelectorService} from '../concept-selector.service';
+import {ViewItemSelectorService} from '../view-item-selector.service';
 import {KVP} from '../../models/KVP';
 import {CodeableConcept} from '../../models/CodeableConcept';
 import {ConceptSelection} from '../../models/ConceptSelection';
@@ -10,7 +10,7 @@ import {Related} from '../../models/Related';
 import {CodeSet} from '../../models/CodeSet';
 
 @Component({
-    selector: 'app-concept-selector',
+    selector: 'app-view-item-selector',
     template: `
       <div>
         <div class="modal-header">
@@ -168,7 +168,7 @@ import {CodeSet} from '../../models/CodeSet';
     `,
     providers: [LoggerService]
 })
-export class ConceptSelectorComponent implements AfterViewInit {
+export class ViewItemSelectorComponent implements AfterViewInit {
     @ViewChild('focus') focusField: ElementRef;
 
     multiSelect: boolean;
@@ -190,7 +190,7 @@ export class ConceptSelectorComponent implements AfterViewInit {
 
 
     public static open(modalService: NgbModal, selection: CodeSet = null, multiSelect: boolean = false): NgbModalRef {
-        const modalRef = modalService.open(ConceptSelectorComponent, {backdrop: 'static', size: 'lg'});
+        const modalRef = modalService.open(ViewItemSelectorComponent, {backdrop: 'static', size: 'lg'});
 
         modalRef.componentInstance.multiSelect = multiSelect;
 
@@ -203,7 +203,7 @@ export class ConceptSelectorComponent implements AfterViewInit {
         return modalRef;
     }
 
-    constructor(public activeModal: NgbActiveModal, private logger: LoggerService, private conceptService: ConceptSelectorService) {
+    constructor(public activeModal: NgbActiveModal, private logger: LoggerService, private conceptService: ViewItemSelectorService) {
     }
 
     ngAfterViewInit(): void {
