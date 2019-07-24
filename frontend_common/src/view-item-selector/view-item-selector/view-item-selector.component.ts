@@ -2,156 +2,45 @@ import {AfterViewInit, Component, ElementRef, ViewChild} from '@angular/core';
 import {NgbActiveModal, NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {LoggerService} from 'eds-angular4';
 import {ViewItemSelectorService} from '../view-item-selector.service';
-import {KVP} from '../../models/KVP';
-import {CodeableConcept} from '../../models/CodeableConcept';
-import {ConceptSelection} from '../../models/ConceptSelection';
-import {SearchResult} from '../../models/SearchResult';
-import {Related} from '../../models/Related';
-import {CodeSet} from '../../models/CodeSet';
+import {ITreeOptions, TreeComponent, IActionMapping} from 'angular-tree-component/dist/angular-tree-component';
 
 @Component({
     selector: 'app-view-item-selector',
     template: `
       <div>
         <div class="modal-header">
-          <h4 class="modal-title">Select concept</h4>
+          <h4 class="modal-title">Dataset editor</h4>
           <button type="button" class="close" (click)="cancel()" aria-hidden="true">&times;</button>
         </div>
         <div class="modal-body">
           <div class="container-fluid">
             <div class="row">
               <div class="form-group col-md-6">
-                <label class="control-label">Search criteria</label>
-                <div class="input-group" id="conceptSelectorSearch">
-                  <input class="form-control" type="text" [(ngModel)]="term" name="filter" #focus autofocus (keyup.enter)="search()">
-                  <div class="input-group-append">
-                    <button class="input-group-text" (click)="search()"><i class="fa fa-search"></i></button>
+<!--                <loadingIndicator [done]="viewTree">-->
+                  <label class="control-label">Model navigator</label>
+                  <div class="scroll-box-300 bordered-box">
+                    <tree-root #tree [nodes]="viewTree" [options]="treeOptions">
+                      <ng-template #treeNodeTemplate let-node>
+                        <span>{{node.data.name}}</span> <span *ngIf="node.data.object" class="badge badge-secondary">{{node.data.object}}</span>
+                      </ng-template>
+                    </tree-root>
                   </div>
-                </div>
+<!--                </loadingIndicator>-->
               </div>
               <div class="form-group col-md-6">
-                <label class="control-label">Code scheme(s)</label>
-                <multiSelectDropdown idField="key" nameField="value" [data]="codeSchemes" [(ngModel)]="selectedCodeSchemes" noneText="All"></multiSelectDropdown>
-              </div>
-            </div>
-            <div class="row">
-              <div class="form-group col-md-8">
-                <loadingIndicator [done]="searchResult">
-                  <label class="control-label">Search results</label>
-                  <div class="scroll-box-300">
-                    <table class="table table-striped table-hover table-sm">
-                      <thead>
-                        <tr class="d-flex">
-                          <th class="col-2">Scheme</th>
-                          <th class="col-2">Code</th>
-                          <th class="col-6">Name</th>
-                          <th class="col-2"></th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr class="d-flex show-child-on-hover" *ngFor="let item of searchResult?.results" (click)="highlightSearch(item)" [class.selection]="searchHighlight==item"
-                            [class.text-warning]="item.status == 2">
-                          <td class="col-2">{{item.scheme}}</td>
-                          <td class="col-2">{{item.code}}</td>
-                          <td class="col-6">{{item.name}}</td>
-                          <td class="col-2">
-                            <div class="pull-right child-to-show" *ngIf="multiSelect">
-                              <button class="btn btn-xs btn-success" (click)="include(item)">Inc</button>
-                              <button class="btn btn-xs btn-danger" (click)="exclude(item)">Exc</button>
-                            </div>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </loadingIndicator>
-              </div>
-              <div class="form-group col-md-4" *ngIf="parents || children || maps">
-                <label class="control-label">Details</label>
+                <label class="control-label">Selection</label>
                 <div class="scroll-box-300 bordered-box">
-                  <table class="w-100">
+                  <table class="table table-striped table-sm table-hover">
                     <tbody>
-                      <tr class="d-flex" *ngIf="parents && parents.length > 0">
-                        <th class="col-12">Parents</th>
-                      </tr>
-                      <ng-container *ngFor="let item of parents">
-                        <ng-container *ngFor="let value of item.concepts">
-                          <tr class="d-flex" (click)="viewRelated(value)">
-                            <td class="col-12">{{value.name}}</td>
-                          </tr>
-                        </ng-container>
-                      </ng-container>
-
-                      <tr class="d-flex" *ngIf="children && children.length > 0">
-                        <th class="col-12">Children</th>
-                      </tr>
-                      <ng-container *ngFor="let item of children">
-                        <ng-container *ngFor="let value of item.concepts">
-                          <tr class="d-flex" (click)="viewRelated(value)">
-                            <td class="col-12">{{value.name}}</td>
-                          </tr>
-                        </ng-container>
-                      </ng-container>
-
-                      <tr class="d-flex" *ngIf="maps && maps.length > 0">
-                        <th class="col-12">Maps</th>
-                      </tr>
-                      <ng-container *ngFor="let item of maps">
-                        <ng-container *ngFor="let value of item.concepts">
-                          <tr class="d-flex" (click)="viewRelated(value)">
-                            <td class="col-12">{{value.name}}</td>
-                          </tr>
-                        </ng-container>
-                      </ng-container>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-            <div class="row" *ngIf="multiSelect">
-              <div class="form-group col-md-6">
-                <label class="control-label">Inclusions</label>
-                <div class="scroll-box-250">
-                  <table class="table table-striped table-hover table-sm">
-                    <thead>
-                      <tr class="d-flex">
-                        <th class="col-2">Scheme</th>
-                        <th class="col-2">Code</th>
-                        <th class="col-6">Name</th>
-                        <th class="col-2">+ Children</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr class="d-flex show-child-on-hover" *ngFor="let item of inclusions" [class.selection]="selectionHighlight==item">
-                        <td class="col-2">{{item.scheme}}</td>
-                        <td class="col-2">{{item.code}}</td>
-                        <td class="col-6">{{item.name}}</td>
-                        <td class="col-1"><i [ngClass]="getChildClass(item)" (click)="item.single = !item.single"></i></td>
-                        <td class="col-1"><button class="btn btn-xs btn-danger child-to-show" (click)="removeItem(inclusions, item)"><i class="fa fa-fw fa-trash"></i> </button></td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-              <div class="form-group col-md-6">
-                <label class="control-label">Exclusions</label>
-                <div class="scroll-box-250">
-                  <table class="table table-striped table-hover table-sm">
-                    <thead>
-                      <tr class="d-flex">
-                        <th class="col-2">Scheme</th>
-                        <th class="col-2">Code</th>
-                        <th class="col-6">Name</th>
-                        <th class="col-2">+ Children</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr class="d-flex show-child-on-hover" *ngFor="let item of exclusions" [class.selection]="selectionHighlight==item">
-                        <td class="col-2">{{item.scheme}}</td>
-                        <td class="col-2">{{item.code}}</td>
-                        <td class="col-6">{{item.name}}</td>
-                        <td class="col-1"><i [ngClass]="getChildClass(item)" (click)="item.single = !item.single"></i></td>
-                        <td class="col-1"><button class="btn btn-xs btn-danger child-to-show" (click)="removeItem(exclusions, item)"><i class="fa fa-fw fa-trash"></i> </button></td>
+                      <tr class="d-flex show-child-on-hover" *ngFor="let item of selection; let i = index">
+                        <td class="col-10">{{item.parent.data.name}}.{{item.data.name}} <span *ngIf="item.data.object" class="badge badge-secondary">{{item.data.object}}</span></td>
+                        <td class="col-2">
+                          <div class="child-to-show pull-right">
+                              <button class="btn btn-xs btn-success" (click)="moveUp(selection, item)" [disabled]="i==0"><i class="fa fa-fw fa-arrow-up"></i></button>
+                              <button class="btn btn-xs btn-success" (click)="moveDown(selection, item)" [disabled]="i==(selection.length-1)"><i class="fa fa-fw fa-arrow-down"></i></button>
+                              <button class="btn btn-xs btn-danger" (click)="remove(selection, item)"><i class="fa fa-fw fa-trash"></i></button>
+                          </div>
+                        </td>
                       </tr>
                     </tbody>
                   </table>
@@ -170,143 +59,138 @@ import {CodeSet} from '../../models/CodeSet';
 })
 export class ViewItemSelectorComponent implements AfterViewInit {
     @ViewChild('focus') focusField: ElementRef;
+    @ViewChild('tree') tree: TreeComponent;
 
-    multiSelect: boolean;
+    viewId: string;
+    selection: any = [];
+    treeOptions: ITreeOptions;
 
-    codeSchemes: KVP[];
-    selectedCodeSchemes: number[];
-    term: string;
-
-    searchResult: SearchResult = {} as SearchResult;
-    parents: Related[];
-    children: Related[];
-    maps: Related[];
-
-    inclusions: ConceptSelection[] = [];
-    exclusions: ConceptSelection[] = [];
-
-    private searchHighlight: CodeableConcept;
-    private selectionHighlight: ConceptSelection;
-
-
-    public static open(modalService: NgbModal, selection: CodeSet = null, multiSelect: boolean = false): NgbModalRef {
+    viewTree: any = [];
+    public static open(modalService: NgbModal, viewId: string, selection: any[] = []): NgbModalRef {
         const modalRef = modalService.open(ViewItemSelectorComponent, {backdrop: 'static', size: 'lg'});
-
-        modalRef.componentInstance.multiSelect = multiSelect;
-
-        if (multiSelect && selection) {
-            if (selection.inclusions)
-                modalRef.componentInstance.inclusions = selection.inclusions;
-            if (selection.exclusions)
-                modalRef.componentInstance.exclusions = selection.exclusions;
-        }
+        modalRef.componentInstance.viewId = viewId;
+        modalRef.componentInstance.selection = selection;
         return modalRef;
     }
 
-    constructor(public activeModal: NgbActiveModal, private logger: LoggerService, private conceptService: ViewItemSelectorService) {
+    constructor(public activeModal: NgbActiveModal, private logger: LoggerService, private viewService: ViewItemSelectorService) {
+        this.treeOptions = {
+            displayField: 'name',
+            childrenField: 'child_node',
+            hasChildrenField: 'hasChildren',
+            idField: 'id',
+            isExpandedField: 'isExpanded',
+            actionMapping: {
+                mouse: {
+                    dblClick: (tree, node, $event) => this.select(node)
+                }
+            }
+        }
     }
 
     ngAfterViewInit(): void {
         if (this.focusField != null)
             this.focusField.nativeElement.focus();
 
-        this.getCodeSchemes();
+        this.loadView();
     }
 
-    getCodeSchemes() {
-        this.conceptService.getCodeSchemes()
-            .subscribe(
-                (result) => this.codeSchemes = result,
-                (error) => this.logger.error(error)
-            )
-    }
+    loadView() {
+        setTimeout(
+            () => this.viewTree = [{
+                "id" : "View.MedicalRecord",
+                "name": "Medical record",
+                "child_node": [
+                    {
+                        "id": "View.MedicalRecord.Demographics",
+                        "name": "Patient Demographics",
+                        "child_node": [
+                            {
+                                "id": "View.MedicalRecord.Patient",
+                                "name": "Patient",
+                                "child_node" : []
+                            },
+                            {
+                                "id": "View.MedicalRecord.Address",
+                                "name": "Address",
+                                "child_node" : []
+                            },
+                        ]
+                    },
+                    {
+                        "id": "View.MedicalRecord.Clinical",
+                        "name": "Clinical",
+                        child_node: [
+                            {
+                                "id": "View.MedicalRecord.Observation",
+                                "name": "Observation",
+                                "child_node": [
+                                    {
+                                        "id": "View.MedicalRecord.Observation.date",
+                                        "name": "Effective date",
+                                        "object": "Observation.date",
+                                    },
+                                    {
+                                        "id": "View.MedicalRecord.Observation.code",
+                                        "name": "Local code",
+                                        "object": "Observation.code",
+                                    }
+                                ]
+                            },
+                            {
+                                "id": "View.MedicalRecord.Medication",
+                                "name": "Medication",
+                                "child_node": []
+                            },
+                        ]
+                    }
+                ]
+            }]
+        );
 
-    search() {
-        this.searchResult = null;
-
-        this.conceptService.search(this.term, this.selectedCodeSchemes)
+/*
+        this.viewService.getView(this.viewId)
             .subscribe(
-                (result) => this.searchResult = result,
+                (result) => this.viewTree = result,
                 (error) => this.logger.error(error)
             );
+*/
+
+        this.tree.treeModel.update();
     }
 
-    highlightSearch(item: CodeableConcept) {
-        if (item != this.searchHighlight) {
-            this.searchHighlight = item;
-            this.getDetails(item);
+    select(item: any) {
+        // Only allow leaf nodes
+        if (item.data.object) {
+            this.selection.push(item);
         }
     }
 
-    getDetails(item: CodeableConcept) {
-        this.parents = [{concepts: [{name: 'Loading...'}]} as Related];
-        this.children = [{concepts: [{name: 'Loading...'}]} as Related];
-        this.maps = [{concepts: [{name: 'Loading...'}]} as Related];
-        this.conceptService.getForwardRelated(item.id, ['has_parent'])
-            .subscribe(
-                (result) => this.parents = result,
-                (error) => this.logger.error(error)
-            );
-        this.conceptService.getBackwardRelated(item.id, ['has_parent'])
-            .subscribe(
-                (result) => this.children = result,
-                (error) => this.logger.error(error)
-            );
-        this.conceptService.getForwardRelated(item.id, ['is_equivalent_to', 'is_related_to'])
-            .subscribe(
-                (result) => this.maps = result,
-                (error) => this.logger.error(error)
-            );
+    moveUp(list: any[], item: any) {
+        const i = list.indexOf(item);
+        if (i < 1)
+            return;
 
+        [list[i], list[i-1]] = [list[i-1], list[i]];
     }
 
-    viewRelated(item: CodeableConcept) {
-        this.searchResult.results = [item];
-        this.getDetails(item);
+    moveDown(list: any[], item: any) {
+        const i = list.indexOf(item);
+        if (i < 0 || i == list.length-1)
+            return;
+
+        [list[i], list[i+1]] = [list[i+1], list[i]];
     }
 
-    include(item: CodeableConcept) {
-        if (this.inclusions.findIndex(i => i.id === item.id) == -1) {
-            this.inclusions.push({
-                id: item.id,
-                name: item.name,
-                scheme: item.scheme,
-                code: item.code
-            } as ConceptSelection);
-        }
-    }
-
-    exclude(item: CodeableConcept) {
-        if (this.exclusions.findIndex(i => i.id === item.id) == -1) {
-            this.exclusions.push({
-                id: item.id,
-                name: item.name,
-                scheme: item.scheme,
-                code: item.code
-            } as ConceptSelection);
-        }
-    }
-
-    getChildClass(item: ConceptSelection) {
-        return item.single ? 'fa fa-fw fa-square-o' : 'fa fa-fw fa-check-square-o';
-    }
-
-    removeItem(list: any[], item: any) {
-        const index = list.indexOf(item, 0);
-        if (index > -1) {
-            list.splice(index, 1);
-        }
+    remove(list: any[], item: any) {
+        const i = list.indexOf(item);
+        if (i < 0)
+            return;
+        list.splice(i,1);
     }
 
     ok() {
-        if (this.multiSelect) {
-            this.activeModal.close({
-                inclusions: this.inclusions,
-                exclusions: this.exclusions
-            });
-        } else {
-            this.activeModal.close(this.searchHighlight);
-        }
+        this.activeModal.close(this.selection);
     }
 
     cancel() {

@@ -7,6 +7,7 @@ import {StatusHelper} from '../models/Status';
 import {SearchResult} from '../models/SearchResult';
 import {OntoSelectorComponent} from '../onto-selector/onto-selector/onto-selector.component';
 import {ConceptSelectorComponent} from 'im-common/dist/concept-selector/concept-selector/concept-selector.component';
+import {ViewItemSelectorComponent} from 'im-common/dist/view-item-selector/view-item-selector/view-item-selector.component';
 
 @Component({
   selector: 'app-concept-library',
@@ -36,6 +37,14 @@ export class ConceptLibraryComponent implements OnInit {
       (result) => {
         this.log.success(result, result, 'IM concept selected')
       }
+    )
+  }
+
+  pickViewItem() {
+    ViewItemSelectorComponent.open(this.modal, 'View.RecordModel', [])
+      .result.then(
+      (result) => this.log.success(result, result, 'View item selected'),
+      (error) => this.log.error(error)
     )
   }
 

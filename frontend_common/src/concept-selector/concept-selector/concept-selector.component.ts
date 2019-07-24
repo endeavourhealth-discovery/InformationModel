@@ -122,7 +122,7 @@ import {CodeSet} from '../../models/CodeSet';
                       </tr>
                     </thead>
                     <tbody>
-                      <tr class="d-flex show-child-on-hover" *ngFor="let item of inclusions" [class.selection]="selectionHighlight==item">
+                      <tr class="d-flex show-child-on-hover" *ngFor="let item of inclusions">
                         <td class="col-2">{{item.scheme}}</td>
                         <td class="col-2">{{item.code}}</td>
                         <td class="col-6">{{item.name}}</td>

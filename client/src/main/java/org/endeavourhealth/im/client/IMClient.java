@@ -129,6 +129,7 @@ public class IMClient {
 
         }
 
+
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target(imUrl).path(path);
 
