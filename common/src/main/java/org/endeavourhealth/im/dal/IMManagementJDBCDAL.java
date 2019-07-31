@@ -153,9 +153,9 @@ public class IMManagementJDBCDAL {
     private void getOrCreateConceptDbids(Connection conn, int docDbid, ArrayNode concepts) throws SQLException {
         // Prepare statements in advance for performance
         String conceptSql = "INSERT INTO concept (document, id, name, description, code, scheme)\n" +
-            "SELECT ?, ?, ?, ?, ?, c.dbid\n" +
-            "FROM concept c\n" +
-            "WHERE c.id = ?";
+            "SELECT d.*, c.dbid as scheme\n" +
+            "FROM (SELECT ? as document, ? as id, ? as name, ? as description, ? as code) AS d\n" +
+            "LEFT OUTER JOIN concept c ON c.id = ?";
 
         try (PreparedStatement getDbid = conn.prepareStatement("SELECT dbid FROM concept WHERE id = ?");
              PreparedStatement addConcept = conn.prepareStatement(conceptSql, Statement.RETURN_GENERATED_KEYS)) {
@@ -177,10 +177,10 @@ public class IMManagementJDBCDAL {
                             addConcept.setInt(1, docDbid);
                             addConcept.setString(2, conceptId);
 
-                            DALHelper.setString(addConcept, 3, concept.get("name").asText());
-                            DALHelper.setString(addConcept, 4, concept.get("description").asText());
-                            DALHelper.setString(addConcept, 5, concept.get("code").asText());
-                            DALHelper.setString(addConcept, 6, concept.get("scheme").asText());
+                            DALHelper.setString(addConcept, 3, getJsonAsText(concept, "name"));
+                            DALHelper.setString(addConcept, 4, getJsonAsText(concept, "description"));
+                            DALHelper.setString(addConcept, 5, getJsonAsText(concept, "code"));
+                            DALHelper.setString(addConcept, 6, getJsonAsText(concept, "scheme"));
 
                             addConcept.execute();
                             idMap.put(conceptId, DALHelper.getGeneratedKey(addConcept));
@@ -378,6 +378,11 @@ public class IMManagementJDBCDAL {
                 }
             }
         }
+    }
+
+    private String getJsonAsText(JsonNode node, String fieldName) {
+        JsonNode field = node.get(fieldName);
+        return (field == null) ? null : field.asText();
     }
 
     // ********** TO DO - REMOVE **********

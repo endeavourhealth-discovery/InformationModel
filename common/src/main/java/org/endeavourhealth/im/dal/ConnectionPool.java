@@ -3,6 +3,7 @@ package org.endeavourhealth.im.dal;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.endeavourhealth.common.cache.GenericCache;
 import org.endeavourhealth.common.config.ConfigManager;
+import org.endeavourhealth.common.utility.MetricsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,5 +69,18 @@ public class ConnectionPool extends GenericCache<Connection> {
             LOG.error("Error getting connection", e);
         }
         return null;
+    }
+
+    @Override
+    public Connection pop() {
+        Connection conn = super.pop();
+        MetricsHelper.recordValue("ConnectionPool", this.getSize());
+        return conn;
+    }
+
+    @Override
+    public void push(Connection conn) {
+        super.push(conn);
+        MetricsHelper.recordValue("ConnectionPool", this.getSize());
     }
 }
