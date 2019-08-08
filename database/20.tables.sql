@@ -61,18 +61,16 @@ CREATE TABLE concept_property_info (
     INDEX concept_property_info_property_value (property, value)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS concept_tct;
-CREATE TABLE concept_tct (
-    dbid INT AUTO_INCREMENT,
-    parent INT NOT NULL,
-    property INT NOT NULL,
-    level INT NOT NULL,
-    child INT NOT NULL,
+    DROP TABLE IF EXISTS concept_tct;
+    CREATE TABLE concept_tct (
+        parent INT NOT NULL,
+        property INT NOT NULL,
+        level INT NOT NULL,
+        child INT NOT NULL,
 
-    PRIMARY KEY concept_tct_pk (dbid),
-    KEY concept_tct_parent_property_idx (parent, property),
-    KEY concept_tct_property_child_idx (property, child)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+        KEY concept_tct_parent_property_idx (parent, property),
+        KEY concept_tct_property_child_idx (property, child)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS concept_term_map;
 CREATE TABLE concept_term_map (
@@ -90,40 +88,48 @@ DROP PROCEDURE IF EXISTS proc_build_tct//
 -- EXAMPLE - Subtype hierarchy...
 -- CALL proc_build_tct("is_subtype_of");
 
-CREATE PROCEDURE proc_build_tct(property VARCHAR(150))
+CREATE PROCEDURE `proc_build_tct`(property_id VARCHAR(150))
 BEGIN
     SELECT @lvl := 0;
 
-    SELECT @property_id := id
+    SELECT @property_dbid := dbid
     FROM concept
-    WHERE id = property;
+    WHERE id = property_id;
 
     DELETE FROM concept_tct
-    WHERE property = @property_id;
+    WHERE property = @property_dbid;
 
+    -- Insert root level (parent == null)
     INSERT INTO concept_tct
-    (parent, property, level, child)
-    SELECT p.dbid, property, @lvl, p.value
-    FROM concept_property_object p
-    WHERE p.property = @property_id;
+    (source, property, target, level)
+    SELECT o.dbid, @property_dbid, o.value, @lvl
+    FROM concept_property_object o
+             LEFT JOIN concept_property_object p ON p.dbid = o.value AND p.property = @property_dbid
+    WHERE o.property = @property_dbid
+      AND p.value IS NULL;
 
     SELECT @inserted := ROW_COUNT();
 
     WHILE @inserted > 0 DO
-        SELECT @lvl := @lvl + 1;
-        SELECT 'Processing level ' + @lvl;
+    SELECT @lvl := @lvl + 1;
+    SELECT 'Processing level ' + @lvl;
 
-        INSERT INTO concept_tct
-        (parent, property, level, child)
-        SELECT s.parent, @property_id, @lvl AS level, t.child
-        FROM concept_tct s
-        JOIN concept_tct t on t.parent = s.child
-        WHERE s.property = @property_id
-        AND   t.property = @property_id
-        AND   t.level = 0
-        AND   s.level = @lvl - 1;
+    INSERT IGNORE INTO concept_tct
+    (source, property, target, level)
+    SELECT o.dbid, @property_dbid, o.value, @lvl as level
+    FROM concept_tct p
+             JOIN concept_property_object o ON o.value = p.source AND o.property = @property_dbid
+    WHERE p.property = @property_dbid
+      AND p.level = @lvl - 1
+    UNION
+    SELECT DISTINCT o.dbid, @property_dbid, a.target, a.level
+    FROM concept_tct p
+             JOIN concept_property_object o ON o.value = p.source AND o.property = @property_dbid
+             JOIN concept_tct a ON a.source = o.value AND a.property = @property_dbid
+    WHERE p.property = @property_dbid
+      AND p.level = @lvl - 1;
 
-        SELECT @inserted := ROW_COUNT();
+    SELECT @inserted := ROW_COUNT();
     END WHILE;
 END; //
 
