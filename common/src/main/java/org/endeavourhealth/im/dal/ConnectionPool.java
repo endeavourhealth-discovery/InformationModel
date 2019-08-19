@@ -16,6 +16,7 @@ public class ConnectionPool extends GenericCache<Connection> {
     private static final Logger LOG = LoggerFactory.getLogger(ConnectionPool.class);
     private static final int VALID_TIMEOUT = 5;
     private static ConnectionPool instance = null;
+    private static int connections = 0;
 
     public static ConnectionPool getInstance() {
         if (instance == null)
@@ -27,7 +28,7 @@ public class ConnectionPool extends GenericCache<Connection> {
     @Override
     protected boolean isValid(Connection connection) {
         try {
-            if (connection == null || connection.isClosed())
+            if (connection == null)
                 return false;
 
             if (connection.isValid(VALID_TIMEOUT)) {
@@ -35,7 +36,12 @@ public class ConnectionPool extends GenericCache<Connection> {
                 return true;
             }
 
-            connection.close();
+            connections--;
+            updateMetrics();
+
+            if (!connection.isClosed())
+                connection.close();
+
             return false;
         } catch (SQLException e) {
             LOG.error("Error validating/cleaning up connection", e);
@@ -64,6 +70,8 @@ public class ConnectionPool extends GenericCache<Connection> {
 
             LOG.debug("New DB Connection created");
 
+            connections++;
+            updateMetrics();
             return connection;
         } catch (Exception e) {
             LOG.error("Error getting connection", e);
@@ -74,13 +82,18 @@ public class ConnectionPool extends GenericCache<Connection> {
     @Override
     public Connection pop() {
         Connection conn = super.pop();
-        MetricsHelper.recordValue("ConnectionPool", this.getSize());
+        updateMetrics();
         return conn;
     }
 
     @Override
     public void push(Connection conn) {
         super.push(conn);
-        MetricsHelper.recordValue("ConnectionPool", this.getSize());
+        updateMetrics();
+    }
+
+    private void updateMetrics() {
+        MetricsHelper.recordValue("ConnectionPool.Total", connections);
+        MetricsHelper.recordValue("ConnectionPool.Pool", this.getSize());
     }
 }

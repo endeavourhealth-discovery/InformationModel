@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS concept (
     name VARCHAR(255)                           COMMENT '',
     description VARCHAR(400)                    COMMENT '',
     scheme VARCHAR(50)                          COMMENT '',
-    code VARCHAR(20)                            COMMENT '',
+    code VARCHAR(20) COLLATE utf8_bin           COMMENT '',
 
     draft BOOLEAN NOT NULL DEFAULT FALSE        COMMENT '',
     use_count BIGINT NOT NULL DEFAULT 0         COMMENT '',
