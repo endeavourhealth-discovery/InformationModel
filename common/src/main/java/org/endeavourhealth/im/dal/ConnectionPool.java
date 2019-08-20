@@ -16,7 +16,6 @@ public class ConnectionPool extends GenericCache<Connection> {
     private static final Logger LOG = LoggerFactory.getLogger(ConnectionPool.class);
     private static final int VALID_TIMEOUT = 5;
     private static ConnectionPool instance = null;
-    private static int connections = 0;
 
     public static ConnectionPool getInstance() {
         if (instance == null)
@@ -36,8 +35,7 @@ public class ConnectionPool extends GenericCache<Connection> {
                 return true;
             }
 
-            connections--;
-            updateMetrics();
+            MetricsHelper.recordCounter("ConnectionPool.Total").dec();
 
             if (!connection.isClosed())
                 connection.close();
@@ -70,8 +68,7 @@ public class ConnectionPool extends GenericCache<Connection> {
 
             LOG.debug("New DB Connection created");
 
-            connections++;
-            updateMetrics();
+            MetricsHelper.recordCounter("ConnectionPool.Total").inc();
             return connection;
         } catch (Exception e) {
             LOG.error("Error getting connection", e);
@@ -82,18 +79,13 @@ public class ConnectionPool extends GenericCache<Connection> {
     @Override
     public Connection pop() {
         Connection conn = super.pop();
-        updateMetrics();
+        MetricsHelper.recordCounter("ConnectionPool.Available").dec();
         return conn;
     }
 
     @Override
     public void push(Connection conn) {
         super.push(conn);
-        updateMetrics();
-    }
-
-    private void updateMetrics() {
-        MetricsHelper.recordValue("ConnectionPool.Total", connections);
-        MetricsHelper.recordValue("ConnectionPool.Pool", this.getSize());
+        MetricsHelper.recordCounter("ConnectionPool.Available").inc();
     }
 }
