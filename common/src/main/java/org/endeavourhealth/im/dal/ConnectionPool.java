@@ -35,7 +35,7 @@ public class ConnectionPool extends GenericCache<Connection> {
                 return true;
             }
 
-            MetricsHelper.recordCounter("ConnectionPool.Total").dec();
+            MetricsHelper.recordCounter("ConnectionPool.Size").dec();
 
             if (!connection.isClosed())
                 connection.close();
@@ -68,7 +68,7 @@ public class ConnectionPool extends GenericCache<Connection> {
 
             LOG.debug("New DB Connection created");
 
-            MetricsHelper.recordCounter("ConnectionPool.Total").inc();
+            MetricsHelper.recordCounter("ConnectionPool.Size").inc();
             return connection;
         } catch (Exception e) {
             LOG.error("Error getting connection", e);
@@ -79,13 +79,13 @@ public class ConnectionPool extends GenericCache<Connection> {
     @Override
     public Connection pop() {
         Connection conn = super.pop();
-        MetricsHelper.recordCounter("ConnectionPool.Available").dec();
+        MetricsHelper.recordCounter("ConnectionPool.InUse").inc();
         return conn;
     }
 
     @Override
     public void push(Connection conn) {
         super.push(conn);
-        MetricsHelper.recordCounter("ConnectionPool.Available").inc();
+        MetricsHelper.recordCounter("ConnectionPool.InUse").dec();
     }
 }
