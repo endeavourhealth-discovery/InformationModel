@@ -218,6 +218,22 @@ CREATE TABLE data_set
     PRIMARY KEY data_set_pk (dbid),
     UNIQUE INDEX data_set_id (id)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8;
+
+DROP TABLE IF EXISTS state_definition;
+CREATE TABLE state_definition
+(
+    dbid        INT AUTO_INCREMENT      COMMENT 'State definition DBID',
+    data        JSON NOT NULL           COMMENT 'State defintion JSON',
+
+    -- Exposed (know) JSON properties
+    id VARCHAR(140) COLLATE utf8_bin    GENERATED ALWAYS AS (`data` ->> '$.id') STORED NOT NULL,
+    name VARCHAR(255)                   GENERATED ALWAYS AS (`data` ->> '$.name') VIRTUAL,
+
+    PRIMARY KEY state_definition_pk (dbid),
+    UNIQUE INDEX state_definition_id (id)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8;
+
 -- --------------------------------------------------------------------------------------------------------------
 
 DROP TABLE IF EXISTS concept_term_map;
