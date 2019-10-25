@@ -6,6 +6,7 @@ import org.endeavourhealth.common.config.ConfigManager;
 import org.endeavourhealth.common.security.keycloak.client.KeycloakClient;
 import org.endeavourhealth.common.utility.MetricsHelper;
 import org.endeavourhealth.common.utility.MetricsTimer;
+import org.glassfish.jersey.uri.UriComponent;
 
 
 import javax.ws.rs.client.Client;
@@ -135,9 +136,13 @@ public class IMClient {
 
         if (params != null && !params.isEmpty()) {
             for (Map.Entry<String, String> entry: params.entrySet()) {
-                target = target.queryParam(entry.getKey(), entry.getValue());
+                if (entry.getValue() != null) {
+                    String encoded = UriComponent.encode(entry.getValue(), UriComponent.Type.QUERY_PARAM_SPACE_ENCODED);
+                    target = target.queryParam(entry.getKey(), encoded);
+                }
             }
         }
+
 
         return target
             .request()

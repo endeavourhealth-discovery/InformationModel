@@ -18,21 +18,21 @@ public class ReadOnlyTests {
     public void getConceptIdForSchemeCode_SNOMED() throws Exception {
         Integer dbid = IMClient.getConceptIdForSchemeCode("SNOMED", "195967001");
         assertNotNull(dbid);
-        assertEquals(16507, dbid.intValue());
+        assertEquals(123732, dbid.intValue());
     }
 
     @Test
     public void getConceptIdForSchemeCode_Known() throws Exception {
         Integer dbid = IMClient.getConceptIdForSchemeCode("READ2", "H33..");
         assertNotNull(dbid);
-        assertEquals(844436, dbid.intValue());
+        assertEquals(1098404, dbid.intValue());
     }
 
     @Test
     public void getConceptIdForSchemeCode_FHIR() throws Exception {
         Integer dbid = IMClient.getConceptIdForSchemeCode("FHIR_AS", "noshow");
         assertNotNull(dbid);
-        assertEquals(1210928, dbid.intValue());
+        assertEquals(1335326, dbid.intValue());
     }
 
     @Test
@@ -64,14 +64,14 @@ public class ReadOnlyTests {
 
     @Test
     public void getCodeForConceptId_SNOMED() throws Exception {
-        String code = IMClient.getCodeForConceptId(16452);
+        String code = IMClient.getCodeForConceptId(123732);
         assertNotNull(code);
-        assertEquals("195811008", code);
+        assertEquals("195967001", code);
     }
 
     @Test
     public void getCodeForConceptId_READ() throws Exception {
-        String code = IMClient.getCodeForConceptId(844436);
+        String code = IMClient.getCodeForConceptId(1098404);
         assertNotNull(code);
         assertEquals("H33..", code);
     }
@@ -80,13 +80,20 @@ public class ReadOnlyTests {
     public void getConceptIdForTypeTerm_Known() throws Exception {
         Integer dbid = IMClient.getConceptIdForTypeTerm("DCE_type_of_encounter", "practice nurse clinic");
         assertNotNull(dbid);
-        assertEquals(1473373, dbid.intValue());
+        assertEquals(1335073, dbid.intValue());
+    }
+
+    @Test
+    public void getConceptIdForTypeTerm_KnownSpecialChars() throws Exception {
+        Integer dbid = IMClient.getConceptIdForTypeTerm("DCE_type_of_encounter", "test {fail} 50%");
+        assertNotNull(dbid);
+        assertEquals(1335073, dbid.intValue());
     }
 
     @Test
     public void getMappedCoreConceptIdForTypeTerm_Known() throws Exception {
         Integer dbid = IMClient.getMappedCoreConceptIdForTypeTerm("DCE_type_of_encounter", "practice nurse clinic");
         assertNotNull(dbid);
-        assertEquals(1473373, dbid.intValue());
+        assertEquals(1335073, dbid.intValue());
     }
 }
