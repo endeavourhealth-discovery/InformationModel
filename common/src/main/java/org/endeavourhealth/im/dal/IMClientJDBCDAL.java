@@ -9,7 +9,7 @@ public class IMClientJDBCDAL {
     private static SchemeCodePrefixCache schemeCodePrefixMap = new SchemeCodePrefixCache();
 
     public Integer getConceptIdForSchemeCode(String context, String scheme, String code, Boolean autoCreate, String term) throws SQLException {
-        Integer conceptId = null;
+        Integer dbid = null;
 
         if (autoCreate && term == null)
             throw new IllegalArgumentException("Term must be supplied if AutoCreate is TRUE");
@@ -29,23 +29,20 @@ public class IMClientJDBCDAL {
 
                 try (ResultSet resultSet = statement.executeQuery()) {
                     if (resultSet.next())
-                        conceptId = resultSet.getInt(1);
+                        dbid = resultSet.getInt(1);
                 }
             }
 
-            if (conceptId != null) {
+            if (dbid != null) {
                 // Found one so increment use count
-                try (PreparedStatement cnt = conn.prepareStatement("UPDATE concept SET use_count = use_count + 1 WHERE dbid = ?")) {
-                    cnt.setInt(1, conceptId);
-                    cnt.execute();
-                }
+                incUseCount(conn, dbid);
             } else if (autoCreate) {
                 // None found, so create a new draft
-                conceptId = createDraftCodeableConcept(conn, scheme, code, term);
+                dbid = createDraftCodeableConcept(conn, scheme, code, term);
             }
 
             conn.commit();
-            return conceptId;
+            return dbid;
         } catch (Exception e) {
             conn.rollback();
             throw e;
@@ -53,6 +50,18 @@ public class IMClientJDBCDAL {
             ConnectionPool.getInstance().push(conn);
         }
     }
+
+    private void incUseCount(Connection conn, Integer dbid) throws SQLException {
+        if (dbid == null)
+            return;
+
+        try (PreparedStatement cnt = conn.prepareStatement("UPDATE concept SET use_count = use_count + 1 WHERE dbid = ?")) {
+            cnt.setInt(1, dbid);
+            cnt.execute();
+        }
+
+    }
+
     private int createDraftCodeableConcept(Connection conn, String scheme, String code, String term) throws SQLException {
         int schemeDbid;
         int docDbid;
@@ -147,7 +156,7 @@ public class IMClientJDBCDAL {
     }
 
     public Integer getConceptIdForTypeTerm(String type, String term, Boolean autoCreate) throws SQLException {
-        Integer conceptId = null;
+        Integer dbid = null;
         String sql = "SELECT m.target \n" +
             "FROM concept c\n" +
             "JOIN concept_term_map m ON m.type = c.dbid\n" +
@@ -161,14 +170,16 @@ public class IMClientJDBCDAL {
             statement.setString(2, term);
 
             try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next())
-                    conceptId = resultSet.getInt("target");
+                if (resultSet.next()) {
+                    dbid = resultSet.getInt("target");
+                    incUseCount(conn, dbid);
+                }
                 else if (autoCreate)
-                    conceptId = createTypeTermConcept(conn, type, term);
+                    dbid = createTypeTermConcept(conn, type, term);
             }
 
             conn.commit();
-            return conceptId;
+            return dbid;
         } catch (Exception e) {
             conn.rollback();
             throw e;
