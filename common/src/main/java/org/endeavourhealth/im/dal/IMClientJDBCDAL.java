@@ -236,7 +236,7 @@ public class IMClientJDBCDAL {
         String sql = "SELECT p.value\n" +
             "FROM concept t\n" +
             "JOIN concept_term_map m ON m.type = t.dbid and m.term = ?\n" +
-            "JOIN concept_property_object p ON p.dbid = t.dbid\n" +
+            "JOIN concept_property_object p ON p.dbid = m.target\n" +
             "JOIN concept e ON e.dbid = p.property AND e.id = 'is_equivalent_to'\n" +
             "WHERE t.id = ?";
         Connection conn = ConnectionPool.getInstance().pop();
