@@ -79,13 +79,19 @@ public class ConnectionPool extends GenericCache<Connection> {
     @Override
     public Connection pop() {
         Connection conn = super.pop();
-        MetricsHelper.recordCounter("ConnectionPool.InUse").inc();
+
+        if (conn != null)
+            MetricsHelper.recordCounter("ConnectionPool.InUse").inc();
+
         return conn;
     }
 
     @Override
-    public void push(Connection conn) {
-        super.push(conn);
+    public boolean push(Connection conn) {
+        if (!super.push(conn))
+            return false;
+
         MetricsHelper.recordCounter("ConnectionPool.InUse").dec();
+        return true;
     }
 }
