@@ -229,19 +229,20 @@ public class IMClientJDBCDAL {
     }
 
     public Integer getMappedCoreConceptIdForTypeTerm(String type, String term) throws SQLException {
-        String sql = "SELECT m.target \n" +
-            "FROM concept c\n" +
-            "JOIN concept_term_map m ON m.type = c.dbid\n" +
-            "WHERE c.id = ? \n" +
-            "AND m.term = ?";
+        String sql = "SELECT p.value\n" +
+            "FROM concept t\n" +
+            "JOIN concept_term_map m ON m.type = t.dbid and m.term = ?\n" +
+            "JOIN concept_property_object p ON p.dbid = t.dbid\n" +
+            "JOIN concept e ON e.dbid = p.property AND e.id = 'is_equivalent_to'\n" +
+            "WHERE t.id = ?";
         Connection conn = ConnectionPool.getInstance().pop();
         try (PreparedStatement statement = conn.prepareStatement(sql)) {
-            statement.setString(1, type);
-            statement.setString(2, term);
+            statement.setString(1, term);
+            statement.setString(2, type);
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next())
-                    return resultSet.getInt("target");
+                    return resultSet.getInt("value");
                 else
                     return null;
             }
