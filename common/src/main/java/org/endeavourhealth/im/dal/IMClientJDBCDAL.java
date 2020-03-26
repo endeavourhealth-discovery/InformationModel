@@ -3,11 +3,13 @@ package org.endeavourhealth.im.dal;
 import org.endeavourhealth.im.cache.SchemeCodePrefixCache;
 
 import java.sql.*;
+import java.util.UUID;
 
 public class IMClientJDBCDAL {
     private static SchemeCodePrefixCache schemeCodePrefixMap = new SchemeCodePrefixCache();
 
-    public Integer getConceptIdForSchemeCode(String context, String scheme, String code, Boolean autoCreate, String term) throws SQLException {
+    // By Concept Dbid
+    public Integer getConceptDbidForSchemeCode(String context, String scheme, String code, Boolean autoCreate, String term) throws SQLException {
         Integer dbid = null;
 
         if (autoCreate && term == null)
@@ -70,7 +72,7 @@ public class IMClientJDBCDAL {
         int schemeDbid;
         int docDbid;
         String prefix;
-        int conceptId;
+        int conceptDbid;
 
         String sql = "SELECT c.dbid, c.document, d.value\n" +
             "FROM concept c\n" +
@@ -100,20 +102,20 @@ public class IMClientJDBCDAL {
             DALHelper.setInt(stmt, 6, schemeDbid);
 
             stmt.execute();
-            conceptId = DALHelper.getGeneratedKey(stmt);
+            conceptDbid = DALHelper.getGeneratedKey(stmt);
         }
 
         try (PreparedStatement stmt = conn.prepareStatement("UPDATE document SET draft = TRUE WHERE dbid = ?")) {
             stmt.setInt(1, docDbid);
             stmt.execute();
         }
-        return conceptId;
+        return conceptDbid;
     }
 
-    public Integer getMappedCoreConceptIdForSchemeCode(String scheme, String code) throws SQLException {
+    public Integer getMappedCoreConceptDbidForSchemeCode(String scheme, String code) throws SQLException {
         // SNOMED codes ARE core so dont have/need maps
         if ("SNOMED".equals(scheme))
-            return this.getConceptIdForSchemeCode(null, scheme, code, false, null);
+            return this.getConceptDbidForSchemeCode(null, scheme, code, false, null);
 
         String sql = "SELECT map.value\n" +
             "FROM concept c\n" +
@@ -139,7 +141,7 @@ public class IMClientJDBCDAL {
         }
     }
 
-    public String getCodeForConceptId(Integer dbid) throws SQLException {
+    public String getCodeForConceptDbid(Integer dbid) throws SQLException {
         Connection conn = ConnectionPool.getInstance().pop();
 
         String sql = "SELECT c.code\n" +
@@ -160,7 +162,7 @@ public class IMClientJDBCDAL {
         }
     }
 
-    public Integer getConceptIdForTypeTerm(String type, String term, Boolean autoCreate) throws SQLException {
+    public Integer getConceptDbidForTypeTerm(String type, String term, Boolean autoCreate) throws SQLException {
         Integer dbid = null;
         String sql = "SELECT m.target \n" +
             "FROM concept c\n" +
@@ -232,7 +234,7 @@ public class IMClientJDBCDAL {
         return mapDbid;
     }
 
-    public Integer getMappedCoreConceptIdForTypeTerm(String type, String term) throws SQLException {
+    public Integer getMappedCoreConceptDbidForTypeTerm(String type, String term) throws SQLException {
         String sql = "SELECT p.value\n" +
             "FROM concept t\n" +
             "JOIN concept_term_map m ON m.type = t.dbid and m.term = ?\n" +
@@ -253,5 +255,109 @@ public class IMClientJDBCDAL {
         } finally {
             ConnectionPool.getInstance().push(conn);
         }
+    }
+
+
+    // By Code
+    public String getMappedCoreCodeForSchemeCode(String scheme, String code) throws SQLException {
+        String sql = "SELECT c.code\n" +
+            "FROM concept l\n" +
+            "JOIN concept s ON s.dbid = l.scheme\n" +
+            "JOIN concept_property_object o ON o.dbid = l.dbid\n" +
+            "JOIN concept p ON p.dbid = o.property AND p.id = 'is_equivalent_to'\n" +
+            "JOIN concept c ON c.dbid = o.value\n" +
+            "WHERE l.code = ?\n" +
+            "AND s.id = ?";
+
+        Connection conn = ConnectionPool.getInstance().pop();
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, code);
+            stmt.setString(2, scheme);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next())
+                    return rs.getString("code");
+                else
+                    return null;
+            }
+        } finally {
+            ConnectionPool.getInstance().push(conn);
+        }
+    }
+
+    public String getCodeForTypeTerm(String scheme, String context, String term, boolean autoCreate) throws SQLException {
+        String sql = "SELECT t.code\n" +
+            "FROM concept c\n" +
+            "JOIN concept s ON s.dbid = c.scheme AND s.id = ?\n" +
+            "JOIN concept_term_map m on m.type = c.dbid\n" +
+            "JOIN concept t ON t.dbid = m.target\n" +
+            "WHERE c.code = ?\n" +
+            "AND m.term = ?";
+
+        Connection conn = ConnectionPool.getInstance().pop();
+        conn.setAutoCommit(false);
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            String result = null;
+            stmt.setString(1, scheme);
+            stmt.setString(2, context);
+            stmt.setString(3, term);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next())
+                    result = rs.getString("code");
+                else {
+                    if (autoCreate)
+                        result = createTermTypeConceptAndMap(conn, scheme, context, term);
+                }
+            }
+            conn.commit();
+            return result;
+        } catch (Exception e) {
+            conn.rollback();
+            throw e;
+        } finally {
+            ConnectionPool.getInstance().push(conn);
+        }
+    }
+
+    private String createTermTypeConceptAndMap(Connection conn, String scheme, String context, String term) throws SQLException {
+        String code = UUID.randomUUID().toString();
+        String id = schemeCodePrefixMap.get(scheme) + code;
+
+        String sql = "INSERT INTO concept\n" +
+            "(document, id, draft, name, scheme, code)\n" +
+            "SELECT s.document, ?, 1, ?, s.dbid, ?\n" +
+            "FROM concept s\n" +
+            "WHERE s.id = ?";
+
+        int dbid;
+        try (PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            stmt.setString(1, id);
+            stmt.setString(2, term);
+            stmt.setString(3, code);
+            stmt.setString(4, scheme);
+
+            if (stmt.executeUpdate() == 0)
+                throw new IllegalStateException("Unable to create draft term type concept!");
+
+            dbid = DALHelper.getGeneratedKey(stmt);
+        }
+
+        sql = "INSERT INTO concept_term_map\n" +
+            "(term, type, target, draft)\n" +
+            "SELECT ?, t.dbid, ?, 1\n" +
+            "FROM concept t\n" +
+            "JOIN concept s ON s.dbid = t.scheme AND s.id = ?\n" +
+            "WHERE t.code = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, term);
+            stmt.setInt(2, dbid);
+            stmt.setString(3, scheme);
+            stmt.setString(4, context);
+
+            if (stmt.executeUpdate() == 0)
+                throw new IllegalStateException("Unable to create draft term type map!");
+        }
+
+        return code;
     }
 }
