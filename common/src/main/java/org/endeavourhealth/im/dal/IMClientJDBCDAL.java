@@ -25,13 +25,8 @@ public class IMClientJDBCDAL {
         conn.setAutoCommit(false);
         try {
             // Check for existing
-            String sql = "SELECT c.dbid\n" +
-                "FROM concept c\n" +
-                "JOIN concept s ON s.dbid = c.scheme AND s.id = ?\n" +
-                "WHERE c.code = ?";
-            try (PreparedStatement statement = conn.prepareStatement(sql)) {
-                statement.setString(1, scheme);
-                statement.setString(2, code);
+            try (PreparedStatement statement = conn.prepareStatement("SELECT c.dbid FROM concept c WHERE id = ?")) {
+                statement.setString(1, prefix + code);
 
                 try (ResultSet resultSet = statement.executeQuery()) {
                     if (resultSet.next())
