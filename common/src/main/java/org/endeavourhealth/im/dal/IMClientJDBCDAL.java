@@ -2,12 +2,14 @@ package org.endeavourhealth.im.dal;
 
 import org.endeavourhealth.im.cache.SchemeCodePrefixCache;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.*;
-import java.util.UUID;
+import java.util.Base64;
 
 public class IMClientJDBCDAL {
     private static SchemeCodePrefixCache schemeCodePrefixMap = new SchemeCodePrefixCache();
-
     // By Concept Dbid
     public Integer getConceptDbidForSchemeCode(String context, String scheme, String code, Boolean autoCreate, String term) throws SQLException {
         Integer dbid = null;
@@ -279,7 +281,7 @@ public class IMClientJDBCDAL {
         }
     }
 
-    public String getCodeForTypeTerm(String scheme, String context, String term, boolean autoCreate) throws SQLException {
+    public String getCodeForTypeTerm(String scheme, String context, String term, boolean autoCreate) throws SQLException, NoSuchAlgorithmException {
         String sql = "SELECT t.code\n" +
             "FROM concept c\n" +
             "JOIN concept s ON s.dbid = c.scheme AND s.id = ?\n" +
@@ -314,8 +316,14 @@ public class IMClientJDBCDAL {
         }
     }
 
-    private String createTermTypeConceptAndMap(Connection conn, String scheme, String context, String term) throws SQLException {
-        String code = UUID.randomUUID().toString();
+    private String createTermTypeConceptAndMap(Connection conn, String scheme, String context, String term) throws SQLException, NoSuchAlgorithmException {
+        // Generate 17 character encoding of 100-bit hash
+        // SQL version: SELECT LEFT(TO_BASE64(UNHEX(SHA2("SARS-CoV-2 RNA DETECTED", 256))), 17);
+
+        MessageDigest md = MessageDigest.getInstance("SHA-256");
+        byte[] digest = md.digest(term.getBytes(StandardCharsets.UTF_8));
+        String code = Base64.getEncoder().encodeToString(digest).substring(0, 17);
+
         String id = schemeCodePrefixMap.get(scheme) + code;
 
         String sql = "INSERT INTO concept\n" +

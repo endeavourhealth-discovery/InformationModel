@@ -31,6 +31,6 @@ public class V1ReadOnlyTests {
     public void getCodeForTypeTerm() throws Exception {
         String code = IMClient.getCodeForTypeTerm("BartsCerner", "687309281", "SARS-CoV-2 RNA DETECTED");
         assertNotNull(code);
-        assertEquals("7f472a28-7374-4f49-bcd1-7fafcbb1be4c", code);
+        assertEquals("Fr1gvtFQJAIPqpoHK", code);
     }
 }
