@@ -26,10 +26,15 @@ public class IMClient {
 
     // V1 / Code
     public static String getMappedCoreCodeForSchemeCode(String scheme, String code) throws Exception {
+        return getMappedCoreCodeForSchemeCode(scheme, code, false);
+    }
+
+    public static String getMappedCoreCodeForSchemeCode(String scheme, String code, boolean snomedOnly) throws Exception {
         try (MetricsTimer timer =MetricsHelper.recordTime("IMClient.getMappedCoreCodeForSchemeCode")) {
             Map<String, String> params = new HashMap<>();
             params.put("scheme", scheme);
             params.put("code", code);
+            params.put("snomedOnly", ((Boolean)snomedOnly).toString());
 
             Response response = get(base + "/Concept/Core/Code", params);
 

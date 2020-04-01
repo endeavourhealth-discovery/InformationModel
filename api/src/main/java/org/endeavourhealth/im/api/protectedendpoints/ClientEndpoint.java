@@ -27,12 +27,16 @@ public class ClientEndpoint {
     @Produces(MediaType.TEXT_PLAIN)
     @ApiOperation(value = "Get core code for given scheme and code", response = Integer.class)
     public Response getMappedCoreCodeForSchemeCode(@Context SecurityContext sc,
-                                                          @ApiParam(value = "Scheme", required = true) @QueryParam("scheme") String scheme,
-                                                          @ApiParam(value = "Code", required = true) @QueryParam("code") String code) throws Exception {
+                                                   @ApiParam(value = "Scheme", required = true) @QueryParam("scheme") String scheme,
+                                                   @ApiParam(value = "Code", required = true) @QueryParam("code") String code,
+                                                   @ApiParam(value = "SnomedOnly", required = false) @QueryParam("snomedOnly") Boolean snomedOnly) throws Exception {
         try (MetricsTimer t = MetricsHelper.recordTime("Client.getMappedCoreCodeForSchemeCode")) {
             LOG.debug("getMappedCoreCodeForSchemeCode");
 
-            String result = new IMClientJDBCDAL().getMappedCoreCodeForSchemeCode(scheme, code);
+            if (snomedOnly == null)
+                snomedOnly = false;
+
+            String result = new IMClientJDBCDAL().getMappedCoreCodeForSchemeCode(scheme, code, snomedOnly);
 
             return Response
                 .ok()
@@ -47,10 +51,10 @@ public class ClientEndpoint {
     @Produces(MediaType.TEXT_PLAIN)
     @ApiOperation(value = "Get code for given scheme, context and term", response = Integer.class)
     public Response getCodeForTypeTerm(@Context SecurityContext sc,
-                                              @ApiParam(value = "Scheme", required = true) @QueryParam("scheme") String scheme,
-                                              @ApiParam(value = "Context", required = true) @QueryParam("context") String context,
-                                              @ApiParam(value = "Term", required = true) @QueryParam("term") String term,
-                                              @ApiParam(value = "AutoCreate", required = false) @QueryParam("autoCreate") boolean autoCreate) throws Exception {
+                                       @ApiParam(value = "Scheme", required = true) @QueryParam("scheme") String scheme,
+                                       @ApiParam(value = "Context", required = true) @QueryParam("context") String context,
+                                       @ApiParam(value = "Term", required = true) @QueryParam("term") String term,
+                                       @ApiParam(value = "AutoCreate", required = false) @QueryParam("autoCreate") boolean autoCreate) throws Exception {
         try (MetricsTimer t = MetricsHelper.recordTime("Client.getCodeForTypeTerm")) {
             LOG.debug("getCodeForTypeTerm");
 

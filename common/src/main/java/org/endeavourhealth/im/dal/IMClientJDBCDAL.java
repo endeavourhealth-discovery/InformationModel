@@ -256,14 +256,18 @@ public class IMClientJDBCDAL {
 
 
     // By Code
-    public String getMappedCoreCodeForSchemeCode(String scheme, String code) throws SQLException {
+    public String getMappedCoreCodeForSchemeCode(String scheme, String code, boolean snomedOnly) throws SQLException {
         String sql = "SELECT c.code\n" +
             "FROM concept l\n" +
             "JOIN concept s ON s.dbid = l.scheme\n" +
             "JOIN concept_property_object o ON o.dbid = l.dbid\n" +
             "JOIN concept p ON p.dbid = o.property AND p.id = 'is_equivalent_to'\n" +
-            "JOIN concept c ON c.dbid = o.value\n" +
-            "WHERE l.code = ?\n" +
+            "JOIN concept c ON c.dbid = o.value\n";
+
+        if (snomedOnly)
+            sql += "JOIN concept so ON so.dbid = c.scheme AND so.id = 'SNOMED'\n";
+
+        sql += "WHERE l.code = ?\n" +
             "AND s.id = ?";
 
         Connection conn = ConnectionPool.getInstance().pop();

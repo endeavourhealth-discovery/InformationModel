@@ -15,17 +15,43 @@ public class V1ReadOnlyTests {
     }
 
     @Test
-    public void getMappedCoreCodeForSchemeCode_Unknown() throws Exception {
+    public void getMappedCoreCodeForSchemeCode_Known() throws Exception {
         String code = IMClient.getMappedCoreCodeForSchemeCode("BartsCerner", "687309281");
         assertNotNull(code);
         assertEquals("1240511000000106", code);
     }
 
     @Test
-    public void getMappedCoreCodeForSchemeCode_Known() throws Exception {
+    public void getMappedCoreCodeForSchemeCode_Unknown() throws Exception {
         String code = IMClient.getMappedCoreCodeForSchemeCode("BartsCerner", "UNKNOWN");
         assertNull(code);
     }
+
+    @Test
+    public void getMappedCoreCodeForSchemeCode_NotSnomed() throws Exception {
+        String code = IMClient.getMappedCoreCodeForSchemeCode("BartsCerner", "163127655");
+        assertEquals("DS_BC_1503405", code);
+    }
+
+    @Test
+    public void getMappedCoreCodeForSchemeCode_IsSnomed() throws Exception {
+        String code = IMClient.getMappedCoreCodeForSchemeCode("READ2", "SLF01");
+        assertEquals("276008", code);
+    }
+
+
+    @Test
+    public void getMappedCoreCodeForSchemeCode_SnomedOnly_NotSnomed() throws Exception {
+        String code = IMClient.getMappedCoreCodeForSchemeCode("BartsCerner", "163127655", true);
+        assertNull(code);
+    }
+
+    @Test
+    public void getMappedCoreCodeForSchemeCode_SnomedOnly_IsSnomed() throws Exception {
+        String code = IMClient.getMappedCoreCodeForSchemeCode("READ2", "SLF01", true);
+        assertEquals("276008", code);
+    }
+
 
     @Test
     public void getCodeForTypeTerm() throws Exception {
