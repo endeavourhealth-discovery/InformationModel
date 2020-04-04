@@ -1,19 +1,10 @@
 package org.endeavourhealth.im.models;
 
 public class Concept {
-    private int dbid;
     private String id;
     private String name;
+    private String description;
     private Short status;
-
-    public int getDbid() {
-        return dbid;
-    }
-
-    public Concept setDbid(int dbid) {
-        this.dbid = dbid;
-        return this;
-    }
 
     public String getId() {
         return id;
@@ -30,6 +21,15 @@ public class Concept {
 
     public Concept setName(String name) {
         this.name = name;
+        return this;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public Concept setDescription(String description) {
+        this.description = description;
         return this;
     }
 

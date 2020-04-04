@@ -1,8 +1,6 @@
 package org.endeavourhealth.im.client;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import io.swagger.annotations.ApiParam;
-import org.bouncycastle.jcajce.provider.asymmetric.ec.KeyFactorySpi;
 import org.endeavourhealth.common.cache.ObjectMapperPool;
 import org.endeavourhealth.common.config.ConfigManager;
 import org.endeavourhealth.common.security.keycloak.client.KeycloakClient;

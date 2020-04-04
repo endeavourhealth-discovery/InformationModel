@@ -42,7 +42,7 @@ public class CommonJDBCDAL {
         if (pageSize == null) pageSize = 15;
         int offset = (page-1) * pageSize;
 
-        String sql = "SELECT SQL_CALC_FOUND_ROWS c.dbid, c.id, c.name, s.id as scheme, c.code\n" +
+        String sql = "SELECT SQL_CALC_FOUND_ROWS c.id, c.name, s.id as scheme, c.code\n" +
             "FROM concept c\n" +
             "JOIN concept s ON s.dbid = c.scheme\n" +
             "WHERE (c.name LIKE ? OR c.code LIKE ?)\n";
@@ -74,7 +74,6 @@ public class CommonJDBCDAL {
                         concept
                             .setScheme(rs.getString("scheme"))
                             .setCode(rs.getString("code"))
-                            .setDbid(rs.getInt("dbid"))
                             .setId(rs.getString("id"))
                             .setName(rs.getString("name"));
                         result.getResults().add(concept);

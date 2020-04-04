@@ -1,0 +1,9 @@
+div#home-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100vh;                        /*  changed  */
+  border: 16px solid transparent;
+  box-sizing: border-box;               /*  added, to avoid scroll and make
+                                              border size be included in set height  */
+}

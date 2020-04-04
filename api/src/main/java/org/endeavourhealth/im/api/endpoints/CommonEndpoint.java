@@ -1,8 +1,5 @@
 package org.endeavourhealth.im.api.endpoints;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import org.endeavourhealth.common.utility.MetricsHelper;
 import org.endeavourhealth.common.utility.MetricsTimer;
 import org.endeavourhealth.im.dal.CommonJDBCDAL;
@@ -20,7 +17,6 @@ import javax.ws.rs.core.SecurityContext;
 import java.util.List;
 
 @Path("/Common")
-@Api(tags = {"Common"})
 public class CommonEndpoint {
     private static final Logger LOG = LoggerFactory.getLogger(CommonEndpoint.class);
 
@@ -28,7 +24,6 @@ public class CommonEndpoint {
     @Path("/CodeScheme")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Get list of known code schemes", response = Integer.class)
     public Response getCodeSchemes(@Context SecurityContext sc) throws Exception {
         try(MetricsTimer t = MetricsHelper.recordTime("Common.getCodeSchemes")) {
             LOG.debug("getCodeScheme");
@@ -46,12 +41,11 @@ public class CommonEndpoint {
     @Path("/Concept/Search")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Search concepts with option scheme restriction", response = Integer.class)
     public Response search(@Context SecurityContext sc,
-                           @ApiParam(value = "Term", required = true) @QueryParam("term") String term,
-                           @ApiParam(value = "Schemes") @QueryParam("scheme") List<Integer> schemes,
-                           @ApiParam(value = "Page") @QueryParam("page") Integer page,
-                           @ApiParam(value = "Page size") @QueryParam("pageSize") Integer pageSize) throws Exception {
+                           @QueryParam("term") String term,
+                           @QueryParam("scheme") List<Integer> schemes,
+                           @QueryParam("page") Integer page,
+                           @QueryParam("pageSize") Integer pageSize) throws Exception {
         try(MetricsTimer t = MetricsHelper.recordTime("Common.search")) {
             LOG.debug("Search");
 
@@ -68,10 +62,9 @@ public class CommonEndpoint {
     @Path("/Concept/{id}/Related")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Get concepts this one relates to", response = Integer.class)
     public Response getRelated(@Context SecurityContext sc,
-                           @ApiParam(value = "Dbid") @PathParam("id") String id,
-                           @ApiParam(value = "Relationships") @QueryParam("relationship") List<String> relationships) throws Exception {
+                           @PathParam("id") String id,
+                           @QueryParam("relationship") List<String> relationships) throws Exception {
         try(MetricsTimer t = MetricsHelper.recordTime("Common.getRelated")) {
             LOG.debug("Search");
 
@@ -88,10 +81,9 @@ public class CommonEndpoint {
     @Path("/Concept/{id}/Related/Reverse")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Get concepts related to this one", response = Integer.class)
     public Response getReverseRelated(@Context SecurityContext sc,
-                               @ApiParam(value = "Dbid") @PathParam("id") String id,
-                               @ApiParam(value = "Relationships") @QueryParam("relationship") List<String> relationships) throws Exception {
+                               @PathParam("id") String id,
+                               @QueryParam("relationship") List<String> relationships) throws Exception {
         try(MetricsTimer t = MetricsHelper.recordTime("Common.getReverseRelated")) {
             LOG.debug("Search");
 

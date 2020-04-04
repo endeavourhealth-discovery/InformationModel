@@ -1,0 +1,97 @@
+<div id="home-content">
+    <mat-card>
+      <mat-card-header>
+        <div mat-card-avatar>
+          <i class="fad fa-sitemap"></i>
+        </div>
+        <mat-card-title>Record model</mat-card-title>
+        <mat-card-subtitle>Clinical record model viewer & navigator</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content style="height: calc(100vh - 141px)">
+        <as-split direction="horizontal">
+          <as-split-area size="30">
+            <as-split direction="vertical" unit="pixel">
+              <as-split-area [size]="searchSize" minSize="64" style="overflow: hidden">
+                <mat-form-field appearance="outline" fxFlex="98">
+                  <mat-label>Search terms</mat-label>
+                  <input matInput [(ngModel)]="searchTerm" placeholder="<Enter> to search" (keyup.enter)="search()">
+                  <mat-icon matSuffix (click)="clear()" style="cursor: pointer">clear</mat-icon>
+                </mat-form-field>
+              </as-split-area>
+              <as-split-area>
+                <mat-tree [dataSource]="dataSource" [treeControl]="treeControl" class="tree-compact scroll">
+                  <mat-tree-node
+                    *matTreeNodeDef="let node"
+                    matTreeNodePadding
+                    matTreeNodePaddingIndent="15"
+                    class="hover-highlight"
+                    [class.selected]="selectedNode == node"
+                    (click)="selectNode(node)"
+                    style="cursor: pointer">
+                  <button mat-icon-button disabled></button>
+                    {{node.name}}
+                  </mat-tree-node>
+                  <mat-tree-node
+                    *matTreeNodeDef="let node; when: hasChild"
+                    matTreeNodePadding
+                    matTreeNodePaddingIndent="15"
+                    class="hover-highlight" [class.selected]="selectedNode == node"
+                    (click)="selectNode(node)"
+                    style="cursor: pointer">
+                    <button mat-icon-button
+                            [attr.aria-label]="'toggle ' + node.filename" matTreeNodeToggle>
+                      <mat-icon class="mat-icon-rtl-mirror">
+                        {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+                      </mat-icon>
+                    </button>
+                    {{node.name}}
+                    <mat-progress-bar *ngIf="node.isLoading"
+                                      mode="indeterminate"
+                                      class="example-tree-progress-bar"></mat-progress-bar>
+                  </mat-tree-node>
+                </mat-tree>
+              </as-split-area>
+            </as-split>
+          </as-split-area>
+          <as-split-area size="70">
+            <as-split direction="vertical" unit="pixel">
+              <as-split-area size="144" minSize="144" maxSize="144" style="overflow: hidden">
+                <div class="flex" fxLayout="row wrap" fxLayoutGap="16px grid" fxLayoutAlign="start">
+                  <mat-form-field appearance="outline" fxFlex="70">
+                    <mat-label>Name</mat-label>
+                    <input matInput [value]="concept?.name" placeholder="Concept name" readonly>
+                  </mat-form-field>
+                  <mat-form-field appearance="outline" fxFlex="30">
+                    <mat-label>Id</mat-label>
+                    <input matInput [value]="concept?.id" placeholder="Concept ID" readonly>
+                  </mat-form-field>
+                  <mat-form-field appearance="outline" fxFlex="100">
+                    <mat-label>Description</mat-label>
+                    <input matInput [value]="concept?.description" placeholder="Concept description" readonly>
+                  </mat-form-field>
+                </div>
+              </as-split-area>
+              <as-split-area>
+                <div fxFlex="100" *ngIf="definition">
+                  <table class="mat-table mat-table-compact mat-elevation-z8" fxFlex="100">
+                  <thead>
+                    <tr class="mat-row">
+                      <th class="mat-cell">Property</th>
+                      <th class="mat-cell">Value</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let p of definition" class="mat-row">
+                      <td class="mat-cell">{{p.relationship.name}}</td>
+                      <td class="mat-cell">{{p.concept.name}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                </div>
+              </as-split-area>
+            </as-split>
+          </as-split-area>
+        </as-split>
+      </mat-card-content>
+    </mat-card>
+</div>

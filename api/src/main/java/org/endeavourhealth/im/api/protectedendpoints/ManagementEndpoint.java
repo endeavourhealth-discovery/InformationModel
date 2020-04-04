@@ -1,7 +1,5 @@
 package org.endeavourhealth.im.api.protectedendpoints;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import org.endeavourhealth.common.utility.MetricsHelper;
 import org.endeavourhealth.common.utility.MetricsTimer;
 import org.endeavourhealth.im.dal.IMManagementJDBCDAL;
@@ -22,7 +20,6 @@ import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 
 @Path("/")
-@Api(tags = {"Management"})
 public class ManagementEndpoint {
     private static final Logger LOG = LoggerFactory.getLogger(ManagementEndpoint.class);
 
@@ -30,7 +27,6 @@ public class ManagementEndpoint {
     @Path("/status")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.TEXT_PLAIN)
-    @ApiOperation(value = "Get the current status of this instance", response = Integer.class)
     public Response getStatus(@Context SecurityContext sc) throws Exception {
         try(MetricsTimer t = MetricsHelper.recordTime("Management.getStatus")) {
             LOG.debug("getStatus");
@@ -48,7 +44,6 @@ public class ManagementEndpoint {
     @Path("/documents")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Get the current documents of this instance", response = Integer.class)
     public Response getDocuments(@Context SecurityContext sc) throws Exception {
         try(MetricsTimer t = MetricsHelper.recordTime("Management.getDocuments")) {
             LOG.debug("getDocuments");
@@ -66,7 +61,6 @@ public class ManagementEndpoint {
     @Path("/documents")
     @Consumes(MediaType.APPLICATION_OCTET_STREAM)
     @Produces(MediaType.TEXT_PLAIN)
-    @ApiOperation(value = "Imports a document from master", response = Integer.class)
     public Response importDocument(@Context SecurityContext sc, byte[] documentData) throws Exception {
         try(MetricsTimer t = MetricsHelper.recordTime("Management.importDocument")) {
             LOG.debug("importDocument");
@@ -86,7 +80,6 @@ public class ManagementEndpoint {
     @Path("/documents/{part: .*}/drafts")
     @Consumes(MediaType.APPLICATION_OCTET_STREAM)
     @Produces(MediaType.TEXT_PLAIN)
-    @ApiOperation(value = "Imports a document from master", response = Integer.class)
     public Response getDocumentDrafts(@Context SecurityContext sc,
                                       @PathParam("part") String documentPath) throws Exception {
         try(MetricsTimer t = MetricsHelper.recordTime("Management.getDocumentDrafts")) {

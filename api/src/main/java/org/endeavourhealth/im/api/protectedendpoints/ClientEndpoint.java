@@ -1,8 +1,5 @@
 package org.endeavourhealth.im.api.protectedendpoints;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import org.endeavourhealth.common.utility.MetricsHelper;
 import org.endeavourhealth.common.utility.MetricsTimer;
 import org.endeavourhealth.im.dal.IMClientJDBCDAL;
@@ -16,7 +13,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
 @Path("/")
-@Api(tags = {"Client"})
 public class ClientEndpoint {
     private static final Logger LOG = LoggerFactory.getLogger(ClientEndpoint.class);
 
@@ -25,11 +21,10 @@ public class ClientEndpoint {
     @Path("/Concept/Core/Code")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.TEXT_PLAIN)
-    @ApiOperation(value = "Get core code for given scheme and code", response = Integer.class)
     public Response getMappedCoreCodeForSchemeCode(@Context SecurityContext sc,
-                                                   @ApiParam(value = "Scheme", required = true) @QueryParam("scheme") String scheme,
-                                                   @ApiParam(value = "Code", required = true) @QueryParam("code") String code,
-                                                   @ApiParam(value = "SnomedOnly", required = false) @QueryParam("snomedOnly") Boolean snomedOnly) throws Exception {
+                                                   @QueryParam("scheme") String scheme,
+                                                   @QueryParam("code") String code,
+                                                   @QueryParam("snomedOnly") Boolean snomedOnly) throws Exception {
         try (MetricsTimer t = MetricsHelper.recordTime("Client.getMappedCoreCodeForSchemeCode")) {
             LOG.debug("getMappedCoreCodeForSchemeCode");
 
@@ -49,12 +44,11 @@ public class ClientEndpoint {
     @Path("/Term/Code")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.TEXT_PLAIN)
-    @ApiOperation(value = "Get code for given scheme, context and term", response = Integer.class)
     public Response getCodeForTypeTerm(@Context SecurityContext sc,
-                                       @ApiParam(value = "Scheme", required = true) @QueryParam("scheme") String scheme,
-                                       @ApiParam(value = "Context", required = true) @QueryParam("context") String context,
-                                       @ApiParam(value = "Term", required = true) @QueryParam("term") String term,
-                                       @ApiParam(value = "AutoCreate", required = false) @QueryParam("autoCreate") boolean autoCreate) throws Exception {
+                                       @QueryParam("scheme") String scheme,
+                                       @QueryParam("context") String context,
+                                       @QueryParam("term") String term,
+                                       @QueryParam("autoCreate") boolean autoCreate) throws Exception {
         try (MetricsTimer t = MetricsHelper.recordTime("Client.getCodeForTypeTerm")) {
             LOG.debug("getCodeForTypeTerm");
 
@@ -72,13 +66,12 @@ public class ClientEndpoint {
     @Path("/Concept")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.TEXT_PLAIN)
-    @ApiOperation(value = "Get concept dbid for given scheme and code", response = Integer.class)
     public Response getConceptDbidForSchemeCode(@Context SecurityContext sc,
-                                                @ApiParam(value = "Context", required = false) @QueryParam("context") String context,
-                                                @ApiParam(value = "Scheme", required = true) @QueryParam("scheme") String scheme,
-                                                @ApiParam(value = "Code", required = true) @QueryParam("code") String code,
-                                                @ApiParam(value = "AutoCreate", required = false) @QueryParam("autoCreate") boolean autoCreate,
-                                                @ApiParam(value = "Term", required = false) @QueryParam("term") String term) throws Exception {
+                                                @QueryParam("context") String context,
+                                                @QueryParam("scheme") String scheme,
+                                                @QueryParam("code") String code,
+                                                @QueryParam("autoCreate") boolean autoCreate,
+                                                @QueryParam("term") String term) throws Exception {
         try (MetricsTimer t = MetricsHelper.recordTime("Client.getConceptDbidForSchemeCode")) {
             LOG.debug("getConceptDbidForSchemeCode");
 
@@ -95,10 +88,9 @@ public class ClientEndpoint {
     @Path("/Concept/Core")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.TEXT_PLAIN)
-    @ApiOperation(value = "Get core concept dbid for given scheme and code", response = Integer.class)
     public Response getMappedCoreConceptDbidForSchemeCode(@Context SecurityContext sc,
-                                                          @ApiParam(value = "Scheme", required = true) @QueryParam("scheme") String scheme,
-                                                          @ApiParam(value = "Code", required = true) @QueryParam("code") String code) throws Exception {
+                                                          @QueryParam("scheme") String scheme,
+                                                          @QueryParam("code") String code) throws Exception {
         try (MetricsTimer t = MetricsHelper.recordTime("Client.getMappedCoreConceptDbidForSchemeCode")) {
             LOG.debug("getMappedCoreConceptDbidForSchemeCode");
 
@@ -115,9 +107,8 @@ public class ClientEndpoint {
     @Path("/Concept/Code")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.TEXT_PLAIN)
-    @ApiOperation(value = "Get code for given concept dbid", response = Integer.class)
     public Response getCodeForConceptDbid(@Context SecurityContext sc,
-                                          @ApiParam(value = "Concept DBID", required = true) @QueryParam("dbid") Integer dbid) throws Exception {
+                                          @QueryParam("dbid") Integer dbid) throws Exception {
         try (MetricsTimer t = MetricsHelper.recordTime("Client.getCodeForConceptDbid")) {
             LOG.debug("getCodeForConceptDbid");
 
@@ -134,11 +125,10 @@ public class ClientEndpoint {
     @Path("/Term")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.TEXT_PLAIN)
-    @ApiOperation(value = "Get concept dbid for given type and term", response = Integer.class)
     public Response getConceptDbidForTypeTerm(@Context SecurityContext sc,
-                                              @ApiParam(value = "Term type", required = true) @QueryParam("type") String type,
-                                              @ApiParam(value = "Term", required = true) @QueryParam("term") String term,
-                                              @ApiParam(value = "AutoCreate", required = false) @QueryParam("autoCreate") boolean autoCreate) throws Exception {
+                                              @QueryParam("type") String type,
+                                              @QueryParam("term") String term,
+                                              @QueryParam("autoCreate") boolean autoCreate) throws Exception {
         try (MetricsTimer t = MetricsHelper.recordTime("Client.getConceptDbidForTypeTerm")) {
             LOG.debug("getConceptDbidForTypeTerm");
 
@@ -155,10 +145,9 @@ public class ClientEndpoint {
     @Path("/Term/Core")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.TEXT_PLAIN)
-    @ApiOperation(value = "Get (mapped) core concept dbid for given type and term", response = Integer.class)
     public Response getMappedCoreConceptDbidForTypeTerm(@Context SecurityContext sc,
-                                                        @ApiParam(value = "Term type", required = true) @QueryParam("type") String type,
-                                                        @ApiParam(value = "Term", required = true) @QueryParam("term") String term) throws Exception {
+                                                        @QueryParam("type") String type,
+                                                        @QueryParam("term") String term) throws Exception {
         try (MetricsTimer t = MetricsHelper.recordTime("Client.getMappedCoreConceptDbidForTypeTerm")) {
             LOG.debug("getMappedCoreConceptDbidForTypeTerm");
 
