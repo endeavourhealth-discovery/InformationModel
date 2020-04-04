@@ -21,4 +21,4 @@ artifacts:
     - appspec.yml
     - aws_scripts/**/*
     - api/target/api/**/*
-    - frontend/dist/**/*
+    - frontendv8/dist/**/*
