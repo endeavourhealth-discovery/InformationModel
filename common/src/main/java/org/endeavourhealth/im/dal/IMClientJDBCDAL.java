@@ -194,7 +194,6 @@ public class IMClientJDBCDAL {
     private int createTypeTermConcept(Connection conn, String type, String term) throws SQLException, NoSuchAlgorithmException {
         int typDbid;
         int docDbid;
-        Integer scmDbid;
 
         // Get term type ids
         try (PreparedStatement stmt = conn.prepareStatement("SELECT dbid, document, scheme FROM concept WHERE id = ?")) {
@@ -204,8 +203,6 @@ public class IMClientJDBCDAL {
                     throw new IllegalArgumentException("Unknown term type [" + type + "]");
                 typDbid = rs.getInt("dbid");
                 docDbid = rs.getInt("document");
-                scmDbid = rs.getInt("scheme");
-                if (rs.wasNull()) scmDbid = null;
             }
         }
 
@@ -221,7 +218,7 @@ public class IMClientJDBCDAL {
             stmt.setString(2, id);
             DALHelper.setString(stmt, 3, term);
             DALHelper.setString(stmt, 4, term);
-            DALHelper.setInt(stmt, 5, scmDbid);
+            DALHelper.setInt(stmt, 5, typDbid);
             DALHelper.setString(stmt, 6, code);
             stmt.execute();
             mapDbid = DALHelper.getGeneratedKey(stmt);
