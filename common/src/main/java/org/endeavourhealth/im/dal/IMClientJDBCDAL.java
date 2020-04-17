@@ -194,15 +194,19 @@ public class IMClientJDBCDAL {
     private int createTypeTermConcept(Connection conn, String type, String term) throws SQLException, NoSuchAlgorithmException {
         int typDbid;
         int docDbid;
+        int scmDbid;
+        String scmId;
 
         // Get term type ids
-        try (PreparedStatement stmt = conn.prepareStatement("SELECT dbid, document, scheme FROM concept WHERE id = ?")) {
+        try (PreparedStatement stmt = conn.prepareStatement("SELECT c.dbid, c.document, c.scheme, s.id FROM concept c JOIN concept s ON s.dbid = c.scheme WHERE c.id = ?")) {
             stmt.setString(1, type);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (!rs.next())
                     throw new IllegalArgumentException("Unknown term type [" + type + "]");
                 typDbid = rs.getInt("dbid");
                 docDbid = rs.getInt("document");
+                scmDbid = rs.getInt("scheme");
+                scmId = rs.getString("id");
             }
         }
 
@@ -210,7 +214,7 @@ public class IMClientJDBCDAL {
         MessageDigest md = MessageDigest.getInstance("SHA-256");
         byte[] digest = md.digest(term.getBytes(StandardCharsets.UTF_8));
         String code = Base64.getEncoder().encodeToString(digest).substring(0, 17);
-        String id = schemeCodePrefixMap.get(type) + code;
+        String id = schemeCodePrefixMap.get(scmId) + code;
 
         // Create the draft concept
         try (PreparedStatement stmt = conn.prepareStatement("INSERT INTO concept (document, id, name, description, draft, scheme, code) VALUES (?, ?, ?, ?, TRUE, ?, ?)", Statement.RETURN_GENERATED_KEYS)) {
@@ -218,7 +222,7 @@ public class IMClientJDBCDAL {
             stmt.setString(2, id);
             DALHelper.setString(stmt, 3, term);
             DALHelper.setString(stmt, 4, term);
-            DALHelper.setInt(stmt, 5, typDbid);
+            stmt.setInt(5, scmDbid);
             DALHelper.setString(stmt, 6, code);
             stmt.execute();
             mapDbid = DALHelper.getGeneratedKey(stmt);
@@ -338,8 +342,8 @@ public class IMClientJDBCDAL {
         String id = schemeCodePrefixMap.get(scheme) + code;
 
         String sql = "INSERT INTO concept\n" +
-            "(document, id, draft, name, scheme, code)\n" +
-            "SELECT s.document, ?, 1, ?, s.dbid, ?\n" +
+            "(document, id, draft, name, description, scheme, code)\n" +
+            "SELECT s.document, ?, 1, ?, ?, s.dbid, ?\n" +
             "FROM concept s\n" +
             "WHERE s.id = ?";
 
@@ -347,8 +351,9 @@ public class IMClientJDBCDAL {
         try (PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, id);
             stmt.setString(2, term);
-            stmt.setString(3, code);
-            stmt.setString(4, scheme);
+            stmt.setString(3, term);
+            stmt.setString(4, code);
+            stmt.setString(5, scheme);
 
             if (stmt.executeUpdate() == 0)
                 throw new IllegalStateException("Unable to create draft term type concept!");
