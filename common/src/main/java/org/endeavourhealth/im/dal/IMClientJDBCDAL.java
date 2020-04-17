@@ -159,7 +159,7 @@ public class IMClientJDBCDAL {
         }
     }
 
-    public Integer getConceptDbidForTypeTerm(String type, String term, Boolean autoCreate) throws SQLException {
+    public Integer getConceptDbidForTypeTerm(String type, String term, Boolean autoCreate) throws SQLException, NoSuchAlgorithmException {
         Integer dbid = null;
         String sql = "SELECT m.target \n" +
             "FROM concept c\n" +
@@ -191,28 +191,38 @@ public class IMClientJDBCDAL {
             ConnectionPool.getInstance().push(conn);
         }
     }
-    private int createTypeTermConcept(Connection conn, String type, String term) throws SQLException {
+    private int createTypeTermConcept(Connection conn, String type, String term) throws SQLException, NoSuchAlgorithmException {
         int typDbid;
         int docDbid;
-        int mapDbid;
+        Integer scmDbid;
 
         // Get term type ids
-        try (PreparedStatement stmt = conn.prepareStatement("SELECT dbid, document FROM concept WHERE id = ?")) {
+        try (PreparedStatement stmt = conn.prepareStatement("SELECT dbid, document, scheme FROM concept WHERE id = ?")) {
             stmt.setString(1, type);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (!rs.next())
                     throw new IllegalArgumentException("Unknown term type [" + type + "]");
                 typDbid = rs.getInt("dbid");
                 docDbid = rs.getInt("document");
+                scmDbid = rs.getInt("scheme");
+                if (rs.wasNull()) scmDbid = null;
             }
         }
 
+        int mapDbid;
+        MessageDigest md = MessageDigest.getInstance("SHA-256");
+        byte[] digest = md.digest(term.getBytes(StandardCharsets.UTF_8));
+        String code = Base64.getEncoder().encodeToString(digest).substring(0, 17);
+        String id = schemeCodePrefixMap.get(type) + code;
+
         // Create the draft concept
-        try (PreparedStatement stmt = conn.prepareStatement("INSERT INTO concept (document, id, name, description, draft) SELECT ?, CONCAT(?, '_', MAX(dbid) + 1), ?, ?, TRUE FROM concept", Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement stmt = conn.prepareStatement("INSERT INTO concept (document, id, name, description, draft, scheme, code) VALUES (?, ?, ?, ?, TRUE, ?, ?)", Statement.RETURN_GENERATED_KEYS)) {
             stmt.setInt(1, docDbid);
-            stmt.setString(2, type);
+            stmt.setString(2, id);
             DALHelper.setString(stmt, 3, term);
             DALHelper.setString(stmt, 4, term);
+            DALHelper.setInt(stmt, 5, scmDbid);
+            DALHelper.setString(stmt, 6, code);
             stmt.execute();
             mapDbid = DALHelper.getGeneratedKey(stmt);
         }
