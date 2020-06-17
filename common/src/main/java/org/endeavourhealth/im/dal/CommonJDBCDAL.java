@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CommonJDBCDAL {
+    private static String tctRebuildStatus;
+
     public List<KVP> getCodeSchemes() throws SQLException {
         Connection conn = ConnectionPool.getInstance().pop();
         List<KVP> result = new ArrayList<>();
@@ -196,5 +198,73 @@ public class CommonJDBCDAL {
         }
 
         return result;
+    }
+
+    public String getTctRebuildStatus() {
+        return tctRebuildStatus;
+    }
+
+    public String rebuildTct(String relationship, boolean force) throws SQLException {
+        if (tctRebuildStatus != null && !force)
+            return tctRebuildStatus;
+
+        String status = "TCT: '" + relationship + "' " + (force ? "(Force) : " : ": ");
+
+
+        int rows = 0;
+        tctRebuildStatus = status + "Intializing...";
+        Connection conn = ConnectionPool.getInstance().pop();
+        try {
+            tctRebuildStatus = status + "Clearing...";
+            String sql = "DELETE t\n" +
+                "FROM concept_tct t\n" +
+                "JOIN concept c ON c.dbid = t.property\n" +
+                "WHERE c.id = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setString(1, relationship);
+                rows = stmt.executeUpdate();
+            }
+
+            sql = "INSERT INTO concept_tct\n" +
+                "(source, property, level, target)\n" +
+                "SELECT o.dbid, o.property, 1, o.value\n" +
+                "FROM concept_property_object o\n" +
+                "JOIN concept p ON p.dbid = o.property\n" +
+                "WHERE p.id = ?";
+            tctRebuildStatus = status + "Cleared " + rows + ", Seeding...";
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setString(1, relationship);
+                rows = stmt.executeUpdate();
+            }
+
+            int level = 1;
+            sql = "REPLACE INTO concept_tct\n" +
+                "(source, property, level, target)\n" +
+                "SELECT t.source, o.property, t.level + 1, o.value\n" +
+                "FROM concept p\n" +
+                "JOIN concept_tct t ON t.property = p.dbid AND t.level = ?\n" +
+                "JOIN concept_property_object o ON o.dbid = t.target AND o.property = p.dbid\n" +
+                "WHERE p.id = ?";
+
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setString(2, relationship);
+                while (rows > 0) {
+                    tctRebuildStatus = status + "level " + level + " parents of " + rows + " concept(s)...";
+                    stmt.setInt(1, level);
+                    rows = stmt.executeUpdate();
+                    level++;
+                }
+            }
+
+            tctRebuildStatus = null;
+
+        } catch (Exception e) {
+            tctRebuildStatus = status + e.toString();
+        }
+        finally {
+            ConnectionPool.getInstance().push(conn);
+        }
+
+        return tctRebuildStatus;
     }
 }

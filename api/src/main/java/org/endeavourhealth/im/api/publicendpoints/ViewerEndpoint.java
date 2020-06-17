@@ -2,6 +2,7 @@ package org.endeavourhealth.im.api.publicendpoints;
 
 import org.endeavourhealth.common.utility.MetricsHelper;
 import org.endeavourhealth.common.utility.MetricsTimer;
+import org.endeavourhealth.im.dal.CommonJDBCDAL;
 import org.endeavourhealth.im.dal.ViewerJDBCDAL;
 import org.endeavourhealth.im.models.Concept;
 import org.endeavourhealth.im.models.RelatedConcept;
@@ -18,6 +19,34 @@ import java.util.List;
 @Path("/Viewer")
 public class ViewerEndpoint {
     private static final Logger LOG = LoggerFactory.getLogger(ViewerEndpoint.class);
+
+
+
+    // TODO: REMOVE!!!!!!!
+    @POST
+    @Path("/RebuildTCT/{relationship}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response rebuildTct(@Context SecurityContext sc,
+                               @PathParam("relationship") String relationship,
+                               @QueryParam("force") Boolean force) throws Exception {
+        try (MetricsTimer t = MetricsHelper.recordTime("Common.rebuildTct")) {
+            if (force == null) force = false;
+            CommonJDBCDAL dal = new CommonJDBCDAL();
+            String result = dal.rebuildTct(relationship, force);
+
+            return Response
+                .ok()
+                .entity(result)
+                .build();
+        }
+    }
+
+
+
+
+
+
 
     @GET
     @Path("/{id}")

@@ -25,7 +25,7 @@ public class CommonEndpoint {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getCodeSchemes(@Context SecurityContext sc) throws Exception {
-        try(MetricsTimer t = MetricsHelper.recordTime("Common.getCodeSchemes")) {
+        try (MetricsTimer t = MetricsHelper.recordTime("Common.getCodeSchemes")) {
             LOG.debug("getCodeScheme");
 
             List<KVP> result = new CommonJDBCDAL().getCodeSchemes();
@@ -46,7 +46,7 @@ public class CommonEndpoint {
                            @QueryParam("scheme") List<Integer> schemes,
                            @QueryParam("page") Integer page,
                            @QueryParam("pageSize") Integer pageSize) throws Exception {
-        try(MetricsTimer t = MetricsHelper.recordTime("Common.search")) {
+        try (MetricsTimer t = MetricsHelper.recordTime("Common.search")) {
             LOG.debug("Search");
 
             SearchResult result = new CommonJDBCDAL().search(term, schemes, page, pageSize);
@@ -63,10 +63,10 @@ public class CommonEndpoint {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getRelated(@Context SecurityContext sc,
-                           @PathParam("id") String id,
-                           @QueryParam("relationship") List<String> relationships) throws Exception {
-        try(MetricsTimer t = MetricsHelper.recordTime("Common.getRelated")) {
-            LOG.debug("Search");
+                               @PathParam("id") String id,
+                               @QueryParam("relationship") List<String> relationships) throws Exception {
+        try (MetricsTimer t = MetricsHelper.recordTime("Common.getRelated")) {
+            LOG.debug("getRelated");
 
             List<Related> result = new CommonJDBCDAL().getRelated(id, relationships);
 
@@ -82,12 +82,31 @@ public class CommonEndpoint {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getReverseRelated(@Context SecurityContext sc,
-                               @PathParam("id") String id,
-                               @QueryParam("relationship") List<String> relationships) throws Exception {
-        try(MetricsTimer t = MetricsHelper.recordTime("Common.getReverseRelated")) {
-            LOG.debug("Search");
+                                      @PathParam("id") String id,
+                                      @QueryParam("relationship") List<String> relationships) throws Exception {
+        try (MetricsTimer t = MetricsHelper.recordTime("Common.getReverseRelated")) {
+            LOG.debug("getReverseRelated");
 
             List<Related> result = new CommonJDBCDAL().getReverseRelated(id, relationships);
+
+            return Response
+                .ok()
+                .entity(result)
+                .build();
+        }
+    }
+
+    @POST
+    @Path("/RebuildTCT/{relationship}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response rebuildTct(@Context SecurityContext sc,
+                               @PathParam("relationship") String relationship,
+                               @QueryParam("force") Boolean force) throws Exception {
+        try (MetricsTimer t = MetricsHelper.recordTime("Common.rebuildTct")) {
+
+            CommonJDBCDAL dal = new CommonJDBCDAL();
+            String result = dal.rebuildTct(relationship, force);
 
             return Response
                 .ok()

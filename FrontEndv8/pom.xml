@@ -6,7 +6,7 @@
     <relativePath>../pom.xml</relativePath>
     <groupId>org.endeavourhealth.im</groupId>
     <artifactId>informationmodel</artifactId>
-    <version>1.14-SNAPSHOT</version>
+    <version>1.15-SNAPSHOT</version>
   </parent>
 
   <artifactId>FrontEndv8</artifactId>

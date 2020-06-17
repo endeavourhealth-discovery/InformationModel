@@ -6,11 +6,15 @@ import org.endeavourhealth.common.config.ConfigManager;
 import org.endeavourhealth.common.security.keycloak.client.KeycloakClient;
 import org.endeavourhealth.common.utility.MetricsHelper;
 import org.endeavourhealth.common.utility.MetricsTimer;
+import org.endeavourhealth.im.models.mapping.Context;
+import org.endeavourhealth.im.models.mapping.Field;
 import org.glassfish.jersey.uri.UriComponent;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.HashMap;
@@ -154,31 +158,72 @@ public class IMClient {
         }
     }
 
+    // Mapping API
+    public static String getMappingContextId(Context context) throws Exception {
+        try (MetricsTimer timer =MetricsHelper.recordTime("IMClient.getMappingContextId")) {
+            Response response = post(base + "/Mapping/Context", context);
+
+            if (response.getStatus() == 200)
+                return response.readEntity(String.class);
+            else
+                throw new IOException(response.readEntity(String.class));
+        }
+    }
+
+    public static String getPropertyConceptIri(String contextId, String field) throws Exception {
+        try (MetricsTimer timer =MetricsHelper.recordTime("IMClient.getPropertyConceptIri")) {
+            Map<String, String> params = new HashMap<>();
+            params.put("context", contextId);
+            params.put("field", field);
+
+            Response response = get(base + "/Mapping/Context/Property", params);
+
+            if (response.getStatus() == 200)
+                return response.readEntity(String.class);
+            else
+                throw new IOException(response.readEntity(String.class));
+        }
+    }
+
+    public static String getValueConceptIri(String contextId, Field field) throws Exception {
+        try (MetricsTimer timer = MetricsHelper.recordTime("IMClient.getValueConceptIri")) {
+            Map<String, String> params = new HashMap<>();
+            params.put("context", contextId);
+            params.put("field", field.getName());
+            params.put("value", field.getValue());
+            params.put("term", field.getTerm());
+
+            Response response = get(base + "/Mapping/Context/Value", params);
+
+            if (response.getStatus() == 200)
+                return response.readEntity(String.class);
+            else
+                throw new IOException(response.readEntity(String.class));
+        }
+    }
+
+    public static Integer getConceptDbid(String conceptIri) throws Exception {
+        try (MetricsTimer timer = MetricsHelper.recordTime("IMClient.getConceptDbid")) {
+            Map<String, String> params = new HashMap<>();
+            params.put("conceptIri", conceptIri);
+
+            Response response = get(base + "/Concept/dbid", params);
+
+            if (response.getStatus() == 200)
+                return response.readEntity(Integer.class);
+            else
+                throw new IOException(response.readEntity(String.class));
+        }
+    }
+
+
+    // Private/common/helper methods
+    private static Response get(String path) throws IOException {
+        return get(path, null);
+    }
     private static Response get(String path, Map<String, String> params) throws IOException {
-        if (kcConfig == null) {
-            kcConfig = ObjectMapperPool.getInstance().readTree(ConfigManager.getConfiguration("api-internal", "information-model"));
-            if (kcConfig == null)
-                throw new IllegalStateException("information-model/api-internal configuration not found!");
-        }
-
-        if (kcClient == null)
-            kcClient = new KeycloakClient(
-              kcConfig.get("auth-server-url").asText(),
-              kcConfig.get("realm").asText(),
-              kcConfig.get("username").asText(),
-              kcConfig.get("password").asText(),
-              "information-model");
-
-        if (imUrl == null) {
-            imUrl = ConfigManager.getConfiguration("api");
-            if (imUrl == null)
-                throw new IllegalStateException("information-model/api configuration not found!");
-
-        }
-
-
         Client client = ClientBuilder.newClient();
-        WebTarget target = client.target(imUrl).path(path);
+        WebTarget target = client.target(getImUrl()).path(path);
 
         if (params != null && !params.isEmpty()) {
             for (Map.Entry<String, String> entry: params.entrySet()) {
@@ -192,7 +237,62 @@ public class IMClient {
 
         return target
             .request()
-            .header("Authorization", "Bearer " + kcClient.getToken().getToken())
+            .header("Authorization", "Bearer " + getKcClient().getToken().getToken())
             .get();
+    }
+
+    private static Response post(String path, Object body) throws IOException {
+        return post(path, body, null);
+    }
+    private static Response post(String path, Object body, Map<String, String> params) throws IOException {
+        Client client = ClientBuilder.newClient();
+        WebTarget target = client.target(getImUrl()).path(path);
+
+        if (params != null && !params.isEmpty()) {
+            for (Map.Entry<String, String> entry: params.entrySet()) {
+                if (entry.getValue() != null) {
+                    String encoded = UriComponent.encode(entry.getValue(), UriComponent.Type.QUERY_PARAM_SPACE_ENCODED);
+                    target = target.queryParam(entry.getKey(), encoded);
+                }
+            }
+        }
+
+        return target
+            .request()
+            .header("Authorization", "Bearer " + getKcClient().getToken().getToken())
+            .post(Entity.entity(body, MediaType.APPLICATION_JSON));
+    }
+
+    private static String getImUrl() {
+        if (imUrl == null) {
+            imUrl = ConfigManager.getConfiguration("api");
+            if (imUrl == null)
+                throw new IllegalStateException("information-model/api configuration not found!");
+
+        }
+
+        return imUrl;
+    }
+
+    private static JsonNode getKcConfig() throws IOException {
+        if (kcConfig == null) {
+            kcConfig = ObjectMapperPool.getInstance().readTree(ConfigManager.getConfiguration("api-internal", "information-model"));
+            if (kcConfig == null)
+                throw new IllegalStateException("information-model/api-internal configuration not found!");
+        }
+
+        return kcConfig;
+    }
+
+    private static KeycloakClient getKcClient() throws IOException {
+        if (kcClient == null)
+            kcClient = new KeycloakClient(
+                getKcConfig().get("auth-server-url").asText(),
+                getKcConfig().get("realm").asText(),
+                getKcConfig().get("username").asText(),
+                getKcConfig().get("password").asText(),
+                "information-model");
+
+        return kcClient;
     }
 }

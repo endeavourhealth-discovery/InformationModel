@@ -3,6 +3,8 @@ package org.endeavourhealth.im.api.protectedendpoints;
 import org.endeavourhealth.common.utility.MetricsHelper;
 import org.endeavourhealth.common.utility.MetricsTimer;
 import org.endeavourhealth.im.dal.IMClientJDBCDAL;
+import org.endeavourhealth.im.logic.MappingLogic;
+import org.endeavourhealth.im.models.mapping.Field;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -152,6 +154,93 @@ public class ClientEndpoint {
             LOG.debug("getMappedCoreConceptDbidForTypeTerm");
 
             Integer result = new IMClientJDBCDAL().getMappedCoreConceptDbidForTypeTerm(type, term);
+
+            return Response
+                .ok()
+                .entity(result)
+                .build();
+        }
+    }
+
+    // Mapping API
+    @POST
+    @Path("/Mapping/Context")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response getMappingContextId(@Context SecurityContext sc,
+                                        org.endeavourhealth.im.models.mapping.Context context) throws Exception {
+        try (MetricsTimer t = MetricsHelper.recordTime("Client.getMappingContextId")) {
+            LOG.debug("getMappingContextId");
+
+            String result = new MappingLogic().getContextId(context);
+
+            return Response
+                .ok()
+                .entity(result)
+                .build();
+        }
+    }
+
+    @GET
+    @Path("/Mapping/Context/Property")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response getMappingContextPropertyConceptIri(@Context SecurityContext sc,
+                                                        @QueryParam("context") String contextId,
+                                                        @QueryParam("field") String field) throws Exception {
+        try (MetricsTimer t = MetricsHelper.recordTime("Client.getMappingContextPropertyConceptIri")) {
+            LOG.debug("getMappingContextPropertyConceptIri");
+
+            String result = new MappingLogic().getPropertyConceptIri(contextId, field);
+
+            return Response
+                .ok()
+                .entity(result)
+                .build();
+        }
+    }
+
+    @GET
+    @Path("/Mapping/Context/Value")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response getMappingContextValueConceptIri(@Context SecurityContext sc,
+                                                     @QueryParam("context") String contextId,
+                                                     @QueryParam("field") String fieldName,
+                                                     @QueryParam("value") String value,
+                                                     @QueryParam("term") String term) throws Exception {
+
+        if ((term == null || term.isEmpty()) && (value == null || value.isEmpty()))
+            throw new IllegalStateException("Either value, term, or both, must be supplied");
+
+        try (MetricsTimer t = MetricsHelper.recordTime("Client.getMappingContextPropertyConceptIri")) {
+            LOG.debug("getMappingContextPropertyConceptIri");
+
+            Field field = new Field()
+                .setName(fieldName)
+                .setValue(value)
+                .setTerm(term);
+
+            String result = new MappingLogic().getValueConceptIri(contextId, field);
+
+            return Response
+                .ok()
+                .entity(result)
+                .build();
+        }
+    }
+
+    @GET
+    @Path("/Concept/dbid")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response getConceptDbid(@Context SecurityContext sc,
+                                   @QueryParam("conceptIri") String conceptIri) throws Exception {
+
+        try (MetricsTimer t = MetricsHelper.recordTime("Client.getConceptDbid")) {
+            LOG.debug("getConceptDbid");
+
+            Integer result = new MappingLogic().getConceptDbid(conceptIri);
 
             return Response
                 .ok()
