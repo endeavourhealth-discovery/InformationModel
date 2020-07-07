@@ -1,28 +1,56 @@
 package org.endeavourhealth.im.dal;
 
-import org.endeavourhealth.im.models.mapping.Field;
-import org.endeavourhealth.im.models.mapping.Identifier;
-import org.endeavourhealth.im.models.mapping.Table;
+import org.endeavourhealth.im.models.mapping.ConceptIdentifiers;
+import org.endeavourhealth.im.models.mapping.MapResponse;
+import org.endeavourhealth.im.models.mapping.MapValueNode;
+import org.endeavourhealth.im.models.mapping.MapValueRequest;
 
 public interface IMMappingDAL extends AutoCloseable {
-    String getOrganisationId(Identifier organisation) throws Exception;
-    String createOrganisationId(Identifier organisation) throws Exception;
-    String getSystemId(Identifier system) throws Exception;
-    String createSystemId(Identifier system) throws Exception;
-    String getSchemaId(Identifier schema) throws Exception;
-    String createSchemaId(Identifier schema) throws Exception;
-    String getTableId(Table table) throws Exception;
-    String createTableId(Table table) throws Exception;
+    String getNode(String provider, String system, String schema, String table, String column) throws Exception;
 
-    String getContextId(String orgId, String sysId, String scmId, String tblId) throws Exception;
-    String createContextId(String orgId, String sysId, String scmId, String tblId) throws Exception;
+    ConceptIdentifiers getNodePropertyConcept(String node) throws Exception;
+    MapResponse createNodePropertyConcept(String provider, String system, String schema, String table, String column) throws Exception;
 
-    String getPropertyConceptIri(String contextId, String field) throws Exception;
-    String createPropertyConceptIri(String contextId, String field) throws Exception;
+    MapValueNode getValueNode(String node, String codeScheme) throws Exception;
+    MapValueNode createValueNode(String node, String codeScheme) throws Exception;
 
-    String getValueConceptIri(String contextId, Field field) throws Exception;
-    String createValueConceptIri(String contextId, Field field) throws Exception;
+    ConceptIdentifiers getValueNodeConcept(MapValueNode valueNode, MapValueRequest value) throws Exception;
+    ConceptIdentifiers createValueNodeConcept(MapValueNode valueNode, String provider, String system, String schema, String table, String column, MapValueRequest value) throws Exception;
+
+    ConceptIdentifiers getConceptIdentifiers(String iri) throws Exception;
+    ConceptIdentifiers createLegacyPropertyValueConcept(String provider, String system, String schema, String table, String column, MapValueRequest value) throws Exception;
+
+    ConceptIdentifiers createFormattedValueNodeConcept(String provider, String system, String schema, String table, String column, MapValueRequest value, String iri) throws Exception;
+
+
+
+
+
+    /*
+    Integer getOrganisationDbid(Identifier organisation) throws Exception;
+    Integer getOrganisationDbidByAlias(String organisationAlias) throws Exception;
+    int createOrganisation(Identifier organisation) throws Exception;
+
+    Integer getSystemDbid(Identifier system) throws Exception;
+    Integer getSystemDbidByAlias(String systemAlias) throws Exception;
+    int createSystem(Identifier system) throws Exception;
+
+    Integer getSchemaDbid(String schema) throws Exception;
+    int createSchema(String schema) throws Exception;
+
+    Integer getContextDbid(int organisationDbid, int systemDbid, int schemaDbid) throws Exception;
+    int createContext(int organisationDbid, int systemDbid, int schemaDbid) throws Exception;
+
+
+    Integer getTableDbid(String table) throws Exception;
+    int createTable(String table) throws Exception;
+
+    ConceptIdentifiers getPropertyConceptIdentifiers(String contextId, String field) throws Exception;
+    ConceptIdentifiers createPropertyConcept(String contextId, String field) throws Exception;
+
+    ConceptIdentifiers getValueConceptIdentifiers(String contextId, Field field) throws Exception;
+    ConceptIdentifiers createValueConcept(String contextId, Field field) throws Exception;
 
     Integer getConceptId(String conceptIri) throws Exception;
-    Integer getContextDbid(String contextId) throws Exception;
+    */
 }

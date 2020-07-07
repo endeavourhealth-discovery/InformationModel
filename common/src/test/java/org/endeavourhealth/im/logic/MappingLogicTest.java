@@ -2,10 +2,7 @@ package org.endeavourhealth.im.logic;
 
 import org.endeavourhealth.common.config.ConfigManager;
 import org.endeavourhealth.common.config.ConfigManagerException;
-import org.endeavourhealth.im.models.mapping.Context;
-import org.endeavourhealth.im.models.mapping.Field;
-import org.endeavourhealth.im.models.mapping.Identifier;
-import org.endeavourhealth.im.models.mapping.Table;
+import org.endeavourhealth.im.models.mapping.*;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -16,7 +13,7 @@ public class MappingLogicTest {
 
     @BeforeClass
     public static void init() throws ConfigManagerException {
-        ConfigManager.Initialize("information-manager");
+        ConfigManager.Initialize("information-model");
     }
 
     @Before
@@ -25,136 +22,168 @@ public class MappingLogicTest {
     }
 
     @Test
-    public void getContextId_FullMatch() throws Exception {
-        String actual = mappingLogic.getContextId(new Context()
-            .setOrganisation(new Identifier("H12345", "https://FHIR.nhs.uk/ods", "BartsNHSTrust", "BRTS"))      // Inline Constructor style
-            .setSystem(new Identifier()                                                                         // Builder style
-                .setValue(":CM_System_CernerMillenium")
-                .setScheme("https://DiscoveryDataService.org/InformationModel")
-                .setShort("CRNR")
-            )
-            .setSchema(new Identifier(":CM_Schema_CDS","https://DiscoveryDataService.org/InformationModel", "CDS", "CDS"))
-            .setTable(new Table("PatientAdministrativeCategory", "APC"))
-        );
+    public void getMapColumnRequest_KnownContext() throws Exception {
+        MapRequest request = new MapRequest()
+            .setMapColumnRequest(
+                new MapColumnRequest()
+                    .setProvider("CM_Org_Barts")
+                    .setSystem("CM_Sys_Cerner")
+                    .setSchema("CDS")
+                    .setTable("emergency")
+                    .setColumn("department_type")
+            );
 
-        Assert.assertEquals("/BRTS/CRNR/CDS/APC", actual);
+        MapResponse actual = mappingLogic.getMapping(request);
+
+        Assert.assertEquals("/CDS/EMGCY/DPT_TYP", actual.getNodeId());
+        Assert.assertEquals("DM_aAndEDepartmentType", actual.getConcept().getIri());
     }
 
     @Test
-    public void getContextId_PartMatch() throws Exception {
-        String actual = mappingLogic.getContextId(new Context()
-            .setOrganisation(new Identifier("H54321", "https://FHIR.nhs.uk/ods", "Homerton", "HMTN"))       // Inline Constructor style
-            .setSystem(new Identifier()                                                                     // Builder style
-                .setValue(":CM_System_CernerMillenium")
-                .setScheme("https://DiscoveryDataService.org/InformationModel")
-                .setShort("CRNR")
-            )
-            .setSchema(new Identifier(":CM_Schema_CDS","https://DiscoveryDataService.org/InformationModel", "CDS", "CDS"))
-            .setTable(new Table("PatientAdministrativeCategory", "APC"))
-        );
+    public void getMapColumnRequest_UnknownContext() throws Exception {
+        MapRequest request = new MapRequest()
+            .setMapColumnRequest(
+                new MapColumnRequest()
+                    .setProvider("CM_Org_Linfit")
+                    .setSystem("CM_Sys_TPP")
+                    .setSchema("CDS")
+                    .setTable("emergency")
+                    .setColumn("department_type")
+            );
 
-        Assert.assertEquals("/CDS/APC", actual);
-    }
-
-    @Test
-    public void getPropertyConcept() throws Exception {
-        String actual = mappingLogic.getPropertyConceptIri("/CDS/APC", "administrative-category_code");
-        Assert.assertEquals(":LP_6u5DQjIZP5xco+5ZYlGi+zdLdIQhD3Ns6ONpYrmZ", actual);
-    }
-
-    @Test
-    public void getValueConcept_Value() throws Exception {
-        String contextId = "/CDS/APC";
-        Field field = new Field()
-            .setName("administrative-category_code")
-            .setValue("1");
-
-        String actual = mappingLogic.getValueConceptIri(contextId, field);
-        Assert.assertEquals(":LPV_7B32LtcIWKX1zF2p2Bqe92PrBfABhLWou2kmQ5oN", actual);
-    }
-
-    @Test
-    public void getValueConcept_Term() throws Exception {
-        String contextId = "/CDS/APC";
-        Field field = new Field()
-            .setName("administrative-category_code")
-            .setTerm("Regular day admission");
-
-        String actual = mappingLogic.getValueConceptIri(contextId, field);
-        Assert.assertEquals(":LPV_aHLZ53wZalYJ59i0qXqCs0GrOVV0S+aS1Xb/iYTy", actual);
-    }
-
-
-    @Test
-    public void getConceptDbid() throws Exception {
-        Integer actual = mappingLogic.getConceptDbid(":Snomed-CT");
+        MapResponse actual = mappingLogic.getMapping(request);
 
         Assert.assertNotNull(actual);
-        Assert.assertEquals(1, actual.intValue());
+        Assert.assertNotNull(actual.getNodeId());
+        Assert.assertNotNull(actual.getConcept().getIri());
     }
 
     @Test
-    public void getShortString_OrganisationDisplay() {
-        String actual = MappingLogic.getShortString("BartsTrust");
-        Assert.assertEquals("BrtsTrst", actual);
+    public void getMapColumnValueRequest_KnownContextKnownValue() throws Exception {
+        MapRequest request = new MapRequest()
+            .setMapColumnValueRequest(
+                new MapColumnValueRequest()
+                    .setProvider("CM_Org_Barts")
+                    .setSystem("CM_Sys_Cerner")
+                    .setSchema("CDS")
+                    .setTable("emergency")
+                    .setColumn("department_type")
+                    .setValue(new MapValueRequest()
+                        .setCode("03")
+                        .setScheme("CM_NHS_DD")
+                    )
+            );
+
+        MapResponse actual = mappingLogic.getMapping(request);
+
+        Assert.assertEquals("CM_AEDepType3", actual.getConcept().getIri());
     }
 
     @Test
-    public void getShortString_SystemConcept() {
-        String actual = MappingLogic.getShortString(":CM_System_CernerMillenium");
-        Assert.assertEquals("SystmCrnrMllnm", actual);
+    public void getMapColumnValueRequest_KnownContextUnknownValue() throws Exception {
+        MapRequest request = new MapRequest()
+            .setMapColumnValueRequest(
+                new MapColumnValueRequest()
+                    .setProvider("CM_Org_Barts")
+                    .setSystem("CM_Sys_Cerner")
+                    .setSchema("CDS")
+                    .setTable("emergency")
+                    .setColumn("department_type")
+                    .setValue(new MapValueRequest()
+                        .setCode("99")
+                        .setScheme("CM_NHS_DD")
+                    )
+            );
+
+        MapResponse actual = mappingLogic.getMapping(request);
+
+        Assert.assertTrue(actual.getConcept().getIri().startsWith("LPV_Brt_Crn_CDS_emr_dpr_99_"));
     }
 
     @Test
-    public void getShortString_TableName() {
-        String actual = MappingLogic.getShortString("PatientAdministrativeCategory");
-        Assert.assertEquals("PtntAdmnstrtvCtgry", actual);
+    public void getMapColumnValueRequest_KnownContextKnownValue_Format() throws Exception {
+        MapRequest request = new MapRequest()
+            .setMapColumnValueRequest(
+                new MapColumnValueRequest()
+                    .setProvider("CM_Org_Barts")
+                    .setSystem("CM_Sys_Cerner")
+                    .setSchema("CDS")
+                    .setTable("emergency")
+                    .setColumn("treatment_function_code")
+                    .setValue(new MapValueRequest()
+                        .setCode("1164554")
+                        .setScheme("CM_BartCernerCode")
+                    )
+            );
+
+        MapResponse actual = mappingLogic.getMapping(request);
+
+        Assert.assertEquals("BC_1164554", actual.getConcept().getIri());
     }
 
     @Test
-    public void getShortIdentifier_IdNoNameNoShort() {
-        Identifier id = new Identifier().setValue("H12345");
-        String actual = MappingLogic.getShortIdentifier(id);
-        Assert.assertEquals("H12345", actual);
+    public void getMapColumnValueRequest_KnownContextUnknownValue_Format() throws Exception {
+        MapRequest request = new MapRequest()
+            .setMapColumnValueRequest(
+                new MapColumnValueRequest()
+                    .setProvider("CM_Org_Barts")
+                    .setSystem("CM_Sys_Cerner")
+                    .setSchema("CDS")
+                    .setTable("emergency")
+                    .setColumn("treatment_function_code")
+                    .setValue(new MapValueRequest()
+                        .setCode("99")
+                        .setScheme("CM_BartCernerCode")
+                    )
+            );
+
+        MapResponse actual = mappingLogic.getMapping(request);
+
+        Assert.assertEquals("BC_99", actual.getConcept().getIri());
     }
 
     @Test
-    public void getShortIdentifier_NameNoIdNoShort() {
-        Identifier id = new Identifier().setDisplay("BartsTrust");
-        String actual = MappingLogic.getShortIdentifier(id);
-        Assert.assertEquals("BrtsTrst", actual);
+    public void getMapColumnValueRequest_KnownContextKnownTerm() throws Exception {
+        MapRequest request = new MapRequest()
+            .setMapColumnValueRequest(
+                new MapColumnValueRequest()
+                    .setProvider("CM_Org_BHRUT")
+                    .setSystem("CM_Sys_Medway")
+                    .setSchema("MedwayBI")
+                    .setTable("PMI")
+                    .setColumn("CAUSEOFDEATH")
+                    .setValue(new MapValueRequest()
+                        .setTerm("Covid-19")
+                    )
+            );
+
+        MapResponse actual = mappingLogic.getMapping(request);
+
+        Assert.assertTrue(actual.getConcept().getIri().startsWith("LPV_BHR_Mdw_Mdw_PMI_CAU_Cvd_"));
     }
 
     @Test
-    public void getShortIdentifier_NameAndIdNoShort() {
-        Identifier id = new Identifier()
-            .setValue("H12345")
-            .setDisplay("BartsTrust");
-        String actual = MappingLogic.getShortIdentifier(id);
-        Assert.assertEquals("BrtsTrst", actual);
+    public void getMapColumnValueRequest_KnownContextUnknownTerm() throws Exception {
+        MapRequest request = new MapRequest()
+            .setMapColumnValueRequest(
+                new MapColumnValueRequest()
+                    .setProvider("CM_Org_BHRUT")
+                    .setSystem("CM_Sys_Medway")
+                    .setSchema("MedwayBI")
+                    .setTable("PMI")
+                    .setColumn("CAUSEOFDEATH 1c")
+                    .setValue(new MapValueRequest()
+                        .setTerm("Benign prostatic hyperplasia")
+                    )
+            );
+
+        MapResponse actual = mappingLogic.getMapping(request);
+
+        Assert.assertTrue(actual.getConcept().getIri().startsWith("LPV_BHR_Mdw_Mdw_PMI_CAU_Bng_"));
     }
 
     @Test
-    public void getShortIdentifier_IdNoNameWithShort() {
-        Identifier id = new Identifier().setValue("H12345").setShort("BRTSCRNR");
-        String actual = MappingLogic.getShortIdentifier(id);
-        Assert.assertEquals("BRTSCRNR", actual);
-    }
-
-    @Test
-    public void getShortIdentifier_NameNoIdWithShort() {
-        Identifier id = new Identifier().setDisplay("BartsTrust").setShort("BRTSCRNR");
-        String actual = MappingLogic.getShortIdentifier(id);
-        Assert.assertEquals("BRTSCRNR", actual);
-    }
-
-    @Test
-    public void getShortIdentifier_NameAndIdWithShort() {
-        Identifier id = new Identifier()
-            .setValue("H12345")
-            .setDisplay("BartsTrust")
-            .setShort("BRTSCRNR");
-        String actual = MappingLogic.getShortIdentifier(id);
-        Assert.assertEquals("BRTSCRNR", actual);
+    public void getShortString() {
+        MappingLogic.getShortString("99");
     }
 }

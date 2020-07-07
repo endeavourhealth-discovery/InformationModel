@@ -6,8 +6,7 @@ import org.endeavourhealth.common.config.ConfigManager;
 import org.endeavourhealth.common.security.keycloak.client.KeycloakClient;
 import org.endeavourhealth.common.utility.MetricsHelper;
 import org.endeavourhealth.common.utility.MetricsTimer;
-import org.endeavourhealth.im.models.mapping.Context;
-import org.endeavourhealth.im.models.mapping.Field;
+import org.endeavourhealth.im.models.mapping.*;
 import org.glassfish.jersey.uri.UriComponent;
 
 import javax.ws.rs.client.Client;
@@ -159,63 +158,78 @@ public class IMClient {
     }
 
     // Mapping API
-    public static String getMappingContextId(Context context) throws Exception {
-        try (MetricsTimer timer =MetricsHelper.recordTime("IMClient.getMappingContextId")) {
-            Response response = post(base + "/Mapping/Context", context);
+
+    public static MapResponse getMapProperty(String provider, String system, String schema, String table, String column) throws Exception {
+        try (MetricsTimer timer =MetricsHelper.recordTime("IMClient.getMapProperty")) {
+            MapRequest request = new MapRequest()
+                .setMapColumnRequest(
+                    new MapColumnRequest()
+                        .setProvider(provider)
+                        .setSystem(system)
+                        .setSchema(schema)
+                        .setTable(table)
+                        .setColumn(column)
+                );
+
+            Response response = post(base + "/Mapping", request);
 
             if (response.getStatus() == 200)
-                return response.readEntity(String.class);
+                return response.readEntity(MapResponse.class);
             else
                 throw new IOException(response.readEntity(String.class));
         }
     }
 
-    public static String getPropertyConceptIri(String contextId, String field) throws Exception {
-        try (MetricsTimer timer =MetricsHelper.recordTime("IMClient.getPropertyConceptIri")) {
-            Map<String, String> params = new HashMap<>();
-            params.put("context", contextId);
-            params.put("field", field);
+    public static MapResponse getMapPropertyValue(String provider, String system, String schema, String table, String column, String value, String scheme) throws Exception {
+        try (MetricsTimer timer = MetricsHelper.recordTime("IMClient.getMapPropertyValue")) {
+            MapRequest request = new MapRequest()
+                .setMapColumnValueRequest(
+                    new MapColumnValueRequest()
+                        .setProvider(provider)
+                        .setSystem(system)
+                        .setSchema(schema)
+                        .setTable(table)
+                        .setColumn(column)
+                        .setValue(
+                            new MapValueRequest()
+                                .setCode(value)
+                                .setScheme(scheme)
+                        )
+                );
 
-            Response response = get(base + "/Mapping/Context/Property", params);
+            Response response = post(base + "/Mapping", request);
 
             if (response.getStatus() == 200)
-                return response.readEntity(String.class);
+                return response.readEntity(MapResponse.class);
             else
                 throw new IOException(response.readEntity(String.class));
         }
     }
 
-    public static String getValueConceptIri(String contextId, Field field) throws Exception {
-        try (MetricsTimer timer = MetricsHelper.recordTime("IMClient.getValueConceptIri")) {
-            Map<String, String> params = new HashMap<>();
-            params.put("context", contextId);
-            params.put("field", field.getName());
-            params.put("value", field.getValue());
-            params.put("term", field.getTerm());
+    public static MapResponse getMapPropertyValue(String provider, String system, String schema, String table, String column, String term) throws Exception {
+        try (MetricsTimer timer = MetricsHelper.recordTime("IMClient.getMapPropertyValueTerm")) {
+            MapRequest request = new MapRequest()
+                .setMapColumnValueRequest(
+                    new MapColumnValueRequest()
+                        .setProvider(provider)
+                        .setSystem(system)
+                        .setSchema(schema)
+                        .setTable(table)
+                        .setColumn(column)
+                        .setValue(
+                            new MapValueRequest()
+                                .setTerm(term)
+                        )
+                );
 
-            Response response = get(base + "/Mapping/Context/Value", params);
+            Response response = post(base + "/Mapping", request);
 
             if (response.getStatus() == 200)
-                return response.readEntity(String.class);
+                return response.readEntity(MapResponse.class);
             else
                 throw new IOException(response.readEntity(String.class));
         }
     }
-
-    public static Integer getConceptDbid(String conceptIri) throws Exception {
-        try (MetricsTimer timer = MetricsHelper.recordTime("IMClient.getConceptDbid")) {
-            Map<String, String> params = new HashMap<>();
-            params.put("conceptIri", conceptIri);
-
-            Response response = get(base + "/Concept/dbid", params);
-
-            if (response.getStatus() == 200)
-                return response.readEntity(Integer.class);
-            else
-                throw new IOException(response.readEntity(String.class));
-        }
-    }
-
 
     // Private/common/helper methods
     private static Response get(String path) throws IOException {
@@ -261,6 +275,10 @@ public class IMClient {
             .request()
             .header("Authorization", "Bearer " + getKcClient().getToken().getToken())
             .post(Entity.entity(body, MediaType.APPLICATION_JSON));
+    }
+
+    private static boolean hasValue(String data) {
+        return data != null && !data.isEmpty();
     }
 
     private static String getImUrl() {

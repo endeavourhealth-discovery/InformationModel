@@ -1,31 +1,32 @@
 package org.endeavourhealth.im.logic;
 
+import org.apache.commons.lang3.StringUtils;
 import org.endeavourhealth.im.dal.IMMappingDAL;
 import org.endeavourhealth.im.dal.IMMappingJDBCDAL;
-import org.endeavourhealth.im.models.mapping.Context;
-import org.endeavourhealth.im.models.mapping.Field;
-import org.endeavourhealth.im.models.mapping.Identifier;
-import org.endeavourhealth.im.models.mapping.Table;
+import org.endeavourhealth.im.models.mapping.*;
+
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 
 public class MappingLogic implements AutoCloseable {
-    public static String getShortIdentifier(Identifier identifier) {
-        if (identifier.getShort() != null && !identifier.getShort().isEmpty())
-            return identifier.getShort();
+    public static String getShortString(String id) {
+        // Handle concepts and standard prefixes
+        if (id.startsWith("CM_Sys_")) id = id.substring(7);
+        else if (id.startsWith("CM_Org_")) id = id.substring(7);
+        else if (id.startsWith("CM_")) id = id.substring(3);
 
-        String id = identifier.getDisplay();
-        if (id == null || id.isEmpty())
-            id = identifier.getValue();
-
-        return getShortString(id);
+        // Strip vowels and spaces (excluding first), return first 3
+        id = (id.substring(0, 1) +
+            id.substring(1).replaceAll("[aeiou\\-_ ]", ""));
+        return StringUtils.left(id, 3);
     }
 
-    public static String getShortString(String id) {
-        // Handle concepts
-        if (id.startsWith(":") && id.indexOf("_") < id.length())
-            id = id.substring(id.indexOf("_"));
-
-        // Strip vowels (only lower case, assume inicaps)
-        return id.replaceAll("[aeiou\\-_]", "");
+    public static String hash(String value) throws NoSuchAlgorithmException {
+        MessageDigest md = MessageDigest.getInstance("SHA-256");
+        byte[] digest = md.digest(value.getBytes(StandardCharsets.UTF_8));
+        return Base64.getEncoder().encodeToString(digest);
     }
 
     private IMMappingDAL dal;
@@ -38,65 +39,189 @@ public class MappingLogic implements AutoCloseable {
         this.dal = dal;
     }
 
-    public String getOrCreateOrganisationId(Identifier organisation) throws Exception{
-        String orgId = dal.getOrganisationId(organisation);
-        if (orgId == null)
-            orgId = dal.createOrganisationId(organisation);
-
-        return orgId;
+    public MapResponse getMapping(MapRequest request) throws Exception {
+        if (request.getMapColumnRequest() != null)
+            return getMapColumnRequest(request);
+        else if (request.getMapColumnValueRequest() != null)
+            return getMapColumnValueRequest(request);
+        else
+            throw new IllegalStateException("Unknown mapping request");
     }
 
-    public String getOrCreateSystemId(Identifier system) throws Exception{
-        String sysId = dal.getSystemId(system);
-        if (sysId == null)
-            sysId = dal.createSystemId(system);
+    private MapResponse getMapColumnRequest(MapRequest request) throws Exception {
+        MapColumnRequest columnRequest = request.getMapColumnRequest();
 
-        return sysId;
+        String node = dal.getNode(
+            columnRequest.getProvider(),
+            columnRequest.getSystem(),
+            columnRequest.getSchema(),
+            columnRequest.getTable(),
+            columnRequest.getColumn()
+        );
+
+        if (node != null) {
+            return new MapResponse()
+                .setRequest(request)
+                .setNodeId(node)
+                .setConcept(dal.getNodePropertyConcept(node));
+        } else {
+            return dal.createNodePropertyConcept(
+                columnRequest.getProvider(),
+                columnRequest.getSystem(),
+                columnRequest.getSchema(),
+                columnRequest.getTable(),
+                columnRequest.getColumn()
+            )
+                .setRequest(request);
+        }
     }
 
-    public String getOrCreateSchemaId(Identifier schema) throws Exception{
-        String scmId = dal.getSchemaId(schema);
-        if (scmId == null)
-            scmId = dal.createSchemaId(schema);
+    private MapResponse getMapColumnValueRequest(MapRequest request) throws Exception {
+        MapColumnValueRequest valueRequest = request.getMapColumnValueRequest();
 
-        return scmId;
+        String node = valueRequest.getNode();
+        if (node == null || node.isEmpty()) {
+            node = dal.getNode(
+                valueRequest.getProvider(),
+                valueRequest.getSystem(),
+                valueRequest.getSchema(),
+                valueRequest.getTable(),
+                valueRequest.getColumn()
+            );
+            valueRequest.setNode(node);
+        }
+
+        MapValueNode valueNode = dal.getValueNode(node, valueRequest.getValue().getScheme());
+        if (valueNode == null) {
+            valueNode = dal.createValueNode(node, valueRequest.getValue().getScheme());
+        }
+
+        ConceptIdentifiers ids;
+        if (valueNode.getFunction().startsWith("Format(")) {
+            String format = valueNode.getFunction().substring(7, valueNode.getFunction().length() - 1);
+            String iri = String.format(format, valueRequest.getValue().getCode());
+            ids = dal.getConceptIdentifiers(iri);
+            if (ids == null)
+                ids = dal.createFormattedValueNodeConcept(
+                    valueRequest.getProvider(),
+                    valueRequest.getSystem(),
+                    valueRequest.getSchema(),
+                    valueRequest.getTable(),
+                    valueRequest.getColumn(),
+                    valueRequest.getValue(),
+                    iri
+                );
+        } else {
+            // valueNode.getFunction().equals("Lookup()")
+            ids = dal.getValueNodeConcept(valueNode, valueRequest.getValue());
+            if (ids == null) {
+                ids = dal.createValueNodeConcept(
+                    valueNode,
+                    valueRequest.getProvider(),
+                    valueRequest.getSystem(),
+                    valueRequest.getSchema(),
+                    valueRequest.getTable(),
+                    valueRequest.getColumn(),
+                    valueRequest.getValue()
+                );
+            }
+        }
+
+        return new MapResponse()
+            .setRequest(request)
+            .setNodeId(node)
+            .setConcept(ids);
     }
+
+
+
+    /*
+    private int getMapContext(Identifier organisation, Identifier system, String schema) throws Exception {
+        int orgDbid = getOrCreateOrganisationDbid(organisation);
+        int sysDbid = getOrCreateSystemDbid(system);
+        int scmDbid = getOrCreateSchemaDbid(schema);
+
+        Integer contextDbid = dal.getContextDbid(orgDbid, sysDbid, scmDbid);
+
+        if (contextDbid == null)
+            contextDbid = dal.createContext(orgDbid, sysDbid, scmDbid);
+
+        return contextDbid;
+    }
+
+    private int getMapContext(String contextPath) throws Exception {
+        String[] parts = contextPath.split("/");
+
+        if (parts.length < 3)
+            throw new IllegalStateException("Context must include organisation, system & schema (org/sys/scm) as a minimum");
+
+        Integer orgDbid = dal.getOrganisationDbidByAlias(parts[0]);
+        if (orgDbid == null)
+            throw new IllegalStateException("Unknown organisation alias [" + parts[0] + "]");
+
+        Integer sysDbid = dal.getSystemDbidByAlias(parts[1]);
+        if (sysDbid == null)
+            throw new IllegalStateException("Unknown system alias [" + parts[1] + "]");
+
+        Integer scmDbid = dal.getSchemaDbid(parts[2]);
+        if (scmDbid == null)
+            throw new IllegalStateException("Unknown schema [" + parts[2] + "]");
+
+        Integer contextDbid = dal.getContextDbid(orgDbid, sysDbid, scmDbid);
+
+        if (contextDbid == null)
+            contextDbid = dal.createContext(orgDbid, sysDbid, scmDbid);
+
+        return contextDbid;
+    }
+
+    public int getOrCreateOrganisationDbid(Identifier organisation) throws Exception{
+        Integer orgDbid = dal.getOrganisationDbid(organisation);
+        if (orgDbid == null)
+            orgDbid = dal.createOrganisation(organisation);
+
+        return orgDbid;
+    }
+
+    public int getOrCreateSystemDbid(Identifier system) throws Exception{
+        Integer sysDbid = dal.getSystemDbid(system);
+        if (sysDbid == null)
+            sysDbid = dal.createSystem(system);
+
+        return sysDbid;
+    }
+
+    public int getOrCreateSchemaDbid(String schema) throws Exception{
+        Integer scmDbid = dal.getSchemaDbid(schema);
+        if (scmDbid == null)
+            scmDbid = dal.createSchema(schema);
+
+        return scmDbid;
+    }
+
 
     public String getOrCreateTableId(Table table) throws Exception{
-        String tblId = dal.getTableId(table);
+        String tblId = dal.getTableShort(table);
         if (tblId == null)
-            tblId = dal.createTableId(table);
+            tblId = dal.createTableShort(table);
 
         return tblId;
     }
 
-    public String getContextId(Context context) throws Exception {
-        String orgId = getOrCreateOrganisationId(context.getOrganisation());
-        String sysId = getOrCreateSystemId(context.getSystem());
-        String scmId = getOrCreateSchemaId(context.getSchema());
-        String tblId = getOrCreateTableId(context.getTable());
-
-        String result = dal.getContextId(orgId, sysId, scmId, tblId);
-        if (result == null)
-            result = dal.createContextId(orgId, sysId, scmId, tblId);
-
-        return result;
-    }
-
-    public String getPropertyConceptIri(String contextId, String field) throws Exception {
-        String propertyConceptIri = dal.getPropertyConceptIri(contextId, field);
+    public ConceptIdentifiers getPropertyConceptIri(String contextId, String field) throws Exception {
+        ConceptIdentifiers propertyConceptIri = dal.getPropertyConceptIdentifiers(contextId, field);
 
         if (propertyConceptIri == null)
-            propertyConceptIri = dal.createPropertyConceptIri(contextId, field);
+            propertyConceptIri = dal.createPropertyConcept(contextId, field);
 
         return propertyConceptIri;
     }
 
-    public String getValueConceptIri(String contextId, Field field) throws Exception {
-        String valueConceptIri = dal.getValueConceptIri(contextId, field);
+    public ConceptIdentifiers getValueConceptIri(String contextId, Field field) throws Exception {
+        ConceptIdentifiers valueConceptIri = dal.getValueConceptIdentifiers(contextId, field);
 
         if (valueConceptIri == null)
-            valueConceptIri = dal.createValueConceptIri(contextId, field);
+            valueConceptIri = dal.createValueConcept(contextId, field);
 
         return valueConceptIri;
     }
@@ -104,9 +229,12 @@ public class MappingLogic implements AutoCloseable {
     public Integer getConceptDbid(String conceptIri) throws Exception {
         return dal.getConceptId(conceptIri);
     }
+*/
 
     @Override
     public void close() throws Exception {
         dal.close();
     }
+
+
 }
