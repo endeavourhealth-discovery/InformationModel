@@ -1,12 +1,9 @@
 package org.endeavourhealth.im.dal;
 
-import org.endeavourhealth.im.models.mapping.ConceptIdentifiers;
-import org.endeavourhealth.im.models.mapping.MapResponse;
-import org.endeavourhealth.im.models.mapping.MapValueNode;
-import org.endeavourhealth.im.models.mapping.MapValueRequest;
+import org.endeavourhealth.im.models.mapping.*;
 
 public interface IMMappingDAL extends AutoCloseable {
-    String getNode(String provider, String system, String schema, String table, String column) throws Exception;
+    MapNodeData getNode(String provider, String system, String schema, String table, String column) throws Exception;
 
     ConceptIdentifiers getNodePropertyConcept(String node) throws Exception;
     MapResponse createNodePropertyConcept(String provider, String system, String schema, String table, String column) throws Exception;

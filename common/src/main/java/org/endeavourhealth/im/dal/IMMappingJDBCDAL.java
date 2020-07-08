@@ -1,10 +1,8 @@
 package org.endeavourhealth.im.dal;
 
+import com.sun.corba.se.impl.orbutil.graph.NodeData;
 import org.endeavourhealth.im.logic.MappingLogic;
-import org.endeavourhealth.im.models.mapping.ConceptIdentifiers;
-import org.endeavourhealth.im.models.mapping.MapResponse;
-import org.endeavourhealth.im.models.mapping.MapValueNode;
-import org.endeavourhealth.im.models.mapping.MapValueRequest;
+import org.endeavourhealth.im.models.mapping.*;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -26,7 +24,7 @@ public class IMMappingJDBCDAL implements IMMappingDAL {
     }
 
     @Override
-    public String getNode(String provider, String system, String schema, String table, String column) throws SQLException {
+    public MapNodeData getNode(String provider, String system, String schema, String table, String column) throws SQLException {
         List<String> join = new ArrayList<>();
         List<String> where = new ArrayList<>();
 
@@ -49,7 +47,7 @@ public class IMMappingJDBCDAL implements IMMappingDAL {
         if (hasValue(column))
             where.add("m.`column` = ?");
 
-        String sql = "SELECT n.node\n" +
+        String sql = "SELECT n.id, n.node\n" +
             "FROM map_context m\n" +
             "JOIN map_node n ON n.id = m.node\n" +
             String.join("\n", join) + "\n" +
@@ -65,7 +63,7 @@ public class IMMappingJDBCDAL implements IMMappingDAL {
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next())
-                    return rs.getString("node");
+                    return new MapNodeData(rs.getInt("id"), rs.getString("node"));
                 else
                     return null;
             }
@@ -179,7 +177,7 @@ public class IMMappingJDBCDAL implements IMMappingDAL {
             conn.commit();
 
             return new MapResponse()
-                .setNodeId(node)
+                .setNodeData(new MapNodeData(nodeId, node))
                 .setConcept(
                     new ConceptIdentifiers()
                         .setDbid(cptId)
@@ -299,7 +297,11 @@ public class IMMappingJDBCDAL implements IMMappingDAL {
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                 int i = 0;
                 stmt.setInt(++i, valueNode.getId());
-                stmt.setString(++i, value.getCode());
+                if (hasValue(value.getCode()))
+                    stmt.setString(++i, value.getCode());
+                else
+                    stmt.setString(++i, value.getTerm());
+
                 stmt.setInt(++i, result.getDbid());
 
                 if (stmt.executeUpdate() != 1)

@@ -1,16 +1,16 @@
 package org.endeavourhealth.im.models.mapping;
 
 public class MapResponse {
-    private String nodeId;
+    private MapNodeData nodeData;
     private ConceptIdentifiers concept;
     private MapRequest request;
 
-    public String getNodeId() {
-        return nodeId;
+    public MapNodeData getNodeData() {
+        return nodeData;
     }
 
-    public MapResponse setNodeId(String nodeId) {
-        this.nodeId = nodeId;
+    public MapResponse setNodeData(MapNodeData nodeData) {
+        this.nodeData = nodeData;
         return this;
     }
 

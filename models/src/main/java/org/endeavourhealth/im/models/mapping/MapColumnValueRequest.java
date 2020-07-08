@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 public class MapColumnValueRequest {
-    private String node;
     private String provider;
     private String system;
     private String schema;
@@ -14,16 +13,6 @@ public class MapColumnValueRequest {
     private MapValueRequest value;
     private List<MapDependentColumn> dependentColumnValue;
     private String target;
-
-    @JsonProperty("Node")
-    public String getNode() {
-        return node;
-    }
-
-    public MapColumnValueRequest setNode(String node) {
-        this.node = node;
-        return this;
-    }
 
     @JsonProperty("Provider")
     public String getProvider() {

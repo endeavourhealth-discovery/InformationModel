@@ -24,7 +24,7 @@ public class MappingTests {
             "department_type"
         );
 
-        Assert.assertEquals("/CDS/EMGCY/DPT_TYP", actual.getNodeId());
+        Assert.assertEquals("/CDS/EMGCY/DPT_TYP", actual.getNodeData().getNode());
         Assert.assertEquals("DM_aAndEDepartmentType", actual.getConcept().getIri());
     }
 
@@ -38,9 +38,9 @@ public class MappingTests {
             "department_type"
         );
 
-
         Assert.assertNotNull(actual);
-        Assert.assertNotNull(actual.getNodeId());
+        Assert.assertNotNull(actual.getNodeData());
+        Assert.assertNotNull(actual.getNodeData().getNode());
         Assert.assertNotNull(actual.getConcept().getIri());
     }
 

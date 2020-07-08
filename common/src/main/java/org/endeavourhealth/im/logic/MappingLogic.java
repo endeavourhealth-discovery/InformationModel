@@ -5,11 +5,6 @@ import org.endeavourhealth.im.dal.IMMappingDAL;
 import org.endeavourhealth.im.dal.IMMappingJDBCDAL;
 import org.endeavourhealth.im.models.mapping.*;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
-
 public class MappingLogic implements AutoCloseable {
     public static String getShortString(String id) {
         // Handle concepts and standard prefixes
@@ -21,12 +16,6 @@ public class MappingLogic implements AutoCloseable {
         id = (id.substring(0, 1) +
             id.substring(1).replaceAll("[aeiou\\-_ ]", ""));
         return StringUtils.left(id, 3);
-    }
-
-    public static String hash(String value) throws NoSuchAlgorithmException {
-        MessageDigest md = MessageDigest.getInstance("SHA-256");
-        byte[] digest = md.digest(value.getBytes(StandardCharsets.UTF_8));
-        return Base64.getEncoder().encodeToString(digest);
     }
 
     private IMMappingDAL dal;
@@ -51,7 +40,7 @@ public class MappingLogic implements AutoCloseable {
     private MapResponse getMapColumnRequest(MapRequest request) throws Exception {
         MapColumnRequest columnRequest = request.getMapColumnRequest();
 
-        String node = dal.getNode(
+        MapNodeData nodeData = dal.getNode(
             columnRequest.getProvider(),
             columnRequest.getSystem(),
             columnRequest.getSchema(),
@@ -59,11 +48,11 @@ public class MappingLogic implements AutoCloseable {
             columnRequest.getColumn()
         );
 
-        if (node != null) {
+        if (nodeData != null) {
             return new MapResponse()
+                .setNodeData(nodeData)
                 .setRequest(request)
-                .setNodeId(node)
-                .setConcept(dal.getNodePropertyConcept(node));
+                .setConcept(dal.getNodePropertyConcept(nodeData.getNode()));
         } else {
             return dal.createNodePropertyConcept(
                 columnRequest.getProvider(),
@@ -79,22 +68,20 @@ public class MappingLogic implements AutoCloseable {
     private MapResponse getMapColumnValueRequest(MapRequest request) throws Exception {
         MapColumnValueRequest valueRequest = request.getMapColumnValueRequest();
 
-        String node = valueRequest.getNode();
-        if (node == null || node.isEmpty()) {
-            node = dal.getNode(
-                valueRequest.getProvider(),
-                valueRequest.getSystem(),
-                valueRequest.getSchema(),
-                valueRequest.getTable(),
-                valueRequest.getColumn()
-            );
-            valueRequest.setNode(node);
+        MapNodeData nodeData = dal.getNode(
+            valueRequest.getProvider(),
+            valueRequest.getSystem(),
+            valueRequest.getSchema(),
+            valueRequest.getTable(),
+            valueRequest.getColumn()
+        );
+
+        MapValueNode valueNode = dal.getValueNode(nodeData.getNode(), valueRequest.getValue().getScheme());
+        if (valueNode == null) {
+            valueNode = dal.createValueNode(nodeData.getNode(), valueRequest.getValue().getScheme());
         }
 
-        MapValueNode valueNode = dal.getValueNode(node, valueRequest.getValue().getScheme());
-        if (valueNode == null) {
-            valueNode = dal.createValueNode(node, valueRequest.getValue().getScheme());
-        }
+        nodeData.setValueNode(valueNode);
 
         ConceptIdentifiers ids;
         if (valueNode.getFunction().startsWith("Format(")) {
@@ -128,8 +115,8 @@ public class MappingLogic implements AutoCloseable {
         }
 
         return new MapResponse()
+            .setNodeData(nodeData)
             .setRequest(request)
-            .setNodeId(node)
             .setConcept(ids);
     }
 
