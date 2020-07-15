@@ -1,16 +1,26 @@
 package org.endeavourhealth.im.models.mapping;
 
 public class MapResponse {
-    private MapNodeData nodeData;
+    private MapNode node;
+    private MapValueNode valueNode;
     private ConceptIdentifiers concept;
     private MapRequest request;
 
-    public MapNodeData getNodeData() {
-        return nodeData;
+    public MapNode getNode() {
+        return node;
     }
 
-    public MapResponse setNodeData(MapNodeData nodeData) {
-        this.nodeData = nodeData;
+    public MapResponse setNode(MapNode node) {
+        this.node = node;
+        return this;
+    }
+
+    public MapValueNode getValueNode() {
+        return valueNode;
+    }
+
+    public MapResponse setValueNode(MapValueNode valueNode) {
+        this.valueNode = valueNode;
         return this;
     }
 

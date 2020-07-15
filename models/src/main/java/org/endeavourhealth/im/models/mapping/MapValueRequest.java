@@ -7,6 +7,17 @@ public class MapValueRequest {
     private String code;
     private String term;
 
+    public MapValueRequest() {}
+
+    public MapValueRequest(String scheme, String code) {
+        this.scheme = scheme;
+        this.code = code;
+    }
+
+    public MapValueRequest(String term) {
+        this.term = term;
+    }
+
     @JsonProperty("CodeScheme")
     public String getScheme() {
         return scheme;

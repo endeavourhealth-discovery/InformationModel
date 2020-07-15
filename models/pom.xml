@@ -3,7 +3,7 @@
 
   <groupId>org.endeavourhealth.im</groupId>
   <artifactId>models</artifactId>
-  <version>1.15-SNAPSHOT</version>
+  <version>1.16-SNAPSHOT</version>
   <modelVersion>4.0.0</modelVersion>
 
   <properties>

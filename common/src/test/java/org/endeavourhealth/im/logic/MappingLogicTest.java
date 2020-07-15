@@ -35,7 +35,7 @@ public class MappingLogicTest {
 
         MapResponse actual = mappingLogic.getMapping(request);
 
-        Assert.assertEquals("/CDS/EMGCY/DPT_TYP", actual.getNodeData().getNode());
+        Assert.assertEquals("/CDS/EMGCY/DPT_TYP", actual.getNode().getNode());
         Assert.assertEquals("DM_aAndEDepartmentType", actual.getConcept().getIri());
     }
 
@@ -54,13 +54,34 @@ public class MappingLogicTest {
         MapResponse actual = mappingLogic.getMapping(request);
 
         Assert.assertNotNull(actual);
-        Assert.assertNotNull(actual.getNodeData());
-        Assert.assertNotNull(actual.getNodeData().getNode());
+        Assert.assertNotNull(actual.getNode());
+        Assert.assertNotNull(actual.getNode().getNode());
         Assert.assertNotNull(actual.getConcept().getIri());
     }
 
     @Test
     public void getMapColumnValueRequest_KnownContextKnownValue() throws Exception {
+        MapRequest request = new MapRequest()
+            .setMapColumnValueRequest(
+                new MapColumnValueRequest()
+                    .setProvider("CM_Org_Barts")
+                    .setSystem("CM_Sys_Cerner")
+                    .setSchema("CDS")
+                    .setTable("emergency")
+                    .setColumn("department_type")
+                    .setValue(new MapValueRequest()
+                        .setCode("03")
+                        .setScheme("CM_NHS_DD")
+                    )
+            );
+
+        MapResponse actual = mappingLogic.getMapping(request);
+
+        Assert.assertEquals("CM_AEDepType3", actual.getConcept().getIri());
+    }
+
+    @Test
+    public void getMapColumnValueRequest_KnownContextKnownValueShortcut() throws Exception {
         MapRequest request = new MapRequest()
             .setMapColumnValueRequest(
                 new MapColumnValueRequest()

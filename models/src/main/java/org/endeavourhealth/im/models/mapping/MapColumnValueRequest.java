@@ -14,6 +14,26 @@ public class MapColumnValueRequest {
     private List<MapDependentColumn> dependentColumnValue;
     private String target;
 
+    public MapColumnValueRequest() {}
+
+    public MapColumnValueRequest(String provider, String system, String schema, String table, String column, String code, String scheme) {
+        this.provider = provider;
+        this.system = system;
+        this.schema = schema;
+        this.table = table;
+        this.column = column;
+        this.value = new MapValueRequest(code, scheme);
+    }
+
+    public MapColumnValueRequest(String provider, String system, String schema, String table, String column, String term) {
+        this.provider = provider;
+        this.system = system;
+        this.schema = schema;
+        this.table = table;
+        this.column = column;
+        this.value = new MapValueRequest(term);
+    }
+
     @JsonProperty("Provider")
     public String getProvider() {
         return provider;

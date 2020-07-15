@@ -159,17 +159,10 @@ public class IMClient {
 
     // Mapping API
 
-    public static MapResponse getMapProperty(String provider, String system, String schema, String table, String column) throws Exception {
+    public static MapResponse getMapProperty(MapColumnRequest mapColumnRequest) throws Exception {
         try (MetricsTimer timer =MetricsHelper.recordTime("IMClient.getMapProperty")) {
             MapRequest request = new MapRequest()
-                .setMapColumnRequest(
-                    new MapColumnRequest()
-                        .setProvider(provider)
-                        .setSystem(system)
-                        .setSchema(schema)
-                        .setTable(table)
-                        .setColumn(column)
-                );
+                .setMapColumnRequest(mapColumnRequest);
 
             Response response = post(base + "/Mapping", request);
 
@@ -180,47 +173,10 @@ public class IMClient {
         }
     }
 
-    public static MapResponse getMapPropertyValue(String provider, String system, String schema, String table, String column, String value, String scheme) throws Exception {
+    public static MapResponse getMapPropertyValue(MapColumnValueRequest mapColumnValueRequest) throws Exception {
         try (MetricsTimer timer = MetricsHelper.recordTime("IMClient.getMapPropertyValue")) {
             MapRequest request = new MapRequest()
-                .setMapColumnValueRequest(
-                    new MapColumnValueRequest()
-                        .setProvider(provider)
-                        .setSystem(system)
-                        .setSchema(schema)
-                        .setTable(table)
-                        .setColumn(column)
-                        .setValue(
-                            new MapValueRequest()
-                                .setCode(value)
-                                .setScheme(scheme)
-                        )
-                );
-
-            Response response = post(base + "/Mapping", request);
-
-            if (response.getStatus() == 200)
-                return response.readEntity(MapResponse.class);
-            else
-                throw new IOException(response.readEntity(String.class));
-        }
-    }
-
-    public static MapResponse getMapPropertyValue(String provider, String system, String schema, String table, String column, String term) throws Exception {
-        try (MetricsTimer timer = MetricsHelper.recordTime("IMClient.getMapPropertyValueTerm")) {
-            MapRequest request = new MapRequest()
-                .setMapColumnValueRequest(
-                    new MapColumnValueRequest()
-                        .setProvider(provider)
-                        .setSystem(system)
-                        .setSchema(schema)
-                        .setTable(table)
-                        .setColumn(column)
-                        .setValue(
-                            new MapValueRequest()
-                                .setTerm(term)
-                        )
-                );
+                .setMapColumnValueRequest(mapColumnValueRequest);
 
             Response response = post(base + "/Mapping", request);
 

@@ -1,6 +1,5 @@
 package org.endeavourhealth.im.dal;
 
-import com.sun.corba.se.impl.orbutil.graph.NodeData;
 import org.endeavourhealth.im.logic.MappingLogic;
 import org.endeavourhealth.im.models.mapping.*;
 
@@ -24,7 +23,7 @@ public class IMMappingJDBCDAL implements IMMappingDAL {
     }
 
     @Override
-    public MapNodeData getNode(String provider, String system, String schema, String table, String column) throws SQLException {
+    public MapNode getNode(String provider, String system, String schema, String table, String column) throws SQLException {
         List<String> join = new ArrayList<>();
         List<String> where = new ArrayList<>();
 
@@ -63,7 +62,7 @@ public class IMMappingJDBCDAL implements IMMappingDAL {
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next())
-                    return new MapNodeData(rs.getInt("id"), rs.getString("node"));
+                    return new MapNode(rs.getInt("id"), rs.getString("node"));
                 else
                     return null;
             }
@@ -177,7 +176,7 @@ public class IMMappingJDBCDAL implements IMMappingDAL {
             conn.commit();
 
             return new MapResponse()
-                .setNodeData(new MapNodeData(nodeId, node))
+                .setNode(new MapNode(nodeId, node))
                 .setConcept(
                     new ConceptIdentifiers()
                         .setDbid(cptId)
@@ -212,10 +211,7 @@ public class IMMappingJDBCDAL implements IMMappingDAL {
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next())
-                    return new MapValueNode()
-                    .setId(rs.getInt("id"))
-                    .setCodeScheme(scheme)
-                    .setFunction(rs.getString("function"));
+                    return new MapValueNode(rs.getInt("id"), scheme, rs.getString("function"));
                 else
                     return null;
             }
@@ -246,10 +242,7 @@ public class IMMappingJDBCDAL implements IMMappingDAL {
             if (stmt.executeUpdate() != 1)
                 throw new IllegalStateException("Unable to create value node for node [" + node + "], scheme [" + codeScheme + "]");
 
-            return new MapValueNode()
-                .setId(DALHelper.getGeneratedKey(stmt))
-                .setCodeScheme(codeScheme)
-                .setFunction("Lookup()");
+            return new MapValueNode(DALHelper.getGeneratedKey(stmt), codeScheme, "Lookup()");
         }
     }
 

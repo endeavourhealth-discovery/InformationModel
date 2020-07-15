@@ -5,6 +5,12 @@ public class MapValueNode {
     String codeScheme;
     String function;
 
+    public MapValueNode(int id, String codeScheme, String function) {
+        this.id = id;
+        this.codeScheme = codeScheme;
+        this.function = function;
+    }
+
     public int getId() {
         return id;
     }
