@@ -95,13 +95,12 @@ VALUES
 
 ('/CDS/EMGCY/ATTNDNC_CTGRY', '1', 'CM_NHS_DD', 'CM_AEAttCat1'),
 ('/CDS/EMGCY/ATTNDNC_CTGRY', '2', 'CM_NHS_DD', 'CM_AEAttCat2'),
-('/CDS/EMGCY/ATTNDNC_CTGRY', '3', 'CM_NHS_DD', 'CM_AEAttCat3'),
-('/CDS/EMGCY/ATTNDNC_CTGRY', '4', 'CM_NHS_DD', 'CM_AEAttCat4');
+('/CDS/EMGCY/ATTNDNC_CTGRY', '3', 'CM_NHS_DD', 'CM_AEAttCat3');
 
 INSERT INTO map_function_value_meta
 (node, scheme, function)
 VALUES
-('/BRTS/CRNR/CDS/EMGCY/TRTMNT_FNCTN', 'CM_BartCernerCode', 'Format(BC_%s)')
+('/BRTS/CRNR/CDS/EMGCY/TRTMNT_FNCTN', 'BartsCerner', 'Format(BC_%s)')
 ;
 
 -- ******************** INPATIENT ********************
@@ -221,7 +220,7 @@ VALUES
 INSERT INTO map_function_value_meta
 (node, scheme, function)
 VALUES
-('/BRTS/CRNR/CDS/INPTNT/TRTMNT_FNCTN', 'CM_BartCernerCode', 'Format(BC_%s)')
+('/BRTS/CRNR/CDS/INPTNT/TRTMNT_FNCTN', 'BartsCerner', 'Format(BC_%s)')
 ;
 
 /*
@@ -292,9 +291,10 @@ VALUES
 ('/CDS/OUTPTNT/ADMNSTRTV_CTGRY', '01', 'CM_NHS_DD', 'CM_AdminCat01'),
 ('/CDS/OUTPTNT/ADMNSTRTV_CTGRY', '02', 'CM_NHS_DD', 'CM_AdminCat02'),
 ('/CDS/OUTPTNT/ADMNSTRTV_CTGRY', '03', 'CM_NHS_DD', 'CM_AdminCat03'),
-('/CDS/OUTPTNT/ADMNSTRTV_CTGRY', '04', 'CM_NHS_DD', 'CM_AdminCat04'),
+('/CDS/OUTPTNT/ADMNSTRTV_CTGRY', '04', 'CM_NHS_DD', 'CM_AdminCat04')
 
-('/CDS/OUTPTNT/RFRRL_SRC', '01', 'CM_NHS_DD', 'CM_OutRefSrc01'),
+/*
+('/CDS/OUTPTNT/RFRRL_SRC', '01', 'CM_NHS_DD', 'CM_OutRefSrc01'),    -- TODO: outpatient referral source
 ('/CDS/OUTPTNT/RFRRL_SRC', '02', 'CM_NHS_DD', 'CM_OutRefSrc02'),
 ('/CDS/OUTPTNT/RFRRL_SRC', '10', 'CM_NHS_DD', 'CM_OutRefSrc10'),
 ('/CDS/OUTPTNT/RFRRL_SRC', '11', 'CM_NHS_DD', 'CM_OutRefSrc11'),
@@ -311,12 +311,14 @@ VALUES
 ('/CDS/OUTPTNT/RFRRL_SRC', '16', 'CM_NHS_DD', 'CM_OutRefSrc16'),
 ('/CDS/OUTPTNT/RFRRL_SRC', '17', 'CM_NHS_DD', 'CM_OutRefSrc17'),
 ('/CDS/OUTPTNT/RFRRL_SRC', '93', 'CM_NHS_DD', 'CM_OutRefSrc93'),
-('/CDS/OUTPTNT/RFRRL_SRC', '97', 'CM_NHS_DD', 'CM_OutRefSrc97');
+('/CDS/OUTPTNT/RFRRL_SRC', '97', 'CM_NHS_DD', 'CM_OutRefSrc97')
+*/
+;
 
 INSERT INTO map_function_value_meta
 (node, scheme, function)
 VALUES
-('/BRTS/CRNR/CDS/OUTPTNT/TRTMNT_FNCTN', 'CM_BartCernerCode', 'Format(BC_%s)')
+('/BRTS/CRNR/CDS/OUTPTNT/TRTMNT_FNCTN', 'BartsCerner', 'Format(BC_%s)')
 ;
 
 -- ******************** CRITICAL CARE ********************
@@ -355,9 +357,11 @@ VALUES
 INSERT INTO map_node_value_meta
 (node, value, scheme, concept)
 VALUES
+/*
 ('/CDS/CRTCL/CRTCL_CR_TYP', '01', 'CM_NHS_DD', 'CM_NeonatalCriticalCareEncounter'),
 ('/CDS/CRTCL/CRTCL_CR_TYP', '02', 'CM_NHS_DD', 'CM_PaediatricCriticalCareEncounter'),
 ('/CDS/CRTCL/CRTCL_CR_TYP', '03', 'CM_NHS_DD', 'CM_AdultCriticalCareEncounter'),
+*/
 
 ('/CDS/CRTCL/CR_UNT_FNCTN', '01', 'CM_NHS_DD', 'CM_CcufAdult1'),
 ('/CDS/CRTCL/CR_UNT_FNCTN', '02', 'CM_NHS_DD', 'CM_CcufAdult2'),
@@ -449,12 +453,26 @@ VALUES
 /* **************************************************************************************************** */
 
 -- Populate real tables from meta (IM v1)
+SELECT DISTINCT m.node, c.dbid, false
+FROM map_node_meta m
+LEFT JOIN concept c ON c.id = m.concept
+WHERE c.id IS NULL;
+
 INSERT INTO map_node
 (node, concept, draft)
 SELECT DISTINCT m.node, c.dbid, false
 FROM map_node_meta m
-JOIN concept c ON c.id = m.concept
-;
+JOIN concept c ON c.id = m.concept;
+
+--
+
+SELECT prv.dbid, sys.dbid, `schema`, `table`, `column`, n.id, false
+FROM map_context_meta m
+JOIN map_node n ON n.node = m.node
+LEFT JOIN concept prv ON prv.id = m.provider
+LEFT JOIN concept sys ON sys.id = m.system
+WHERE prv.id IS NULL
+OR sys.id IS NULL;
 
 INSERT INTO map_context
 (provider, `system`, `schema`, `table`, `column`, node, draft)
@@ -462,36 +480,61 @@ SELECT prv.dbid, sys.dbid, `schema`, `table`, `column`, n.id, false
 FROM map_context_meta m
 JOIN map_node n ON n.node = m.node
 JOIN concept prv ON prv.id = m.provider
-JOIN concept sys ON sys.id = m.system
-;
+JOIN concept sys ON sys.id = m.system;
+
+--
+
+SELECT DISTINCT n.id, c.dbid, 'Lookup()'
+FROM map_node_value_meta m
+JOIN map_node n ON n.node = m.node
+LEFT JOIN concept c ON c.id = m.scheme
+WHERE c.id IS NULL;
 
 INSERT INTO map_value_node
 (node, code_scheme, function)
 SELECT DISTINCT n.id, c.dbid, 'Lookup()'
 FROM map_node_value_meta m
 JOIN map_node n ON n.node = m.node
-JOIN concept c ON c.id = m.scheme
-;
+JOIN concept c ON c.id = m.scheme;
+
+--
+
+SELECT n.id, c.dbid, m.function
+FROM map_function_value_meta m
+JOIN map_node n ON n.node = m.node
+LEFT JOIN concept c ON c.id = m.scheme
+WHERE c.id IS NULL;
 
 INSERT INTO map_value_node
 (node, code_scheme, function)
 SELECT n.id, c.dbid, m.function
 FROM map_function_value_meta m
 JOIN map_node n ON n.node = m.node
-JOIN concept c ON c.id = m.scheme
-;
+JOIN concept c ON c.id = m.scheme;
+
+--
+
+SELECT v.id, m.value, c.dbid, false
+FROM map_node_value_meta m
+LEFT JOIN map_node n ON n.node = m.node
+LEFT JOIN map_value_node v ON v.node = n.id
+LEFT JOIN concept s ON s.dbid = v.code_scheme AND s.id = m.scheme
+LEFT JOIN concept c ON c.id = m.concept
+WHERE n.node IS NULL
+OR v.node IS NULL
+OR s.id IS NULL
+OR c.id IS NULL;
 
 INSERT INTO map_value_node_lookup
 (value_node, value, concept, draft)
-SELECT n.id, m.value, c.dbid, false
+SELECT v.id, m.value, c.dbid, false
 FROM map_node_value_meta m
 JOIN map_node n ON n.node = m.node
 JOIN map_value_node v ON v.node = n.id
 JOIN concept s ON s.dbid = v.code_scheme AND s.id = m.scheme
-JOIN concept c ON c.id = m.concept
-;
+JOIN concept c ON c.id = m.concept;
 
 -- Clean up
--- DROP TABLE IF EXISTS map_context_meta;
--- DROP TABLE IF EXISTS map_node_value_meta;
+DROP TABLE IF EXISTS map_context_meta;
+DROP TABLE IF EXISTS map_node_value_meta;
 

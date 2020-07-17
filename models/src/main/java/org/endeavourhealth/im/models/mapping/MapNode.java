@@ -4,6 +4,9 @@ public class MapNode {
     private int nodeId;
     private String node;
 
+    public MapNode() {
+    }
+
     public MapNode(int nodeId, String node) {
         this.nodeId = nodeId;
         this.node = node;
