@@ -9,7 +9,7 @@ public class MapValueRequest {
 
     public MapValueRequest() {}
 
-    public MapValueRequest(String scheme, String code) {
+    public MapValueRequest(String code, String scheme) {
         this.scheme = scheme;
         this.code = code;
     }
