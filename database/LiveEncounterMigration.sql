@@ -57,7 +57,18 @@ SET c.id = m.newId
 ;
 
 -- **************************************** 6. Add in any missing CM/DM ****************************************
+-- Ensure code scheme exists
+INSERT IGNORE INTO concept
+(document, id, name, description, code)
+VALUES
+(1, 'CM_DiscoveryCode', 'Discovery code', 'Discovery core code for value based concepts. Always the same as the IRI affix after the Discovery baseline IRI of http://www.DiscoveryDataService.org/InformationModel#', 'CM_DiscoveryCode');
+
+SELECT @core_scm := dbid FROM concept WHERE id = 'CM_DiscoveryCode';
+
+UPDATE concept SET scheme = @core_scm WHERE id = 'CM_DiscoveryCode';
+
 -- New/missing encounter types
+SELECT @core_scm := dbid FROM concept WHERE id = 'CM_DiscoveryCode';
 SELECT @snomed_scm := dbid FROM concept WHERE id = 'SNOMED';
 SELECT @ctv3_scm := dbid FROM concept WHERE id = 'CTV3';
 
@@ -66,6 +77,7 @@ SELECT * FROM im_next.concept WHERE iri = ':DM_PatientEvent';
 INSERT INTO concept
 (document, id, name, description, scheme, code)
 VALUES
+(1, 'CM_DiscoveryCode', 'Discovery code', 'Discovery core code for value based concepts. Always the same as the IRI affix after the Discovery baseline IRI of http://www.DiscoveryDataService.org/InformationModel#', null, null),
 (1, 'DM_PatientEvent', 'Patient health event', 'An health event relating to the patient.', null, null),
 (1, 'DM_EncounterEntry', 'Encounter', 'A record entry about an encounter, which is an interaction between a patient (or on behalf of the patient) and a health professional or health provider.', null, null),
 (1, 'DM_HospitalDischEntry', 'Hospital discharge (entry)', 'An entry describing the event of a hospital discharge. Has specialised encounter properties', null, null),

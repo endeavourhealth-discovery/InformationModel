@@ -193,15 +193,15 @@ public class MappingLogicTest {
                     .setSystem("CM_Sys_Medway")
                     .setSchema("MedwayBI")
                     .setTable("PMI")
-                    .setColumn("CAUSEOFDEATH 1c")
+                    .setColumn("CAUSEOFDEATH 1B")
                     .setValue(new MapValueRequest()
-                        .setTerm("Benign prostatic hyperplasia")
+                        .setTerm("Copd")
                     )
             );
 
         MapResponse actual = mappingLogic.getMapping(request);
 
-        Assert.assertTrue(actual.getConcept().getIri().startsWith("LPV_BHR_Mdw_Mdw_PMI_CAU_Bng_"));
+        Assert.assertTrue(actual.getConcept().getIri().startsWith("LPV_BHR_Mdw_Mdw_PMI_CAU_Cpd_"));
     }
 
     @Test

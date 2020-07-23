@@ -40,35 +40,43 @@ public class MappingLogic implements AutoCloseable {
     private MapResponse getMapColumnRequest(MapRequest request) throws Exception {
         MapColumnRequest columnRequest = request.getMapColumnRequest();
 
-        MapNode nodeData = dal.getNode(
+        return getOrCreateColumnNode(
             columnRequest.getProvider(),
             columnRequest.getSystem(),
             columnRequest.getSchema(),
             columnRequest.getTable(),
             columnRequest.getColumn()
+        ).setRequest(request);
+    }
+
+    private MapResponse getOrCreateColumnNode(String provider, String system, String schema, String table, String column) throws Exception {
+        MapNode nodeData = dal.getNode(
+            provider,
+            system,
+            schema,
+            table,
+            column
         );
 
         if (nodeData != null) {
             return new MapResponse()
                 .setNode(nodeData)
-                .setRequest(request)
                 .setConcept(dal.getNodePropertyConcept(nodeData.getNode()));
         } else {
             return dal.createNodePropertyConcept(
-                columnRequest.getProvider(),
-                columnRequest.getSystem(),
-                columnRequest.getSchema(),
-                columnRequest.getTable(),
-                columnRequest.getColumn()
-            )
-                .setRequest(request);
+                provider,
+                system,
+                schema,
+                table,
+                column
+            );
         }
     }
 
     private MapResponse getMapColumnValueRequest(MapRequest request) throws Exception {
         MapColumnValueRequest valueRequest = request.getMapColumnValueRequest();
 
-        MapNode nodeData = dal.getNode(
+        MapResponse nodeData = getOrCreateColumnNode(
             valueRequest.getProvider(),
             valueRequest.getSystem(),
             valueRequest.getSchema(),
@@ -76,9 +84,9 @@ public class MappingLogic implements AutoCloseable {
             valueRequest.getColumn()
         );
 
-        MapValueNode valueNode = dal.getValueNode(nodeData.getNode(), valueRequest.getValue().getScheme());
+        MapValueNode valueNode = dal.getValueNode(nodeData.getNode().getNode(), valueRequest.getValue().getScheme());
         if (valueNode == null) {
-            valueNode = dal.createValueNode(nodeData.getNode(), valueRequest.getValue().getScheme());
+            valueNode = dal.createValueNode(nodeData.getNode().getNode(), valueRequest.getValue().getScheme());
         }
 
         ConceptIdentifiers ids;
@@ -113,7 +121,7 @@ public class MappingLogic implements AutoCloseable {
         }
 
         return new MapResponse()
-            .setNode(nodeData)
+            .setNode(nodeData.getNode())
             .setValueNode(valueNode)
             .setRequest(request)
             .setConcept(ids);
