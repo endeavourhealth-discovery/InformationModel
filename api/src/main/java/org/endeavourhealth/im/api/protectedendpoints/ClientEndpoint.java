@@ -21,6 +21,25 @@ public class ClientEndpoint {
 
     // V1 / Code APIs
     @GET
+    @Path("/Concept/Id")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response getConceptIdForSchemeCode(@Context SecurityContext sc,
+                                                   @QueryParam("scheme") String scheme,
+                                                   @QueryParam("code") String code) throws Exception {
+        try (MetricsTimer t = MetricsHelper.recordTime("Client.getConceptIdForSchemeCode")) {
+            LOG.debug("getConceptIdForSchemeCode");
+
+            String result = new IMClientJDBCDAL().getConceptIdForSchemeCode(scheme, code);
+
+            return Response
+                .ok()
+                .entity(result)
+                .build();
+        }
+    }
+
+    @GET
     @Path("/Concept/Core/Code")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.TEXT_PLAIN)

@@ -26,6 +26,23 @@ public class IMClient {
     private static KeycloakClient kcClient;
 
     // V1 / Code
+    public static String getConceptIdForSchemeCode(String scheme, String code) throws Exception {
+        try (MetricsTimer timer =MetricsHelper.recordTime("IMClient.getMappedCoreCodeForSchemeCode")) {
+            Map<String, String> params = new HashMap<>();
+            params.put("scheme", scheme);
+            params.put("code", code);
+
+            Response response = get(base + "/Concept/Id", params);
+
+            if (response.getStatus() == 200) {
+                String result = response.readEntity(String.class);
+                return result.isEmpty() ? null : result;
+            }
+            else
+                throw new IOException(response.readEntity(String.class));
+        }
+    }
+
     public static String getMappedCoreCodeForSchemeCode(String scheme, String code) throws Exception {
         return getMappedCoreCodeForSchemeCode(scheme, code, false);
     }

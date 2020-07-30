@@ -267,6 +267,29 @@ public class IMClientJDBCDAL {
 
 
     // By Code
+    public String getConceptIdForSchemeCode(String scheme, String code) throws SQLException {
+        String sql = "SELECT c.id\n" +
+            "FROM concept c\n" +
+            "JOIN concept s ON s.dbid = c.scheme\n" +
+            "WHERE c.code = ?\n" +
+            "AND s.id = ?\n";
+
+
+        Connection conn = ConnectionPool.getInstance().pop();
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, code);
+            stmt.setString(2, scheme);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next())
+                    return rs.getString("id");
+                else
+                    return null;
+            }
+        } finally {
+            ConnectionPool.getInstance().push(conn);
+        }
+    }
+
     public String getMappedCoreCodeForSchemeCode(String scheme, String code, boolean snomedOnly) throws SQLException {
         String sql = "SELECT c.code\n" +
             "FROM concept l\n" +
