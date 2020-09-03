@@ -35,11 +35,11 @@ VALUES
 INSERT INTO map_node_meta
 (node, concept)
 VALUES
-('/BHRUT/MDWY/MDWYBI/PMI/CS_DTH',               ''),
-('/BHRUT/MDWY/MDWYBI/PMI/CS_DTH_1B',            ''),
-('/BHRUT/MDWY/MDWYBI/PMI/CS_DTH_1C',            ''),
-('/BHRUT/MDWY/MDWYBI/PMI/CS_DTH_2',             ''),
-('/BHRUT/MDWY/MDWYBI/PMI/INFCTN_STTS',          '')
+('/BHRUT/MDWY/MDWYBI/PMI/CS_DTH',               'DM_CauseOfDeath'),
+('/BHRUT/MDWY/MDWYBI/PMI/CS_DTH_1B',            'DM_CauseOfDeath1b'),
+('/BHRUT/MDWY/MDWYBI/PMI/CS_DTH_1C',            'DM_CauseOfDeath1c'),
+('/BHRUT/MDWY/MDWYBI/PMI/CS_DTH_2',             'DM_CauseOfDeath2'),
+('/BHRUT/MDWY/MDWYBI/PMI/INFCTN_STTS',          'DM_InfectionStatus')
 ;
 
 /* **************************************************************************************************** */

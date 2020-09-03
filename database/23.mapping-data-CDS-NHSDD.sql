@@ -45,22 +45,15 @@ VALUES
 ('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'emergency', 'arrival_mode',             '/CDS/EMGCY/ARRVL_MD'),                 -- SNOMED
 ('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'emergency', 'attendance_category',      '/CDS/EMGCY/ATTNDNC_CTGRY'),            -- NHS DD
 ('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'emergency', 'attendance_source',        '/CDS/EMGCY/ATTNDNC_SRC'),              -- SNOMED
--- ('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'emergency', 'chief_complaint',          '/CDS/EMGCY/CHF_CMPLNT'),               -- SNOMED               -- TODO: Chief complaint A&E Property
 ('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'emergency', 'treatment_function_code',  '/BRTS/CRNR/CDS/EMGCY/TRTMNT_FNCTN'),   -- BARTS/CERNER code
--- ('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'emergency', 'discharge_status',         '/CDS/EMGCY/DSCHRG_STTS'),              -- SNOMED               -- TODO: Discharge status
-('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'emergency', 'discharge_destination',    '/CDS/EMGCY/DSCHRG_DSTNTN')            -- SNOMED
--- ('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'emergency', 'discharge_follow_up',      '/CDS/EMGCY/DSCHRG_FLLW_UP'),           -- SNOMED         -- TODO: Discharge follow-up
--- ('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'emergency', 'diagnosis',                '/CDS/EMGCY/DGNSS'),                    -- SNOMED               -- TODO: diagnosis
--- ('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'emergency', 'investigation',            '/CDS/EMGCY/INVSTGTN'),                 -- SNOMED               -- TODO: investigation
--- ('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'emergency', 'treatment',                '/CDS/EMGCY/TRTMNT'),                   -- SNOMED               -- TODO: treatment
--- ('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'emergency', 'referred_to_services',     '/CDS/EMGCY/RFRRD_SRVCS'),              -- SNOMED               -- TODO: referred_to_services
--- ('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'emergency', 'safe_guarding_concerns',   '/CDS/EMGCY/SFGRDNG_CNCRNS')            -- SNOMED               -- TODO: safe_guarding_concerns
+('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'emergency', 'discharge_status',         '/CDS/EMGCY/DSCHRG_STTS'),              -- SNOMED
+('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'emergency', 'discharge_destination',    '/CDS/EMGCY/DSCHRG_DSTNTN'),            -- SNOMED
+('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'emergency', 'discharge_follow_up',      '/CDS/EMGCY/DSCHRG_FLLW_UP'),           -- SNOMED
+('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'emergency', 'referred_to_services',     '/CDS/EMGCY/RFRRD_SRVCS')               -- SNOMED
 
 /* convergent mapping examples
-
 ('CM_Org_Homerton', 'CM_Sys_Cerner', 'CDS', 'emergency', 'department_type',          '/CDS/EMGCY/DPT_TYP'),                  -- HOMERTON LOOKUP MAPS TO SAME CONTEXT AS BARTS (COMMON NHS DD CODES)
 ('CM_Org_Homerton', 'CM_Sys_Cerner', 'CDS', 'emergency', 'treatment_function_code',  '/HMTN/CRNR/CDS/EMGCY/TRTMNT_FNCTN'),   -- HOMERTON LOOKUP MAPS TO DIFFERENT CONTEXT (LOCAL/SPECIFIC CERNER CODES)
-
 */
 ;
 
@@ -72,16 +65,11 @@ VALUES
 ('/CDS/EMGCY/ARRVL_MD',                  'DM_arrivalMode'),             -- SNOMED
 ('/CDS/EMGCY/ATTNDNC_CTGRY',             'DM_aeAttendanceCategory'),    -- NHS DD
 ('/CDS/EMGCY/ATTNDNC_SRC',               'DM_aeAttendanceSource'),      -- SNOMED
--- ('/CDS/EMGCY/CHF_CMPLNT',                ''),                           -- SNOMED               -- TODO: Chief complaint A&E Property - YES
 ('/BRTS/CRNR/CDS/EMGCY/TRTMNT_FNCTN',    'DM_treatmentFunctionAdmit'),  -- BARTS/CERNER code
--- ('/CDS/EMGCY/DSCHRG_STTS',               ''),                           -- SNOMED               -- TODO: Discharge status
-('/CDS/EMGCY/DSCHRG_DSTNTN',             'DM_hasDischargeDestination') -- SNOMED
--- ('/CDS/EMGCY/DSCHRG_FLLW_UP',            ''),                           -- SNOMED               -- TODO: Discharge follow up property
--- ('/CDS/EMGCY/DGNSS',                     ''),                           -- SNOMED               -- TODO: diagnosis
--- ('/CDS/EMGCY/INVSTGTN',                  ''),                           -- SNOMED               -- TODO: investigation
--- ('/CDS/EMGCY/TRTMNT',                    ''),                           -- SNOMED               -- TODO: treatment
--- ('/CDS/EMGCY/RFRRD_SRVCS',               ''),                           -- SNOMED               -- TODO: referred_to_services
--- ('/CDS/EMGCY/SFGRDNG_CNCRNS',            '')                            -- SNOMED               -- TODO: safe_guarding_concerns
+('/CDS/EMGCY/DSCHRG_STTS',               'DM_dischargeStatus'),         -- SNOMED
+('/CDS/EMGCY/DSCHRG_DSTNTN',             'DM_hasDischargeDestination'), -- SNOMED
+('/CDS/EMGCY/DSCHRG_FLLW_UP',            'DM_dischargeFollowUp'),       -- SNOMED
+('/CDS/EMGCY/RFRRD_SRVCS',               'DM_referredToServices')       -- SNOMED
 ;
 
 -- Value maps
@@ -92,10 +80,12 @@ VALUES
 ('/CDS/EMGCY/DPT_TYP', '02', 'CM_NHS_DD', 'CM_AEDepType2'),
 ('/CDS/EMGCY/DPT_TYP', '03', 'CM_NHS_DD', 'CM_AEDepType3'),
 ('/CDS/EMGCY/DPT_TYP', '04', 'CM_NHS_DD', 'CM_AEDepType4'),
+('/CDS/EMGCY/DPT_TYP', '05', 'CM_NHS_DD', 'CM_AEDepType5'),
 
 ('/CDS/EMGCY/ATTNDNC_CTGRY', '1', 'CM_NHS_DD', 'CM_AEAttCat1'),
 ('/CDS/EMGCY/ATTNDNC_CTGRY', '2', 'CM_NHS_DD', 'CM_AEAttCat2'),
-('/CDS/EMGCY/ATTNDNC_CTGRY', '3', 'CM_NHS_DD', 'CM_AEAttCat3');
+('/CDS/EMGCY/ATTNDNC_CTGRY', '3', 'CM_NHS_DD', 'CM_AEAttCat3'),
+('/CDS/EMGCY/ATTNDNC_CTGRY', '4', 'CM_NHS_DD', 'CM_AEAttCat4');
 
 INSERT INTO map_function_value_meta
 (node, scheme, function)
@@ -115,10 +105,10 @@ VALUES
 ('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'inpatient', 'discharge_destination_code',    '/CDS/INPTNT/DSCHRG_DSTNTN'),          -- NHS DD
 ('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'inpatient', 'discharge_method',              '/CDS/INPTNT/DSCHRG_MTHD'),            -- NHS DD
 ('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'inpatient', 'administrative_category_code',  '/CDS/INPTNT/ADMNSTRV_CTGRY'),         -- NHS DD
-('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'inpatient', 'treatment_function_code',       '/BRTS/CRNR/CDS/INPTNT/TRTMNT_FNCTN') -- BARTS LOCAL
--- ('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'inpatient', 'live_or_still_birth_indicator', '/CDS/INPTNT/LV_STLL_BRTH_INDCTR'),    -- NHS DD       -- TODO: Confirm correct with Leigh
--- ('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'inpatient', 'delivery_method',               '/CDS/INPTNT/DLVRY_MTHD'),             -- NHS DD       -- TODO: Confirm correct with Leigh
--- ('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'inpatient', 'gender',                        '/CDS/INPTNT/GNDR')                    -- NHS DD       -- TODO: Confirm correct with Leigh
+('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'inpatient', 'treatment_function_code',       '/BRTS/CRNR/CDS/INPTNT/TRTMNT_FNCTN'), -- BARTS LOCAL
+('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'inpatient', 'live_or_still_birth_indicator', '/CDS/INPTNT/LV_STLL_BRTH_INDCTR'),    -- NHS DD
+('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'inpatient', 'delivery_method',               '/CDS/INPTNT/DLVRY_MTHD'),             -- NHS DD
+('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'inpatient', 'gender',                        '/CDS/INPTNT/GNDR')                    -- NHS DD
 ;
 
 -- Node maps
@@ -131,10 +121,10 @@ VALUES
 ('/CDS/INPTNT/DSCHRG_DSTNTN',            'DM_hasDischargeDestination'),         -- NHS DD
 ('/CDS/INPTNT/DSCHRG_MTHD',              'DM_hasDischargeMethod'),              -- NHS DD
 ('/CDS/INPTNT/ADMNSTRV_CTGRY',           'DM_adminCategoryonAdmission'),        -- NHS DD
-('/BRTS/CRNR/CDS/INPTNT/TRTMNT_FNCTN',   'DM_treatmentFunctionAdmit')          -- BARTS LOCAL
--- ('/CDS/INPTNT/LV_STLL_BRTH_INDCTR',      ''),                                   -- NHS DD       -- TODO: Confirm correct with Leigh
--- ('/CDS/INPTNT/DLVRY_MTHD',               ''),                                   -- NHS DD       -- TODO: Confirm correct with Leigh
--- ('/CDS/INPTNT/GNDR',                     '')                                    -- NHS DD       -- TODO: Confirm correct with Leigh
+('/BRTS/CRNR/CDS/INPTNT/TRTMNT_FNCTN',   'DM_treatmentFunctionAdmit'),          -- BARTS LOCAL
+('/CDS/INPTNT/LV_STLL_BRTH_INDCTR',      'DM_liveOrStillBirthIndicator'),       -- NHS DD
+('/CDS/INPTNT/DLVRY_MTHD',               'DM_deliveryMethod'),                  -- NHS DD
+('/CDS/INPTNT/GNDR',                     'DM_gender')                           -- NHS DD
 ;
 
 -- Value maps
@@ -215,37 +205,35 @@ VALUES
 ('/CDS/INPTNT/ADMNSTRV_CTGRY', '01', 'CM_NHS_DD', 'CM_AdminCat01'),
 ('/CDS/INPTNT/ADMNSTRV_CTGRY', '02', 'CM_NHS_DD', 'CM_AdminCat02'),
 ('/CDS/INPTNT/ADMNSTRV_CTGRY', '03', 'CM_NHS_DD', 'CM_AdminCat03'),
-('/CDS/INPTNT/ADMNSTRV_CTGRY', '04', 'CM_NHS_DD', 'CM_AdminCat04');
+('/CDS/INPTNT/ADMNSTRV_CTGRY', '04', 'CM_NHS_DD', 'CM_AdminCat04'),
+
+('/CDS/INPTNT/LV_STLL_BRTH_INDCTR', '1', 'CM_NHS_DD', 'CM_LiveStillBirthInd1'),
+('/CDS/INPTNT/LV_STLL_BRTH_INDCTR', '2', 'CM_NHS_DD', 'CM_LiveStillBirthInd2'),
+('/CDS/INPTNT/LV_STLL_BRTH_INDCTR', '3', 'CM_NHS_DD', 'CM_LiveStillBirthInd3'),
+('/CDS/INPTNT/LV_STLL_BRTH_INDCTR', '4', 'CM_NHS_DD', 'CM_LiveStillBirthInd4'),
+('/CDS/INPTNT/LV_STLL_BRTH_INDCTR', '5', 'CM_NHS_DD', 'CM_LiveStillBirthInd5'),
+
+('/CDS/INPTNT/DLVRY_MTHD', '0', 'CM_NHS_DD', 'CM_DlvryMthd0'),
+('/CDS/INPTNT/DLVRY_MTHD', '1', 'CM_NHS_DD', 'CM_DlvryMthd1'),
+('/CDS/INPTNT/DLVRY_MTHD', '2', 'CM_NHS_DD', 'CM_DlvryMthd2'),
+('/CDS/INPTNT/DLVRY_MTHD', '3', 'CM_NHS_DD', 'CM_DlvryMthd3'),
+('/CDS/INPTNT/DLVRY_MTHD', '4', 'CM_NHS_DD', 'CM_DlvryMthd4'),
+('/CDS/INPTNT/DLVRY_MTHD', '5', 'CM_NHS_DD', 'CM_DlvryMthd5'),
+('/CDS/INPTNT/DLVRY_MTHD', '6', 'CM_NHS_DD', 'CM_DlvryMthd6'),
+('/CDS/INPTNT/DLVRY_MTHD', '7', 'CM_NHS_DD', 'CM_DlvryMthd7'),
+('/CDS/INPTNT/DLVRY_MTHD', '8', 'CM_NHS_DD', 'CM_DlvryMthd8'),
+('/CDS/INPTNT/DLVRY_MTHD', '9', 'CM_NHS_DD', 'CM_DlvryMthd9'),
+
+('/CDS/INPTNT/GNDR', '0', 'CM_NHS_DD', 'CM_Gender0'),
+('/CDS/INPTNT/GNDR', '1', 'CM_NHS_DD', 'CM_Gender1'),
+('/CDS/INPTNT/GNDR', '2', 'CM_NHS_DD', 'CM_Gender2'),
+('/CDS/INPTNT/GNDR', '9', 'CM_NHS_DD', 'CM_Gender9')
+;
 
 INSERT INTO map_function_value_meta
 (node, scheme, function)
 VALUES
 ('/BRTS/CRNR/CDS/INPTNT/TRTMNT_FNCTN', 'BartsCerner', 'Format(BC_%s)')
-;
-
-/*
-('/CDS/INPTNT/LV_STLL_BRTH_INDCTR', '1', 'CM_NHS_DD', ''),  -- TODO: Confirm correct with Leigh
-('/CDS/INPTNT/LV_STLL_BRTH_INDCTR', '2', 'CM_NHS_DD', ''),
-('/CDS/INPTNT/LV_STLL_BRTH_INDCTR', '3', 'CM_NHS_DD', ''),
-('/CDS/INPTNT/LV_STLL_BRTH_INDCTR', '4', 'CM_NHS_DD', ''),
-('/CDS/INPTNT/LV_STLL_BRTH_INDCTR', '5', 'CM_NHS_DD', ''),
-
-('/CDS/INPTNT/DLVRY_MTHD', '0', 'CM_NHS_DD', ''),  -- TODO: Confirm correct with Leigh
-('/CDS/INPTNT/DLVRY_MTHD', '1', 'CM_NHS_DD', ''),
-('/CDS/INPTNT/DLVRY_MTHD', '2', 'CM_NHS_DD', ''),
-('/CDS/INPTNT/DLVRY_MTHD', '3', 'CM_NHS_DD', ''),
-('/CDS/INPTNT/DLVRY_MTHD', '4', 'CM_NHS_DD', ''),
-('/CDS/INPTNT/DLVRY_MTHD', '5', 'CM_NHS_DD', ''),
-('/CDS/INPTNT/DLVRY_MTHD', '6', 'CM_NHS_DD', ''),
-('/CDS/INPTNT/DLVRY_MTHD', '7', 'CM_NHS_DD', ''),
-('/CDS/INPTNT/DLVRY_MTHD', '8', 'CM_NHS_DD', ''),
-('/CDS/INPTNT/DLVRY_MTHD', '9', 'CM_NHS_DD', ''),
-
-('/CDS/INPTNT/GNDR', '0', 'CM_NHS_DD', ''),  -- TODO: Confirm correct with Leigh
-('/CDS/INPTNT/GNDR', '1', 'CM_NHS_DD', ''),
-('/CDS/INPTNT/GNDR', '2', 'CM_NHS_DD', ''),
-('/CDS/INPTNT/GNDR', '9', 'CM_NHS_DD', '')
- */
 ;
 
 -- ******************** OUTPATIENT ********************
@@ -257,8 +245,8 @@ VALUES
 ('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'outpatient', 'appt_attended_code',           '/CDS/OUTPTNT/APPT_ATTNDD'),           -- NHS DD
 ('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'outpatient', 'appt_outcome_code',            '/CDS/OUTPTNT/OUTCM'),                 -- NHS DD
 ('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'outpatient', 'administrative_category_code', '/CDS/OUTPTNT/ADMNSTRTV_CTGRY'),       -- NHS DD
--- ('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'outpatient', 'referral_source',              '/CDS/OUTPTNT/RFRRL_SRC'),             -- NHS DD               -- TODO: outpatient referral source
-('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'outpatient', 'treatment_function_code',      '/BRTS/CRNR/CDS/OUTPTNT/TRMNT_FNCTN')  -- BARTS/CERNER code
+('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'outpatient', 'referral_source',              '/CDS/OUTPTNT/RFRRL_SRC'),             -- NHS DD
+('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'outpatient', 'treatment_function_code',      '/BRTS/CRNR/CDS/OUTPTNT/TRTMNT_FNCTN') -- BARTS/CERNER code
 ;
 
 -- Node maps
@@ -268,7 +256,7 @@ VALUES
 ('/CDS/OUTPTNT/APPT_ATTNDD',             'DM_attendanceStatus'),                -- NHS DD
 ('/CDS/OUTPTNT/OUTCM',                   'DM_hasAttendanceOutcome'),            -- NHS DD
 ('/CDS/OUTPTNT/ADMNSTRTV_CTGRY',         'DM_adminCategoryonAdmission'),        -- NHS DD
--- ('/CDS/OUTPTNT/RFRRL_SRC',               ''),                                   -- NHS DD               -- TODO: outpatient referral source
+('/CDS/OUTPTNT/RFRRL_SRC',               'DM_outpatientReferralSource'),        -- NHS DD
 ('/BRTS/CRNR/CDS/OUTPTNT/TRMNT_FNCTN',   'DM_treatmentFunctionAdmit')           -- BARTS/CERNER code
 ;
 
@@ -291,10 +279,9 @@ VALUES
 ('/CDS/OUTPTNT/ADMNSTRTV_CTGRY', '01', 'CM_NHS_DD', 'CM_AdminCat01'),
 ('/CDS/OUTPTNT/ADMNSTRTV_CTGRY', '02', 'CM_NHS_DD', 'CM_AdminCat02'),
 ('/CDS/OUTPTNT/ADMNSTRTV_CTGRY', '03', 'CM_NHS_DD', 'CM_AdminCat03'),
-('/CDS/OUTPTNT/ADMNSTRTV_CTGRY', '04', 'CM_NHS_DD', 'CM_AdminCat04')
+('/CDS/OUTPTNT/ADMNSTRTV_CTGRY', '04', 'CM_NHS_DD', 'CM_AdminCat04'),
 
-/*
-('/CDS/OUTPTNT/RFRRL_SRC', '01', 'CM_NHS_DD', 'CM_OutRefSrc01'),    -- TODO: outpatient referral source
+('/CDS/OUTPTNT/RFRRL_SRC', '01', 'CM_NHS_DD', 'CM_OutRefSrc01'),
 ('/CDS/OUTPTNT/RFRRL_SRC', '02', 'CM_NHS_DD', 'CM_OutRefSrc02'),
 ('/CDS/OUTPTNT/RFRRL_SRC', '10', 'CM_NHS_DD', 'CM_OutRefSrc10'),
 ('/CDS/OUTPTNT/RFRRL_SRC', '11', 'CM_NHS_DD', 'CM_OutRefSrc11'),
@@ -312,7 +299,6 @@ VALUES
 ('/CDS/OUTPTNT/RFRRL_SRC', '17', 'CM_NHS_DD', 'CM_OutRefSrc17'),
 ('/CDS/OUTPTNT/RFRRL_SRC', '93', 'CM_NHS_DD', 'CM_OutRefSrc93'),
 ('/CDS/OUTPTNT/RFRRL_SRC', '97', 'CM_NHS_DD', 'CM_OutRefSrc97')
-*/
 ;
 
 INSERT INTO map_function_value_meta
@@ -327,41 +313,37 @@ VALUES
 INSERT INTO map_context_meta
 (provider, `system`, `schema`, `table`, `column`, node)
 VALUES
--- ('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'critical', 'critical_care_type_id',          '/CDS/CRTCL/CRTCL_CR_TYP'),    -- NHS DD       -- TODO: critical care type
+('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'critical', 'critical_care_type_id',          '/CDS/CRTCL/CRTCL_CR_TYP'),    -- NHS DD
 ('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'critical', 'care_unit_function',             '/CDS/CRTCL/CR_UNT_FNCTN'),    -- NHS DD
-('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'critical', 'admission_source_code',          '/CDS/CRTCL/ADMSSN_SRC')      -- NHS DD
--- ('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'critical', 'admission_type_code',            '/CDS/CRTCL/ADMSSN_TYP'),      -- NHS DD       -- TODO: admission type
--- ('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'critical', 'admission_location',             '/CDS/CRTCL/ADMSSN_LCTN'),     -- NHS DD       -- TODO: admission location
--- ('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'critical', 'discharge_status_code',          '/CDS/CRTCL/DSCHRG_STTS'),     -- NHS DD       -- TODO: discharge status
--- ('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'critical', 'discharge_destination',          '/CDS/CRTCL/DSCHRG_DSTNTN'),   -- NHS DD       -- TODO: discharge destination
--- ('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'critical', 'discharge_location',             '/CDS/CRTCL/DSCHRG_LCTN'),     -- NHS DD       -- TODO: discharge location
--- ('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'critical', 'care_activity',                  '/CDS/CRTCL/CR_ACTVTY')        -- NHS DD       -- TODO: care activity
+('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'critical', 'admission_source_code',          '/CDS/CRTCL/ADMSSN_SRC'),      -- NHS DD
+('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'critical', 'admission_type_code',            '/CDS/CRTCL/ADMSSN_TYP'),      -- NHS DD
+('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'critical', 'admission_location',             '/CDS/CRTCL/ADMSSN_LCTN'),     -- NHS DD
+('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'critical', 'discharge_status_code',          '/CDS/CRTCL/DSCHRG_STTS'),     -- NHS DD
+('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'critical', 'discharge_destination',          '/CDS/CRTCL/DSCHRG_DSTNTN'),   -- NHS DD
+('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'critical', 'discharge_location',             '/CDS/CRTCL/DSCHRG_LCTN')      -- NHS DD
 ;
 
 -- Node maps
 INSERT INTO map_node_meta
 (node, concept)
 VALUES
--- ('/CDS/CRTCL/CRTCL_CR_TYP',              ''),                               -- NHS DD       -- TODO: critical care type
-('/CDS/CRTCL/CR_UNT_FNCTN',              'DM_hasCriticalCareUnitFunction'), -- NHS DD
-('/CDS/CRTCL/ADMSSN_SRC',                'DM_sourceOfAdmission')           -- NHS DD
--- ('/CDS/CRTCL/ADMSSN_TYP',                ''),                               -- NHS DD       -- TODO: admission type
--- ('/CDS/CRTCL/ADMSSN_LCTN',               ''),                               -- NHS DD       -- TODO: admission location
--- ('/CDS/CRTCL/DSCHRG_STTS',               ''),                               -- NHS DD       -- TODO: discharge status
--- ('/CDS/CRTCL/DSCHRG_DSTNTN',             ''),                               -- NHS DD       -- TODO: discharge destination
--- ('/CDS/CRTCL/DSCHRG_LCTN',               ''),                               -- NHS DD       -- TODO: discharge location
--- ('/CDS/CRTCL/CR_ACTVTY',                 '')                                -- NHS DD       -- TODO: care activity
+('/CDS/CRTCL/CRTCL_CR_TYP',              'DM_criticalCareType'),                -- NHS DD
+('/CDS/CRTCL/CR_UNT_FNCTN',              'DM_hasCriticalCareUnitFunction'),     -- NHS DD
+('/CDS/CRTCL/ADMSSN_SRC',                'DM_sourceOfAdmission'),               -- NHS DD
+('/CDS/CRTCL/ADMSSN_TYP',                'DM_criticalCareAdmType'),             -- NHS DD
+('/CDS/CRTCL/ADMSSN_LCTN',               'DM_criticalCareSourceLocation'),      -- NHS DD
+('/CDS/CRTCL/DSCHRG_STTS',               'DM_criticalCareDischargeStatus'),     -- NHS DD
+('/CDS/CRTCL/DSCHRG_DSTNTN',             'DM_criticalCareDischargeDest'),       -- NHS DD
+('/CDS/CRTCL/DSCHRG_LCTN',               'DM_criticalCareDischargeLocation')    -- NHS DD
 ;
 
 -- Value maps
 INSERT INTO map_node_value_meta
 (node, value, scheme, concept)
 VALUES
-/*
-('/CDS/CRTCL/CRTCL_CR_TYP', '01', 'CM_NHS_DD', 'CM_NeonatalCriticalCareEncounter'),
-('/CDS/CRTCL/CRTCL_CR_TYP', '02', 'CM_NHS_DD', 'CM_PaediatricCriticalCareEncounter'),
-('/CDS/CRTCL/CRTCL_CR_TYP', '03', 'CM_NHS_DD', 'CM_AdultCriticalCareEncounter'),
-*/
+('/CDS/CRTCL/CRTCL_CR_TYP', '01', 'CM_CDS', 'CM_CritCareType01'),
+('/CDS/CRTCL/CRTCL_CR_TYP', '02', 'CM_CDS', 'CM_CritCareType02'),
+('/CDS/CRTCL/CRTCL_CR_TYP', '03', 'CM_CDS', 'CM_CritCareType03'),
 
 ('/CDS/CRTCL/CR_UNT_FNCTN', '01', 'CM_NHS_DD', 'CM_CcufAdult1'),
 ('/CDS/CRTCL/CR_UNT_FNCTN', '02', 'CM_NHS_DD', 'CM_CcufAdult2'),
@@ -390,59 +372,58 @@ VALUES
 ('/CDS/CRTCL/ADMSSN_SRC', '02', 'CM_NHS_DD', 'CM_CriticalCareSource2'),
 ('/CDS/CRTCL/ADMSSN_SRC', '03', 'CM_NHS_DD', 'CM_CriticalCareSource3'),
 ('/CDS/CRTCL/ADMSSN_SRC', '04', 'CM_NHS_DD', 'CM_CriticalCareSource4'),
-('/CDS/CRTCL/ADMSSN_SRC', '05', 'CM_NHS_DD', 'CM_CriticalCareSource5')
+('/CDS/CRTCL/ADMSSN_SRC', '05', 'CM_NHS_DD', 'CM_CriticalCareSource5'),
 
-/*
-('/CDS/CRTCL/ADMSSN_TYP', '01', 'CM_NHS_DD', ''),                                   -- TODO: Admission type
-('/CDS/CRTCL/ADMSSN_TYP', '02', 'CM_NHS_DD', ''),
-('/CDS/CRTCL/ADMSSN_TYP', '03', 'CM_NHS_DD', ''),
-('/CDS/CRTCL/ADMSSN_TYP', '04', 'CM_NHS_DD', ''),
-('/CDS/CRTCL/ADMSSN_TYP', '05', 'CM_NHS_DD', ''),
-('/CDS/CRTCL/ADMSSN_TYP', '06', 'CM_NHS_DD', ''),
 
-('/CDS/CRTCL/ADMSSN_LCTN', '01', 'CM_NHS_DD', ''),                                   -- TODO: Admission location
-('/CDS/CRTCL/ADMSSN_LCTN', '02', 'CM_NHS_DD', ''),
-('/CDS/CRTCL/ADMSSN_LCTN', '03', 'CM_NHS_DD', ''),
-('/CDS/CRTCL/ADMSSN_LCTN', '04', 'CM_NHS_DD', ''),
-('/CDS/CRTCL/ADMSSN_LCTN', '05', 'CM_NHS_DD', ''),
-('/CDS/CRTCL/ADMSSN_LCTN', '06', 'CM_NHS_DD', ''),
-('/CDS/CRTCL/ADMSSN_LCTN', '07', 'CM_NHS_DD', ''),
-('/CDS/CRTCL/ADMSSN_LCTN', '08', 'CM_NHS_DD', ''),
-('/CDS/CRTCL/ADMSSN_LCTN', '09', 'CM_NHS_DD', ''),
-('/CDS/CRTCL/ADMSSN_LCTN', '10', 'CM_NHS_DD', ''),
-('/CDS/CRTCL/ADMSSN_LCTN', '11', 'CM_NHS_DD', ''),
-('/CDS/CRTCL/ADMSSN_LCTN', '12', 'CM_NHS_DD', ''),
+('/CDS/CRTCL/ADMSSN_TYP', '01', 'CM_NHS_DD', 'CM_CritCareAdmType01'),
+('/CDS/CRTCL/ADMSSN_TYP', '02', 'CM_NHS_DD', 'CM_CritCareAdmType02'),
+('/CDS/CRTCL/ADMSSN_TYP', '03', 'CM_NHS_DD', 'CM_CritCareAdmType03'),
+('/CDS/CRTCL/ADMSSN_TYP', '04', 'CM_NHS_DD', 'CM_CritCareAdmType04'),
+('/CDS/CRTCL/ADMSSN_TYP', '05', 'CM_NHS_DD', 'CM_CritCareAdmType05'),
+('/CDS/CRTCL/ADMSSN_TYP', '06', 'CM_NHS_DD', 'CM_CritCareAdmType06'),
 
-('/CDS/CRTCL/DSCHRG_STTS', '01', 'CM_NHS_DD', ''),                                   -- TODO: Discharge status
-('/CDS/CRTCL/DSCHRG_STTS', '02', 'CM_NHS_DD', ''),
-('/CDS/CRTCL/DSCHRG_STTS', '03', 'CM_NHS_DD', ''),
-('/CDS/CRTCL/DSCHRG_STTS', '04', 'CM_NHS_DD', ''),
-('/CDS/CRTCL/DSCHRG_STTS', '05', 'CM_NHS_DD', ''),
-('/CDS/CRTCL/DSCHRG_STTS', '06', 'CM_NHS_DD', ''),
-('/CDS/CRTCL/DSCHRG_STTS', '07', 'CM_NHS_DD', ''),
-('/CDS/CRTCL/DSCHRG_STTS', '08', 'CM_NHS_DD', ''),
-('/CDS/CRTCL/DSCHRG_STTS', '09', 'CM_NHS_DD', ''),
-('/CDS/CRTCL/DSCHRG_STTS', '10', 'CM_NHS_DD', ''),
-('/CDS/CRTCL/DSCHRG_STTS', '11', 'CM_NHS_DD', ''),
+('/CDS/CRTCL/ADMSSN_LCTN', '01', 'CM_NHS_DD', 'CM_CritCareSrcLctn01'),
+('/CDS/CRTCL/ADMSSN_LCTN', '02', 'CM_NHS_DD', 'CM_CritCareSrcLctn02'),
+('/CDS/CRTCL/ADMSSN_LCTN', '03', 'CM_NHS_DD', 'CM_CritCareSrcLctn03'),
+('/CDS/CRTCL/ADMSSN_LCTN', '04', 'CM_NHS_DD', 'CM_CritCareSrcLctn04'),
+('/CDS/CRTCL/ADMSSN_LCTN', '05', 'CM_NHS_DD', 'CM_CritCareSrcLctn05'),
+('/CDS/CRTCL/ADMSSN_LCTN', '06', 'CM_NHS_DD', 'CM_CritCareSrcLctn06'),
+('/CDS/CRTCL/ADMSSN_LCTN', '07', 'CM_NHS_DD', 'CM_CritCareSrcLctn07'),
+('/CDS/CRTCL/ADMSSN_LCTN', '08', 'CM_NHS_DD', 'CM_CritCareSrcLctn08'),
+('/CDS/CRTCL/ADMSSN_LCTN', '09', 'CM_NHS_DD', 'CM_CritCareSrcLctn09'),
+('/CDS/CRTCL/ADMSSN_LCTN', '10', 'CM_NHS_DD', 'CM_CritCareSrcLctn10'),
+('/CDS/CRTCL/ADMSSN_LCTN', '11', 'CM_NHS_DD', 'CM_CritCareSrcLctn11'),
+('/CDS/CRTCL/ADMSSN_LCTN', '12', 'CM_NHS_DD', 'CM_CritCareSrcLctn12'),
 
-('/CDS/CRTCL/DSCHRG_DSTNTN', '01', 'CM_NHS_DD', ''),                                 -- TODO: Discharge destination
-('/CDS/CRTCL/DSCHRG_DSTNTN', '02', 'CM_NHS_DD', ''),
-('/CDS/CRTCL/DSCHRG_DSTNTN', '03', 'CM_NHS_DD', ''),
-('/CDS/CRTCL/DSCHRG_DSTNTN', '04', 'CM_NHS_DD', ''),
-('/CDS/CRTCL/DSCHRG_DSTNTN', '05', 'CM_NHS_DD', ''),
-('/CDS/CRTCL/DSCHRG_DSTNTN', '06', 'CM_NHS_DD', ''),
+('/CDS/CRTCL/DSCHRG_STTS', '01', 'CM_NHS_DD', 'CM_CritCareDschgStts01'),
+('/CDS/CRTCL/DSCHRG_STTS', '02', 'CM_NHS_DD', 'CM_CritCareDschgStts02'),
+('/CDS/CRTCL/DSCHRG_STTS', '03', 'CM_NHS_DD', 'CM_CritCareDschgStts03'),
+('/CDS/CRTCL/DSCHRG_STTS', '04', 'CM_NHS_DD', 'CM_CritCareDschgStts04'),
+('/CDS/CRTCL/DSCHRG_STTS', '05', 'CM_NHS_DD', 'CM_CritCareDschgStts05'),
+('/CDS/CRTCL/DSCHRG_STTS', '06', 'CM_NHS_DD', 'CM_CritCareDschgStts06'),
+('/CDS/CRTCL/DSCHRG_STTS', '07', 'CM_NHS_DD', 'CM_CritCareDschgStts07'),
+('/CDS/CRTCL/DSCHRG_STTS', '08', 'CM_NHS_DD', 'CM_CritCareDschgStts08'),
+('/CDS/CRTCL/DSCHRG_STTS', '09', 'CM_NHS_DD', 'CM_CritCareDschgStts09'),
+('/CDS/CRTCL/DSCHRG_STTS', '10', 'CM_NHS_DD', 'CM_CritCareDschgStts10'),
+('/CDS/CRTCL/DSCHRG_STTS', '11', 'CM_NHS_DD', 'CM_CritCareDschgStts11'),
 
-('/CDS/CRTCL/DSCHRG_LCTN', '01', 'CM_NHS_DD', ''),                                   -- TODO: Discharge location
-('/CDS/CRTCL/DSCHRG_LCTN', '02', 'CM_NHS_DD', ''),
-('/CDS/CRTCL/DSCHRG_LCTN', '03', 'CM_NHS_DD', ''),
-('/CDS/CRTCL/DSCHRG_LCTN', '04', 'CM_NHS_DD', ''),
-('/CDS/CRTCL/DSCHRG_LCTN', '05', 'CM_NHS_DD', ''),
-('/CDS/CRTCL/DSCHRG_LCTN', '06', 'CM_NHS_DD', ''),
-('/CDS/CRTCL/DSCHRG_LCTN', '07', 'CM_NHS_DD', ''),
-('/CDS/CRTCL/DSCHRG_LCTN', '08', 'CM_NHS_DD', ''),
-('/CDS/CRTCL/DSCHRG_LCTN', '09', 'CM_NHS_DD', ''),
-('/CDS/CRTCL/DSCHRG_LCTN', '10', 'CM_NHS_DD', '')
- */
+('/CDS/CRTCL/DSCHRG_DSTNTN', '01', 'CM_NHS_DD', 'CM_CritCareDschgDest01'),
+('/CDS/CRTCL/DSCHRG_DSTNTN', '02', 'CM_NHS_DD', 'CM_CritCareDschgDest02'),
+('/CDS/CRTCL/DSCHRG_DSTNTN', '03', 'CM_NHS_DD', 'CM_CritCareDschgDest03'),
+('/CDS/CRTCL/DSCHRG_DSTNTN', '04', 'CM_NHS_DD', 'CM_CritCareDschgDest04'),
+('/CDS/CRTCL/DSCHRG_DSTNTN', '05', 'CM_NHS_DD', 'CM_CritCareDschgDest05'),
+('/CDS/CRTCL/DSCHRG_DSTNTN', '06', 'CM_NHS_DD', 'CM_CritCareDschgDest06'),
+
+('/CDS/CRTCL/DSCHRG_LCTN', '01', 'CM_NHS_DD', 'CM_CritCareDschgLctn01'),
+('/CDS/CRTCL/DSCHRG_LCTN', '02', 'CM_NHS_DD', 'CM_CritCareDschgLctn02'),
+('/CDS/CRTCL/DSCHRG_LCTN', '03', 'CM_NHS_DD', 'CM_CritCareDschgLctn03'),
+('/CDS/CRTCL/DSCHRG_LCTN', '04', 'CM_NHS_DD', 'CM_CritCareDschgLctn04'),
+('/CDS/CRTCL/DSCHRG_LCTN', '05', 'CM_NHS_DD', 'CM_CritCareDschgLctn05'),
+('/CDS/CRTCL/DSCHRG_LCTN', '06', 'CM_NHS_DD', 'CM_CritCareDschgLctn06'),
+('/CDS/CRTCL/DSCHRG_LCTN', '07', 'CM_NHS_DD', 'CM_CritCareDschgLctn07'),
+('/CDS/CRTCL/DSCHRG_LCTN', '08', 'CM_NHS_DD', 'CM_CritCareDschgLctn08'),
+('/CDS/CRTCL/DSCHRG_LCTN', '09', 'CM_NHS_DD', 'CM_CritCareDschgLctn09'),
+('/CDS/CRTCL/DSCHRG_LCTN', '10', 'CM_NHS_DD', 'CM_CritCareDschgLctn10')
 ;
 
 /* **************************************************************************************************** */
