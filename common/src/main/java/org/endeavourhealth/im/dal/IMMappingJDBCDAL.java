@@ -10,16 +10,10 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class IMMappingJDBCDAL implements IMMappingDAL {
-    private final Connection conn;
-
     private final String GENERATED_SCHEME = "CM_DiscoveryCode";
 
     private static boolean hasValue(String s) {
         return (s != null && !s.isEmpty());
-    }
-
-    public IMMappingJDBCDAL()  {
-        this.conn = ConnectionPool.getInstance().pop();
     }
 
     @Override
@@ -52,7 +46,8 @@ public class IMMappingJDBCDAL implements IMMappingDAL {
             String.join("\n", join) + "\n" +
             "WHERE " + String.join("\nAND ", where);
 
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = ConnectionPool.getInstance().pop();
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
             int i = 0;
             if (hasValue(provider)) stmt.setString(++i, provider);
             if (hasValue(system)) stmt.setString(++i, system);
@@ -77,7 +72,8 @@ public class IMMappingJDBCDAL implements IMMappingDAL {
             "LEFT JOIN concept s ON s.dbid = c.scheme\n" +
             "WHERE m.node = ?";
 
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = ConnectionPool.getInstance().pop();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, node);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next())
@@ -104,91 +100,91 @@ public class IMMappingJDBCDAL implements IMMappingDAL {
         // Generate a full context string
         String context = "/" + String.join("/", ids);
 
-        conn.setAutoCommit(false);
-        try {
-            // ******************** Legacy property concept ********************
-            // Use temp (unique) IRI to generate/allocate a dbid
-            String iri = UUID.randomUUID().toString();
+        try (Connection conn = ConnectionPool.getInstance().pop()) {
+            conn.setAutoCommit(false);
+            try {
+                // ******************** Legacy property concept ********************
+                // Use temp (unique) IRI to generate/allocate a dbid
+                String iri = UUID.randomUUID().toString();
 
-            int cptId = createConcept(iri, "Legacy mapping property ", "Legacy mapping property for " + context, iri, GENERATED_SCHEME);
+                int cptId = createConcept(iri, "Legacy mapping property ", "Legacy mapping property for " + context, iri, GENERATED_SCHEME);
 
-            iri = "LP_" + ids.stream().map(MappingLogic::getShortString).collect(Collectors.joining("_")) + "_" + cptId;
+                iri = "LP_" + ids.stream().map(MappingLogic::getShortString).collect(Collectors.joining("_")) + "_" + cptId;
 
-            // Update with final IRI
-            String sql = "UPDATE concept SET id = ?, code = ? WHERE dbid = ?";
-            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-                stmt.setString(1, iri);
-                stmt.setString(2, iri);
-                stmt.setInt(3, cptId);
-                if (stmt.executeUpdate() != 1)
-                    throw new IllegalStateException("Unable to update temporary legacy mapping property [" + cptId + "] ==> [" + iri + "]");
+                // Update with final IRI
+                String sql = "UPDATE concept SET id = ?, code = ? WHERE dbid = ?";
+                try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                    stmt.setString(1, iri);
+                    stmt.setString(2, iri);
+                    stmt.setInt(3, cptId);
+                    if (stmt.executeUpdate() != 1)
+                        throw new IllegalStateException("Unable to update temporary legacy mapping property [" + cptId + "] ==> [" + iri + "]");
+                }
+
+                // ******************** Mapping node ********************
+                // Create node
+                sql = "INSERT INTO map_node (node, concept) VALUES (?, ?)";
+                String node = UUID.randomUUID().toString();
+                int nodeId;
+                try (PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                    stmt.setString(1, node);
+                    stmt.setInt(2, cptId);
+                    if (stmt.executeUpdate() != 1)
+                        throw new IllegalStateException("Unable to create map node [" + node + "] ==> [" + cptId + "]");
+
+                    nodeId = DALHelper.getGeneratedKey(stmt);
+                }
+
+                node = "/" + ids.stream().map(MappingLogic::getShortString).collect(Collectors.joining("/")) + "/" + nodeId;
+                sql = "UPDATE map_node SET node = ? WHERE id = ?";
+                try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                    stmt.setString(1, node);
+                    stmt.setInt(2, nodeId);
+
+                    if (stmt.executeUpdate() != 1)
+                        throw new IllegalStateException("Unable to update temporary node [" + nodeId + "] ==> [" + node + "]");
+                }
+
+                // ******************** Mapping context ********************
+                // Check context
+                ConceptIdentifiers prv = getConcept(provider);
+                int prvId = (prv != null) ? prv.getDbid() : createConcept(provider, "Context organisation", "Auto generated map context organistion", provider, GENERATED_SCHEME);
+
+                ConceptIdentifiers sys = getConcept(system);
+                int sysId = (sys != null) ? sys.getDbid() : createConcept(system, "Context system", "Auto generated map context system", system, GENERATED_SCHEME);
+
+                // Create context map to node
+                sql = "INSERT INTO map_context (provider, `system`, `schema`, `table`, `column`, node)\n" +
+                    "VALUES (?, ?, ?, ?, ?, ?)";
+
+                try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                    int i = 0;
+                    DALHelper.setInt(stmt, ++i, prvId);
+                    DALHelper.setInt(stmt, ++i, sysId);
+                    DALHelper.setString(stmt, ++i, schema);
+                    DALHelper.setString(stmt, ++i, table);
+                    DALHelper.setString(stmt, ++i, column);
+                    DALHelper.setInt(stmt, ++i, nodeId);
+
+                    if (stmt.executeUpdate() != 1)
+                        throw new IllegalStateException("Unable to create context");
+                }
+
+                conn.commit();
+
+                return new MapResponse()
+                    .setNode(new MapNode(nodeId, node))
+                    .setConcept(
+                        new ConceptIdentifiers()
+                            .setDbid(cptId)
+                            .setIri("LP_" + iri)
+                            .setCode(iri)
+                            .setScheme(GENERATED_SCHEME)
+                    );
+            } catch (Exception e) {
+                conn.rollback();
+                throw e;
             }
-
-            // ******************** Mapping node ********************
-            // Create node
-            sql = "INSERT INTO map_node (node, concept) VALUES (?, ?)";
-            String node = UUID.randomUUID().toString();
-            int nodeId;
-            try (PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-                stmt.setString(1, node);
-                stmt.setInt(2, cptId);
-                if (stmt.executeUpdate() != 1)
-                    throw new IllegalStateException("Unable to create map node [" + node + "] ==> [" + cptId + "]");
-
-                nodeId = DALHelper.getGeneratedKey(stmt);
-            }
-
-            node = "/" + ids.stream().map(MappingLogic::getShortString).collect(Collectors.joining("/")) + "/" + nodeId;
-            sql = "UPDATE map_node SET node = ? WHERE id = ?";
-            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-                stmt.setString(1, node);
-                stmt.setInt(2, nodeId);
-
-                if (stmt.executeUpdate() != 1)
-                    throw new IllegalStateException("Unable to update temporary node [" + nodeId + "] ==> [" + node + "]");
-            }
-
-            // ******************** Mapping context ********************
-            // Check context
-            ConceptIdentifiers prv = getConcept(provider);
-            int prvId = (prv != null) ? prv.getDbid() : createConcept(provider, "Context organisation", "Auto generated map context organistion", provider, GENERATED_SCHEME);
-
-            ConceptIdentifiers sys = getConcept(system);
-            int sysId = (sys != null) ? sys.getDbid() : createConcept(system, "Context system", "Auto generated map context system", system, GENERATED_SCHEME);
-
-            // Create context map to node
-            sql = "INSERT INTO map_context (provider, `system`, `schema`, `table`, `column`, node)\n" +
-                "VALUES (?, ?, ?, ?, ?, ?)";
-
-            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-                int i = 0;
-                DALHelper.setInt(stmt, ++i, prvId);
-                DALHelper.setInt(stmt, ++i, sysId);
-                DALHelper.setString(stmt, ++i, schema);
-                DALHelper.setString(stmt, ++i, table);
-                DALHelper.setString(stmt, ++i, column);
-                DALHelper.setInt(stmt, ++i, nodeId);
-
-                if (stmt.executeUpdate() != 1)
-                    throw new IllegalStateException("Unable to create context");
-            }
-
-            conn.commit();
-
-            return new MapResponse()
-                .setNode(new MapNode(nodeId, node))
-                .setConcept(
-                    new ConceptIdentifiers()
-                        .setDbid(cptId)
-                        .setIri("LP_" + iri)
-                        .setCode(iri)
-                        .setScheme(GENERATED_SCHEME)
-                );
-        } catch (Exception e) {
-            conn.rollback();
-            throw e;
-        } finally {
-            conn.setAutoCommit(true);
         }
     }
 
@@ -204,7 +200,8 @@ public class IMMappingJDBCDAL implements IMMappingDAL {
             sql += "JOIN concept s ON s.dbid = v.code_scheme AND s.id = ?\n";
         }
 
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = ConnectionPool.getInstance().pop();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, node);
             if (hasValue(scheme))
                 stmt.setString(2, scheme);
@@ -234,7 +231,8 @@ public class IMMappingJDBCDAL implements IMMappingDAL {
             "FROM map_node n\n" +
             "WHERE n.node = ?\n";
 
-        try (PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (Connection conn = ConnectionPool.getInstance().pop();
+             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, node);
             if (hasValue(codeScheme))
                 stmt.setString(2, codeScheme);
@@ -256,7 +254,8 @@ public class IMMappingJDBCDAL implements IMMappingDAL {
             "WHERE v.value_node = ?\n" +
             "AND v.value = ?";
 
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = ConnectionPool.getInstance().pop();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, valueNode.getId());
             if (hasValue(value.getCode()))
                 stmt.setString(2, value.getCode());
@@ -278,37 +277,37 @@ public class IMMappingJDBCDAL implements IMMappingDAL {
 
     @Override
     public ConceptIdentifiers createValueNodeConcept(MapValueNode valueNode, String provider, String system, String schema, String table, String column, MapValueRequest value) throws SQLException {
-        conn.setAutoCommit(false);
-        try {
-            ConceptIdentifiers result = createLegacyPropertyValueConcept(provider, system, schema, table, column, value);
+        try (Connection conn = ConnectionPool.getInstance().pop()) {
+            conn.setAutoCommit(false);
+            try {
+                ConceptIdentifiers result = createLegacyPropertyValueConcept(provider, system, schema, table, column, value);
 
-            String sql = "INSERT INTO map_value_node_lookup\n" +
-                "(value_node, value, concept)\n" +
-                "VALUES\n" +
-                "(?, ?, ?)\n";
+                String sql = "INSERT INTO map_value_node_lookup\n" +
+                    "(value_node, value, concept)\n" +
+                    "VALUES\n" +
+                    "(?, ?, ?)\n";
 
-            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-                int i = 0;
-                stmt.setInt(++i, valueNode.getId());
-                if (hasValue(value.getCode()))
-                    stmt.setString(++i, value.getCode());
-                else
-                    stmt.setString(++i, value.getTerm());
+                try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                    int i = 0;
+                    stmt.setInt(++i, valueNode.getId());
+                    if (hasValue(value.getCode()))
+                        stmt.setString(++i, value.getCode());
+                    else
+                        stmt.setString(++i, value.getTerm());
 
-                stmt.setInt(++i, result.getDbid());
+                    stmt.setInt(++i, result.getDbid());
 
-                if (stmt.executeUpdate() != 1)
-                    throw new IllegalStateException("Unable to create node value");
+                    if (stmt.executeUpdate() != 1)
+                        throw new IllegalStateException("Unable to create node value");
+                }
+
+                conn.commit();
+
+                return result;
+            } catch (Exception e) {
+                conn.rollback();
+                throw e;
             }
-
-            conn.commit();
-
-            return result;
-        } catch (Exception e) {
-            conn.rollback();
-            throw e;
-        } finally {
-            conn.setAutoCommit(true);
         }
     }
 
@@ -319,7 +318,8 @@ public class IMMappingJDBCDAL implements IMMappingDAL {
             "LEFT JOIN concept s ON s.dbid = c.scheme\n" +
             "WHERE c.id = ?";
 
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = ConnectionPool.getInstance().pop();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, iri);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next())
@@ -356,7 +356,8 @@ public class IMMappingJDBCDAL implements IMMappingDAL {
 
         // Update with final IRI
         String sql = "UPDATE concept SET id = ?, code = ? WHERE dbid = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = ConnectionPool.getInstance().pop();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, iri);
             stmt.setString(2, iri);
             stmt.setInt(3, cptId);
@@ -402,7 +403,8 @@ public class IMMappingJDBCDAL implements IMMappingDAL {
             "LEFT JOIN concept s ON s.dbid = c.scheme\n" +
             "WHERE m.node = ?";
 
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = ConnectionPool.getInstance().pop();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, node);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next())
@@ -423,7 +425,8 @@ public class IMMappingJDBCDAL implements IMMappingDAL {
             "LEFT JOIN concept s ON s.dbid = c.scheme\n" +
             "WHERE c.id = ?";
 
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = ConnectionPool.getInstance().pop();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
             DALHelper.setString(stmt, 1, conceptIri);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next())
@@ -447,7 +450,8 @@ public class IMMappingJDBCDAL implements IMMappingDAL {
             "FROM concept s\n" +
             "WHERE s.id = ?";
 
-        try (PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (Connection conn = ConnectionPool.getInstance().pop();
+             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             DALHelper.setString(stmt, 1, conceptIri);
             DALHelper.setString(stmt, 2, name);
             DALHelper.setString(stmt, 3, description);
@@ -462,9 +466,4 @@ public class IMMappingJDBCDAL implements IMMappingDAL {
             return DALHelper.getGeneratedKey(stmt);
         }
     }
-
-    public void close() {
-        ConnectionPool.getInstance().push(this.conn);
-    }
-
 }

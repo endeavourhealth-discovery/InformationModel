@@ -22,35 +22,34 @@ public class IMClientJDBCDAL {
         if (prefix == null)
             throw new IllegalArgumentException("No prefix set for code scheme [" + scheme + "]");
 
-        Connection conn = ConnectionPool.getInstance().pop();
+        try (Connection conn = ConnectionPool.getInstance().pop()) {
 
-        conn.setAutoCommit(false);
-        try {
-            // Check for existing
-            try (PreparedStatement statement = conn.prepareStatement("SELECT c.dbid FROM concept c WHERE id = ?")) {
-                statement.setString(1, prefix + code);
+            conn.setAutoCommit(false);
+            try {
+                // Check for existing
+                try (PreparedStatement statement = conn.prepareStatement("SELECT c.dbid FROM concept c WHERE id = ?")) {
+                    statement.setString(1, prefix + code);
 
-                try (ResultSet resultSet = statement.executeQuery()) {
-                    if (resultSet.next())
-                        dbid = resultSet.getInt(1);
+                    try (ResultSet resultSet = statement.executeQuery()) {
+                        if (resultSet.next())
+                            dbid = resultSet.getInt(1);
+                    }
                 }
-            }
 
-            if (dbid != null) {
-                // Found one so increment use count
-                incUseCount(conn, dbid);
-            } else if (autoCreate) {
-                // None found, so create a new draft
-                dbid = createDraftCodeableConcept(conn, scheme, code, term);
-            }
+                if (dbid != null) {
+                    // Found one so increment use count
+                    incUseCount(conn, dbid);
+                } else if (autoCreate) {
+                    // None found, so create a new draft
+                    dbid = createDraftCodeableConcept(conn, scheme, code, term);
+                }
 
-            conn.commit();
-            return dbid;
-        } catch (Exception e) {
-            conn.rollback();
-            throw e;
-        } finally {
-            ConnectionPool.getInstance().push(conn);
+                conn.commit();
+                return dbid;
+            } catch (Exception e) {
+                conn.rollback();
+                throw e;
+            }
         }
     }
 
@@ -122,8 +121,9 @@ public class IMClientJDBCDAL {
             "WHERE s.id = ?\n" +
             "AND c.code = ?";
 
-        Connection conn = ConnectionPool.getInstance().pop();
-        try (PreparedStatement statement = conn.prepareStatement(sql)) {
+        ;
+        try (Connection conn = ConnectionPool.getInstance().pop();
+             PreparedStatement statement = conn.prepareStatement(sql)) {
             statement.setString(1, scheme);
             statement.setString(2, code);
 
@@ -133,19 +133,16 @@ public class IMClientJDBCDAL {
                 else
                     return null;
             }
-        } finally {
-            ConnectionPool.getInstance().push(conn);
         }
     }
 
     public String getCodeForConceptDbid(Integer dbid) throws SQLException {
-        Connection conn = ConnectionPool.getInstance().pop();
-
         String sql = "SELECT c.code\n" +
             "FROM concept c\n" +
             "WHERE c.dbid = ?";
 
-        try (PreparedStatement statement = conn.prepareStatement(sql)) {
+        try (Connection conn = ConnectionPool.getInstance().pop();
+             PreparedStatement statement = conn.prepareStatement(sql)) {
             statement.setInt(1, dbid);
 
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -154,8 +151,6 @@ public class IMClientJDBCDAL {
                 else
                     return null;
             }
-        } finally {
-            ConnectionPool.getInstance().push(conn);
         }
     }
 
@@ -167,28 +162,26 @@ public class IMClientJDBCDAL {
             "WHERE c.id = ? \n" +
             "AND m.term = ?";
 
-        Connection conn = ConnectionPool.getInstance().pop();
-        conn.setAutoCommit(false);
-        try (PreparedStatement statement = conn.prepareStatement(sql)) {
-            statement.setString(1, type);
-            statement.setString(2, term);
+        try (Connection conn = ConnectionPool.getInstance().pop()) {
+            conn.setAutoCommit(false);
+            try (PreparedStatement statement = conn.prepareStatement(sql)) {
+                statement.setString(1, type);
+                statement.setString(2, term);
 
-            try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    dbid = resultSet.getInt("target");
-                    incUseCount(conn, dbid);
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    if (resultSet.next()) {
+                        dbid = resultSet.getInt("target");
+                        incUseCount(conn, dbid);
+                    } else if (autoCreate)
+                        dbid = createTypeTermConcept(conn, type, term);
                 }
-                else if (autoCreate)
-                    dbid = createTypeTermConcept(conn, type, term);
-            }
 
-            conn.commit();
-            return dbid;
-        } catch (Exception e) {
-            conn.rollback();
-            throw e;
-        } finally {
-            ConnectionPool.getInstance().push(conn);
+                conn.commit();
+                return dbid;
+            } catch (Exception e) {
+                conn.rollback();
+                throw e;
+            }
         }
     }
     private int createTypeTermConcept(Connection conn, String type, String term) throws SQLException, NoSuchAlgorithmException {
@@ -249,8 +242,9 @@ public class IMClientJDBCDAL {
             "JOIN concept_property_object p ON p.dbid = m.target\n" +
             "JOIN concept e ON e.dbid = p.property AND e.id = 'is_equivalent_to'\n" +
             "WHERE t.id = ?";
-        Connection conn = ConnectionPool.getInstance().pop();
-        try (PreparedStatement statement = conn.prepareStatement(sql)) {
+
+        try (Connection conn = ConnectionPool.getInstance().pop();
+             PreparedStatement statement = conn.prepareStatement(sql)) {
             statement.setString(1, term);
             statement.setString(2, type);
 
@@ -260,8 +254,6 @@ public class IMClientJDBCDAL {
                 else
                     return null;
             }
-        } finally {
-            ConnectionPool.getInstance().push(conn);
         }
     }
 
@@ -274,9 +266,8 @@ public class IMClientJDBCDAL {
             "WHERE c.code = ?\n" +
             "AND s.id = ?\n";
 
-
-        Connection conn = ConnectionPool.getInstance().pop();
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = ConnectionPool.getInstance().pop();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, code);
             stmt.setString(2, scheme);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -285,8 +276,6 @@ public class IMClientJDBCDAL {
                 else
                     return null;
             }
-        } finally {
-            ConnectionPool.getInstance().push(conn);
         }
     }
 
@@ -304,8 +293,8 @@ public class IMClientJDBCDAL {
         sql += "WHERE l.code = ?\n" +
             "AND s.id = ?";
 
-        Connection conn = ConnectionPool.getInstance().pop();
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = ConnectionPool.getInstance().pop();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, code);
             stmt.setString(2, scheme);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -314,8 +303,6 @@ public class IMClientJDBCDAL {
                 else
                     return null;
             }
-        } finally {
-            ConnectionPool.getInstance().push(conn);
         }
     }
 
@@ -328,29 +315,28 @@ public class IMClientJDBCDAL {
             "WHERE c.code = ?\n" +
             "AND m.term = ?";
 
-        Connection conn = ConnectionPool.getInstance().pop();
-        conn.setAutoCommit(false);
+        try (Connection conn = ConnectionPool.getInstance().pop()) {
+            conn.setAutoCommit(false);
 
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            String result = null;
-            stmt.setString(1, scheme);
-            stmt.setString(2, context);
-            stmt.setString(3, term);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next())
-                    result = rs.getString("code");
-                else {
-                    if (autoCreate)
-                        result = createTermTypeConceptAndMap(conn, scheme, context, term);
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                String result = null;
+                stmt.setString(1, scheme);
+                stmt.setString(2, context);
+                stmt.setString(3, term);
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next())
+                        result = rs.getString("code");
+                    else {
+                        if (autoCreate)
+                            result = createTermTypeConceptAndMap(conn, scheme, context, term);
+                    }
                 }
+                conn.commit();
+                return result;
+            } catch (Exception e) {
+                conn.rollback();
+                throw e;
             }
-            conn.commit();
-            return result;
-        } catch (Exception e) {
-            conn.rollback();
-            throw e;
-        } finally {
-            ConnectionPool.getInstance().push(conn);
         }
     }
 

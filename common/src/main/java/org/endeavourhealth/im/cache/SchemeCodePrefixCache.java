@@ -36,14 +36,15 @@ public class SchemeCodePrefixCache implements ICache {
         String prefix = map.get(scheme);
 
         if (prefix == null) {
-            Connection conn = ConnectionPool.getInstance().pop();
             String sql = "SELECT d.value\n" +
                 "FROM concept_property_data d\n" +
                 "JOIN concept c ON c.dbid = d.dbid\n" +
                 "JOIN concept p ON p.dbid = d.property\n" +
                 "WHERE c.id = ?\n" +
                 "AND p.id = 'code_prefix'";
-            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            try (Connection conn = ConnectionPool.getInstance().pop();
+                 PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setString(1, scheme);
                 try (ResultSet rs = stmt.executeQuery()) {
                     if (rs.next()) {
@@ -51,8 +52,6 @@ public class SchemeCodePrefixCache implements ICache {
                         map.put(scheme, prefix);
                     }
                 }
-            } finally {
-                ConnectionPool.getInstance().push(conn);
             }
         }
 

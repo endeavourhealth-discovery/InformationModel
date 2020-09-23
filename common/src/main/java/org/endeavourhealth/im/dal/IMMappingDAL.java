@@ -2,7 +2,7 @@ package org.endeavourhealth.im.dal;
 
 import org.endeavourhealth.im.models.mapping.*;
 
-public interface IMMappingDAL extends AutoCloseable {
+public interface IMMappingDAL {
     MapNode getNode(String provider, String system, String schema, String table, String column) throws Exception;
 
     ConceptIdentifiers getNodePropertyConcept(String node) throws Exception;

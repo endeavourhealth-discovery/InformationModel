@@ -1,91 +1,82 @@
 package org.endeavourhealth.im.dal;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.endeavourhealth.common.cache.GenericCache;
+import com.zaxxer.hikari.HikariDataSource;
 import org.endeavourhealth.common.config.ConfigManager;
 import org.endeavourhealth.common.utility.MetricsHelper;
+import org.endeavourhealth.coreui.framework.ContextShutdownHook;
+import org.endeavourhealth.coreui.framework.StartupConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Properties;
 
-public class ConnectionPool extends GenericCache<Connection> {
+public class ConnectionPool implements ContextShutdownHook {
     private static final Logger LOG = LoggerFactory.getLogger(ConnectionPool.class);
-    private static final int VALID_TIMEOUT = 5;
+    private static final Object lock = new Object();
     private static ConnectionPool instance = null;
 
     public static ConnectionPool getInstance() {
-        if (instance == null)
-            instance = new ConnectionPool();
-
-        return instance;
-    }
-
-    @Override
-    protected boolean isValid(Connection connection) {
-        try {
-            if (connection == null)
-                return false;
-
-            if (connection.isValid(VALID_TIMEOUT)) {
-                connection.setAutoCommit(true);
-                return true;
+        synchronized (lock) {
+            if (instance == null) {
+                try {
+                    instance = new ConnectionPool();
+                } catch (Exception e) {
+                    LOG.error(e.getMessage());
+                    return null;
+                }
             }
 
-            MetricsHelper.recordCounter("ConnectionPool.Size").dec();
-
-            if (!connection.isClosed())
-                connection.close();
-
-            return false;
-        } catch (SQLException e) {
-            LOG.error("Error validating/cleaning up connection", e);
-            return false;
+            return instance;
         }
     }
 
-    @Override
-    protected Connection create() {
-        try {
-            JsonNode json = ConfigManager.getConfigurationAsJson("database");
-            String url = json.get("url").asText();
-            String user = json.get("username").asText();
-            String pass = json.get("password").asText();
-            String driver = json.get("class") == null ? null : json.get("class").asText();
+    private HikariDataSource dataSource = null;
 
-            if (driver != null && !driver.isEmpty())
-                Class.forName(driver);
+    public ConnectionPool() throws Exception {
+        this.dataSource = new HikariDataSource();
+        JsonNode json = ConfigManager.getConfigurationAsJson("database");
+        String url = json.get("url").asText();
+        String user = json.get("username").asText();
+        String pass = json.get("password").asText();
+        String driver = json.get("class") == null ? null : json.get("class").asText();
+        if (driver != null && !driver.isEmpty())
+            Class.forName(driver);
 
-            Properties props = new Properties();
+        dataSource.setJdbcUrl(url);
+        dataSource.setUsername(user);
+        dataSource.setPassword(pass);
 
-            props.setProperty("user", user);
-            props.setProperty("password", pass);
+        JsonNode max = json.get("max");
+        if (max != null && max.isNumber())
+            dataSource.setMaximumPoolSize(max.asInt());
 
-            Connection connection = DriverManager.getConnection(url, props);    // NOSONAR
-
-            LOG.debug("New DB Connection created");
-
-            MetricsHelper.recordCounter("ConnectionPool.Size").inc();
-            return connection;
-        } catch (Exception e) {
-            LOG.error("Error getting connection", e);
-        }
-        return null;
+        StartupConfig.registerShutdownHook("Hikari connection pool", this);
     }
 
-    @Override
-    public Connection pop() {
-        Connection conn = super.pop();
-        MetricsHelper.recordCounter("ConnectionPool.InUse").inc();
+    public Connection pop() throws SQLException {
+        LOG.debug("Connection popped from pool");
+
+        Connection conn = this.dataSource.getConnection();
+
+        MetricsHelper.recordValue("ConnectionPool.Size", dataSource.getHikariPoolMXBean().getTotalConnections());
+        MetricsHelper.recordValue("ConnectionPool.Active", dataSource.getHikariPoolMXBean().getActiveConnections());
+
         return conn;
     }
 
     @Override
-    public void push(Connection conn) {
-        super.push(conn);
-        MetricsHelper.recordCounter("ConnectionPool.InUse").dec();
+    public void contextShutdown() {
+        LOG.debug("Clearing Hikari pool");
+
+        int size = dataSource.getHikariPoolMXBean().getActiveConnections();
+        if (size > 0)
+            LOG.warn(size + "connections still active!");
+
+        size = dataSource.getHikariPoolMXBean().getTotalConnections();
+        LOG.debug("Closing " + size + " connections in pool");
+
+        dataSource.close();
     }
 }

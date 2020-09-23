@@ -5,7 +5,7 @@ import org.endeavourhealth.im.dal.IMMappingDAL;
 import org.endeavourhealth.im.dal.IMMappingJDBCDAL;
 import org.endeavourhealth.im.models.mapping.*;
 
-public class MappingLogic implements AutoCloseable {
+public class MappingLogic {
     public static String getShortString(String id) {
         // Handle concepts and standard prefixes
         if (id.startsWith("CM_Sys_")) id = id.substring(7);
@@ -224,11 +224,5 @@ public class MappingLogic implements AutoCloseable {
         return dal.getConceptId(conceptIri);
     }
 */
-
-    @Override
-    public void close() throws Exception {
-        dal.close();
-    }
-
 
 }

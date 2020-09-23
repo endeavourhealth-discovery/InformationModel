@@ -13,7 +13,6 @@ import java.util.List;
 
 public class ViewerJDBCDAL {
     public List<RelatedConcept> getTargets(String id, List<String> relationships) throws SQLException {
-        Connection conn = ConnectionPool.getInstance().pop();
         List<RelatedConcept> result = new ArrayList<>();
 
 
@@ -26,7 +25,8 @@ public class ViewerJDBCDAL {
         if (relationships != null && relationships.size() > 0)
             sql += "WHERE p.id IN (" + DALHelper.inListParams(relationships.size()) + ")";
 
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = ConnectionPool.getInstance().pop();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
             int i = 1;
             stmt.setString(i++, id);
 
@@ -49,15 +49,12 @@ public class ViewerJDBCDAL {
                      );
                  }
              }
-        } finally {
-            ConnectionPool.getInstance().push(conn);
         }
 
         return result;
     }
 
     public List<RelatedConcept> getSources(String id, List<String> relationships) throws SQLException {
-        Connection conn = ConnectionPool.getInstance().pop();
         List<RelatedConcept> result = new ArrayList<>();
 
 
@@ -70,7 +67,8 @@ public class ViewerJDBCDAL {
         if (relationships != null && relationships.size() > 0)
             sql += "WHERE p.id IN (" + DALHelper.inListParams(relationships.size()) + ")";
 
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = ConnectionPool.getInstance().pop();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
             int i = 1;
             stmt.setString(i++, id);
 
@@ -93,32 +91,27 @@ public class ViewerJDBCDAL {
                     );
                 }
             }
-        } finally {
-            ConnectionPool.getInstance().push(conn);
         }
 
         return result;
     }
 
     public Concept getConcept(String id) throws SQLException {
-        Connection conn = ConnectionPool.getInstance().pop();
 
         String sql = "SELECT name, description FROM concept WHERE id = ?";
 
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = ConnectionPool.getInstance().pop();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (!rs.next())
                     return null;
                 else
                     return new Concept()
-                    .setId(id)
-                    .setName(rs.getString("name"))
-                    .setDescription(rs.getString("description"));
+                        .setId(id)
+                        .setName(rs.getString("name"))
+                        .setDescription(rs.getString("description"));
             }
-
-        } finally {
-            ConnectionPool.getInstance().push(conn);
         }
     }
 }

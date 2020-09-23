@@ -13,7 +13,6 @@ public class CommonJDBCDAL {
     private static String tctRebuildStatus;
 
     public List<KVP> getCodeSchemes() throws SQLException {
-        Connection conn = ConnectionPool.getInstance().pop();
         List<KVP> result = new ArrayList<>();
 
         String sql = "SELECT c.dbid, c.name\n" +
@@ -22,7 +21,8 @@ public class CommonJDBCDAL {
             "JOIN concept cs ON cs.id = 'CodeScheme'\n" +
             "JOIN concept_property_object o ON c.dbid = o.dbid  AND o.property = st.dbid AND o.value = cs.dbid\n";
 
-        try (PreparedStatement stmt = conn.prepareStatement(sql);
+        try (        Connection conn = ConnectionPool.getInstance().pop();
+                     PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
                 result.add(new KVP()
@@ -30,8 +30,6 @@ public class CommonJDBCDAL {
                     .setValue(rs.getString("name"))
                 );
             }
-        } finally {
-            ConnectionPool.getInstance().push(conn);
         }
 
         return result;
@@ -42,7 +40,7 @@ public class CommonJDBCDAL {
 
         if (page == null) page = 1;
         if (pageSize == null) pageSize = 15;
-        int offset = (page-1) * pageSize;
+        int offset = (page - 1) * pageSize;
 
         String sql = "SELECT SQL_CALC_FOUND_ROWS c.id, c.name, s.id as scheme, c.code\n" +
             "FROM concept c\n" +
@@ -55,40 +53,38 @@ public class CommonJDBCDAL {
         sql += "ORDER BY LENGTH(c.name)\n" +
             "LIMIT ?,?";
 
-        Connection conn = ConnectionPool.getInstance().pop();
-        try {
-            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-                int i = 1;
-                stmt.setString(i++, term + '%');
-                stmt.setString(i++, term + '%');
 
-                if (schemes != null) {
-                    for (int s : schemes)
-                        stmt.setInt(i++, s);
-                }
+        try (Connection conn = ConnectionPool.getInstance().pop();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            int i = 1;
+            stmt.setString(i++, term + '%');
+            stmt.setString(i++, term + '%');
 
-                stmt.setInt(i++, offset);
-                stmt.setInt(i++, pageSize);
+            if (schemes != null) {
+                for (int s : schemes)
+                    stmt.setInt(i++, s);
+            }
 
-                try (ResultSet rs = stmt.executeQuery()) {
-                    while (rs.next()) {
-                        CodeableConcept concept = new CodeableConcept();
-                        concept
-                            .setScheme(rs.getString("scheme"))
-                            .setCode(rs.getString("code"))
-                            .setId(rs.getString("id"))
-                            .setName(rs.getString("name"));
-                        result.getResults().add(concept);
-                    }
+            stmt.setInt(i++, offset);
+            stmt.setInt(i++, pageSize);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    CodeableConcept concept = new CodeableConcept();
+                    concept
+                        .setScheme(rs.getString("scheme"))
+                        .setCode(rs.getString("code"))
+                        .setId(rs.getString("id"))
+                        .setName(rs.getString("name"));
+                    result.getResults().add(concept);
                 }
             }
-            try (PreparedStatement statement = conn.prepareStatement("SELECT FOUND_ROWS()");
-                 ResultSet rs = statement.executeQuery()) {
-                rs.next();
-                result.setCount(rs.getInt(1));
-            }
-        } finally {
-            ConnectionPool.getInstance().push(conn);
+        }
+        try (Connection conn = ConnectionPool.getInstance().pop();
+             PreparedStatement statement = conn.prepareStatement("SELECT FOUND_ROWS()");
+             ResultSet rs = statement.executeQuery()) {
+            rs.next();
+            result.setCount(rs.getInt(1));
         }
 
         return result;
@@ -108,8 +104,9 @@ public class CommonJDBCDAL {
         String lastRelId = "";
         Related rel = null;
 
-        Connection conn = ConnectionPool.getInstance().pop();
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+        try (Connection conn = ConnectionPool.getInstance().pop();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, id);
 
             try (ResultSet rs = stmt.executeQuery()) {
@@ -139,9 +136,6 @@ public class CommonJDBCDAL {
                     rel.getConcepts().add(cc);
                 }
             }
-
-        } finally {
-            ConnectionPool.getInstance().push(conn);
         }
 
         return result;
@@ -161,8 +155,8 @@ public class CommonJDBCDAL {
         String lastRelId = "";
         Related rel = null;
 
-        Connection conn = ConnectionPool.getInstance().pop();
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = ConnectionPool.getInstance().pop();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, id);
 
             try (ResultSet rs = stmt.executeQuery()) {
@@ -192,9 +186,6 @@ public class CommonJDBCDAL {
                     rel.getConcepts().add(cc);
                 }
             }
-
-        } finally {
-            ConnectionPool.getInstance().push(conn);
         }
 
         return result;
@@ -213,8 +204,8 @@ public class CommonJDBCDAL {
 
         int rows = 0;
         tctRebuildStatus = status + "Intializing...";
-        Connection conn = ConnectionPool.getInstance().pop();
-        try {
+
+        try (Connection conn = ConnectionPool.getInstance().pop()) {
             tctRebuildStatus = status + "Clearing...";
             String sql = "DELETE t\n" +
                 "FROM concept_tct t\n" +
@@ -260,9 +251,6 @@ public class CommonJDBCDAL {
 
         } catch (Exception e) {
             tctRebuildStatus = status + e.toString();
-        }
-        finally {
-            ConnectionPool.getInstance().push(conn);
         }
 
         return tctRebuildStatus;

@@ -31,8 +31,8 @@ public class IMManagementJDBCDAL {
             "LEFT JOIN concept c ON c.document = d.dbid AND c.draft = TRUE\n" +
             "GROUP BY d.dbid";
 
-        Connection conn = ConnectionPool.getInstance().pop();
-        try (PreparedStatement statement = conn.prepareStatement(sql);
+        try (Connection conn = ConnectionPool.getInstance().pop();
+             PreparedStatement statement = conn.prepareStatement(sql);
              ResultSet resultSet = statement.executeQuery()) {
 
             while (resultSet.next()) {
@@ -44,8 +44,6 @@ public class IMManagementJDBCDAL {
                         .setDrafts(resultSet.getInt("drafts"))
                 );
             }
-        } finally {
-            ConnectionPool.getInstance().push(conn);
         }
 
         return result;
@@ -59,10 +57,9 @@ public class IMManagementJDBCDAL {
 
         status = "Importing ";
 
-        Connection conn = ConnectionPool.getInstance().pop();
-        // conn.setAutoCommit(false);
+        try (Connection conn = ConnectionPool.getInstance().pop()) {
+            // conn.setAutoCommit(false);
 
-        try {
             LOG.debug("Deserialising document...");
             JsonNode root = ObjectMapperPool.getInstance().readTree(documentJson);
 
@@ -91,11 +88,11 @@ public class IMManagementJDBCDAL {
             throw e;
         } finally {
             status = "Running";
-            ConnectionPool.getInstance().push(conn);
         }
         LOG.debug("Document import complete");
         return "Import complete";
     }
+
     private void importTermMaps(JsonNode root, Connection conn) throws SQLException {
         if (root.has("TermMaps")) {
             LOG.debug("Importing term maps");
@@ -287,9 +284,7 @@ public class IMManagementJDBCDAL {
     }
 
     public String getDocumentDrafts(String documentPath) throws SQLException, JsonProcessingException {
-        Connection conn = ConnectionPool.getInstance().pop();
-
-        try {
+        try (Connection conn = ConnectionPool.getInstance().pop()) {
             Integer dbid = getDocumentDbid(conn, documentPath);
 
             if (dbid == null)
@@ -307,11 +302,9 @@ public class IMManagementJDBCDAL {
             }
 
             return om.writeValueAsString(root);
-        } finally {
-            ConnectionPool.getInstance().push(conn);
         }
-
     }
+
     private Integer getDocumentDbid(Connection conn, String documentPath) throws SQLException {
         try (PreparedStatement stmt = conn.prepareStatement("SELECT dbid FROM document WHERE path = ?")) {
             stmt.setString(1, documentPath);
