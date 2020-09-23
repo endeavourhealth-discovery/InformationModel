@@ -44,13 +44,28 @@ public class ConnectionPool implements ContextShutdownHook {
         if (driver != null && !driver.isEmpty())
             Class.forName(driver);
 
+        int max = 10;
+        int min = 2;
+        int timeout = 120000;
+
+        JsonNode maxNode = json.get("max");
+        if (maxNode != null && maxNode.isNumber())
+            max = maxNode.asInt();
+
+        JsonNode minNode = json.get("min");
+        if (minNode != null && minNode.isNumber())
+            min = minNode.asInt();
+
+        JsonNode timeoutNode = json.get("timeoutms");
+        if (timeoutNode != null && timeoutNode.isNumber())
+            timeout = timeoutNode.asInt();
+
         dataSource.setJdbcUrl(url);
         dataSource.setUsername(user);
         dataSource.setPassword(pass);
-
-        JsonNode max = json.get("max");
-        if (max != null && max.isNumber())
-            dataSource.setMaximumPoolSize(max.asInt());
+        dataSource.setMaximumPoolSize(max);
+        dataSource.setMinimumIdle(min);
+        dataSource.setIdleTimeout(timeout);
 
         StartupConfig.registerShutdownHook("Hikari connection pool", this);
     }
