@@ -59,9 +59,7 @@ public class ConnectionPool implements ContextShutdownHook {
         LOG.debug("Connection popped from pool");
 
         Connection conn = this.dataSource.getConnection();
-
-        MetricsHelper.recordValue("ConnectionPool.Size", dataSource.getHikariPoolMXBean().getTotalConnections());
-        MetricsHelper.recordValue("ConnectionPool.Active", dataSource.getHikariPoolMXBean().getActiveConnections());
+        logStats();
 
         return conn;
     }
@@ -69,7 +67,7 @@ public class ConnectionPool implements ContextShutdownHook {
     @Override
     public void contextShutdown() {
         LOG.debug("Clearing Hikari pool");
-
+        logStats();
         int size = dataSource.getHikariPoolMXBean().getActiveConnections();
         if (size > 0)
             LOG.warn(size + "connections still active!");
@@ -78,5 +76,15 @@ public class ConnectionPool implements ContextShutdownHook {
         LOG.debug("Closing " + size + " connections in pool");
 
         dataSource.close();
+    }
+
+    private void logStats() {
+        int active = dataSource.getHikariPoolMXBean().getActiveConnections();
+        int total = dataSource.getHikariPoolMXBean().getTotalConnections();
+
+        MetricsHelper.recordValue("ConnectionPool.Active", active);
+        MetricsHelper.recordValue("ConnectionPool.Size", total);
+
+        LOG.trace("Connection pool " + active + "/" + total);
     }
 }
