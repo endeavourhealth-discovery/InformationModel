@@ -19,7 +19,7 @@ public class IMClientJDBCDAL {
 
         String prefix = schemeCodePrefixMap.get(scheme);
 
-        if (prefix == null)
+        if (prefix == null && autoCreate)
             throw new IllegalArgumentException("No prefix set for code scheme [" + scheme + "]");
 
         try (Connection conn = ConnectionPool.getInstance().pop()) {
@@ -27,8 +27,11 @@ public class IMClientJDBCDAL {
             conn.setAutoCommit(false);
             try {
                 // Check for existing
-                try (PreparedStatement statement = conn.prepareStatement("SELECT c.dbid FROM concept c WHERE id = ?")) {
-                    statement.setString(1, prefix + code);
+                try (PreparedStatement statement = conn.prepareStatement("SELECT c.dbid FROM concept c JOIN concept s ON s.dbid = c.scheme AND s.id = ? WHERE c.code = ?")) {
+                // try (PreparedStatement statement = conn.prepareStatement("SELECT c.dbid FROM concept c WHERE id = ?")) {
+                //    statement.setString(1, prefix + code);
+                    statement.setString(1, scheme);
+                    statement.setString(2, code);
 
                     try (ResultSet resultSet = statement.executeQuery()) {
                         if (resultSet.next())
