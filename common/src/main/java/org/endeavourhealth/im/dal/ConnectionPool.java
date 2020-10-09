@@ -71,8 +71,6 @@ public class ConnectionPool implements ContextShutdownHook {
     }
 
     public Connection pop() throws SQLException {
-        LOG.debug("Connection popped from pool");
-
         Connection conn = this.dataSource.getConnection();
         logStats();
 
@@ -99,7 +97,5 @@ public class ConnectionPool implements ContextShutdownHook {
 
         MetricsHelper.recordValue("ConnectionPool.Active", active);
         MetricsHelper.recordValue("ConnectionPool.Size", total);
-
-        LOG.trace("Connection pool " + active + "/" + total);
     }
 }
