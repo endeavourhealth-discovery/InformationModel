@@ -93,7 +93,8 @@ public class ConnectionPool implements ContextShutdownHook {
 
     private void logStats() {
         int active = dataSource.getHikariPoolMXBean().getActiveConnections();
-        int total = dataSource.getHikariPoolMXBean().getTotalConnections();
+        int idle = dataSource.getHikariPoolMXBean().getIdleConnections();
+        int total = active + idle;
 
         MetricsHelper.recordValue("ConnectionPool.Active", active);
         MetricsHelper.recordValue("ConnectionPool.Size", total);
