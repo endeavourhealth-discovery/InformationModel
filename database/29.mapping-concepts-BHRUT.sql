@@ -1,3 +1,8 @@
+INSERT IGNORE INTO concept
+(document, id, name, description)
+VALUES
+(1, 'CM_DiscoveryCode', 'Discovery code', 'Discovery (core) coding scheme ');
+
 SELECT @scm := dbid FROM concept WHERE id = 'CM_DiscoveryCode';
 
 INSERT IGNORE INTO concept

@@ -34,29 +34,7 @@ CREATE TEMPORARY TABLE map_function_value_meta (
 ) ENGINE = Memory
   DEFAULT CHARSET = utf8;
 
-
 -- ******************** EMERGENCY ********************
-
--- Context maps
-INSERT INTO map_context_meta
-(provider, `system`, `schema`, `table`, `column`, node)
-VALUES
-('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'emergency', 'department_type',          '/CDS/EMGCY/DPT_TYP'),                  -- NHS DD
-('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'emergency', 'arrival_mode',             '/CDS/EMGCY/ARRVL_MD'),                 -- SNOMED
-('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'emergency', 'attendance_category',      '/CDS/EMGCY/ATTNDNC_CTGRY'),            -- NHS DD
-('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'emergency', 'attendance_source',        '/CDS/EMGCY/ATTNDNC_SRC'),              -- SNOMED
-('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'emergency', 'treatment_function_code',  '/BRTS/CRNR/CDS/EMGCY/TRTMNT_FNCTN'),   -- BARTS/CERNER code
-('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'emergency', 'discharge_status',         '/CDS/EMGCY/DSCHRG_STTS'),              -- SNOMED
-('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'emergency', 'discharge_destination',    '/CDS/EMGCY/DSCHRG_DSTNTN'),            -- SNOMED
-('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'emergency', 'discharge_follow_up',      '/CDS/EMGCY/DSCHRG_FLLW_UP'),           -- SNOMED
-('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'emergency', 'referred_to_services',     '/CDS/EMGCY/RFRRD_SRVCS')               -- SNOMED
-
-/* convergent mapping examples
-('CM_Org_Homerton', 'CM_Sys_Cerner', 'CDS', 'emergency', 'department_type',          '/CDS/EMGCY/DPT_TYP'),                  -- HOMERTON LOOKUP MAPS TO SAME CONTEXT AS BARTS (COMMON NHS DD CODES)
-('CM_Org_Homerton', 'CM_Sys_Cerner', 'CDS', 'emergency', 'treatment_function_code',  '/HMTN/CRNR/CDS/EMGCY/TRTMNT_FNCTN'),   -- HOMERTON LOOKUP MAPS TO DIFFERENT CONTEXT (LOCAL/SPECIFIC CERNER CODES)
-*/
-;
-
 -- Node maps
 INSERT INTO map_node_meta
 (node, concept)
@@ -65,7 +43,6 @@ VALUES
 ('/CDS/EMGCY/ARRVL_MD',                  'DM_arrivalMode'),             -- SNOMED
 ('/CDS/EMGCY/ATTNDNC_CTGRY',             'DM_aeAttendanceCategory'),    -- NHS DD
 ('/CDS/EMGCY/ATTNDNC_SRC',               'DM_aeAttendanceSource'),      -- SNOMED
-('/BRTS/CRNR/CDS/EMGCY/TRTMNT_FNCTN',    'DM_treatmentFunctionAdmit'),  -- BARTS/CERNER code
 ('/CDS/EMGCY/DSCHRG_STTS',               'DM_dischargeStatus'),         -- SNOMED
 ('/CDS/EMGCY/DSCHRG_DSTNTN',             'DM_hasDischargeDestination'), -- SNOMED
 ('/CDS/EMGCY/DSCHRG_FLLW_UP',            'DM_dischargeFollowUp'),       -- SNOMED
@@ -87,29 +64,7 @@ VALUES
 ('/CDS/EMGCY/ATTNDNC_CTGRY', '3', 'CM_NHS_DD', 'CM_AEAttCat3'),
 ('/CDS/EMGCY/ATTNDNC_CTGRY', '4', 'CM_NHS_DD', 'CM_AEAttCat4');
 
-INSERT INTO map_function_value_meta
-(node, scheme, function)
-VALUES
-('/BRTS/CRNR/CDS/EMGCY/TRTMNT_FNCTN', 'BartsCerner', 'Format(BC_%s)')
-;
-
 -- ******************** INPATIENT ********************
-
--- Context maps
-INSERT INTO map_context_meta
-(provider, `system`, `schema`, `table`, `column`, node)
-VALUES
-('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'inpatient', 'admission_method_code',         '/CDS/INPTNT/ADMSSN_MTHD'),            -- NHS DD
-('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'inpatient', 'admission_source_code',         '/CDS/INPTNT/ADMSSN_SRC'),             -- NHS DD
-('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'inpatient', 'patient_classification',        '/CDS/INPTNT/PTNT_CLSSFCTN'),          -- NHS DD
-('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'inpatient', 'discharge_destination_code',    '/CDS/INPTNT/DSCHRG_DSTNTN'),          -- NHS DD
-('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'inpatient', 'discharge_method',              '/CDS/INPTNT/DSCHRG_MTHD'),            -- NHS DD
-('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'inpatient', 'administrative_category_code',  '/CDS/INPTNT/ADMNSTRV_CTGRY'),         -- NHS DD
-('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'inpatient', 'treatment_function_code',       '/BRTS/CRNR/CDS/INPTNT/TRTMNT_FNCTN'), -- BARTS LOCAL
-('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'inpatient', 'live_or_still_birth_indicator', '/CDS/INPTNT/LV_STLL_BRTH_INDCTR'),    -- NHS DD
-('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'inpatient', 'delivery_method',               '/CDS/INPTNT/DLVRY_MTHD'),             -- NHS DD
-('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'inpatient', 'gender',                        '/CDS/INPTNT/GNDR')                    -- NHS DD
-;
 
 -- Node maps
 INSERT INTO map_node_meta
@@ -121,8 +76,6 @@ VALUES
 ('/CDS/INPTNT/DSCHRG_DSTNTN',            'DM_hasDischargeDestination'),         -- NHS DD
 ('/CDS/INPTNT/DSCHRG_MTHD',              'DM_hasDischargeMethod'),              -- NHS DD
 ('/CDS/INPTNT/ADMNSTRV_CTGRY',           'DM_adminCategoryonAdmission'),        -- NHS DD
-('/BRTS/CRNR/CDS/INPTNT/TRTMNT_FNCTN',   'DM_treatmentFunctionAdmit'),          -- BARTS LOCAL
-('/CDS/INPTNT/LV_STLL_BRTH_INDCTR',      'DM_liveOrStillBirthIndicator'),       -- NHS DD
 ('/CDS/INPTNT/DLVRY_MTHD',               'DM_deliveryMethod'),                  -- NHS DD
 ('/CDS/INPTNT/GNDR',                     'DM_gender')                           -- NHS DD
 ;
@@ -230,24 +183,7 @@ VALUES
 ('/CDS/INPTNT/GNDR', '9', 'CM_NHS_DD', 'CM_Gender9')
 ;
 
-INSERT INTO map_function_value_meta
-(node, scheme, function)
-VALUES
-('/BRTS/CRNR/CDS/INPTNT/TRTMNT_FNCTN', 'BartsCerner', 'Format(BC_%s)')
-;
-
 -- ******************** OUTPATIENT ********************
-
--- Context maps
-INSERT INTO map_context_meta
-(provider, `system`, `schema`, `table`, `column`, node)
-VALUES
-('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'outpatient', 'appt_attended_code',           '/CDS/OUTPTNT/APPT_ATTNDD'),           -- NHS DD
-('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'outpatient', 'appt_outcome_code',            '/CDS/OUTPTNT/OUTCM'),                 -- NHS DD
-('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'outpatient', 'administrative_category_code', '/CDS/OUTPTNT/ADMNSTRTV_CTGRY'),       -- NHS DD
-('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'outpatient', 'referral_source',              '/CDS/OUTPTNT/RFRRL_SRC'),             -- NHS DD
-('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'outpatient', 'treatment_function_code',      '/BRTS/CRNR/CDS/OUTPTNT/TRTMNT_FNCTN') -- BARTS/CERNER code
-;
 
 -- Node maps
 INSERT INTO map_node_meta
@@ -256,8 +192,7 @@ VALUES
 ('/CDS/OUTPTNT/APPT_ATTNDD',             'DM_attendanceStatus'),                -- NHS DD
 ('/CDS/OUTPTNT/OUTCM',                   'DM_hasAttendanceOutcome'),            -- NHS DD
 ('/CDS/OUTPTNT/ADMNSTRTV_CTGRY',         'DM_adminCategoryonAdmission'),        -- NHS DD
-('/CDS/OUTPTNT/RFRRL_SRC',               'DM_outpatientReferralSource'),        -- NHS DD
-('/BRTS/CRNR/CDS/OUTPTNT/TRMNT_FNCTN',   'DM_treatmentFunctionAdmit')           -- BARTS/CERNER code
+('/CDS/OUTPTNT/RFRRL_SRC',               'DM_outpatientReferralSource')         -- NHS DD
 ;
 
 -- Value maps
@@ -301,27 +236,7 @@ VALUES
 ('/CDS/OUTPTNT/RFRRL_SRC', '97', 'CM_NHS_DD', 'CM_OutRefSrc97')
 ;
 
-INSERT INTO map_function_value_meta
-(node, scheme, function)
-VALUES
-('/BRTS/CRNR/CDS/OUTPTNT/TRTMNT_FNCTN', 'BartsCerner', 'Format(BC_%s)')
-;
-
 -- ******************** CRITICAL CARE ********************
-
--- Context maps
-INSERT INTO map_context_meta
-(provider, `system`, `schema`, `table`, `column`, node)
-VALUES
-('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'critical', 'critical_care_type_id',          '/CDS/CRTCL/CRTCL_CR_TYP'),    -- NHS DD
-('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'critical', 'care_unit_function',             '/CDS/CRTCL/CR_UNT_FNCTN'),    -- NHS DD
-('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'critical', 'admission_source_code',          '/CDS/CRTCL/ADMSSN_SRC'),      -- NHS DD
-('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'critical', 'admission_type_code',            '/CDS/CRTCL/ADMSSN_TYP'),      -- NHS DD
-('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'critical', 'admission_location',             '/CDS/CRTCL/ADMSSN_LCTN'),     -- NHS DD
-('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'critical', 'discharge_status_code',          '/CDS/CRTCL/DSCHRG_STTS'),     -- NHS DD
-('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'critical', 'discharge_destination',          '/CDS/CRTCL/DSCHRG_DSTNTN'),   -- NHS DD
-('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'critical', 'discharge_location',             '/CDS/CRTCL/DSCHRG_LCTN')      -- NHS DD
-;
 
 -- Node maps
 INSERT INTO map_node_meta

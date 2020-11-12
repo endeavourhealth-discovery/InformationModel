@@ -9,8 +9,6 @@ INSERT IGNORE INTO concept
 (document, id, scheme, code, name, description)
 VALUES
 -- GENERAL/GLOBAL --
-(1, 'CM_Org_Barts', @scm, 'CM_Org_Barts', 'Barts Hospital', 'Barts NHS Trust Hospital'),
-(1, 'CM_Sys_Cerner', @scm, 'CM_Sys_Cerner', 'Cerner Millennium', 'Cerner Millennium system'),
 (1, 'CM_NHS_DD', @scm, 'CM_NHS_DD', 'NHS Data Dictionary', 'NHS Data Dictionary coding scheme'),
 (1, 'CM_CDS', @scm, 'CM_CDS', 'CDS Local code', 'Local CDS code'),
 
