@@ -13,6 +13,7 @@
     <module>client</module>
     <module>api</module>
     <module>FrontEndv8</module>
+    <module>TRUDImport</module>
   </modules>
 
   <properties>
