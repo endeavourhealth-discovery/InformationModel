@@ -70,7 +70,7 @@ public class Importer {
         importRelationships(folder);
 
         // Apply to database
-        // patchDB();
+        buildPatchData();
     }
 
     // ---------------------- PRIVATES ---------------------- //
@@ -211,19 +211,75 @@ public class Importer {
         LOG.info("Relationships processed");
     }
 
-    private void patchDB() throws SQLException {
+    private void buildPatchData() throws SQLException {
         Integer snomedCodeScheme = null;
         Integer snomedDocument = null;
+        Integer isA = null;
 
-        try (PreparedStatement stmt = conn.prepareStatement("SELECT dbid, document FROM concept WHERE id = 'SNOMED'");
+        // CPO patch delete table
+        conn.prepareStatement("CREATE TABLE cpo_delete SELECT * FROM concept_property_object WHERE 1 = 0 LIMIT 1").executeUpdate();
+
+        // Useful DBIDs
+        try (PreparedStatement stmt = conn.prepareStatement("SELECT dbid, document, scheme FROM concept WHERE id = 'SN_116680003'");
         ResultSet rs = stmt.executeQuery()) {
             if (!rs.next())
                 throw new IllegalStateException("Could not find snomed code scheme concept!!");
 
-            snomedCodeScheme = rs.getInt("dbid");
+            isA = rs.getInt("dbid");
+            snomedCodeScheme = rs.getInt("scheme");
             snomedDocument = rs.getInt("document");
         }
 
+        // Identify deprecated relationships
+        LOG.info("Processing existing relationships");
+        try (PreparedStatement stmt = conn.prepareStatement("SELECT c.dbid AS childDbid, c.code AS childCode, cpo.group, v.dbid AS parentDbid, v.code AS parentCode\n" +
+            "FROM concept_property_object cpo\n" +
+            "JOIN concept c ON c.dbid = cpo.dbid\n" +
+            "JOIN concept v ON v.dbid = cpo.value\n" +
+            "WHERE c.scheme = " + snomedCodeScheme + "\n" +
+            "AND v.scheme = " + snomedCodeScheme + "\n" +
+            "AND cpo.property = " + isA + "\n" +
+            "ORDER BY c.dbid");
+             ResultSet rs = stmt.executeQuery()) {
+            int i = 0;
+            while (rs.next()) {
+                String childCode = rs.getString("childCode");
+                String parentCode = rs.getString("parentCode");
+                Integer group = rs.getInt("group");
+                SnomedConcept c = snomed.get(childCode);
+                if (c != null && c.getParents().stream().noneMatch(p -> p.getConceptId().equals(parentCode) && group.equals(p.getGroup()))) {
+                    c.setDbid(rs.getInt("childDbid"));
+                    c.addDeletedParent(new SnomedParent(parentCode, group).setDbid(rs.getInt("parentDbid")));
+                    i++;
+                    if (i % LOGSTEP == 0)
+                        LOG.debug("Processed {} rows...", i);
+                }
+            }
+            LOG.info("Removing {} deprecated relationships", i);
+        }
+
+        // Remove deprecated relationships
+        LOG.info("Removing relationships");
+        try (PreparedStatement stmt = conn.prepareStatement("INSERT INTO cpo_delete(property, dbid, value, `group`) VALUES (?, ?, ?, ?)")) {
+            int i = 0;
+            stmt.setInt(1, isA);
+            for (SnomedConcept c: snomed.values()) {
+                if (c.getDbid() != null && !c.getDeletedParents().isEmpty()) {
+                    stmt.setInt(2, c.getDbid());
+                    for (SnomedParent p: c.getDeletedParents()) {
+                        stmt.setInt(3, p.getDbid());
+                        stmt.setInt(4, p.getGroup());
+                        i += stmt.executeUpdate();
+                        if (i % (LOGSTEP/100) == 0)
+                            LOG.debug("Removing {} relationships...", i);
+                    }
+                }
+            }
+            LOG.info("Removed {} deprecated relationships", i);
+        }
+
+        // Remove existing snomed codes
+        LOG.info("Identifying new concepts");
         try (PreparedStatement stmt = conn.prepareStatement("SELECT c.dbid, c.code, c.name FROM concept c WHERE c.scheme = " + snomedCodeScheme);
         ResultSet rs = stmt.executeQuery()) {
             int i = 0;
@@ -234,8 +290,9 @@ public class Importer {
                     LOG.debug("Processed {} rows...", i);
             }
         }
-        LOG.info("Inserting {} new concepts", snomed.size());
 
+        // Patch in new codes
+        LOG.info("Inserting {} new concepts", snomed.size());
         try (PreparedStatement stmt = conn.prepareStatement("INSERT INTO concept (id, document, name, description, code, scheme) VALUES (?, ?, ?, ?, ?, ?)")) {
             int i = 0;
             for (SnomedConcept c : snomed.values()) {
@@ -248,11 +305,12 @@ public class Importer {
                 stmt.executeUpdate();
                 i++;
                 if (i % (LOGSTEP/100) == 0)
-                    LOG.debug("Added {} concepts...", i);
+                    LOG.debug("Adding {} concepts...", i);
             }
+            LOG.info("Added {} concepts", i);
         }
 
-        LOG.info("Inserting relationships");
+        LOG.info("Inserting new relationships");
 
         try (PreparedStatement stmt = conn.prepareStatement("INSERT INTO concept_property_object (dbid, property, value, `group`)\n" +
             "SELECT c.dbid, p.dbid, v.dbid, ?\n" +
@@ -272,9 +330,10 @@ public class Importer {
                     stmt.setString(5, "SN_" + c.getConceptId());
                     i = i + stmt.executeUpdate();
                     if (i % (LOGSTEP/100) == 0)
-                        LOG.debug("Added {} relationships...", i);
+                        LOG.debug("Adding {} relationships...", i);
                 }
             }
+            LOG.info("Added {} relationships", i);
         }
 
         LOG.info("Database patched");

@@ -1,8 +1,18 @@
 package org.endeavourhealth.informationmodel;
 
 public class SnomedParent {
+    private Integer dbid;
     private String conceptId;
     private int group = 0;
+
+    public Integer getDbid() {
+        return dbid;
+    }
+
+    public SnomedParent setDbid(Integer dbid) {
+        this.dbid = dbid;
+        return this;
+    }
 
     public SnomedParent(String conceptId, int group) {
         this.conceptId = conceptId;
