@@ -72,11 +72,11 @@
         <artifactId>maven-dependency-plugin</artifactId>
         <version>${maven-dependency-plugin.version}</version>
       </plugin>
-      <plugin>
+<!--      <plugin>
         <groupId>org.sonarsource.scanner.maven</groupId>
         <artifactId>sonar-maven-plugin</artifactId>
         <version>${maven-sonar-plugin.version}</version>
-      </plugin>
+      </plugin>-->
     </plugins>
   </build>
 
