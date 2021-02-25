@@ -1,8 +1,6 @@
 version: 0.0
 os: linux
 files:
-  - source: /FrontEndv8/dist/FrontEndv8
-    destination: //opt/tomcat/webapps/information-model
   - source: /api/target/api
     destination: //opt/tomcat/webapps/information-model
 hooks:
