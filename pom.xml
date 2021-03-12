@@ -12,9 +12,6 @@
     <module>common</module>
     <module>client</module>
     <module>api</module>
-<!--
-    <module>FrontEndv8</module>
--->
     <module>TRUDImport</module>
   </modules>
 
@@ -74,11 +71,6 @@
         <artifactId>maven-dependency-plugin</artifactId>
         <version>${maven-dependency-plugin.version}</version>
       </plugin>
-<!--      <plugin>
-        <groupId>org.sonarsource.scanner.maven</groupId>
-        <artifactId>sonar-maven-plugin</artifactId>
-        <version>${maven-sonar-plugin.version}</version>
-      </plugin>-->
     </plugins>
   </build>
 

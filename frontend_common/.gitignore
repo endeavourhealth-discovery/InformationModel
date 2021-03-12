@@ -1,6 +1,0 @@
-.idea
-*.iml
-node_modules
-dist
-typings/globals
-aot/src
