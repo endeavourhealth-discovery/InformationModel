@@ -39,49 +39,52 @@ public class MappingLogic {
 
     private MapResponse getMapColumnRequest(MapRequest request) throws Exception {
         MapColumnRequest columnRequest = request.getMapColumnRequest();
+        MapResponse mapResponse = getColumnNode(
+                columnRequest.getProvider(),
+                columnRequest.getSystem(),
+                columnRequest.getSchema(),
+                columnRequest.getTable(),
+                columnRequest.getColumn(),
+                columnRequest.getTarget());
 
-        return getOrCreateColumnNode(
-            columnRequest.getProvider(),
-            columnRequest.getSystem(),
-            columnRequest.getSchema(),
-            columnRequest.getTable(),
-            columnRequest.getColumn()
-        ).setRequest(request);
+        if(mapResponse == null)
+            return null;
+
+        return mapResponse.setRequest(request);
     }
 
-    private MapResponse getOrCreateColumnNode(String provider, String system, String schema, String table, String column) throws Exception {
+    private MapResponse getColumnNode(String provider, String system, String schema, String table, String column, String target) throws Exception {
         MapNode nodeData = dal.getNode(
             provider,
             system,
             schema,
             table,
-            column
+            column,
+                target
         );
 
-        if (nodeData != null) {
-            return new MapResponse()
-                .setNode(nodeData)
-                .setConcept(dal.getNodePropertyConcept(nodeData.getNode()));
-        } else {
-            return dal.createNodePropertyConcept(
-                provider,
-                system,
-                schema,
-                table,
-                column
-            );
+        if (nodeData == null)
+            return null;
+
+        MapResponse mapResponse = new MapResponse().setNode(nodeData);
+
+        if(nodeData.getTarget()==null || nodeData.getTarget().equals(target)){
+            mapResponse.setConcept(dal.getNodePropertyConcept(nodeData.getNode()));
         }
+        return mapResponse;
+
     }
 
     private MapResponse getMapColumnValueRequest(MapRequest request) throws Exception {
         MapColumnValueRequest valueRequest = request.getMapColumnValueRequest();
 
-        MapResponse nodeData = getOrCreateColumnNode(
+        MapResponse nodeData = getColumnNode(
             valueRequest.getProvider(),
             valueRequest.getSystem(),
             valueRequest.getSchema(),
             valueRequest.getTable(),
-            valueRequest.getColumn()
+            valueRequest.getColumn(),
+                valueRequest.getTarget()
         );
 
         MapValueNode valueNode = dal.getValueNode(nodeData.getNode().getNode(), valueRequest.getValue().getScheme());

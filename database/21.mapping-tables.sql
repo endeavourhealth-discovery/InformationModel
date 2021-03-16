@@ -8,6 +8,7 @@ CREATE TABLE map_node (
     id          INT AUTO_INCREMENT,
     node        VARCHAR(200),
     concept     INT NOT NULL,
+    target      INT,
     draft       BOOLEAN NOT NULL DEFAULT TRUE,
 
     PRIMARY KEY map_node_pk (id),

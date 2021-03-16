@@ -3,13 +3,15 @@ package org.endeavourhealth.im.models.mapping;
 public class MapNode {
     private int nodeId;
     private String node;
+    private String target;
 
     public MapNode() {
     }
 
-    public MapNode(int nodeId, String node) {
+    public MapNode(int nodeId, String node, String target) {
         this.nodeId = nodeId;
         this.node = node;
+        this.target = target;
     }
 
     public int getNodeId() {
@@ -27,6 +29,15 @@ public class MapNode {
 
     public MapNode setNode(String node) {
         this.node = node;
+        return this;
+    }
+
+    public String getTarget() {
+        return target;
+    }
+
+    public MapNode setTarget(String target) {
+        this.target = target;
         return this;
     }
 }

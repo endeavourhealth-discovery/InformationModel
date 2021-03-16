@@ -3,10 +3,10 @@ package org.endeavourhealth.im.dal;
 import org.endeavourhealth.im.models.mapping.*;
 
 public interface IMMappingDAL {
-    MapNode getNode(String provider, String system, String schema, String table, String column) throws Exception;
+    MapNode getNode(String provider, String system, String schema, String table, String column, String target) throws Exception;
 
     ConceptIdentifiers getNodePropertyConcept(String node) throws Exception;
-    MapResponse createNodePropertyConcept(String provider, String system, String schema, String table, String column) throws Exception;
+
 
     MapValueNode getValueNode(String node, String codeScheme) throws Exception;
     MapValueNode createValueNode(String node, String codeScheme) throws Exception;

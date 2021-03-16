@@ -40,6 +40,46 @@ public class MappingLogicTest {
     }
 
     @Test
+    public void getMapColumnRequestTarget_KnownContext() throws Exception {
+        MapRequest request = new MapRequest()
+                .setMapColumnRequest(
+                        new MapColumnRequest()
+                                .setProvider("CM_Org_Barts")
+                                .setSystem("CM_Sys_Cerner")
+                                .setSchema("CDS")
+                                .setTable("emergency")
+                                .setColumn("arrival_mode")
+                                .setTarget("DS_FHIR_RFT_N")
+                );
+
+        MapResponse actual = mappingLogic.getMapping(request);
+
+        Assert.assertEquals("/CDS/EMGCY/ARRVL_MD", actual.getNode().getNode());
+        Assert.assertEquals("DM_arrivalMode", actual.getConcept().getIri());
+        Assert.assertEquals("DS_FHIR_RFT_N", actual.getNode().getTarget());
+    }
+
+    @Test
+    public void getMapColumnRequestWrongTarget_KnownContext() throws Exception {
+        MapRequest request = new MapRequest()
+                .setMapColumnRequest(
+                        new MapColumnRequest()
+                                .setProvider("CM_Org_Barts")
+                                .setSystem("CM_Sys_Cerner")
+                                .setSchema("CDS")
+                                .setTable("emergency")
+                                .setColumn("arrival_mode")
+                                .setTarget("Wrong")
+                );
+
+        MapResponse actual = mappingLogic.getMapping(request);
+
+        Assert.assertEquals("/CDS/EMGCY/ARRVL_MD", actual.getNode().getNode());
+        Assert.assertNull( actual.getConcept());
+        Assert.assertEquals("DS_FHIR_RFT_N", actual.getNode().getTarget());
+    }
+
+    @Test
     public void getMapColumnRequest_UnknownContext() throws Exception {
         MapRequest request = new MapRequest()
             .setMapColumnRequest(
@@ -48,15 +88,13 @@ public class MappingLogicTest {
                     .setSystem("CM_Sys_TPP")
                     .setSchema("CDS")
                     .setTable("emergency")
-                    .setColumn("department_type")
+                    .setColumn("Unknown")
             );
 
         MapResponse actual = mappingLogic.getMapping(request);
 
-        Assert.assertNotNull(actual);
-        Assert.assertNotNull(actual.getNode());
-        Assert.assertNotNull(actual.getNode().getNode());
-        Assert.assertNotNull(actual.getConcept().getIri());
+        Assert.assertNull(actual);
+
     }
 
     @Test
