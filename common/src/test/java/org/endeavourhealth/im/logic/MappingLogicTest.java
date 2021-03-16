@@ -13,7 +13,7 @@ public class MappingLogicTest {
 
     @BeforeClass
     public static void init() throws ConfigManagerException {
-        ConfigManager.Initialize("information-model");
+        ConfigManager.Initialize("information-model-test");
     }
 
     @Before
@@ -134,7 +134,7 @@ public class MappingLogicTest {
                     .setColumn("treatment_function_code")
                     .setValue(new MapValueRequest()
                         .setCode("1164554")
-                        .setScheme("CM_BartCernerCode")
+                        .setScheme("BartsCerner")
                     )
             );
 
@@ -155,7 +155,7 @@ public class MappingLogicTest {
                     .setColumn("treatment_function_code")
                     .setValue(new MapValueRequest()
                         .setCode("99")
-                        .setScheme("CM_BartCernerCode")
+                        .setScheme("BartsCerner")
                     )
             );
 
