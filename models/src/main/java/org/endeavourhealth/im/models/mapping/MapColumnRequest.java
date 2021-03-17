@@ -21,6 +21,15 @@ public class MapColumnRequest {
         this.column = column;
     }
 
+    public MapColumnRequest(String provider, String system, String schema, String table, String column, String target) {
+        this.provider = provider;
+        this.system = system;
+        this.schema = schema;
+        this.table = table;
+        this.column = column;
+        this.column = target;
+    }
+
     @JsonProperty("Provider")
     public String getProvider() {
         return provider;
