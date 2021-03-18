@@ -27,7 +27,7 @@ public class MapColumnRequest {
         this.schema = schema;
         this.table = table;
         this.column = column;
-        this.column = target;
+        this.target = target;
     }
 
     @JsonProperty("Provider")
