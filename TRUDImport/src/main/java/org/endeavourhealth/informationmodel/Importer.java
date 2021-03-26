@@ -83,14 +83,15 @@ public class Importer {
 
         // Process data
         identifyDeprecatedRelationship(snomedCodeScheme, isA);
+        generateDelCPOTable(isA);
+
         identifyNewConcepts(snomedCodeScheme);
         saveNewConcepts(snomedCodeScheme, snomedDocument);
-        saveNewRelationships();
-
-        // Generate outputs
         generateNewConceptTable();
+
+        saveNewRelationships();
         generateNewCPOTable();
-        generateDelCPOTable(isA);
+
         generateTCTTable(folder);
     }
 
