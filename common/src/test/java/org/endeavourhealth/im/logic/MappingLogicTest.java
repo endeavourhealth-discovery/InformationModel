@@ -10,19 +10,32 @@ import org.junit.Test;
 
 public class MappingLogicTest {
     private MappingLogic mappingLogic;
+    private MappingMockDal mappingMockDal;
 
     @BeforeClass
     public static void init() throws ConfigManagerException {
-        ConfigManager.Initialize("information-model-test");
+      //  ConfigManager.Initialize("information-model-test");
     }
 
     @Before
     public void setup() {
-        this.mappingLogic = new MappingLogic();
+        this.mappingMockDal = new MappingMockDal();
+        this.mappingLogic = new MappingLogic(mappingMockDal);
+
     }
 
     @Test
     public void getMapColumnRequest_KnownContext() throws Exception {
+
+        mappingMockDal.setGetNodeResult(new MapNode()
+            .setNode("/CDS/EMGCY/DPT_TYP")
+
+        );
+
+        mappingMockDal.setGetNodePropertyConceptResult(new ConceptIdentifiers()
+            .setIri("DM_aAndEDepartmentType")
+        );
+
         MapRequest request = new MapRequest()
             .setMapColumnRequest(
                 new MapColumnRequest()
@@ -41,6 +54,15 @@ public class MappingLogicTest {
 
     @Test
     public void getMapColumnRequestTarget_KnownContext() throws Exception {
+        mappingMockDal.setGetNodeResult(new MapNode()
+            .setNode("/CDS/EMGCY/ARRVL_MD")
+            .setTarget("DS_FHIR_RFT_N")
+        );
+
+        mappingMockDal.setGetNodePropertyConceptResult(new ConceptIdentifiers()
+            .setIri("DM_arrivalMode")
+        );
+
         MapRequest request = new MapRequest()
                 .setMapColumnRequest(
                         new MapColumnRequest()
@@ -61,6 +83,12 @@ public class MappingLogicTest {
 
     @Test
     public void getMapColumnRequestWrongTarget_KnownContext() throws Exception {
+
+        mappingMockDal.setGetNodeResult(new MapNode()
+            .setNode("/CDS/EMGCY/ARRVL_MD")
+            .setTarget("DS_FHIR_RFT_N")
+        );
+
         MapRequest request = new MapRequest()
                 .setMapColumnRequest(
                         new MapColumnRequest()
@@ -99,6 +127,17 @@ public class MappingLogicTest {
 
     @Test
     public void getMapColumnValueRequest_KnownContextKnownValue() throws Exception {
+
+        mappingMockDal.setGetNodeResult(new MapNode());
+
+        mappingMockDal.setGetValueNodeResult(new MapValueNode()
+            .setFunction("Lookup()")
+        );
+
+        mappingMockDal.setGetValueNodeConceptResult(new ConceptIdentifiers()
+            .setIri("CM_AEDepType3")
+        );
+
         MapRequest request = new MapRequest()
             .setMapColumnValueRequest(
                 new MapColumnValueRequest()
@@ -120,6 +159,17 @@ public class MappingLogicTest {
 
     @Test
     public void getMapColumnValueRequest_KnownContextKnownValueShortcut() throws Exception {
+
+        mappingMockDal.setGetNodeResult(new MapNode());
+
+        mappingMockDal.setGetValueNodeResult(new MapValueNode()
+            .setFunction("Lookup()")
+        );
+
+        mappingMockDal.setGetValueNodeConceptResult(new ConceptIdentifiers()
+            .setIri("CM_AEDepType3")
+        );
+
         MapRequest request = new MapRequest()
             .setMapColumnValueRequest(
                 new MapColumnValueRequest()
@@ -141,6 +191,17 @@ public class MappingLogicTest {
 
     @Test
     public void getMapColumnValueRequest_KnownContextUnknownValue() throws Exception {
+
+        mappingMockDal.setGetNodeResult(new MapNode());
+
+        mappingMockDal.setGetValueNodeResult(new MapValueNode()
+            .setFunction("Lookup()")
+        );
+
+        mappingMockDal.setGetValueNodeConceptResult(new ConceptIdentifiers()
+            .setIri("LPV_Brt_Crn_CDS_emr_dpr_99_")
+        );
+
         MapRequest request = new MapRequest()
             .setMapColumnValueRequest(
                 new MapColumnValueRequest()
@@ -162,6 +223,17 @@ public class MappingLogicTest {
 
     @Test
     public void getMapColumnValueRequest_KnownContextKnownValue_Format() throws Exception {
+
+        mappingMockDal.setGetNodeResult(new MapNode());
+
+        mappingMockDal.setGetValueNodeResult(new MapValueNode()
+            .setFunction("Lookup()")
+        );
+
+        mappingMockDal.setGetValueNodeConceptResult(new ConceptIdentifiers()
+            .setIri("BC_1164554")
+        );
+
         MapRequest request = new MapRequest()
             .setMapColumnValueRequest(
                 new MapColumnValueRequest()
@@ -183,6 +255,17 @@ public class MappingLogicTest {
 
     @Test
     public void getMapColumnValueRequest_KnownContextUnknownValue_Format() throws Exception {
+
+        mappingMockDal.setGetNodeResult(new MapNode());
+
+        mappingMockDal.setGetValueNodeResult(new MapValueNode()
+            .setFunction("Lookup()")
+        );
+
+        mappingMockDal.setGetValueNodeConceptResult(new ConceptIdentifiers()
+            .setIri("BC_99")
+        );
+
         MapRequest request = new MapRequest()
             .setMapColumnValueRequest(
                 new MapColumnValueRequest()
@@ -204,6 +287,17 @@ public class MappingLogicTest {
 
     @Test
     public void getMapColumnValueRequest_KnownContextKnownTerm() throws Exception {
+
+        mappingMockDal.setGetNodeResult(new MapNode());
+
+        mappingMockDal.setGetValueNodeResult(new MapValueNode()
+            .setFunction("Lookup()")
+        );
+
+        mappingMockDal.setGetValueNodeConceptResult(new ConceptIdentifiers()
+            .setIri("LPV_BHR_Mdw_Mdw_PMI_CAU_Cvd_")
+        );
+
         MapRequest request = new MapRequest()
             .setMapColumnValueRequest(
                 new MapColumnValueRequest()
@@ -224,6 +318,17 @@ public class MappingLogicTest {
 
     @Test
     public void getMapColumnValueRequest_KnownContextUnknownTerm() throws Exception {
+
+        mappingMockDal.setGetNodeResult(new MapNode());
+
+        mappingMockDal.setGetValueNodeResult(new MapValueNode()
+            .setFunction("Lookup()")
+        );
+
+        mappingMockDal.setGetValueNodeConceptResult(new ConceptIdentifiers()
+            .setIri("LPV_BHR_Mdw_Mdw_PMI_CAU_Cpd_")
+        );
+
         MapRequest request = new MapRequest()
             .setMapColumnValueRequest(
                 new MapColumnValueRequest()
