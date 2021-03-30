@@ -97,7 +97,8 @@ public class MappingLogic {
             String format = valueNode.getFunction().substring(7, valueNode.getFunction().length() - 1);
             String iri = String.format(format, valueRequest.getValue().getCode());
             ids = dal.getConceptIdentifiers(iri);
-            if (ids == null)
+            if (ids == null) {
+
                 ids = dal.createFormattedValueNodeConcept(
                     valueRequest.getProvider(),
                     valueRequest.getSystem(),
@@ -107,6 +108,8 @@ public class MappingLogic {
                     valueRequest.getValue(),
                     iri
                 );
+                nodeData.setWasCreated(true);
+            }
         } else {
             // valueNode.getFunction().equals("Lookup()")
             ids = dal.getValueNodeConcept(valueNode, valueRequest.getValue());
@@ -120,6 +123,7 @@ public class MappingLogic {
                     valueRequest.getColumn(),
                     valueRequest.getValue()
                 );
+                nodeData.setWasCreated(true);
             }
         }
 

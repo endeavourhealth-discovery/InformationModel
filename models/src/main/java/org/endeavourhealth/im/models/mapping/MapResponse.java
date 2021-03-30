@@ -5,6 +5,9 @@ public class MapResponse {
     private MapValueNode valueNode;
     private ConceptIdentifiers concept;
     private MapRequest request;
+    private Boolean wasCreated = false;
+
+
 
     public MapNode getNode() {
         return node;
@@ -39,6 +42,15 @@ public class MapResponse {
 
     public MapResponse setRequest(MapRequest request) {
         this.request = request;
+        return this;
+    }
+
+    public Boolean getWasCreated() {
+        return wasCreated;
+    }
+
+    public MapResponse setWasCreated(Boolean wasCreated) {
+        this.wasCreated = wasCreated;
         return this;
     }
 }
