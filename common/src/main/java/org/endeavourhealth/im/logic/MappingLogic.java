@@ -84,7 +84,7 @@ public class MappingLogic {
             valueRequest.getSchema(),
             valueRequest.getTable(),
             valueRequest.getColumn(),
-                valueRequest.getTarget()
+            valueRequest.getTarget()
         );
 
         MapValueNode valueNode = dal.getValueNode(nodeData.getNode().getNode(), valueRequest.getValue().getScheme());
@@ -121,7 +121,10 @@ public class MappingLogic {
                     valueRequest.getSchema(),
                     valueRequest.getTable(),
                     valueRequest.getColumn(),
-                    valueRequest.getValue()
+                    valueRequest.getValue(),
+                    valueRequest.getColumn(),
+                    (valueRequest.getValue().getCode()==null || valueRequest.getValue().getCode().isEmpty())
+                        ? valueRequest.getValue().getTerm() : valueRequest.getValue().getCode()
                 );
                 nodeData.setWasCreated(true);
             }

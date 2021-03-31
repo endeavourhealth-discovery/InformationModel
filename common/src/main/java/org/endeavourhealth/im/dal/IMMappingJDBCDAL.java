@@ -180,11 +180,11 @@ public class IMMappingJDBCDAL implements IMMappingDAL {
     }
 
     @Override
-    public ConceptIdentifiers createValueNodeConcept(MapValueNode valueNode, String provider, String system, String schema, String table, String column, MapValueRequest value) throws SQLException {
+    public ConceptIdentifiers createValueNodeConcept(MapValueNode valueNode, String provider, String system, String schema, String table, String column, MapValueRequest valueRequest,String propertyName, String value) throws SQLException {
         try (Connection conn = ConnectionPool.getInstance().pop()) {
             conn.setAutoCommit(false);
             try {
-                ConceptIdentifiers result = createLegacyPropertyValueConcept(provider, system, schema, table, column, value);
+                ConceptIdentifiers result = createLegacyPropertyValueConcept(provider, system, schema, table, column, valueRequest, propertyName, value);
 
                 String sql = "INSERT INTO map_value_node_lookup\n" +
                     "(value_node, value, concept)\n" +
@@ -194,10 +194,10 @@ public class IMMappingJDBCDAL implements IMMappingDAL {
                 try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                     int i = 0;
                     stmt.setInt(++i, valueNode.getId());
-                    if (hasValue(value.getCode()))
-                        stmt.setString(++i, value.getCode());
+                    if (hasValue(valueRequest.getCode()))
+                        stmt.setString(++i, valueRequest.getCode());
                     else
-                        stmt.setString(++i, value.getTerm());
+                        stmt.setString(++i, valueRequest.getTerm());
 
                     stmt.setInt(++i, result.getDbid());
 
@@ -239,23 +239,23 @@ public class IMMappingJDBCDAL implements IMMappingDAL {
     }
 
     @Override
-    public ConceptIdentifiers createLegacyPropertyValueConcept(String provider, String system, String schema, String table, String column, MapValueRequest value) throws SQLException {
+    public ConceptIdentifiers createLegacyPropertyValueConcept(String provider, String system, String schema, String table, String column, MapValueRequest valueRequest, String propertyName, String value) throws SQLException {
         List<String> ids = new ArrayList<>();
         if (hasValue(provider)) ids.add(provider);
         if (hasValue(system)) ids.add(system);
         if (hasValue(schema)) ids.add(schema);
         if (hasValue(table)) ids.add(table);
         if (hasValue(column)) ids.add(column);
-        if (hasValue(value.getCode())) ids.add(value.getCode());
-        if (hasValue(value.getScheme())) ids.add(value.getScheme());
-        if (hasValue(value.getTerm())) ids.add(value.getTerm());
+        if (hasValue(valueRequest.getCode())) ids.add(valueRequest.getCode());
+        if (hasValue(valueRequest.getScheme())) ids.add(valueRequest.getScheme());
+        if (hasValue(valueRequest.getTerm())) ids.add(valueRequest.getTerm());
 
         // Generate a full context string
         String context = "/" + String.join("/", ids);
 
         String iri = UUID.randomUUID().toString();
 
-        int cptId = createConcept(iri, "Legacy mapping property value", "Legacy mapping property value for " + context, iri, GENERATED_SCHEME);
+        int cptId = createConcept(iri, propertyName+"="+value, "Legacy mapping property value for " + context, iri, GENERATED_SCHEME);
         iri = "LPV_" + ids.stream().map(MappingLogic::getShortString).collect(Collectors.joining("_")) + "_" + cptId;
 
         // Update with final IRI

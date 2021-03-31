@@ -12,10 +12,10 @@ public interface IMMappingDAL {
     MapValueNode createValueNode(String node, String codeScheme) throws Exception;
 
     ConceptIdentifiers getValueNodeConcept(MapValueNode valueNode, MapValueRequest value) throws Exception;
-    ConceptIdentifiers createValueNodeConcept(MapValueNode valueNode, String provider, String system, String schema, String table, String column, MapValueRequest value) throws Exception;
+    ConceptIdentifiers createValueNodeConcept(MapValueNode valueNode, String provider, String system, String schema, String table, String column, MapValueRequest valueRequest,String propertyName, String value) throws Exception;
 
     ConceptIdentifiers getConceptIdentifiers(String iri) throws Exception;
-    ConceptIdentifiers createLegacyPropertyValueConcept(String provider, String system, String schema, String table, String column, MapValueRequest value) throws Exception;
+    ConceptIdentifiers createLegacyPropertyValueConcept(String provider, String system, String schema, String table, String column, MapValueRequest valueRequest, String propertyName, String value) throws Exception;
 
     ConceptIdentifiers createFormattedValueNodeConcept(String provider, String system, String schema, String table, String column, MapValueRequest value, String iri) throws Exception;
 

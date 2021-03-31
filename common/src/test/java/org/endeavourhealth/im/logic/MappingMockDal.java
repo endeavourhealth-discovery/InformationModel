@@ -125,7 +125,7 @@ public class MappingMockDal implements IMMappingDAL {
     }
 
     @Override
-    public ConceptIdentifiers createValueNodeConcept(MapValueNode valueNode, String provider, String system, String schema, String table, String column, MapValueRequest value) throws Exception {
+    public ConceptIdentifiers createValueNodeConcept(MapValueNode valueNode, String provider, String system, String schema, String table, String column, MapValueRequest valueRequest, String propertyName, String value) throws Exception {
         return createValueNodeConceptResult;
     }
 
@@ -135,7 +135,7 @@ public class MappingMockDal implements IMMappingDAL {
     }
 
     @Override
-    public ConceptIdentifiers createLegacyPropertyValueConcept(String provider, String system, String schema, String table, String column, MapValueRequest value) throws Exception {
+    public ConceptIdentifiers createLegacyPropertyValueConcept(String provider, String system, String schema, String table, String column, MapValueRequest valueRequest, String propertyName, String value) throws Exception {
         return createLegacyPropertyValueConceptResult;
     }
 
