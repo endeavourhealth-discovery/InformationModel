@@ -68,7 +68,9 @@ public class MappingLogic {
 
         MapResponse mapResponse = new MapResponse().setNode(nodeData);
 
-        if(nodeData.getTarget()==null || nodeData.getTarget().equals(target)){
+        if(isNullOrEmpty(nodeData.getTarget())
+            || isNullOrEmpty(target)
+            || nodeData.getTarget().equals(target)){
             mapResponse.setConcept(dal.getNodePropertyConcept(nodeData.getNode()));
         }
         return mapResponse;
@@ -76,20 +78,21 @@ public class MappingLogic {
     }
 
     private MapResponse getMapColumnValueRequest(MapRequest request) throws Exception {
+        boolean wasCreated = false;
         MapColumnValueRequest valueRequest = request.getMapColumnValueRequest();
 
-        MapResponse nodeData = getColumnNode(
+        MapNode nodeData = getColumnNode(
             valueRequest.getProvider(),
             valueRequest.getSystem(),
             valueRequest.getSchema(),
             valueRequest.getTable(),
             valueRequest.getColumn(),
             valueRequest.getTarget()
-        );
+        ).getNode();
 
-        MapValueNode valueNode = dal.getValueNode(nodeData.getNode().getNode(), valueRequest.getValue().getScheme());
+        MapValueNode valueNode = dal.getValueNode(nodeData.getNode(), valueRequest.getValue().getScheme());
         if (valueNode == null) {
-            valueNode = dal.createValueNode(nodeData.getNode().getNode(), valueRequest.getValue().getScheme());
+            valueNode = dal.createValueNode(nodeData.getNode(), valueRequest.getValue().getScheme());
         }
 
         ConceptIdentifiers ids;
@@ -108,7 +111,7 @@ public class MappingLogic {
                     valueRequest.getValue(),
                     iri
                 );
-                nodeData.setWasCreated(true);
+                wasCreated = true;
             }
         } else {
             // valueNode.getFunction().equals("Lookup()")
@@ -126,113 +129,20 @@ public class MappingLogic {
                     (valueRequest.getValue().getCode()==null || valueRequest.getValue().getCode().isEmpty())
                         ? valueRequest.getValue().getTerm() : valueRequest.getValue().getCode()
                 );
-                nodeData.setWasCreated(true);
+                wasCreated = true;
             }
         }
 
         return new MapResponse()
-            .setNode(nodeData.getNode())
+            .setNode(nodeData)
             .setValueNode(valueNode)
             .setRequest(request)
-            .setConcept(ids);
+            .setConcept(ids)
+            .setWasCreated(wasCreated);
     }
 
-
-
-    /*
-    private int getMapContext(Identifier organisation, Identifier system, String schema) throws Exception {
-        int orgDbid = getOrCreateOrganisationDbid(organisation);
-        int sysDbid = getOrCreateSystemDbid(system);
-        int scmDbid = getOrCreateSchemaDbid(schema);
-
-        Integer contextDbid = dal.getContextDbid(orgDbid, sysDbid, scmDbid);
-
-        if (contextDbid == null)
-            contextDbid = dal.createContext(orgDbid, sysDbid, scmDbid);
-
-        return contextDbid;
+    private boolean isNullOrEmpty(String value) {
+        return (value == null || value.isEmpty());
     }
-
-    private int getMapContext(String contextPath) throws Exception {
-        String[] parts = contextPath.split("/");
-
-        if (parts.length < 3)
-            throw new IllegalStateException("Context must include organisation, system & schema (org/sys/scm) as a minimum");
-
-        Integer orgDbid = dal.getOrganisationDbidByAlias(parts[0]);
-        if (orgDbid == null)
-            throw new IllegalStateException("Unknown organisation alias [" + parts[0] + "]");
-
-        Integer sysDbid = dal.getSystemDbidByAlias(parts[1]);
-        if (sysDbid == null)
-            throw new IllegalStateException("Unknown system alias [" + parts[1] + "]");
-
-        Integer scmDbid = dal.getSchemaDbid(parts[2]);
-        if (scmDbid == null)
-            throw new IllegalStateException("Unknown schema [" + parts[2] + "]");
-
-        Integer contextDbid = dal.getContextDbid(orgDbid, sysDbid, scmDbid);
-
-        if (contextDbid == null)
-            contextDbid = dal.createContext(orgDbid, sysDbid, scmDbid);
-
-        return contextDbid;
-    }
-
-    public int getOrCreateOrganisationDbid(Identifier organisation) throws Exception{
-        Integer orgDbid = dal.getOrganisationDbid(organisation);
-        if (orgDbid == null)
-            orgDbid = dal.createOrganisation(organisation);
-
-        return orgDbid;
-    }
-
-    public int getOrCreateSystemDbid(Identifier system) throws Exception{
-        Integer sysDbid = dal.getSystemDbid(system);
-        if (sysDbid == null)
-            sysDbid = dal.createSystem(system);
-
-        return sysDbid;
-    }
-
-    public int getOrCreateSchemaDbid(String schema) throws Exception{
-        Integer scmDbid = dal.getSchemaDbid(schema);
-        if (scmDbid == null)
-            scmDbid = dal.createSchema(schema);
-
-        return scmDbid;
-    }
-
-
-    public String getOrCreateTableId(Table table) throws Exception{
-        String tblId = dal.getTableShort(table);
-        if (tblId == null)
-            tblId = dal.createTableShort(table);
-
-        return tblId;
-    }
-
-    public ConceptIdentifiers getPropertyConceptIri(String contextId, String field) throws Exception {
-        ConceptIdentifiers propertyConceptIri = dal.getPropertyConceptIdentifiers(contextId, field);
-
-        if (propertyConceptIri == null)
-            propertyConceptIri = dal.createPropertyConcept(contextId, field);
-
-        return propertyConceptIri;
-    }
-
-    public ConceptIdentifiers getValueConceptIri(String contextId, Field field) throws Exception {
-        ConceptIdentifiers valueConceptIri = dal.getValueConceptIdentifiers(contextId, field);
-
-        if (valueConceptIri == null)
-            valueConceptIri = dal.createValueConcept(contextId, field);
-
-        return valueConceptIri;
-    }
-
-    public Integer getConceptDbid(String conceptIri) throws Exception {
-        return dal.getConceptId(conceptIri);
-    }
-*/
 
 }
