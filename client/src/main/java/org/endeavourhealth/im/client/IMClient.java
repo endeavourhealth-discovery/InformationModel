@@ -21,8 +21,10 @@ import java.util.Map;
 
 public class IMClient {
     private static final String base = "/client";
+    private static final String baseV2 = "/api/runtime";
     private static JsonNode kcConfig;
     private static String imUrl;
+    private static String imV2Url;
     private static KeycloakClient kcClient;
 
     // V1 / Code
@@ -32,7 +34,7 @@ public class IMClient {
             params.put("scheme", scheme);
             params.put("code", code);
 
-            Response response = get(base + "/Concept/Id", params);
+            Response response = get(getImUrl(), base + "/Concept/Id", params);
 
             if (response.getStatus() == 200) {
                 String result = response.readEntity(String.class);
@@ -54,7 +56,7 @@ public class IMClient {
             params.put("code", code);
             params.put("snomedOnly", ((Boolean)snomedOnly).toString());
 
-            Response response = get(base + "/Concept/Core/Code", params);
+            Response response = get(getImUrl(), base + "/Concept/Core/Code", params);
 
             if (response.getStatus() == 200) {
                 String result = response.readEntity(String.class);
@@ -77,7 +79,7 @@ public class IMClient {
             params.put("term", term);
             params.put("autoCreate", ((Boolean)autoCreate).toString());
 
-            Response response = get(base + "/Term/Code", params);
+            Response response = get(getImUrl(), base + "/Term/Code", params);
 
             if (response.getStatus() == 200) {
                 String result = response.readEntity(String.class);
@@ -101,7 +103,7 @@ public class IMClient {
             params.put("autoCreate", ((Boolean)autoCreate).toString());
             params.put("term", term);
 
-            Response response = get(base + "/Concept", params);
+            Response response = get(getImUrl(), base + "/Concept", params);
 
             if (response.getStatus() == 200)
                 return response.readEntity(Integer.class);
@@ -116,7 +118,7 @@ public class IMClient {
             params.put("scheme", scheme);
             params.put("code", code);
 
-            Response response = get(base + "/Concept/Core", params);
+            Response response = get(getImUrl(), base + "/Concept/Core", params);
 
             if (response.getStatus() == 200)
                 return response.readEntity(Integer.class);
@@ -130,7 +132,7 @@ public class IMClient {
             Map<String, String> params = new HashMap<>();
             params.put("dbid", conceptDbid.toString());
 
-            Response response = get(base + "/Concept/Code", params);
+            Response response = get(getImUrl(), base + "/Concept/Code", params);
 
             if (response.getStatus() == 200)
                 return response.readEntity(String.class);
@@ -150,7 +152,7 @@ public class IMClient {
             params.put("term", term);
             params.put("autoCreate", ((Boolean)autoCreate).toString());
 
-            Response response = get(base + "/Term", params);
+            Response response = get(getImUrl(), base + "/Term", params);
 
             if (response.getStatus() == 200)
                 return response.readEntity(Integer.class);
@@ -165,7 +167,7 @@ public class IMClient {
             params.put("type", type);
             params.put("term", term);
 
-            Response response = get(base + "/Term/Core", params);
+            Response response = get(getImUrl(), base + "/Term/Core", params);
 
             if (response.getStatus() == 200)
                 return response.readEntity(Integer.class);
@@ -181,7 +183,7 @@ public class IMClient {
             MapRequest request = new MapRequest()
                 .setMapColumnRequest(mapColumnRequest);
 
-            Response response = post(base + "/Mapping", request);
+            Response response = post(getImUrl(), base + "/Mapping", request);
 
             if (response.getStatus() == 200)
                 return response.readEntity(MapResponse.class);
@@ -195,7 +197,7 @@ public class IMClient {
             MapRequest request = new MapRequest()
                 .setMapColumnValueRequest(mapColumnValueRequest);
 
-            Response response = post(base + "/Mapping", request);
+            Response response = post(getImUrl(), base + "/Mapping", request);
 
             if (response.getStatus() == 200)
                 return response.readEntity(MapResponse.class);
@@ -204,13 +206,27 @@ public class IMClient {
         }
     }
 
-    // Private/common/helper methods
-    private static Response get(String path) throws IOException {
-        return get(path, null);
+    // Valueset API
+    public static Boolean isSchemeCodeInVSet(String scheme, String code, String vSet) throws Exception {
+        try (MetricsTimer timer =MetricsHelper.recordTime("IMClient.isSchemeCodeInVSet")) {
+            Map<String, String> params = new HashMap<>();
+            params.put("code", code);
+            params.put("scheme", scheme);
+            params.put("vSet", vSet);
+
+            Response response = get(getImV2Url(), baseV2 + "/Concept/isValueSetMember", params);
+
+            if (response.getStatus() == 200)
+                return response.readEntity(Boolean.class);
+            else
+                throw new IOException(response.readEntity(String.class));
+        }
     }
-    private static Response get(String path, Map<String, String> params) throws IOException {
+
+    // Private/common/helper methods
+    private static Response get(String url, String path, Map<String, String> params) throws IOException {
         Client client = ClientBuilder.newClient();
-        WebTarget target = client.target(getImUrl()).path(path);
+        WebTarget target = client.target(url).path(path);
 
         if (params != null && !params.isEmpty()) {
             for (Map.Entry<String, String> entry: params.entrySet()) {
@@ -220,7 +236,6 @@ public class IMClient {
                 }
             }
         }
-
 
         return target
             .request()
@@ -228,30 +243,14 @@ public class IMClient {
             .get();
     }
 
-    private static Response post(String path, Object body) throws IOException {
-        return post(path, body, null);
-    }
-    private static Response post(String path, Object body, Map<String, String> params) throws IOException {
+    private static Response post(String url, String path, Object body) throws IOException {
         Client client = ClientBuilder.newClient();
-        WebTarget target = client.target(getImUrl()).path(path);
-
-        if (params != null && !params.isEmpty()) {
-            for (Map.Entry<String, String> entry: params.entrySet()) {
-                if (entry.getValue() != null) {
-                    String encoded = UriComponent.encode(entry.getValue(), UriComponent.Type.QUERY_PARAM_SPACE_ENCODED);
-                    target = target.queryParam(entry.getKey(), encoded);
-                }
-            }
-        }
+        WebTarget target = client.target(url).path(path);
 
         return target
             .request()
             .header("Authorization", "Bearer " + getKcClient().getToken().getToken())
             .post(Entity.entity(body, MediaType.APPLICATION_JSON));
-    }
-
-    private static boolean hasValue(String data) {
-        return data != null && !data.isEmpty();
     }
 
     private static String getImUrl() {
@@ -263,6 +262,17 @@ public class IMClient {
         }
 
         return imUrl;
+    }
+
+    private static String getImV2Url() {
+        if (imV2Url == null) {
+            imV2Url = ConfigManager.getConfiguration("apiv2");
+            if (imV2Url == null)
+                throw new IllegalStateException("information-model v2 /api configuration not found!");
+
+        }
+
+        return imV2Url;
     }
 
     private static JsonNode getKcConfig() throws IOException {
