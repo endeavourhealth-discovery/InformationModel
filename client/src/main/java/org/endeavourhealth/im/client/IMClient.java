@@ -21,10 +21,8 @@ import java.util.Map;
 
 public class IMClient {
     private static final String base = "/client";
-    private static final String baseV2 = "/api/runtime";
     private static JsonNode kcConfig;
     private static String imUrl;
-    private static String imV2Url;
     private static KeycloakClient kcClient;
 
     // V1 / Code
@@ -212,9 +210,9 @@ public class IMClient {
             Map<String, String> params = new HashMap<>();
             params.put("code", code);
             params.put("scheme", scheme);
-            params.put("vSet", vSet);
+            params.put("valueset", vSet);
 
-            Response response = get(getImV2Url(), baseV2 + "/Concept/isValueSetMember", params);
+            Response response = get(getImUrl(), base + "/ValueSet", params);
 
             if (response.getStatus() == 200)
                 return response.readEntity(Boolean.class);
@@ -262,17 +260,6 @@ public class IMClient {
         }
 
         return imUrl;
-    }
-
-    private static String getImV2Url() {
-        if (imV2Url == null) {
-            imV2Url = ConfigManager.getConfiguration("apiv2");
-            if (imV2Url == null)
-                throw new IllegalStateException("information-model v2 /api configuration not found!");
-
-        }
-
-        return imV2Url;
     }
 
     private static JsonNode getKcConfig() throws IOException {

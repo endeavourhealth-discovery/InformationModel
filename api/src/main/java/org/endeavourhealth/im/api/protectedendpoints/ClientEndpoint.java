@@ -3,6 +3,7 @@ package org.endeavourhealth.im.api.protectedendpoints;
 import org.endeavourhealth.common.utility.MetricsHelper;
 import org.endeavourhealth.common.utility.MetricsTimer;
 import org.endeavourhealth.im.dal.IMClientJDBCDAL;
+import org.endeavourhealth.im.dal.ValueSetJDBCDAL;
 import org.endeavourhealth.im.logic.MappingLogic;
 import org.endeavourhealth.im.models.mapping.MapRequest;
 import org.endeavourhealth.im.models.mapping.MapResponse;
@@ -200,4 +201,26 @@ public class ClientEndpoint {
                 .build();
         }
     }
+
+    // Valueset API
+    @GET
+    @Path("/ValueSet")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response isSchemeCodeMemberOfValueSet(@Context SecurityContext sc,
+                                                 @QueryParam("scheme") String scheme,
+                                                 @QueryParam("code") String code,
+                                                 @QueryParam("valueset") String valueSet) throws Exception {
+        try (MetricsTimer t = MetricsHelper.recordTime("Client.isSchemeCodeMemberOfValueSet")) {
+            LOG.debug("isSchemeCodeMemberOfValueSet");
+
+            Boolean result = new ValueSetJDBCDAL().isSchemeCodeMemberOfValueSet(scheme, code, valueSet);
+
+            return Response
+                .ok()
+                .entity(result)
+                .build();
+        }
+    }
+
 }
