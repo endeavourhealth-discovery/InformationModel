@@ -1,39 +1,16 @@
--- Meta tables for clarity/simplicity
-DROP TABLE IF EXISTS map_context_meta;
-CREATE TABLE map_context_meta (
-    provider    VARCHAR(150),
-    `system`    VARCHAR(150),
-    `schema`    VARCHAR(40),
-    `table`     VARCHAR(40),
-    `column`    VARCHAR(40),
-    node        VARCHAR(200)
-) ENGINE = Memory
-  DEFAULT CHARSET = utf8;
+INSERT IGNORE INTO concept
+(document, id, name, description)
+VALUES
+(1, 'CM_DiscoveryCode', 'Discovery code', 'Discovery (core) coding scheme ');
 
-DROP TABLE IF EXISTS map_node_meta;
-CREATE TABLE map_node_meta(
-    node    VARCHAR(200),
-    concept VARCHAR(150)
-) ENGINE = Memory
-  DEFAULT CHARSET = utf8;
+SELECT @scm := dbid FROM concept WHERE id = 'CM_DiscoveryCode';
 
-DROP TABLE IF EXISTS map_node_value_meta;
-CREATE TEMPORARY TABLE map_node_value_meta (
-    node    VARCHAR(200),
-    value   VARCHAR(250),
-    scheme  VARCHAR(150),
-    concept VARCHAR(150)
-) ENGINE = Memory
-  DEFAULT CHARSET = utf8;
-
-DROP TABLE IF EXISTS map_function_value_meta;
-CREATE TEMPORARY TABLE map_function_value_meta (
-    node    VARCHAR(200),
-    scheme  VARCHAR(150),
-    function  VARCHAR(200)
-) ENGINE = Memory
-  DEFAULT CHARSET = utf8;
-
+INSERT IGNORE INTO concept
+(document, id, scheme, code, name, description)
+VALUES
+-- GENERAL/GLOBAL --
+(1, 'CM_Org_Barts', @scm, 'CM_Org_Barts', 'Barts Hospital', 'Barts NHS Trust Hospital'),
+(1, 'CM_Sys_Cerner', @scm, 'CM_Sys_Cerner', 'Cerner Millennium', 'Cerner Millennium system');
 
 -- ******************** EMERGENCY ********************
 
@@ -136,94 +113,3 @@ VALUES
 ('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'critical', 'discharge_destination',          '/CDS/CRTCL/DSCHRG_DSTNTN'),   -- NHS DD
 ('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'critical', 'discharge_location',             '/CDS/CRTCL/DSCHRG_LCTN')      -- NHS DD
 ;
-
-/* **************************************************************************************************** */
-
--- Populate real tables from meta (IM v1)
-SELECT DISTINCT m.node, c.dbid, false
-FROM map_node_meta m
-         LEFT JOIN concept c ON c.id = m.concept
-WHERE c.id IS NULL;
-
-INSERT INTO map_node
-(node, concept, draft)
-SELECT DISTINCT m.node, c.dbid, false
-FROM map_node_meta m
-         JOIN concept c ON c.id = m.concept;
-
---
-
-SELECT prv.dbid, sys.dbid, `schema`, `table`, `column`, n.id, false
-FROM map_context_meta m
-         JOIN map_node n ON n.node = m.node
-         LEFT JOIN concept prv ON prv.id = m.provider
-         LEFT JOIN concept sys ON sys.id = m.system
-WHERE prv.id IS NULL
-   OR sys.id IS NULL;
-
-INSERT INTO map_context
-(provider, `system`, `schema`, `table`, `column`, node, draft)
-SELECT prv.dbid, sys.dbid, `schema`, `table`, `column`, n.id, false
-FROM map_context_meta m
-         JOIN map_node n ON n.node = m.node
-         JOIN concept prv ON prv.id = m.provider
-         JOIN concept sys ON sys.id = m.system;
-
---
-
-SELECT DISTINCT n.id, c.dbid, 'Lookup()'
-FROM map_node_value_meta m
-         JOIN map_node n ON n.node = m.node
-         LEFT JOIN concept c ON c.id = m.scheme
-WHERE c.id IS NULL;
-
-INSERT INTO map_value_node
-(node, code_scheme, function)
-SELECT DISTINCT n.id, c.dbid, 'Lookup()'
-FROM map_node_value_meta m
-         JOIN map_node n ON n.node = m.node
-         JOIN concept c ON c.id = m.scheme;
-
---
-
-SELECT n.id, c.dbid, m.function
-FROM map_function_value_meta m
-         JOIN map_node n ON n.node = m.node
-         LEFT JOIN concept c ON c.id = m.scheme
-WHERE c.id IS NULL;
-
-INSERT INTO map_value_node
-(node, code_scheme, function)
-SELECT n.id, c.dbid, m.function
-FROM map_function_value_meta m
-         JOIN map_node n ON n.node = m.node
-         JOIN concept c ON c.id = m.scheme;
-
---
-
-SELECT v.id, m.value, c.dbid, false
-FROM map_node_value_meta m
-         LEFT JOIN map_node n ON n.node = m.node
-         LEFT JOIN map_value_node v ON v.node = n.id
-         LEFT JOIN concept s ON s.dbid = v.code_scheme AND s.id = m.scheme
-         LEFT JOIN concept c ON c.id = m.concept
-WHERE n.node IS NULL
-   OR v.node IS NULL
-   OR s.id IS NULL
-   OR c.id IS NULL;
-
-INSERT INTO map_value_node_lookup
-(value_node, value, concept, draft)
-SELECT v.id, m.value, c.dbid, false
-FROM map_node_value_meta m
-         JOIN map_node n ON n.node = m.node
-         JOIN map_value_node v ON v.node = n.id
-         JOIN concept s ON s.dbid = v.code_scheme AND s.id = m.scheme
-         JOIN concept c ON c.id = m.concept;
-
--- Clean up
-DROP TABLE IF EXISTS map_context_meta;
-DROP TABLE IF EXISTS map_node_meta;
-DROP TABLE IF EXISTS map_node_value_meta;
-DROP TABLE IF EXISTS map_function_value_meta;
-

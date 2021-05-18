@@ -1,21 +1,23 @@
--- Meta tables for clarity/simplicity
-DROP TABLE IF EXISTS map_context_meta;
-CREATE TABLE map_context_meta (
-    provider    VARCHAR(150),
-    `system`    VARCHAR(150),
-    `schema`    VARCHAR(40),
-    `table`     VARCHAR(40),
-    `column`    VARCHAR(40),
-    node        VARCHAR(200)
-) ENGINE = Memory
-  DEFAULT CHARSET = utf8;
+INSERT IGNORE INTO concept
+(document, id, name, description)
+VALUES
+(1, 'CM_DiscoveryCode', 'Discovery code', 'Discovery (core) coding scheme ');
 
-DROP TABLE IF EXISTS map_node_meta;
-CREATE TABLE map_node_meta(
-                              node    VARCHAR(200),
-                              concept VARCHAR(150)
-) ENGINE = Memory
-  DEFAULT CHARSET = utf8;
+SELECT @scm := dbid FROM concept WHERE id = 'CM_DiscoveryCode';
+
+INSERT IGNORE INTO concept
+(document, id, scheme, code, name, description)
+VALUES
+-- GENERAL/GLOBAL --
+(1, 'CM_Org_BHRUT', @scm, 'CM_Org_BHRUT', 'BHRUT', 'Barking, Havering and Redbridge Univerity Trust'),
+(1, 'CM_Sys_Medway', @scm, 'CM_Sys_Medway', 'Medway', 'Medway patient administration system'),
+-- MORBIDITY --
+(1, 'DM_CauseOfDeath', @scm, 'DM_CauseOfDeath', 'Cause of death - I(a)', 'Disease or condition leading directly to death - MCCD I(a)'),
+(1, 'DM_CauseOfDeath1b', @scm, 'DM_CauseOfDeath1b', 'Cause of death - I(b)', 'Other disease or condition, if any, leading to I(a) - MCCD I(b)'),
+(1, 'DM_CauseOfDeath1c', @scm, 'DM_CauseOfDeath1c', 'Cause of death - I(c)', 'Other disease or condition, if any, leading to I(b) - MCCD I(c)'),
+(1, 'DM_CauseOfDeath2', @scm, 'DM_CauseOfDeath2', 'Contributing to death - II', 'Other significant condition contributing to death but not related to the disease or condition causing it - MCCD II'),
+(1, 'DM_InfectionStatus', @scm, 'DM_InfectionStatus', 'Infection status', 'Infection status (in cases of repatriation request for example)')
+;
 
 -- Context maps
 INSERT INTO map_context_meta
@@ -50,39 +52,3 @@ VALUES
 ('/BHRUT/MDWY/MDWYBI/PMI/CS_DTH_2',             'DM_CauseOfDeath2'),
 ('/BHRUT/MDWY/MDWYBI/PMI/INFCTN_STTS',          'DM_InfectionStatus')
 ;
-
-/* **************************************************************************************************** */
-
--- Populate real tables from meta (IM v1)
-SELECT DISTINCT m.node, c.dbid, false
-FROM map_node_meta m
-         LEFT JOIN concept c ON c.id = m.concept
-WHERE c.id IS NULL;
-
-INSERT INTO map_node
-(node, concept, draft)
-SELECT DISTINCT m.node, c.dbid, false
-FROM map_node_meta m
-         JOIN concept c ON c.id = m.concept;
-
---
-
-SELECT prv.dbid, sys.dbid, `schema`, `table`, `column`, n.id, false
-FROM map_context_meta m
-         JOIN map_node n ON n.node = m.node
-         LEFT JOIN concept prv ON prv.id = m.provider
-         LEFT JOIN concept sys ON sys.id = m.system
-WHERE prv.id IS NULL
-   OR sys.id IS NULL;
-
-INSERT INTO map_context
-(provider, `system`, `schema`, `table`, `column`, node, draft)
-SELECT prv.dbid, sys.dbid, `schema`, `table`, `column`, n.id, false
-FROM map_context_meta m
-         JOIN map_node n ON n.node = m.node
-         JOIN concept prv ON prv.id = m.provider
-         JOIN concept sys ON sys.id = m.system;
-
--- Clean up
-DROP TABLE IF EXISTS map_context_meta;
-DROP TABLE IF EXISTS map_node_meta;
