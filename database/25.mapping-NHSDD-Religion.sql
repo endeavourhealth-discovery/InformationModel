@@ -121,7 +121,6 @@ VALUES
 (1, 'CM_ReligionC78', @scm, 'CM_ReligionC78', 'Unitarian', 'Unitarian'),
 (1, 'CM_ReligionC79', @scm, 'CM_ReligionC79', 'United Reform', 'United Reform'),
 (1, 'CM_ReligionC80', @scm, 'CM_ReligionC80', 'Zwinglian', 'Zwinglian'),
-(1, 'CM_ReligionD1', @scm, 'CM_ReligionD1', 'Hindu', 'Hindu'),
 (1, 'CM_ReligionD2', @scm, 'CM_ReligionD2', 'Advaitin Hindu', 'Advaitin Hindu'),
 (1, 'CM_ReligionD3', @scm, 'CM_ReligionD3', 'Arya Samaj Hindu', 'Arya Samaj Hindu'),
 (1, 'CM_ReligionD4', @scm, 'CM_ReligionD4', 'Shakti Hindu', 'Shakti Hindu'),

@@ -1,4 +1,4 @@
-USE im_dev;
+USE im_live_2021;
 
 DROP TABLE IF EXISTS concept_tct_meta;
 CREATE TABLE concept_tct_meta (
@@ -13,7 +13,7 @@ LOAD DATA LOCAL INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 5.7\\Uploads\\closu
     LINES TERMINATED BY '\r\n'
     (source, target, level)
 ;
-
+/*
 
 SELECT @isa := dbid FROM concept WHERE id = 'SN_116680003';
 
@@ -27,3 +27,4 @@ JOIN concept t ON t.id = m.target;
 
 
 DROP TABLE IF EXISTS concept_tct_meta;
+*/

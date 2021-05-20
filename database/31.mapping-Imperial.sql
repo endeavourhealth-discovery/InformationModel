@@ -570,6 +570,7 @@ VALUES
 ('/IMPRL/CRNR/TRTMNT_FNCTN', '80024', 'ImperialCerner', 'CM_TrtmntFnc800'),
 ('/IMPRL/CRNR/TRTMNT_FNCTN', '80099', 'ImperialCerner', 'CM_TrtmntFnc800'),
 ('/IMPRL/CRNR/TRTMNT_FNCTN', '81199', 'ImperialCerner', 'CM_TrtmntFnc811'),
+       -- Missing from NHS-DD
 ('/IMPRL/CRNR/TRTMNT_FNCTN', '147L', 'ImperialCerner', 'CM_TrtmntFnc147'),
 ('/IMPRL/CRNR/TRTMNT_FNCTN', '820L', 'ImperialCerner', 'CM_TrtmntFnc820'),
 ('/IMPRL/CRNR/TRTMNT_FNCTN', '823L', 'ImperialCerner', 'CM_TrtmntFnc823'),

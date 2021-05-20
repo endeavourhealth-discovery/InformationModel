@@ -139,6 +139,7 @@ VALUES
 ('/CDS/INPTNT/DSCHRG_DSTNTN',            'DM_hasDischargeDestination'),         -- NHS DD
 ('/CDS/INPTNT/DSCHRG_MTHD',              'DM_hasDischargeMethod'),              -- NHS DD
 ('/CDS/INPTNT/ADMNSTRV_CTGRY',           'DM_adminCategoryonAdmission'),        -- NHS DD
+('/CDS/INPTNT/LV_STLL_BRTH_INDCTR',      'DM_liveOrStillBirthIndicator'),       -- NHS DD
 ('/CDS/INPTNT/DLVRY_MTHD',               'DM_deliveryMethod'),                  -- NHS DD
 ('/CDS/INPTNT/GNDR',                     'DM_gender')                           -- NHS DD
 ;

@@ -36,7 +36,7 @@ FROM map_node_value_meta m
          LEFT JOIN concept c ON c.id = m.scheme
 WHERE c.id IS NULL;
 
-INSERT INTO map_value_node
+INSERT IGNORE INTO map_value_node
 (node, code_scheme, function)
 SELECT DISTINCT n.id, c.dbid, 'Lookup()'
 FROM map_node_value_meta m
@@ -71,7 +71,7 @@ WHERE n.node IS NULL
    OR s.id IS NULL
    OR c.id IS NULL;
 
-INSERT INTO map_value_node_lookup
+INSERT IGNORE INTO map_value_node_lookup
 (value_node, value, concept, draft)
 SELECT v.id, m.value, c.dbid, false
 FROM map_node_value_meta m
