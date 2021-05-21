@@ -9,7 +9,7 @@ Run the TRUD Import application, passing the directory containing the snomed dat
 Once the application has finished, run the `import_tct.sql` script to import the generated transitive closure table
 
 ## Transfer
-Create a backup of the `concept_new`, `cpo_delete`, `cpo_new` and `tct_new` tables.
+Create a backup of the `concept_new`, `cpo_delete`, `cpo_new` and `tct_meta` tables.
 
 ## Patch
 After restoring the above backup to its own `im_live_patch` schema, run the `patch_live.sql` script
