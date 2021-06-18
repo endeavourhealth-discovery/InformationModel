@@ -1,5 +1,8 @@
 -- Patch new concepts
-INSERT IGNORE INTO concept SELECT * FROM im_patch.concept_new;
+INSERT IGNORE INTO concept
+(document, id, draft, name, description, scheme, code, use_count)
+SELECT document, id, draft, name, description, scheme, code, use_count
+FROM im_patch.concept_new;
 
 -- Delete deprecated CPO data
 DELETE cpo

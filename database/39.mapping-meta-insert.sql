@@ -20,7 +20,7 @@ FROM map_context_meta m
 WHERE prv.id IS NULL
    OR sys.id IS NULL;
 
-INSERT INTO map_context
+INSERT IGNORE INTO map_context
 (provider, `system`, `schema`, `table`, `column`, node, draft)
 SELECT prv.dbid, sys.dbid, `schema`, `table`, `column`, n.id, false
 FROM map_context_meta m

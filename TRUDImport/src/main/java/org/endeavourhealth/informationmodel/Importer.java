@@ -21,6 +21,7 @@ public class Importer {
 
     private static final String CLINICAL = "999001261000000100";
     private static final String PHARMACY = "999000691000001104";
+    private static final String GB_ENGLISH = "900000000000508004";
     private static final String FULLSPEC = "900000000000003001";
     private static final String IS_A = "116680003";
     private static final String ACTIVE = "1";
@@ -72,6 +73,7 @@ public class Importer {
         // Initial checks
         validateFiles(folder);
 
+
         // TRUD file import
         importRefsets(folder);
         importDescriptions(folder);
@@ -82,15 +84,14 @@ public class Importer {
         getDbids();
 
         // Process data
-        identifyDeprecatedRelationship(snomedCodeScheme, isA);
+        processRelationships(snomedCodeScheme, isA);
         generateDelCPOTable(isA);
+        saveNewRelationships();
+        generateNewCPOTable();
 
         identifyNewConcepts(snomedCodeScheme);
         saveNewConcepts(snomedCodeScheme, snomedDocument);
         generateNewConceptTable();
-
-        saveNewRelationships();
-        generateNewCPOTable();
 
         generateTCTTable(folder);
     }
@@ -139,7 +140,7 @@ public class Importer {
                 while (line != null && !line.isEmpty()) {
                     String[] fields = line.split("\t");
 
-                    if (ACTIVE.equals(fields[2]) && (CLINICAL.equals(fields[4]) || PHARMACY.equals(fields[4]))) {
+                    if (ACTIVE.equals(fields[2]) && (CLINICAL.equals(fields[4]) || PHARMACY.equals(fields[4]) || GB_ENGLISH.equals(fields[4]))) {
                         refsetActive.add(fields[5]);
                     }
 
@@ -260,6 +261,12 @@ public class Importer {
             stmt.setTimestamp(1, new Timestamp(start));
             stmt.executeUpdate();
         }
+
+        LOG.info("Indexing cpo table");
+        try (PreparedStatement stmt = conn.prepareStatement("ALTER TABLE cpo_new ADD INDEX cpo_new_property_idx (property)")) {
+            stmt.executeUpdate();
+        }
+
     }
 
     private void generateNewConceptTable() throws SQLException {
@@ -339,6 +346,8 @@ public class Importer {
         // CPO patch delete table
         conn.prepareStatement("CREATE TABLE cpo_delete SELECT * FROM concept_property_object WHERE 1 = 0 LIMIT 1").executeUpdate();
 
+        conn.prepareStatement("ALTER TABLE cpo_delete ADD INDEX cpo_delete_idx (dbid, property, `value`, `group`)").executeUpdate();
+
         // Remove deprecated relationships
         LOG.info("Saving deprecated relationships (cpo_delete)");
         try (PreparedStatement stmt = conn.prepareStatement("INSERT INTO cpo_delete(property, dbid, value, `group`) VALUES (?, ?, ?, ?)")) {
@@ -360,7 +369,7 @@ public class Importer {
         }
     }
 
-    private void identifyDeprecatedRelationship(Integer snomedCodeScheme, Integer isA) throws SQLException {
+    private void processRelationships(Integer snomedCodeScheme, Integer isA) throws SQLException {
         // Identify deprecated relationships
         LOG.info("Identifying deprecated relationships");
         try (PreparedStatement stmt = conn.prepareStatement("SELECT c.dbid AS childDbid, c.code AS childCode, cpo.group, v.dbid AS parentDbid, v.code AS parentCode\n" +
@@ -378,12 +387,21 @@ public class Importer {
                 String parentCode = rs.getString("parentCode");
                 Integer group = rs.getInt("group");
                 SnomedConcept c = snomed.get(childCode);
-                if (c != null && c.getParents().stream().noneMatch(p -> p.getConceptId().equals(parentCode) && group.equals(p.getGroup()))) {
-                    c.setDbid(rs.getInt("childDbid"));
-                    c.addDeletedParent(new SnomedParent(parentCode, group).setDbid(rs.getInt("parentDbid")));
-                    i++;
-                    if (i % LOGSTEP == 0)
-                        LOG.debug("Processed {} relationships...", i);
+                if (c != null) {
+                    // Get matching parents
+                    List<SnomedParent> parents = c.getParents().stream().filter(p -> p.getConceptId().equals(parentCode) && group.equals(p.getGroup())).collect(Collectors.toList());
+
+                    if (parents.isEmpty()) {
+                        // Deleted
+                        c.setDbid(rs.getInt("childDbid"));
+                        c.addDeletedParent(new SnomedParent(parentCode, group).setDbid(rs.getInt("parentDbid")));
+                        i++;
+                        if (i % LOGSTEP == 0)
+                            LOG.debug("Processed {} relationships...", i);
+                    } else {
+                        // Existing
+                        c.getParents().removeAll(parents);
+                    }
                 }
             }
             LOG.info("Identified {} deprecated relationships", i);
@@ -399,12 +417,14 @@ public class Importer {
     private void loadCPOData() throws SQLException {
         System.out.println("Loading relationships...");
 
-        String sql = "SELECT c.id AS concept, v.id AS value\n" +
+        String sql = "SELECT DISTINCT c.id AS concept, v.id AS value\n" +
             "FROM concept s\n" +
             "JOIN concept_property_object cpo ON cpo.property = s.dbid\n" +
             "JOIN concept c ON c.dbid = cpo.dbid\n" +
             "JOIN concept v ON v.dbid = cpo.value\n" +
-            "WHERE s.id = 'SN_116680003'";
+            "LEFT JOIN cpo_delete d ON d.dbid = cpo.dbid AND d.property = cpo.property AND d.value = cpo.value AND d.group = cpo.group\n" +
+            "WHERE s.id = 'SN_116680003'\n" +
+            "ORDER BY concept";
 
         String previousConceptId = null;
 

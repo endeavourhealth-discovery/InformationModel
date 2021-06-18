@@ -1,18 +1,46 @@
--- ********************* READ V2 *********************
+-- ********************* READ V2 CODES *********************
 
-DROP TABLE IF EXISTS read_v2;
-CREATE TABLE read_v2 (
-    code VARCHAR(6) COLLATE utf8_bin NOT NULL    COMMENT 'The READ code id',
-    term VARCHAR(250) NOT NULL                   COMMENT 'The term',
+DROP TABLE IF EXISTS read_v2_desc;
+CREATE TABLE read_v2_desc (
+    code CHAR(5) COLLATE utf8_bin NOT NULL    COMMENT 'The READ code id',
+    termid CHAR(5) COLLATE utf8_bin NOT NULL  COMMENT 'The term code',
+    termtype CHAR(1) NOT NULL,
+    children INT NOT NULL,
+    multiple INT NOT NULL,
+    qualifier INT NOT NULL,
+    status CHAR(1) NOT NULL,
+    type INT NOT NULL,
+    level INT NOT NULL DEFAULT 0,
 
-    PRIMARY KEY read_v2_code_pk (code)
+    PRIMARY KEY read_v2_code_pk (code, termid)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-LOAD DATA LOCAL INFILE 'C:\\read\\v2\\Unified\\Corev2.all'
-INTO TABLE read_v2
-FIELDS ENCLOSED BY '"' TERMINATED BY ','
+LOAD DATA LOCAL INFILE 'H:\\\ImportData\\READ\\DESC.csv'
+INTO TABLE read_v2_desc
+FIELDS TERMINATED BY ','
 LINES TERMINATED BY '\r\n'
-(code, term);
+IGNORE 1 LINES;
+
+-- ********************* READ V2 TERMS *********************
+
+DROP TABLE IF EXISTS read_v2_term;
+CREATE TABLE read_v2_term (
+    termid CHAR(5) COLLATE utf8_bin NOT NULL  COMMENT 'The term code',
+    termstatus CHAR(1) NOT NULL,
+    term30 VARCHAR(30),
+    term60 VARCHAR(60),
+    status CHAR(1) NOT NULL,
+    type INT NOT NULL,
+    level INT NOT NULL DEFAULT 0,
+
+    PRIMARY KEY read_v2_term_pk (termid)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+LOAD DATA LOCAL INFILE 'H:\\\ImportData\\READ\\Term.csv'
+    INTO TABLE read_v2_term
+    FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
+    LINES TERMINATED BY '\r\n'
+    IGNORE 1 LINES;
 
 -- ********************* READ V2 -> SNOMED MAP *********************
 

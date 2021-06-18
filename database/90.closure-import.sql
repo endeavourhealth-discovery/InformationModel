@@ -1,4 +1,4 @@
-USE im_live_2021;
+USE `im_live`;
 
 DROP TABLE IF EXISTS concept_tct_meta;
 CREATE TABLE concept_tct_meta (
@@ -7,7 +7,7 @@ CREATE TABLE concept_tct_meta (
                                level INT NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-LOAD DATA LOCAL INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 5.7\\Uploads\\closure_v1.csv'
+LOAD DATA INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 5.7\\Uploads\\closure_v1.csv'
     INTO TABLE concept_tct_meta
     FIELDS TERMINATED BY '\t'
     LINES TERMINATED BY '\r\n'
