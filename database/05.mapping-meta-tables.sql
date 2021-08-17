@@ -30,6 +30,6 @@ DROP TABLE IF EXISTS map_function_value_meta;
 CREATE TEMPORARY TABLE map_function_value_meta (
     node    VARCHAR(200),
     scheme  VARCHAR(150),
-    function  VARCHAR(200)
+    `function`  VARCHAR(200)
 ) ENGINE = Memory
   DEFAULT CHARSET = utf8;

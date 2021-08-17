@@ -94,6 +94,7 @@ public class Importer {
         generateNewConceptTable();
 
         generateTCTTable(folder);
+        importTCTTable(folder);
     }
 
     // ---------------------- PRIVATES ---------------------- //
@@ -516,5 +517,30 @@ public class Importer {
         }
         System.out.println();
         System.out.println("Done (written " + t + " rows)");
+    }
+
+    private void importTCTTable(String outpath) throws SQLException {
+        LOG.info("Importing closure");
+        try (PreparedStatement stmt = conn.prepareStatement("DROP TABLE IF EXISTS concept_tct_meta;")) {
+            stmt.executeUpdate();
+        };
+
+        try (PreparedStatement stmt = conn.prepareStatement("CREATE TABLE concept_tct_meta (\n" +
+            "                               source VARCHAR(150) NOT NULL,\n" +
+            "                               target VARCHAR(150) NOT NULL,\n" +
+            "                               level INT NOT NULL\n" +
+            ") ENGINE=InnoDB DEFAULT CHARSET=utf8;")) {
+            stmt.executeUpdate();
+        };
+
+        try (PreparedStatement buildClosure = conn.prepareStatement("LOAD DATA LOCAL INFILE ?\n" +
+            "    INTO TABLE concept_tct_meta\n" +
+            "    FIELDS TERMINATED BY '\\t'\n" +
+            "    LINES TERMINATED BY '\\r\\n'\n" +
+            "    (source, target, level)\n" +
+            ";")) {
+            buildClosure.setString(1, outpath + "/closure_v1.csv");
+            buildClosure.executeUpdate();
+        }
     }
 }

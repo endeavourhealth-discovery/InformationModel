@@ -1,7 +1,7 @@
 -- ****************************************************
 -- ** REQUIRES
--- **   - NHSDD/Religion
 -- **   - FHIR/Language
+-- **   - NHSDD/Religion
 -- **   - NHSDD/Speciality
 -- **   - NHSDD/Inpatient
 -- **   - NHSDD/Ethnicity
@@ -30,7 +30,7 @@ VALUES
 (1, 'CM_Sys_Cerner', @scm, 'CM_Sys_Cerner', 'Cerner Millennium', 'Cerner Millennium system'),
 (1, 'ImperialCerner', @scm, 'ImperialCerner', 'Imperial Local Codes', 'Imperial Cerner local code scheme'),
 (1, 'DM_patientFIN', @scm, 'DM_patientFIN', 'Patient FIN', 'Patient FIN'),
-(1, 'DM_gpPractitionerId', @scm, 'DM_gpPractitionerId', 'GP Practitioner Id', 'GP Practitioner Id');
+(1, 'CM_GPPractitionerId', @scm, 'CM_GPPractitionerId', 'GP Practitioner Id', 'GP Practitioner Id');
 
 -- ******************** Religion ********************
 
@@ -59,7 +59,8 @@ VALUES
 ('/IMPRL/CRNR/RLGN', 'L', 'ImperialCerner', 'CM_ReligionL2'),
 ('/IMPRL/CRNR/RLGN', 'H', 'ImperialCerner', 'CM_ReligionH1'),
 ('/IMPRL/CRNR/RLGN', 'N', 'ImperialCerner', 'CM_ReligionN1'),
-('/IMPRL/CRNR/RLGN', 'J', 'ImperialCerner', 'CM_ReligionJ1');
+('/IMPRL/CRNR/RLGN', 'J', 'ImperialCerner', 'CM_ReligionJ1'),
+('/IMPRL/CRNR/RLGN', 'RCATHOLIC', 'ImperialCerner', 'CM_ReligionC67');
 
 
 -- ******************** Language ********************
@@ -79,6 +80,7 @@ VALUES
 (1, 'IC_Lang_36', @scm, 'IC_Lang_36', 'Mandarin', 'Mandarin'),
 (1, 'IC_Lang_200', @scm, 'IC_Lang_200', 'Other', 'Other'),
 (1, 'IC_Lang_39', @scm, 'IC_Lang_39', 'Patois', 'Patois'),
+(1, 'IC_Lang_44', @scm, 'IC_Lang_44', 'Serbo-Croat', 'Serbo-Croat'),
 (1, 'IC_Lang_51', @scm, 'IC_Lang_51', 'Sylheti', 'Sylheti');
 
 -- Context
@@ -172,11 +174,20 @@ SELECT @scm := dbid FROM concept WHERE id = 'ImperialCerner';
 INSERT IGNORE INTO concept
 (document, id, scheme, code, name, description)
 VALUES
+(1, 'IC_Enc_DayCase', @scm, 'IC_Enc_DayCase', 'Day case', 'Day case'),
 (1, 'IC_Enc_Inpatient', @scm, 'IC_Enc_Inpatient', 'Inpatient', 'Inpatient'),
-(1, 'IC_Enc_Recurring', @scm, 'IC_Enc_Recurring', 'Regular day admission', 'Regular day admission'),
+(1, 'IC_Enc_Maternity', @scm, 'IC_Enc_Maternity', 'Maternity', 'Maternity'),
+(1, 'IC_Enc_Newborn', @scm, 'IC_Enc_Newborn', 'Newborn', 'Newborn'),
+(1, 'IC_Enc_RegRDayAdm', @scm, 'IC_Enc_RegRDayAdm', 'Regular day admission', 'Regular day admission'),
+(1, 'IC_Enc_RegNghtAdm', @scm, 'IC_Enc_RegNghtAdm', 'Regular night admission', 'Regular night admission'),
+(1, 'IC_Enc_DirectRef', @scm, 'IC_Enc_DirectRef', 'Direct referral', 'Direct referral'),
 (1, 'IC_Enc_Emergency', @scm, 'IC_Enc_Emergency', 'Emergency department', 'Emergency department'),
-(1, 'IC_Enc_WaitList', @scm, 'IC_Enc_WaitList', 'Outpatient referral', 'Outpatient referral'),
-(1, 'IC_Enc_PreAdmit', @scm, 'IC_Enc_PreAdmit', 'Outpatient registration', 'Outpatient registration');
+(1, 'IC_Enc_Outpatient', @scm, 'IC_Enc_Outpatient', 'Outpatient', 'Outpatient'),
+(1, 'IC_Enc_DCWL', @scm, 'IC_Enc_DCWL', 'Day case waiting list', 'Day case waiting list'),
+(1, 'IC_Enc_PreReg', @scm, 'IC_Enc_PreReg', 'Preregistration', 'Preregistration'),
+(1, 'IC_Enc_IPWL', @scm, 'IC_Enc_IPWL', 'Inpatient waiting list', 'Inpatient waiting list'),
+(1, 'IC_Enc_PreAdmit', @scm, 'IC_Enc_PreAdmit', 'Outpatient registration', 'Outpatient registration'),
+(1, 'IC_Enc_OPReferral', @scm, 'IC_Enc_OPReferral', 'Outpatient referral', 'Outpatient referral');
 
 -- Context
 INSERT INTO map_context_meta (provider, `system`, `schema`, `table`, `column`, node)
@@ -190,11 +201,20 @@ VALUES ('/IMPRL/CRNR/ENCNTR_TYP', 'DM_admissionPatientClassification');
 INSERT INTO map_node_value_meta
 (node, value, scheme, concept)
 VALUES
+('/IMPRL/CRNR/ENCNTR_TYP', 'DAYCASE', 'ImperialCerner', 'IC_Enc_DayCase'),
 ('/IMPRL/CRNR/ENCNTR_TYP', 'INPATIENT', 'ImperialCerner', 'IC_Enc_Inpatient'),
-('/IMPRL/CRNR/ENCNTR_TYP', 'RECURRING', 'ImperialCerner', 'IC_Enc_Recurring'),
+('/IMPRL/CRNR/ENCNTR_TYP', 'MATERNITY', 'ImperialCerner', 'IC_Enc_Maternity'),
+('/IMPRL/CRNR/ENCNTR_TYP', 'NEWBORN', 'ImperialCerner', 'IC_Enc_Newborn'),
+('/IMPRL/CRNR/ENCNTR_TYP', 'REGRDAYADM', 'ImperialCerner', 'IC_Enc_RegRDayAdm'),
+('/IMPRL/CRNR/ENCNTR_TYP', 'REGNGHTADM', 'ImperialCerner', 'IC_Enc_RegNghtAdm'),
+('/IMPRL/CRNR/ENCNTR_TYP', 'DIRECTREF', 'ImperialCerner', 'IC_Enc_DirectRef'),
 ('/IMPRL/CRNR/ENCNTR_TYP', 'EMERGENCY', 'ImperialCerner', 'IC_Enc_Emergency'),
-('/IMPRL/CRNR/ENCNTR_TYP', 'WAITLIST', 'ImperialCerner', 'IC_Enc_WaitList'),
-('/IMPRL/CRNR/ENCNTR_TYP', 'PREADMIT', 'ImperialCerner', 'IC_Enc_PreAdmit');
+('/IMPRL/CRNR/ENCNTR_TYP', 'OUTPATIENT', 'ImperialCerner', 'IC_Enc_Outpatient'),
+('/IMPRL/CRNR/ENCNTR_TYP', 'DCWL', 'ImperialCerner', 'IC_Enc_DCWL'),
+('/IMPRL/CRNR/ENCNTR_TYP', 'PREREG', 'ImperialCerner', 'IC_Enc_PreReg'),
+('/IMPRL/CRNR/ENCNTR_TYP', 'IPWL', 'ImperialCerner', 'IC_Enc_IPWL'),
+('/IMPRL/CRNR/ENCNTR_TYP', 'PREADMIT', 'ImperialCerner', 'IC_Enc_PreAdmit'),
+('/IMPRL/CRNR/ENCNTR_TYP', 'OPREFERRAL', 'ImperialCerner', 'IC_Enc_OPReferral');
 
 -- ******************** Treatment Function ********************
 
@@ -579,8 +599,14 @@ VALUES
 ('/IMPRL/CRNR/TRTMNT_FNCTN', '900L', 'ImperialCerner', 'CM_TrtmntFnc900'),
 ('/IMPRL/CRNR/TRTMNT_FNCTN', '901L', 'ImperialCerner', 'CM_TrtmntFnc901'),
 ('/IMPRL/CRNR/TRTMNT_FNCTN', '903L', 'ImperialCerner', 'CM_TrtmntFnc903'),
-('/IMPRL/CRNR/TRTMNT_FNCTN', '950L', 'ImperialCerner', 'CM_TrtmntFnc950');
-/*
+('/IMPRL/CRNR/TRTMNT_FNCTN', '950L', 'ImperialCerner', 'CM_TrtmntFnc950'),
+
+-- New codes from 18-June-2021
+('/IMPRL/CRNR/TRTMNT_FNCTN', '145', 'ImperialCerner', 'CM_TrtmntFnc145')
+-- ('/IMPRL/CRNR/TRTMNT_FNCTN', '830', 'ImperialCerner', 'CM_TrtmntFnc830')
+;
+
+/*   STILL UNMAPPED:-
 Psychology
 ECG
 ECG Virtual Clinic
@@ -604,7 +630,8 @@ VALUES ('CM_Org_Imperial', 'CM_Sys_Cerner', null, null, 'admission_method_code',
 
 -- Context
 INSERT INTO map_context_meta (provider, `system`, `schema`, `table`, `column`, node)
-VALUES ('CM_Org_Imperial', 'CM_Sys_Cerner', null, null, 'discharge_method', '/IMPRL/CRNR/DSCHRG_MTHD');    -- Local
+VALUES ('CM_Org_Imperial', 'CM_Sys_Cerner', null, null, 'discharge_method', '/CDS/INPTNT/DSCHRG_MTHD');
+/*VALUES ('CM_Org_Imperial', 'CM_Sys_Cerner', null, null, 'discharge_method', '/IMPRL/CRNR/DSCHRG_MTHD');    -- Local
 
 -- Property
 INSERT INTO map_node_meta (node, concept)
@@ -626,13 +653,14 @@ VALUES
 ('/IMPRL/CRNR/DSCHRG_MTHD', '12', 'ImperialCerner', 'CM_DisMethod6'),
 ('/IMPRL/CRNR/DSCHRG_MTHD', '13', 'ImperialCerner', 'CM_DisMethod6'),
 ('/IMPRL/CRNR/DSCHRG_MTHD', '14', 'ImperialCerner', 'CM_DisMethod4'),
-('/IMPRL/CRNR/DSCHRG_MTHD', 'Treatment Complete', 'ImperialCerner', 'CM_DisMethod1');
+('/IMPRL/CRNR/DSCHRG_MTHD', 'Treatment Complete', 'ImperialCerner', 'CM_DisMethod1');*/
 
 -- ******************** Discharge Destination ********************
 
 -- Context
 INSERT INTO map_context_meta (provider, `system`, `schema`, `table`, `column`, node)
-VALUES ('CM_Org_Imperial', 'CM_Sys_Cerner', null, null, 'discharge_destination_code', '/IMPRL/CRNR/DSCHRG_DSTNTN');    -- Local
+VALUES ('CM_Org_Imperial', 'CM_Sys_Cerner', null, null, 'discharge_destination_code', '/CDS/INPTNT/DSCHRG_DSTNTN');    -- Local
+/*VALUES ('CM_Org_Imperial', 'CM_Sys_Cerner', null, null, 'discharge_destination_code', '/IMPRL/CRNR/DSCHRG_DSTNTN');    -- Local
 
 -- Property
 INSERT INTO map_node_meta (node, concept)
@@ -643,9 +671,6 @@ INSERT INTO map_node_value_meta
 (node, value, scheme, concept)
 VALUES
 ('/IMPRL/CRNR/DSCHRG_DSTNTN', '1', 'ImperialCerner', 'CM_SrcAdmUsual'),
--- ('/IMPRL/CRNR/DSCHRG_DSTNTN', '1', 'ImperialCerner', 'CM_DisDest79'),
--- ('/IMPRL/CRNR/DSCHRG_DSTNTN', '1', 'ImperialCerner', 'CM_SrcAdmA2'),
--- ('/IMPRL/CRNR/DSCHRG_DSTNTN', '1', 'ImperialCerner', 'CM_DisDest51'),
 ('/IMPRL/CRNR/DSCHRG_DSTNTN', '7', 'ImperialCerner', 'CM_DisDest51'),
 ('/IMPRL/CRNR/DSCHRG_DSTNTN', '19', 'ImperialCerner', 'CM_SrcAdmUsual'),
 ('/IMPRL/CRNR/DSCHRG_DSTNTN', '29', 'ImperialCerner', 'CM_SrcAdmTempR'),
@@ -657,8 +682,6 @@ VALUES
 ('/IMPRL/CRNR/DSCHRG_DSTNTN', '49', 'ImperialCerner', 'CM_DisDest49'),
 ('/IMPRL/CRNR/DSCHRG_DSTNTN', '50', 'ImperialCerner', 'CM_DisDest50'),
 ('/IMPRL/CRNR/DSCHRG_DSTNTN', '51', 'ImperialCerner', 'CM_DisDest51'),
-('/IMPRL/CRNR/DSCHRG_DSTNTN', '51', 'ImperialCerner', 'CM_DisDest51'),
-('/IMPRL/CRNR/DSCHRG_DSTNTN', '51', 'ImperialCerner', 'CM_DisDest51'),
 ('/IMPRL/CRNR/DSCHRG_DSTNTN', '52', 'ImperialCerner', 'CM_SrcAdmA2'),
 ('/IMPRL/CRNR/DSCHRG_DSTNTN', '53', 'ImperialCerner', 'CM_SrcAdmA3'),
 ('/IMPRL/CRNR/DSCHRG_DSTNTN', '54', 'ImperialCerner', 'CM_SrcAdmA4'),
@@ -669,7 +692,7 @@ VALUES
 ('/IMPRL/CRNR/DSCHRG_DSTNTN', '84', 'ImperialCerner', 'CM_DisDest84'),
 ('/IMPRL/CRNR/DSCHRG_DSTNTN', '85', 'ImperialCerner', 'CM_SrcAdmA8'),
 ('/IMPRL/CRNR/DSCHRG_DSTNTN', '87', 'ImperialCerner', 'CM_SrcAdmA9'),
-('/IMPRL/CRNR/DSCHRG_DSTNTN', '88', 'ImperialCerner', 'CM_SrcAsmA10');
+('/IMPRL/CRNR/DSCHRG_DSTNTN', '88', 'ImperialCerner', 'CM_SrcAsmA10');*/
 
 -- ******************** Ethnicity ********************
 
