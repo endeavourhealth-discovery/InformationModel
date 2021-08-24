@@ -2,12 +2,15 @@ package org.endeavourhealth.im.dal;
 
 import org.endeavourhealth.im.models.*;
 
+import java.io.IOException;
+import java.io.Writer;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringJoiner;
 
 public class CommonJDBCDAL {
     private static String tctRebuildStatus;
@@ -254,5 +257,38 @@ public class CommonJDBCDAL {
         }
 
         return tctRebuildStatus;
+    }
+
+    public void getDbidSchemeCodeMaps(int start, Integer end, boolean draftOnly, Writer writer) throws SQLException, IOException {
+        StringJoiner sql = new StringJoiner("\n")
+            .add("SELECT c.dbid, s.id, c.code")
+            .add("FROM concept c")
+            .add("JOIN concept s ON s.dbid = c.scheme")
+            .add("WHERE c.dbid >= ?")
+            .add("AND c.code IS NOT NULL");
+
+        if (end != null) sql.add("AND c.dbid <= ?");
+        if (draftOnly) sql.add("AND c.draft = true");
+
+        sql.add("ORDER BY c.dbid");
+
+        try (Connection conn = ConnectionPool.getInstance().pop();
+             PreparedStatement stmt  = conn.prepareStatement(sql.toString())) {
+            stmt.setInt(1, start);
+            if (end != null)
+                stmt.setInt(2, end);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                writer.write("dbid\tscheme\tcode\n");
+                int flush = 0;
+                while (rs.next()) {
+                    writer.write(rs.getInt("dbid") + "\t" + rs.getString("id") + "\t" + rs.getString("code") + "\n");
+
+                    if (flush++ % 1000 == 0)
+                        writer.flush();
+                }
+                writer.flush();
+            }
+        }
     }
 }
