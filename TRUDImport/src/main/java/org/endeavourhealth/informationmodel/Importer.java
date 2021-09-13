@@ -67,7 +67,7 @@ public class Importer {
         LOG.info("...connected");
     }
 
-    public void execute(String folder) throws IOException, SQLException {
+    public void execute(String folder, boolean secure) throws IOException, SQLException {
         start = System.currentTimeMillis();
 
         // Initial checks
@@ -94,7 +94,7 @@ public class Importer {
         generateNewConceptTable();
 
         generateTCTTable(folder);
-        importTCTTable(folder);
+        importTCTTable(folder, secure);
     }
 
     // ---------------------- PRIVATES ---------------------- //
@@ -519,7 +519,7 @@ public class Importer {
         System.out.println("Done (written " + t + " rows)");
     }
 
-    private void importTCTTable(String outpath) throws SQLException {
+    private void importTCTTable(String outpath, boolean secure) throws SQLException {
         LOG.info("Importing closure");
         try (PreparedStatement stmt = conn.prepareStatement("DROP TABLE IF EXISTS concept_tct_meta;")) {
             stmt.executeUpdate();
@@ -533,7 +533,16 @@ public class Importer {
             stmt.executeUpdate();
         };
 
-        try (PreparedStatement buildClosure = conn.prepareStatement("LOAD DATA LOCAL INFILE ?\n" +
+        String loadSql = "LOAD DATA ";
+        if (secure) {
+            try (PreparedStatement buildClosure = conn.prepareStatement("SET GLOBAL local_infile=1")) {
+                buildClosure.executeUpdate();
+                loadSql += "LOCAL ";
+            }
+        }
+
+
+        try (PreparedStatement buildClosure = conn.prepareStatement(loadSql + "INFILE ?\n" +
             "    INTO TABLE concept_tct_meta\n" +
             "    FIELDS TERMINATED BY '\\t'\n" +
             "    LINES TERMINATED BY '\\r\\n'\n" +

@@ -12,11 +12,13 @@ public class TRUDImport {
     public static void main(String[] argv) throws SQLException, IOException {
         LOG.info("IM TRUD Import tool");
 
-        if (argv.length != 2) {
-            LOG.error("Use: TRUDImport <folder> <jdbc connection string>");
+        if (argv.length < 2 || argv.length > 3) {
+            LOG.error("Use: TRUDImport <folder> <jdbc connection string> [secure]");
             System.exit(-1);
         }
 
-        new Importer(argv[1]).execute(argv[0]);
+        boolean secure = (argv.length == 3 && "secure".equalsIgnoreCase(argv[2]));
+
+        new Importer(argv[1]).execute(argv[0], secure);
     }
 }
