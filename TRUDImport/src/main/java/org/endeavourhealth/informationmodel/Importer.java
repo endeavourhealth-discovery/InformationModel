@@ -83,6 +83,9 @@ public class Importer {
         // Get useful data
         getDbids();
 
+        // Create patch schema
+        createSchema();
+
         // Process data
         processRelationships(snomedCodeScheme, isA);
         generateDelCPOTable(isA);
@@ -249,10 +252,16 @@ public class Importer {
         }
     }
 
+    private void createSchema() throws SQLException {
+        try (PreparedStatement stmt = conn.prepareStatement("CREATE SCHEMA im_patch;")) {
+            stmt.executeUpdate();
+        }
+    }
+
     private void generateNewCPOTable() throws SQLException {
         LOG.info("Generating new cpo table");
         // Generate new cpo table
-        try (PreparedStatement stmt = conn.prepareStatement("CREATE TABLE cpo_new " +
+        try (PreparedStatement stmt = conn.prepareStatement("CREATE TABLE im_patch.cpo_new " +
             "SELECT c.id AS concept, p.id AS property, v.id AS value, cpo.group " +
             "FROM concept_property_object cpo " +
             "JOIN concept c ON c.dbid = cpo.dbid " +
@@ -264,7 +273,7 @@ public class Importer {
         }
 
         LOG.info("Indexing cpo table");
-        try (PreparedStatement stmt = conn.prepareStatement("ALTER TABLE cpo_new ADD INDEX cpo_new_property_idx (property)")) {
+        try (PreparedStatement stmt = conn.prepareStatement("ALTER TABLE im_patch.cpo_new ADD INDEX cpo_new_property_idx (property)")) {
             stmt.executeUpdate();
         }
 
@@ -273,7 +282,7 @@ public class Importer {
     private void generateNewConceptTable() throws SQLException {
         LOG.info("Generating new concept table");
         // Generate new concept table
-        try (PreparedStatement stmt = conn.prepareStatement("CREATE TABLE concept_new SELECT * FROM concept WHERE updated >= ?")) {
+        try (PreparedStatement stmt = conn.prepareStatement("CREATE TABLE im_patch.concept_new SELECT * FROM concept WHERE updated >= ?")) {
             stmt.setTimestamp(1, new Timestamp(start));
             stmt.executeUpdate();
         }
@@ -345,13 +354,13 @@ public class Importer {
 
     private void generateDelCPOTable(Integer isA) throws SQLException {
         // CPO patch delete table
-        conn.prepareStatement("CREATE TABLE cpo_delete SELECT * FROM concept_property_object WHERE 1 = 0 LIMIT 1").executeUpdate();
+        conn.prepareStatement("CREATE TABLE im_patch.cpo_delete SELECT * FROM concept_property_object WHERE 1 = 0 LIMIT 1").executeUpdate();
 
-        conn.prepareStatement("ALTER TABLE cpo_delete ADD INDEX cpo_delete_idx (dbid, property, `value`, `group`)").executeUpdate();
+        conn.prepareStatement("ALTER TABLE im_patch.cpo_delete ADD INDEX cpo_delete_idx (dbid, property, `value`, `group`)").executeUpdate();
 
         // Remove deprecated relationships
         LOG.info("Saving deprecated relationships (cpo_delete)");
-        try (PreparedStatement stmt = conn.prepareStatement("INSERT INTO cpo_delete(property, dbid, value, `group`) VALUES (?, ?, ?, ?)")) {
+        try (PreparedStatement stmt = conn.prepareStatement("INSERT INTO im_patch.cpo_delete(property, dbid, value, `group`) VALUES (?, ?, ?, ?)")) {
             int i = 0;
             stmt.setInt(1, isA);
             for (SnomedConcept c : snomed.values()) {
@@ -423,7 +432,7 @@ public class Importer {
             "JOIN concept_property_object cpo ON cpo.property = s.dbid\n" +
             "JOIN concept c ON c.dbid = cpo.dbid\n" +
             "JOIN concept v ON v.dbid = cpo.value\n" +
-            "LEFT JOIN cpo_delete d ON d.dbid = cpo.dbid AND d.property = cpo.property AND d.value = cpo.value AND d.group = cpo.group\n" +
+            "LEFT JOIN im_patch.cpo_delete d ON d.dbid = cpo.dbid AND d.property = cpo.property AND d.value = cpo.value AND d.group = cpo.group\n" +
             "WHERE s.id = 'SN_116680003'\n" +
             "ORDER BY concept";
 
@@ -521,11 +530,11 @@ public class Importer {
 
     private void importTCTTable(String outpath, boolean secure) throws SQLException {
         LOG.info("Importing closure");
-        try (PreparedStatement stmt = conn.prepareStatement("DROP TABLE IF EXISTS concept_tct_meta;")) {
+        try (PreparedStatement stmt = conn.prepareStatement("DROP TABLE IF EXISTS im_patch.concept_tct_meta;")) {
             stmt.executeUpdate();
         };
 
-        try (PreparedStatement stmt = conn.prepareStatement("CREATE TABLE concept_tct_meta (\n" +
+        try (PreparedStatement stmt = conn.prepareStatement("CREATE TABLE im_patch.concept_tct_meta (\n" +
             "                               source VARCHAR(150) NOT NULL,\n" +
             "                               target VARCHAR(150) NOT NULL,\n" +
             "                               level INT NOT NULL\n" +
@@ -543,7 +552,7 @@ public class Importer {
 
 
         try (PreparedStatement buildClosure = conn.prepareStatement(loadSql + "INFILE ?\n" +
-            "    INTO TABLE concept_tct_meta\n" +
+            "    INTO TABLE im_patch.concept_tct_meta\n" +
             "    FIELDS TERMINATED BY '\\t'\n" +
             "    LINES TERMINATED BY '\\r\\n'\n" +
             "    (source, target, level)\n" +
