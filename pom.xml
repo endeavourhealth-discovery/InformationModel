@@ -13,6 +13,7 @@
     <module>client</module>
     <module>api</module>
     <module>TRUDImport</module>
+    <module>ConceptExport</module>
   </modules>
 
   <properties>
