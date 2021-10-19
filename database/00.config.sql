@@ -15,11 +15,7 @@ VALUES
 	"realm" : "endeavour",
 	"username" : "information-model-client"
 }'),
-('IMv1Sender','LastDbid','{
-    "concept": 1452440,
-    "cpo": 1435150,
-    "cpd": 1406670
-}'),
+('IMv1Sender','LastDate','"2021-05-31T21:24:14"'),
 ('IMv1Sender','S3Config','{
     "region": "eu-west-2",
     "bucket": "imv1sender",
