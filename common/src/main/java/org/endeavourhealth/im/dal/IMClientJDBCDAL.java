@@ -39,10 +39,7 @@ public class IMClientJDBCDAL {
                     }
                 }
 
-                if (dbid != null) {
-                    // Found one so increment use count
-                    incUseCount(conn, dbid);
-                } else if (autoCreate) {
+                if (dbid == null && autoCreate) {
                     // None found, so create a new draft
                     dbid = createDraftCodeableConcept(conn, scheme, code, term);
                 }
@@ -54,17 +51,6 @@ public class IMClientJDBCDAL {
                 throw e;
             }
         }
-    }
-
-    private void incUseCount(Connection conn, Integer dbid) throws SQLException {
-        if (dbid == null)
-            return;
-
-        try (PreparedStatement cnt = conn.prepareStatement("UPDATE concept SET use_count = use_count + 1 WHERE dbid = ?")) {
-            cnt.setInt(1, dbid);
-            cnt.execute();
-        }
-
     }
 
     private int createDraftCodeableConcept(Connection conn, String scheme, String code, String term) throws SQLException {
@@ -174,7 +160,6 @@ public class IMClientJDBCDAL {
                 try (ResultSet resultSet = statement.executeQuery()) {
                     if (resultSet.next()) {
                         dbid = resultSet.getInt("target");
-                        incUseCount(conn, dbid);
                     } else if (autoCreate)
                         dbid = createTypeTermConcept(conn, type, term);
                 }
