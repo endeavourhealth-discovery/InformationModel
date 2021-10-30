@@ -193,7 +193,7 @@ public class IMClientJDBCDAL {
 
         int mapDbid;
         MessageDigest md = MessageDigest.getInstance("SHA-256");
-        byte[] digest = md.digest(term.getBytes(StandardCharsets.UTF_8));
+        byte[] digest = md.digest((type + term).getBytes(StandardCharsets.UTF_8));
         String code = Base64.getEncoder().encodeToString(digest).substring(0, 17);
         String id = schemeCodePrefixMap.get(scmId) + code;
 
