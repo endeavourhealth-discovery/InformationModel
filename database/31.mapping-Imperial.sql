@@ -60,6 +60,7 @@ VALUES
 ('/IMPRL/CRNR/RLGN', 'H', 'ImperialCerner', 'CM_ReligionH1'),
 ('/IMPRL/CRNR/RLGN', 'N', 'ImperialCerner', 'CM_ReligionN1'),
 ('/IMPRL/CRNR/RLGN', 'J', 'ImperialCerner', 'CM_ReligionJ1'),
+('/IMPRL/CRNR/RLGN', 'GREEKORTH', 'ImperialCerner', 'CM_ReligionC41'),
 ('/IMPRL/CRNR/RLGN', 'RCATHOLIC', 'ImperialCerner', 'CM_ReligionC67');
 
 
@@ -704,7 +705,6 @@ VALUES
 ('/IMPRL/CRNR/DSCHRG_DSTNTN', '30', 'ImperialCerner', 'CM_DisDest30'),
 ('/IMPRL/CRNR/DSCHRG_DSTNTN', '37', 'ImperialCerner', 'CM_SrcAdmCo'),
 ('/IMPRL/CRNR/DSCHRG_DSTNTN', '38', 'ImperialCerner', 'CM_DisDest38'),
-('/IMPRL/CRNR/DSCHRG_DSTNTN', '38', 'ImperialCerner', 'CM_DisDest38'),
 ('/IMPRL/CRNR/DSCHRG_DSTNTN', '48', 'ImperialCerner', 'CM_DisDest48'),
 ('/IMPRL/CRNR/DSCHRG_DSTNTN', '49', 'ImperialCerner', 'CM_DisDest49'),
 ('/IMPRL/CRNR/DSCHRG_DSTNTN', '50', 'ImperialCerner', 'CM_DisDest50'),
@@ -712,7 +712,6 @@ VALUES
 ('/IMPRL/CRNR/DSCHRG_DSTNTN', '52', 'ImperialCerner', 'CM_SrcAdmA2'),
 ('/IMPRL/CRNR/DSCHRG_DSTNTN', '53', 'ImperialCerner', 'CM_SrcAdmA3'),
 ('/IMPRL/CRNR/DSCHRG_DSTNTN', '54', 'ImperialCerner', 'CM_SrcAdmA4'),
-('/IMPRL/CRNR/DSCHRG_DSTNTN', '65', 'ImperialCerner', 'CM_SrcAdmA5'),
 ('/IMPRL/CRNR/DSCHRG_DSTNTN', '65', 'ImperialCerner', 'CM_SrcAdmA5'),
 ('/IMPRL/CRNR/DSCHRG_DSTNTN', '66', 'ImperialCerner', 'CM_SrcAdmA6'),
 ('/IMPRL/CRNR/DSCHRG_DSTNTN', '79', 'ImperialCerner', 'CM_DisDest79'),
