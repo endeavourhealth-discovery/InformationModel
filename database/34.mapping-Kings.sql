@@ -6,13 +6,6 @@
 SELECT @scm := dbid FROM concept WHERE id = 'CM_DiscoveryCode';
 
 -- Code scheme prefix entries
-INSERT IGNORE INTO concept_property_data
-(`dbid`, `group`, `property`, `value`)
-SELECT c.dbid, 0 AS `group`, p.dbid AS `property`, 'KC_' AS `value`
-FROM concept c
-JOIN concept p ON p.id = 'code_prefix'
-WHERE c.id = 'KingsPIMS';
-
 INSERT IGNORE INTO concept
 (document, id, scheme, code, name, description)
 VALUES
@@ -20,6 +13,13 @@ VALUES
 (1, 'CM_Org_Kings', @scm, 'CM_Org_Kings', 'Kings College', 'Kings College Hospital, London'),
 (1, 'CM_Sys_PIMS', @scm, 'CM_Sys_PIMS', 'PIMS', 'PIMS system'),
 (1, 'KingsPIMS', @scm, 'KingsPIMS', 'Kings Local Codes', 'Kings PIMS local code scheme');
+
+INSERT IGNORE INTO concept_property_data
+(`dbid`, `group`, `property`, `value`)
+SELECT c.dbid, 0 AS `group`, p.dbid AS `property`, 'KC_' AS `value`
+FROM concept c
+         JOIN concept p ON p.id = 'code_prefix'
+WHERE c.id = 'KingsPIMS';
 
 -- ******************** Gender ********************
 
