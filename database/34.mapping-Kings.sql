@@ -153,7 +153,7 @@ VALUES
     ('/KINGS/PIMS/ADMSSN_MTHD', '23', 'KingsPIMS', 'CM_AdmMetBedBureau'),
     ('/KINGS/PIMS/ADMSSN_MTHD', '24', 'KingsPIMS', 'CM_AdmMetConClin'),
     ('/KINGS/PIMS/ADMSSN_MTHD', '25', 'KingsPIMS', 'CM_AdmMetMheCrisis'),
-    ('/KINGS/PIMS/ADMSSN_MTHD', '28', 'KingsPIMS', 'CM_AdmMetEMore'),           -- 2D replaces 28 in "Method of admission" - Hardik to confirm
+    -- ('/KINGS/PIMS/ADMSSN_MTHD', '28', 'KingsPIMS', 'CM_AdmMetEMore'),           -- 2D replaces 28 in "Method of admission" - Confirmed by Jack 14/1/22
     ('/KINGS/PIMS/ADMSSN_MTHD', '2A', 'KingsPIMS', 'CM_AdmMetCasElsewhere'),
     ('/KINGS/PIMS/ADMSSN_MTHD', '2B', 'KingsPIMS', 'CM_AdmMetHosTran'),
     ('/KINGS/PIMS/ADMSSN_MTHD', '2C', 'KingsPIMS', 'CM_AdmMetBBhok'),
@@ -223,7 +223,7 @@ VALUES
     ('/KINGS/PIMS/ADMSSN_SRC', '66', 'KingsPIMS', 'CM_SrcAdmA6'),
     ('/KINGS/PIMS/ADMSSN_SRC', '79', 'KingsPIMS', 'CM_SrcAdmA7'),
     ('/KINGS/PIMS/ADMSSN_SRC', '85', 'KingsPIMS', 'CM_SrcAdmA8'),
-    -- ('/KINGS/PIMS/ADMSSN_SRC', '86', 'KingsPIMS', 'CM_SrcAdmA8'),    -- NO 86 National Code - Should be 85 (above)?
+    -- ('/KINGS/PIMS/ADMSSN_SRC', '86', 'KingsPIMS', 'CM_SrcAdmA8'),    -- NO 86 National Code - Should be 85 (above) - Confirmed Jack Barker 14/1/22
     ('/KINGS/PIMS/ADMSSN_SRC', '85', 'KingsPIMS', 'CM_SrcAdmA9'),
     ('/KINGS/PIMS/ADMSSN_SRC', '88', 'KingsPIMS', 'CM_SrcAsmA10');
 
@@ -245,8 +245,8 @@ VALUES
     ('/KINGS/PIMS/ENCNTR_TYP', '1', 'KingsPIMS', 'CM_AdmClassOrdinary'),
     ('/KINGS/PIMS/ENCNTR_TYP', '2', 'KingsPIMS', 'CM_AdmClassDayCase'),
     ('/KINGS/PIMS/ENCNTR_TYP', '3', 'KingsPIMS', 'CM_AdmClassRegularDay'),
-    ('/KINGS/PIMS/ENCNTR_TYP', '4', 'KingsPIMS', 'CM_AdmClassRegularNight'),
-    ('/KINGS/PIMS/ENCNTR_TYP', '5/99', 'KingsPIMS', 'CM_AdmClassMotherBabyDelivery/?????????????????'); -- Whats this?
+    ('/KINGS/PIMS/ENCNTR_TYP', '4', 'KingsPIMS', 'CM_AdmClassRegularNight');
+    -- ('/KINGS/PIMS/ENCNTR_TYP', '5/99', 'KingsPIMS', 'CM_AdmClassMotherBabyDelivery/?????????????????'); -- Replaced by 1 in TIE - Jack Barker 14/1/22
 
 -- ******************** Discharge Disposition ********************
 
@@ -266,8 +266,8 @@ VALUES
     ('/KINGS/PIMS/DSCHRG_MTHD', '2', 'KingsPIMS', 'CM_DisMethod2'),
     ('/KINGS/PIMS/DSCHRG_MTHD', '3', 'KingsPIMS', 'CM_DisMethod3'),
     ('/KINGS/PIMS/DSCHRG_MTHD', '4', 'KingsPIMS', 'CM_DisMethod4'),
-    ('/KINGS/PIMS/DSCHRG_MTHD', '5', 'KingsPIMS', 'CM_DisMethod5'),
-    ('/KINGS/PIMS/DSCHRG_MTHD', '99', 'KingsPIMS', '??????????????????');   -- No national 99?
+    ('/KINGS/PIMS/DSCHRG_MTHD', '5', 'KingsPIMS', 'CM_DisMethod5');
+    -- ('/KINGS/PIMS/DSCHRG_MTHD', '99', 'KingsPIMS', '??????????????????');   -- Replaced by 1 in TIE - Jack Barker 14/1/22
 
 
 -- ******************** Discharge Destination ********************
@@ -303,3 +303,138 @@ VALUES
     ('/KINGS/PIMS/DSCHRG_DSTNTN', '85', 'KingsPIMS', 'CM_SrcAdmA8'),
     ('/KINGS/PIMS/DSCHRG_DSTNTN', '87', 'KingsPIMS', 'CM_SrcAdmA9'),
     ('/KINGS/PIMS/DSCHRG_DSTNTN', '88', 'KingsPIMS', 'CM_SrcAsmA10');
+
+-- ******************** Treatment Function ********************
+
+-- Context
+INSERT INTO map_context_meta (provider, `system`, `schema`, `table`, `column`, node)
+VALUES ('CM_Org_Kings', 'CM_Sys_PIMS', null, null, 'treatment_function_code', '/KINGS/PIMS/TRTMNT_FNCTN');    -- Local
+
+-- Property
+INSERT INTO map_node_meta (node, concept)
+VALUES ('/KINGS/PIMS/TRTMNT_FNCTN', 'DM_treatmentFunctionAdmit');
+
+-- Value maps
+INSERT INTO map_node_value_meta
+(node, value, scheme, concept)
+VALUES
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '100', 'KingsPIMS', 'CM_TrtmntFnc100'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '101', 'KingsPIMS', 'CM_TrtmntFnc101'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '102', 'KingsPIMS', 'CM_TrtmntFnc102'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '103', 'KingsPIMS', 'CM_TrtmntFnc103'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '104', 'KingsPIMS', 'CM_TrtmntFnc104'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '105', 'KingsPIMS', 'CM_TrtmntFnc105'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '106', 'KingsPIMS', 'CM_TrtmntFnc106'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '107', 'KingsPIMS', 'CM_TrtmntFnc107'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '109', 'KingsPIMS', 'CM_TrtmntFnc109'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '110', 'KingsPIMS', 'CM_TrtmntFnc110'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '111', 'KingsPIMS', 'CM_TrtmntFnc111'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '113', 'KingsPIMS', 'CM_TrtmntFnc113'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '120', 'KingsPIMS', 'CM_TrtmntFnc120'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '130', 'KingsPIMS', 'CM_TrtmntFnc130'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '140', 'KingsPIMS', 'CM_TrtmntFnc140'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '141', 'KingsPIMS', 'CM_TrtmntFnc141'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '650', 'KingsPIMS', 'CM_TrtmntFnc650'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '142', 'KingsPIMS', 'CM_TrtmntFnc142'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '143', 'KingsPIMS', 'CM_TrtmntFnc143'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '144', 'KingsPIMS', 'CM_TrtmntFnc144'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '145', 'KingsPIMS', 'CM_TrtmntFnc145'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '150', 'KingsPIMS', 'CM_TrtmntFnc150'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '253', 'KingsPIMS', 'CM_TrtmntFnc253'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '160', 'KingsPIMS', 'CM_TrtmntFnc160'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '170', 'KingsPIMS', 'CM_TrtmntFnc170'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '171', 'KingsPIMS', 'CM_TrtmntFnc171'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '180', 'KingsPIMS', 'CM_TrtmntFnc180'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '190', 'KingsPIMS', 'CM_TrtmntFnc190'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '192', 'KingsPIMS', 'CM_TrtmntFnc192'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '211', 'KingsPIMS', 'CM_TrtmntFnc211'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '213', 'KingsPIMS', 'CM_TrtmntFnc213'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '212', 'KingsPIMS', 'CM_TrtmntFnc212'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '214', 'KingsPIMS', 'CM_TrtmntFnc214'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '216', 'KingsPIMS', 'CM_TrtmntFnc216'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '218', 'KingsPIMS', 'CM_TrtmntFnc218'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '219', 'KingsPIMS', 'CM_TrtmntFnc219'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '223', 'KingsPIMS', 'CM_TrtmntFnc223'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '250', 'KingsPIMS', 'CM_TrtmntFnc250'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '251', 'KingsPIMS', 'CM_TrtmntFnc251'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '252', 'KingsPIMS', 'CM_TrtmntFnc252'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '303', 'KingsPIMS', 'CM_TrtmntFnc303'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '255', 'KingsPIMS', 'CM_TrtmntFnc255'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '256', 'KingsPIMS', 'CM_TrtmntFnc256'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '257', 'KingsPIMS', 'CM_TrtmntFnc257'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '258', 'KingsPIMS', 'CM_TrtmntFnc258'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '260', 'KingsPIMS', 'CM_TrtmntFnc260'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '261', 'KingsPIMS', 'CM_TrtmntFnc261'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '262', 'KingsPIMS', 'CM_TrtmntFnc262'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '263', 'KingsPIMS', 'CM_TrtmntFnc263'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '264', 'KingsPIMS', 'CM_TrtmntFnc264'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '270', 'KingsPIMS', 'CM_TrtmntFnc270'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '280', 'KingsPIMS', 'CM_TrtmntFnc280'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '291', 'KingsPIMS', 'CM_TrtmntFnc291'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '301', 'KingsPIMS', 'CM_TrtmntFnc301'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '300', 'KingsPIMS', 'CM_TrtmntFnc300'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '302', 'KingsPIMS', 'CM_TrtmntFnc302'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '306', 'KingsPIMS', 'CM_TrtmntFnc306'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '307', 'KingsPIMS', 'CM_TrtmntFnc307'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '308', 'KingsPIMS', 'CM_TrtmntFnc308'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '310', 'KingsPIMS', 'CM_TrtmntFnc310'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '311', 'KingsPIMS', 'CM_TrtmntFnc311'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '314', 'KingsPIMS', 'CM_TrtmntFnc314'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '315', 'KingsPIMS', 'CM_TrtmntFnc315'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '316', 'KingsPIMS', 'CM_TrtmntFnc316'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '317', 'KingsPIMS', 'CM_TrtmntFnc317'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '320', 'KingsPIMS', 'CM_TrtmntFnc320'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '321', 'KingsPIMS', 'CM_TrtmntFnc321'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '322', 'KingsPIMS', 'CM_TrtmntFnc322'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '324', 'KingsPIMS', 'CM_TrtmntFnc324'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '326', 'KingsPIMS', 'CM_TrtmntFnc326'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '328', 'KingsPIMS', 'CM_TrtmntFnc328'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '329', 'KingsPIMS', 'CM_TrtmntFnc329'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '330', 'KingsPIMS', 'CM_TrtmntFnc330'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '340', 'KingsPIMS', 'CM_TrtmntFnc340'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '343', 'KingsPIMS', 'CM_TrtmntFnc343'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '348', 'KingsPIMS', 'CM_TrtmntFnc348'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '350', 'KingsPIMS', 'CM_TrtmntFnc350'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '360', 'KingsPIMS', 'CM_TrtmntFnc360'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '361', 'KingsPIMS', 'CM_TrtmntFnc361'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '370', 'KingsPIMS', 'CM_TrtmntFnc370'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '371', 'KingsPIMS', 'CM_TrtmntFnc371'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '400', 'KingsPIMS', 'CM_TrtmntFnc400'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '401', 'KingsPIMS', 'CM_TrtmntFnc401'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '410', 'KingsPIMS', 'CM_TrtmntFnc410'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '420', 'KingsPIMS', 'CM_TrtmntFnc420'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '421', 'KingsPIMS', 'CM_TrtmntFnc421'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '422', 'KingsPIMS', 'CM_TrtmntFnc422'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '424', 'KingsPIMS', 'CM_TrtmntFnc424'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '430', 'KingsPIMS', 'CM_TrtmntFnc430'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '431', 'KingsPIMS', 'CM_TrtmntFnc431'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '450', 'KingsPIMS', 'CM_TrtmntFnc450'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '451', 'KingsPIMS', 'CM_TrtmntFnc451'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '461', 'KingsPIMS', 'CM_TrtmntFnc461'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '503', 'KingsPIMS', 'CM_TrtmntFnc503'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '502', 'KingsPIMS', 'CM_TrtmntFnc502'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '501', 'KingsPIMS', 'CM_TrtmntFnc501'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '505', 'KingsPIMS', 'CM_TrtmntFnc505'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '560', 'KingsPIMS', 'CM_TrtmntFnc560'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '651', 'KingsPIMS', 'CM_TrtmntFnc651'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '652', 'KingsPIMS', 'CM_TrtmntFnc652'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '812', 'KingsPIMS', 'CM_TrtmntFnc812'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '653', 'KingsPIMS', 'CM_TrtmntFnc653'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '654', 'KingsPIMS', 'CM_TrtmntFnc654'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '655', 'KingsPIMS', 'CM_TrtmntFnc655'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '730', 'KingsPIMS', 'CM_TrtmntFnc730'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '658', 'KingsPIMS', 'CM_TrtmntFnc658'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '670', 'KingsPIMS', 'CM_TrtmntFnc670'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '673', 'KingsPIMS', 'CM_TrtmntFnc673'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '675', 'KingsPIMS', 'CM_TrtmntFnc675'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '677', 'KingsPIMS', 'CM_TrtmntFnc677'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '710', 'KingsPIMS', 'CM_TrtmntFnc710'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '711', 'KingsPIMS', 'CM_TrtmntFnc711'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '712', 'KingsPIMS', 'CM_TrtmntFnc712'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '713', 'KingsPIMS', 'CM_TrtmntFnc713'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '724', 'KingsPIMS', 'CM_TrtmntFnc724'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '727', 'KingsPIMS', 'CM_TrtmntFnc727'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '800', 'KingsPIMS', 'CM_TrtmntFnc800'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '811', 'KingsPIMS', 'CM_TrtmntFnc811'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '822', 'KingsPIMS', 'CM_TrtmntFnc822'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '840', 'KingsPIMS', 'CM_TrtmntFnc840');
