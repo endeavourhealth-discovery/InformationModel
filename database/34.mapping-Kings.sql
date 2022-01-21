@@ -101,7 +101,7 @@ VALUES
     ('/KINGS/PIMS/RLGN', 'N1',  'KingsPIMS', 'CM_ReligionN1');
 
 
--- ******************** Patient Class ********************
+-- ******************** Patient Class ********************          No longer being done - Will has workaround (Andy Thomas - 14/01/2022)
 
 -- CONFLICT WITH ENCOUNTER CLASS/PATIENT CLASSIFICATION????
 
@@ -224,7 +224,7 @@ VALUES
     ('/KINGS/PIMS/ADMSSN_SRC', '79', 'KingsPIMS', 'CM_SrcAdmA7'),
     ('/KINGS/PIMS/ADMSSN_SRC', '85', 'KingsPIMS', 'CM_SrcAdmA8'),
     -- ('/KINGS/PIMS/ADMSSN_SRC', '86', 'KingsPIMS', 'CM_SrcAdmA8'),    -- NO 86 National Code - Should be 85 (above) - Confirmed Jack Barker 14/1/22
-    ('/KINGS/PIMS/ADMSSN_SRC', '85', 'KingsPIMS', 'CM_SrcAdmA9'),
+    ('/KINGS/PIMS/ADMSSN_SRC', '87', 'KingsPIMS', 'CM_SrcAdmA9'),
     ('/KINGS/PIMS/ADMSSN_SRC', '88', 'KingsPIMS', 'CM_SrcAsmA10');
 
 
