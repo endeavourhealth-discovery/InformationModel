@@ -204,15 +204,15 @@ VALUES
 (1, 'CM_TrtmntFnc677', @scm, 'CM_TrtmntFnc677', 'Gastrointestinal Physiology Service', 'Gastrointestinal Physiology Service'),
 (1, 'CM_TrtmntFnc840', @scm, 'CM_TrtmntFnc840', 'Audiology Service', 'Audiology Service'),
 (1, 'CM_TrtmntFnc920', @scm, 'CM_TrtmntFnc920', 'Diabetic Education Service', 'Diabetic Education Service'),
-(1, 'CM_TrtmntFnc990', @scm, 'CM_TrtmntFnc990', 'Retired but retained for historical purposes', 'Retired but retained for historical purposes');
-       -- Additional - TODO: CHECK!!
-/*(1, 'CM_TrtmntFnc147', @scm, 'CM_TrtmntFnc147', 'Periodontics', 'Periodontics'),
+(1, 'CM_TrtmntFnc990', @scm, 'CM_TrtmntFnc990', 'Retired but retained for historical purposes', 'Retired but retained for historical purposes'),
+(1, 'CM_TrtmntFnc147', @scm, 'CM_TrtmntFnc147', 'Periodontics', 'Periodontics'),
 (1, 'CM_TrtmntFnc820', @scm, 'CM_TrtmntFnc820', 'General Pathology', 'General Pathology'),
 (1, 'CM_TrtmntFnc823', @scm, 'CM_TrtmntFnc823', 'Haematology', 'Haematology'),
 (1, 'CM_TrtmntFnc824', @scm, 'CM_TrtmntFnc824', 'Histopathology', 'Histopathology'),
+(1, 'CM_TrtmntFnc830', @scm, 'CM_TrtmntFnc830', 'Immunopathology', 'Immunopathology'),
 (1, 'CM_TrtmntFnc831', @scm, 'CM_TrtmntFnc831', 'Medical Microbiology and Virology', 'Medical Microbiology and Virology'),
-(1, 'CM_TrtmntFnc900', @scm, 'CM_TrtmntFnc831', 'Community Medicine', 'Community Medicine'),
+(1, 'CM_TrtmntFnc900', @scm, 'CM_TrtmntFnc900', 'Community Medicine', 'Community Medicine'),
 (1, 'CM_TrtmntFnc901', @scm, 'CM_TrtmntFnc901', 'Occupational Medicine', 'Occupational Medicine'),
 (1, 'CM_TrtmntFnc903', @scm, 'CM_TrtmntFnc903', 'Public Health Medicine', 'Public Health Medicine'),
-(1, 'CM_TrtmntFnc950', @scm, 'CM_TrtmntFnc950', 'Nursing', 'Nursing');*/
+(1, 'CM_TrtmntFnc950', @scm, 'CM_TrtmntFnc950', 'Nursing', 'Nursing');
 

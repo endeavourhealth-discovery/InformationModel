@@ -605,8 +605,8 @@ VALUES
 ('/CWH/CRNR/TRTMNT_FNCTN', '950L', 'CWHCerner', 'CM_TrtmntFnc950'),
 
 -- New codes from 18-June-2021
-('/CWH/CRNR/TRTMNT_FNCTN', '145', 'CWHCerner', 'CM_TrtmntFnc145')
--- ('/CWH/CRNR/TRTMNT_FNCTN', '830', 'CWHCerner', 'CM_TrtmntFnc830')
+('/CWH/CRNR/TRTMNT_FNCTN', '145', 'CWHCerner', 'CM_TrtmntFnc145'),
+('/CWH/CRNR/TRTMNT_FNCTN', '830', 'CWHCerner', 'CM_TrtmntFnc830')
 ;
 
 
