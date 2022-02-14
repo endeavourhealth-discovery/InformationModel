@@ -8,6 +8,9 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+
 public class MappingLogicTest {
     private MappingLogic mappingLogic;
     private MappingMockDal mappingMockDal;
@@ -345,6 +348,97 @@ public class MappingLogicTest {
         MapResponse actual = mappingLogic.getMapping(request);
 
         Assert.assertTrue(actual.getConcept().getIri().startsWith("LPV_BHR_Mdw_Mdw_PMI_CAU_Cpd_"));
+    }
+
+    @Test
+    public void getMapColumnValueRequest_PositiveRegex() throws Exception {
+
+        mappingMockDal.setGetNodeResult(new MapNode());
+
+        mappingMockDal.setGetValueNodeResult(new MapValueNode()
+            .setFunction("Regex()")
+        );
+
+        HashMap<String, ConceptIdentifiers> regexMap = new HashMap<>();
+        regexMap.put("^Positive(.*)", new ConceptIdentifiers().setIri("Positive_Concept_Iri"));
+        regexMap.put("^Negative(.*)", new ConceptIdentifiers().setIri("Negative_Concept_Iri"));
+
+        mappingMockDal.setGetRegexMapResult(regexMap);
+
+        MapRequest request = new MapRequest()
+            .setMapColumnValueRequest(
+                new MapColumnValueRequest()
+                    .setValue(new MapValueRequest()
+                        .setTerm("Positive test result")
+                    )
+            );
+
+        MapResponse actual = mappingLogic.getMapping(request);
+
+        Assert.assertNotNull(actual);
+        Assert.assertNotNull(actual.getConcept());
+        Assert.assertNotNull(actual.getConcept().getIri());
+        Assert.assertTrue(actual.getConcept().getIri().startsWith("Positive_Concept_Iri"));
+    }
+
+    @Test
+    public void getMapColumnValueRequest_NegativeRegex() throws Exception {
+
+        mappingMockDal.setGetNodeResult(new MapNode());
+
+        mappingMockDal.setGetValueNodeResult(new MapValueNode()
+            .setFunction("Regex()")
+        );
+
+        HashMap<String, ConceptIdentifiers> regexMap = new LinkedHashMap<>();
+        regexMap.put("^Positive(.*)", new ConceptIdentifiers().setIri("Positive_Concept_Iri"));
+        regexMap.put("^Negative(.*)", new ConceptIdentifiers().setIri("Negative_Concept_Iri"));
+
+        mappingMockDal.setGetRegexMapResult(regexMap);
+
+        MapRequest request = new MapRequest()
+            .setMapColumnValueRequest(
+                new MapColumnValueRequest()
+                    .setValue(new MapValueRequest()
+                        .setTerm("Negative test result")
+                    )
+            );
+
+        MapResponse actual = mappingLogic.getMapping(request);
+
+        Assert.assertNotNull(actual);
+        Assert.assertNotNull(actual.getConcept());
+        Assert.assertNotNull(actual.getConcept().getIri());
+        Assert.assertTrue(actual.getConcept().getIri().startsWith("Negative_Concept_Iri"));
+    }
+
+    @Test
+    public void getMapColumnValueRequest_UnknownRegex() throws Exception {
+
+        mappingMockDal.setGetNodeResult(new MapNode());
+
+        mappingMockDal.setGetValueNodeResult(new MapValueNode()
+            .setFunction("Regex()")
+        );
+
+        HashMap<String, ConceptIdentifiers> regexMap = new HashMap<>();
+        regexMap.put("^Positive(.*)", new ConceptIdentifiers().setIri("Positive_Concept_Iri"));
+        regexMap.put("^Negative(.*)", new ConceptIdentifiers().setIri("Negative_Concept_Iri"));
+
+        mappingMockDal.setGetRegexMapResult(regexMap);
+
+        MapRequest request = new MapRequest()
+            .setMapColumnValueRequest(
+                new MapColumnValueRequest()
+                    .setValue(new MapValueRequest()
+                        .setTerm("Deleted test result")
+                    )
+            );
+
+        MapResponse actual = mappingLogic.getMapping(request);
+
+        Assert.assertNotNull(actual);
+        Assert.assertNull(actual.getConcept());
     }
 
     @Test

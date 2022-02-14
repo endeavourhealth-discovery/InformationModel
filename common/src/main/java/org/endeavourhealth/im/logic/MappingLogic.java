@@ -5,6 +5,9 @@ import org.endeavourhealth.im.dal.IMMappingDAL;
 import org.endeavourhealth.im.dal.IMMappingJDBCDAL;
 import org.endeavourhealth.im.models.mapping.*;
 
+import java.util.Map;
+import java.util.Set;
+
 public class MappingLogic {
     public static String getShortString(String id) {
         // Handle concepts and standard prefixes
@@ -97,39 +100,77 @@ public class MappingLogic {
 
         ConceptIdentifiers ids;
         if (valueNode.getFunction().startsWith("Format(")) {
-            String format = valueNode.getFunction().substring(7, valueNode.getFunction().length() - 1);
-            String iri = String.format(format, valueRequest.getValue().getCode());
-            ids = dal.getConceptIdentifiers(iri);
-            if (ids == null) {
-
-                ids = dal.createFormattedValueNodeConcept(
-                    valueRequest.getProvider(),
-                    valueRequest.getSystem(),
-                    valueRequest.getSchema(),
-                    valueRequest.getTable(),
-                    valueRequest.getColumn(),
-                    valueRequest.getValue(),
-                    iri
-                );
-                wasCreated = true;
-            }
+            return getMapColumnValueRequestFormat(request, wasCreated, valueRequest, nodeData, valueNode);
+        } else if ("Regex()".equals(valueNode.getFunction())) {
+            return getMapColumnValueRequestRegex(request, wasCreated, valueRequest, nodeData, valueNode);
         } else {
-            // valueNode.getFunction().equals("Lookup()")
-            ids = dal.getValueNodeConcept(valueNode, valueRequest.getValue());
-            if (ids == null) {
-                ids = dal.createValueNodeConcept(
-                    valueNode,
-                    valueRequest.getProvider(),
-                    valueRequest.getSystem(),
-                    valueRequest.getSchema(),
-                    valueRequest.getTable(),
-                    valueRequest.getColumn(),
-                    valueRequest.getValue(),
-                    valueRequest.getColumn(),
-                    (valueRequest.getValue().getCode()==null || valueRequest.getValue().getCode().isEmpty())
-                        ? valueRequest.getValue().getTerm() : valueRequest.getValue().getCode()
-                );
-                wasCreated = true;
+            return getMapColumnValueRequestLookup(request, wasCreated, valueRequest, nodeData, valueNode);
+        }
+    }
+
+    private MapResponse getMapColumnValueRequestLookup(MapRequest request, boolean wasCreated, MapColumnValueRequest valueRequest, MapNode nodeData, MapValueNode valueNode) throws Exception {
+        ConceptIdentifiers ids;
+
+        ids = dal.getValueNodeConcept(valueNode, valueRequest.getValue());
+        if (ids == null) {
+            ids = dal.createValueNodeConcept(
+                valueNode,
+                valueRequest.getProvider(),
+                valueRequest.getSystem(),
+                valueRequest.getSchema(),
+                valueRequest.getTable(),
+                valueRequest.getColumn(),
+                valueRequest.getValue(),
+                valueRequest.getColumn(),
+                (valueRequest.getValue().getCode()==null || valueRequest.getValue().getCode().isEmpty())
+                    ? valueRequest.getValue().getTerm() : valueRequest.getValue().getCode()
+            );
+            wasCreated = true;
+        }
+        return new MapResponse()
+            .setNode(nodeData)
+            .setValueNode(valueNode)
+            .setRequest(request)
+            .setConcept(ids)
+            .setWasCreated(wasCreated);
+    }
+
+    private MapResponse getMapColumnValueRequestFormat(MapRequest request, boolean wasCreated, MapColumnValueRequest valueRequest, MapNode nodeData, MapValueNode valueNode) throws Exception {
+        ConceptIdentifiers ids;
+        String format = valueNode.getFunction().substring(7, valueNode.getFunction().length() - 1);
+        String iri = String.format(format, valueRequest.getValue().getCode());
+        ids = dal.getConceptIdentifiers(iri);
+        if (ids == null) {
+
+            ids = dal.createFormattedValueNodeConcept(
+                valueRequest.getProvider(),
+                valueRequest.getSystem(),
+                valueRequest.getSchema(),
+                valueRequest.getTable(),
+                valueRequest.getColumn(),
+                valueRequest.getValue(),
+                iri
+            );
+            wasCreated = true;
+        }
+        return new MapResponse()
+            .setNode(nodeData)
+            .setValueNode(valueNode)
+            .setRequest(request)
+            .setConcept(ids)
+            .setWasCreated(wasCreated);
+    }
+
+    private MapResponse getMapColumnValueRequestRegex(MapRequest request, boolean wasCreated, MapColumnValueRequest valueRequest, MapNode nodeData, MapValueNode valueNode) throws Exception {
+        Map<String, ConceptIdentifiers> regexMap = dal.getRegexMap(valueNode, valueRequest.getValue());
+        String blob = valueRequest.getValue().getTerm();
+
+        ConceptIdentifiers ids = null;
+
+        for (Map.Entry<String, ConceptIdentifiers> entry : regexMap.entrySet()) {
+            if (blob.matches(entry.getKey())) {
+                ids = entry.getValue();
+                break;
             }
         }
 

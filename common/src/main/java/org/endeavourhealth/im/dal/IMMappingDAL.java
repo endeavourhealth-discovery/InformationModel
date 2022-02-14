@@ -2,6 +2,8 @@ package org.endeavourhealth.im.dal;
 
 import org.endeavourhealth.im.models.mapping.*;
 
+import java.util.Map;
+
 public interface IMMappingDAL {
     MapNode getNode(String provider, String system, String schema, String table, String column, String target) throws Exception;
 
@@ -18,6 +20,8 @@ public interface IMMappingDAL {
     ConceptIdentifiers createLegacyPropertyValueConcept(String provider, String system, String schema, String table, String column, MapValueRequest valueRequest, String propertyName, String value) throws Exception;
 
     ConceptIdentifiers createFormattedValueNodeConcept(String provider, String system, String schema, String table, String column, MapValueRequest value, String iri) throws Exception;
+
+    Map<String, ConceptIdentifiers> getRegexMap(MapValueNode valueNode, MapValueRequest value) throws Exception;
 
 
 

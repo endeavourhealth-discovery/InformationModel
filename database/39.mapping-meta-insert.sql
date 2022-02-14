@@ -30,6 +30,21 @@ FROM map_context_meta m
 
 --
 
+SELECT DISTINCT n.id, c.dbid, 'Regex()'
+FROM map_node_regex_meta m
+         JOIN map_node n ON n.node = m.node
+         LEFT JOIN concept c ON c.id = m.scheme
+WHERE c.id IS NULL;
+
+INSERT IGNORE INTO map_value_node
+(node, code_scheme, `function`)
+SELECT DISTINCT n.id, c.dbid, 'Regex()'
+FROM map_node_regex_meta m
+         JOIN map_node n ON n.node = m.node
+         JOIN concept c ON c.id = m.scheme;
+
+--
+
 SELECT DISTINCT n.id, c.dbid, 'Lookup()'
 FROM map_node_value_meta m
          JOIN map_node n ON n.node = m.node
@@ -80,9 +95,32 @@ FROM map_node_value_meta m
          JOIN concept s ON s.dbid = v.code_scheme AND s.id = m.scheme
          JOIN concept c ON c.id = m.concept;
 
+--
+
+SELECT v.id, m.value, m.regex, m.priority, c.dbid
+FROM map_node_regex_meta m
+         LEFT JOIN map_node n ON n.node = m.node
+         LEFT JOIN map_value_node v ON v.node = n.id
+         LEFT JOIN concept s ON s.dbid = v.code_scheme AND s.id = m.scheme
+         LEFT JOIN concept c ON c.id = m.concept
+WHERE n.node IS NULL
+   OR v.node IS NULL
+   OR s.id IS NULL
+   OR c.id IS NULL;
+
+REPLACE INTO map_value_node_regex
+(value_node, value, regex, priority, concept)
+SELECT v.id, m.value, m.regex, m.priority, c.dbid
+FROM map_node_regex_meta m
+         JOIN map_node n ON n.node = m.node
+         JOIN map_value_node v ON v.node = n.id
+         JOIN concept s ON s.dbid = v.code_scheme AND s.id = m.scheme
+         JOIN concept c ON c.id = m.concept;
+
 -- Clean up
 DROP TABLE IF EXISTS map_context_meta;
 DROP TABLE IF EXISTS map_node_meta;
 DROP TABLE IF EXISTS map_node_value_meta;
+DROP TABLE IF EXISTS map_node_regex_meta;
 DROP TABLE IF EXISTS map_function_value_meta;
 

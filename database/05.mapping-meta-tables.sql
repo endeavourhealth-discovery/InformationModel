@@ -26,6 +26,17 @@ CREATE TEMPORARY TABLE map_node_value_meta (
 ) ENGINE = Memory
   DEFAULT CHARSET = utf8;
 
+DROP TABLE IF EXISTS map_node_regex_meta;
+CREATE TEMPORARY TABLE map_node_regex_meta (
+    node        VARCHAR(200),
+    value       VARCHAR(250),
+    scheme      VARCHAR(150),
+    regex       VARCHAR(250),
+    priority    INT NOT NULL DEFAULT 0,
+    concept     VARCHAR(150)
+) ENGINE = Memory
+  DEFAULT CHARSET = utf8;
+
 DROP TABLE IF EXISTS map_function_value_meta;
 CREATE TEMPORARY TABLE map_function_value_meta (
     node    VARCHAR(200),

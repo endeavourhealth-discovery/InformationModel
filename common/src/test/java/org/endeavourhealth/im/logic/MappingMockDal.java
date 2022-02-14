@@ -6,6 +6,8 @@ import org.endeavourhealth.im.models.mapping.MapNode;
 import org.endeavourhealth.im.models.mapping.MapValueNode;
 import org.endeavourhealth.im.models.mapping.MapValueRequest;
 
+import java.util.Map;
+
 public class MappingMockDal implements IMMappingDAL {
 
     private MapNode getNodeResult;
@@ -17,6 +19,7 @@ public class MappingMockDal implements IMMappingDAL {
     private ConceptIdentifiers getConceptIdentifiersResult;
     private ConceptIdentifiers createLegacyPropertyValueConceptResult;
     private ConceptIdentifiers createFormattedValueNodeConceptResult;
+    private Map<String, ConceptIdentifiers> getRegexMapResult;
 
     public MapNode getGetNodeResult() {
         return getNodeResult;
@@ -99,6 +102,15 @@ public class MappingMockDal implements IMMappingDAL {
         return this;
     }
 
+    public Map<String, ConceptIdentifiers> getGetRegexMapResult() {
+        return getRegexMapResult;
+    }
+
+    public MappingMockDal setGetRegexMapResult(Map<String, ConceptIdentifiers> getRegexMapResult) {
+        this.getRegexMapResult = getRegexMapResult;
+        return this;
+    }
+
     @Override
     public MapNode getNode(String provider, String system, String schema, String table, String column, String target) throws Exception {
         return getNodeResult;
@@ -142,5 +154,10 @@ public class MappingMockDal implements IMMappingDAL {
     @Override
     public ConceptIdentifiers createFormattedValueNodeConcept(String provider, String system, String schema, String table, String column, MapValueRequest value, String iri) throws Exception {
         return createFormattedValueNodeConceptResult;
+    }
+
+    @Override
+    public Map<String, ConceptIdentifiers> getRegexMap(MapValueNode valueNode, MapValueRequest value) throws Exception {
+        return getRegexMapResult;
     }
 }

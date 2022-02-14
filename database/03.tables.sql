@@ -264,6 +264,7 @@ CREATE TABLE concept_tct (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS map_context;
+DROP TABLE IF EXISTS map_value_node_regex;
 DROP TABLE IF EXISTS map_value_node_lookup;
 DROP TABLE IF EXISTS map_value_node;
 DROP TABLE IF EXISTS map_node;
@@ -320,6 +321,22 @@ CREATE TABLE map_value_node_lookup (
                                        value       VARCHAR(250),
                                        concept     INT NOT NULL,
                                        draft       BOOLEAN NOT NULL DEFAULT TRUE,
+
+                                       PRIMARY KEY map_value_node_lookup_pk (id),
+                                       UNIQUE INDEX map_value_node_lookup_uq (value_node, value),
+
+                                       FOREIGN KEY map_value_node_lookup_node_fk(value_node) REFERENCES map_value_node(id)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8;
+
+-- PROPERTY VALUE TYPE REGEX
+CREATE TABLE map_value_node_regex (
+                                       id          INT AUTO_INCREMENT,
+                                       value_node  INT NOT NULL,
+                                       value       VARCHAR(250),
+                                       regex       VARCHAR(250),
+                                       priority    INT NOT NULL DEFAULT 0,
+                                       concept     INT NOT NULL,
 
                                        PRIMARY KEY map_value_node_lookup_pk (id),
                                        UNIQUE INDEX map_value_node_lookup_uq (value_node, value),

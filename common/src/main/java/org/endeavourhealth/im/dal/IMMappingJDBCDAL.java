@@ -4,9 +4,7 @@ import org.endeavourhealth.im.logic.MappingLogic;
 import org.endeavourhealth.im.models.mapping.*;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class IMMappingJDBCDAL implements IMMappingDAL {
@@ -298,6 +296,38 @@ public class IMMappingJDBCDAL implements IMMappingDAL {
             .setIri(iri)
             .setCode(value.getCode())
             .setScheme(value.getScheme());
+    }
+
+    @Override
+    public Map<String, ConceptIdentifiers> getRegexMap(MapValueNode valueNode, MapValueRequest value) throws Exception {
+        String sql = "SELECT r.regex, c.dbid, c.id, c.code, s.id AS scheme\n" +
+            "FROM map_value_node_regex r\n" +
+            "JOIN concept c ON c.dbid = r.concept\n" +
+            "LEFT JOIN concept s ON s.dbid = c.scheme\n" +
+            "WHERE r.value_node = ?\n" +
+            "AND r.value = ?\n" +
+            "ORDER BY r.priority\n";
+
+        Map<String, ConceptIdentifiers> result = new LinkedHashMap<>();
+
+        try (Connection conn = ConnectionPool.getInstance().pop();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, valueNode.getId());
+            stmt.setString(2, value.getCode());
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next())
+                    result.put(rs.getString("regex"),
+                        new ConceptIdentifiers()
+                            .setDbid(rs.getInt("dbid"))
+                            .setIri(rs.getString("id"))
+                            .setCode(rs.getString("code"))
+                            .setScheme(rs.getString("scheme"))
+                    );
+            }
+        }
+
+        return result;
     }
 
     private ConceptIdentifiers getNodeConcept(String node) throws SQLException {
