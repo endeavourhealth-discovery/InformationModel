@@ -367,10 +367,16 @@ public class MappingLogicTest {
 
         MapRequest request = new MapRequest()
             .setMapColumnValueRequest(
-                new MapColumnValueRequest()
-                    .setValue(new MapValueRequest()
-                        .setTerm("Positive test result")
-                    )
+                new MapColumnValueRequest(
+                    "CM_Org_Barts",         // Publisher/Org
+                    "CM_Sys_Cerner",        // System
+                    "CSV",                  // Scheme/Format
+                    "CLEVE",                // File/Table
+                    "EVENT_CD",             // Field/Column
+                    "316081992",            // Code
+                    "BartsCerner",          // Scheme
+                    "Positive test result"  // Blob text
+                )
             );
 
         MapResponse actual = mappingLogic.getMapping(request);
@@ -398,10 +404,15 @@ public class MappingLogicTest {
 
         MapRequest request = new MapRequest()
             .setMapColumnValueRequest(
-                new MapColumnValueRequest()
-                    .setValue(new MapValueRequest()
-                        .setTerm("Negative test result")
-                    )
+                new MapColumnValueRequest(
+                    "CM_Org_Barts",
+                    "CM_Sys_Cerner",
+                    "CSV",
+                    "CLEVE",
+                    "EVENT_CD",
+                    "316081992",
+                    "BartsCerner",
+                    "Negative test result")
             );
 
         MapResponse actual = mappingLogic.getMapping(request);
@@ -429,10 +440,15 @@ public class MappingLogicTest {
 
         MapRequest request = new MapRequest()
             .setMapColumnValueRequest(
-                new MapColumnValueRequest()
-                    .setValue(new MapValueRequest()
-                        .setTerm("Deleted test result")
-                    )
+                new MapColumnValueRequest(
+                    "CM_Org_Barts",
+                    "CM_Sys_Cerner",
+                    "CSV",
+                    "CLEVE",
+                    "EVENT_CD",
+                    "316081992",
+                    "BartsCerner",
+                    "Deleted test result")
             );
 
         MapResponse actual = mappingLogic.getMapping(request);

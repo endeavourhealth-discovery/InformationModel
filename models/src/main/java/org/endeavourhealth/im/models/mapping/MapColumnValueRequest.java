@@ -34,6 +34,15 @@ public class MapColumnValueRequest {
         this.value = new MapValueRequest(term);
     }
 
+    public MapColumnValueRequest(String provider, String system, String schema, String table, String column, String code, String scheme, String term) {
+        this.provider = provider;
+        this.system = system;
+        this.schema = schema;
+        this.table = table;
+        this.column = column;
+        this.value = new MapValueRequest(code, scheme, term);
+    }
+
     @JsonProperty("Provider")
     public String getProvider() {
         return provider;

@@ -18,6 +18,12 @@ public class MapValueRequest {
         this.term = term;
     }
 
+    public MapValueRequest(String code, String scheme, String term) {
+        this.scheme = scheme;
+        this.code = code;
+        this.term = term;
+    }
+
     @JsonProperty("CodeScheme")
     public String getScheme() {
         return scheme;
