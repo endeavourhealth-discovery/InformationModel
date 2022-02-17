@@ -19,17 +19,17 @@ VALUES
 
 -- Context
 INSERT INTO map_context_meta (provider, `system`, `schema`, `table`, `column`, node)
-VALUES ('CM_Org_Barts', 'CM_Sys_Cerner', null, null, 'vitt', '/BRTS/CRNR/VITT');
+VALUES ('CM_Org_Barts', 'CM_Sys_Cerner', 'CDE', 'CLEVE', 'EVENT_CD', '/BRTS/CRNR/CDE/CLEVE/EVENT_CD');
 
 -- Property
 INSERT INTO map_node_meta (node, concept)
-VALUES ('/BRTS/CRNR/VITT', 'SN_103847006');   -- Platelet factor 4 assay (procedure)
+VALUES ('/BRTS/CRNR/CDE/CLEVE/EVENT_CD', 'SN_103847006');   -- Platelet factor 4 assay (procedure)
 
 -- Value maps
 INSERT INTO map_node_regex_meta
 (node, value, scheme, regex, concept)
 VALUES
-('/BRTS/CRNR/VITT', '316081992', 'BartsCerner', '^Positive(.*)', 'CM_PF4_Positive'),
-('/BRTS/CRNR/VITT', '316081992', 'BartsCerner', '^Negative(.*)', 'CM_PF4_Negative'),
-('/BRTS/CRNR/VITT', '316081942', 'BartsCerner', '^Positive$', 'CM_PF4_Positive'),
-('/BRTS/CRNR/VITT', '316081942', 'BartsCerner', '^Negative$', 'CM_PF4_Negative');
+('/BRTS/CRNR/CDE/CLEVE/EVENT_CD', '316081992', 'BartsCerner', '^Positive(.*)', 'CM_PF4_Positive'),
+('/BRTS/CRNR/CDE/CLEVE/EVENT_CD', '316081992', 'BartsCerner', '^Negative(.*)', 'CM_PF4_Negative'),
+('/BRTS/CRNR/CDE/CLEVE/EVENT_CD', '316081942', 'BartsCerner', '^Positive$', 'CM_PF4_Positive'),
+('/BRTS/CRNR/CDE/CLEVE/EVENT_CD', '316081942', 'BartsCerner', '^Negative$', 'CM_PF4_Negative');
