@@ -339,7 +339,7 @@ CREATE TABLE map_value_node_regex (
                                        concept     INT NOT NULL,
 
                                        PRIMARY KEY map_value_node_lookup_pk (id),
-                                       UNIQUE INDEX map_value_node_lookup_uq (value_node, value),
+                                       INDEX map_value_node_lookup_uq (value_node, value),
 
                                        FOREIGN KEY map_value_node_lookup_node_fk(value_node) REFERENCES map_value_node(id)
 ) ENGINE = InnoDB

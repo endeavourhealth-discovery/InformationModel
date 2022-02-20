@@ -438,3 +438,28 @@ VALUES
     ('/KINGS/PIMS/TRTMNT_FNCTN', '811', 'KingsPIMS', 'CM_TrtmntFnc811'),
     ('/KINGS/PIMS/TRTMNT_FNCTN', '822', 'KingsPIMS', 'CM_TrtmntFnc822'),
     ('/KINGS/PIMS/TRTMNT_FNCTN', '840', 'KingsPIMS', 'CM_TrtmntFnc840');
+
+-- ******************** Language ********************
+
+-- Concepts
+SELECT @scm := dbid FROM concept WHERE id = 'KingsPIMS';
+
+INSERT IGNORE INTO concept
+(document, id, scheme, code, name, description)
+VALUES
+(1, 'KC_Lang_NSP', @scm, 'KC_Lang_NSP', 'Not specified', 'Not specified');
+
+-- Context
+INSERT INTO map_context_meta (provider, `system`, `schema`, `table`, `column`, node)
+VALUES ('CM_Org_Kings', 'CM_Sys_PIMS', null, null, 'language', '/KINGS/PIMS/LNGG');    -- Local
+
+-- Property
+INSERT INTO map_node_meta (node, concept)
+VALUES ('/KINGS/PIMS/LNGG', 'DM_language');
+
+-- Value maps
+INSERT INTO map_node_value_meta
+(node, value, scheme, concept)
+VALUES
+('/KINGS/PIMS/LNGG', 'NSP', 'KingsPIMS', 'KC_Lang_NSP'),
+('/KINGS/PIMS/LNGG', 'CA', 'KingsPIMS', 'FHIR_LANG_ca');
