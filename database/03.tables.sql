@@ -191,6 +191,18 @@ CREATE TABLE value_set
     UNIQUE INDEX value_set_id (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS value_set_member;
+CREATE TABLE value_set_member
+(
+    dbid        INT AUTO_INCREMENT      COMMENT 'Value set member DBID',
+    value_set   INT NOT NULL ,
+    member      INT NOT NULL ,
+
+    PRIMARY KEY value_set_member_pk (dbid),
+    FOREIGN KEY value_set_member_fk (value_set) REFERENCES value_set (dbid),
+    FOREIGN KEY value_set_member_fk (member)    REFERENCES concept (dbid)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 DROP TABLE IF EXISTS cohort;
 CREATE TABLE cohort
 (

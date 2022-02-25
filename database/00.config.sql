@@ -8,6 +8,11 @@ VALUES
    "username" : "xxxxxxxxxxx",
    "password" : "xxxxxxxxxxx"
 }'),
+('IMv2Receiver', 'database', '{
+   "url" : "jdbc:mysql://localhost:3306/information-model?useSSL=false",
+   "username" : "xxxxxxxxxxx",
+   "password" : "xxxxxxxxxxx"
+}'),
 ('information-model', 'api-internal', '{
 	"auth-server-url" : "https://devauth.discoverydataservice.net/auth",
 	"im-url" : "xxxxxxxxxx",
@@ -19,6 +24,12 @@ VALUES
 ('IMv1Sender','S3Config','{
     "region": "eu-west-2",
     "bucket": "imv1sender",
+    "accessKey": "xxxxxxxxxxx",
+    "secretKey": "xxxxxxxxxxx"
+}'),
+('IMv2Receiver','S3Config','{
+    "region": "eu-west-2",
+    "bucket": "im-inbound-dev",
     "accessKey": "xxxxxxxxxxx",
     "secretKey": "xxxxxxxxxxx"
 }');
