@@ -14,6 +14,7 @@
     <module>api</module>
     <module>TRUDImport</module>
     <module>ConceptExport</module>
+    <module>IMv2Receiver</module>
   </modules>
 
   <properties>
