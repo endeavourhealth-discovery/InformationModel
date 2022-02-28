@@ -322,8 +322,8 @@ CREATE TABLE map_value_node_lookup (
                                        concept     INT NOT NULL,
                                        draft       BOOLEAN NOT NULL DEFAULT TRUE,
 
-                                       PRIMARY KEY map_value_node_lookup_pk (id),
-                                       UNIQUE INDEX map_value_node_lookup_uq (value_node, value),
+                                       PRIMARY KEY map_value_node_regex_pk (id),
+                                       UNIQUE INDEX map_value_node_regex_uq (value_node, value, regex),
 
                                        FOREIGN KEY map_value_node_lookup_node_fk(value_node) REFERENCES map_value_node(id)
 ) ENGINE = InnoDB
@@ -341,7 +341,7 @@ CREATE TABLE map_value_node_regex (
                                        PRIMARY KEY map_value_node_lookup_pk (id),
                                        INDEX map_value_node_lookup_uq (value_node, value),
 
-                                       FOREIGN KEY map_value_node_lookup_node_fk(value_node) REFERENCES map_value_node(id)
+                                       FOREIGN KEY map_value_node_regex_node_fk(value_node) REFERENCES map_value_node(id)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8;
 
