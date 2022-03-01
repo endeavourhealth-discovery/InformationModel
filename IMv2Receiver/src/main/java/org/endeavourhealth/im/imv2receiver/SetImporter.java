@@ -1,6 +1,5 @@
 package org.endeavourhealth.im.imv2receiver;
 
-import com.amazonaws.AmazonServiceException;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
@@ -13,7 +12,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.endeavourhealth.common.config.ConfigManager;
 import org.endeavourhealth.common.config.ConfigManagerException;
-import org.endeavourhealth.im.dal.ConnectionPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,18 +26,23 @@ import java.util.*;
 
 public class SetImporter {
     private static final Logger LOG = LoggerFactory.getLogger(SetImporter.class);
+    private String bucket = "im-inbound-dev";
+    private String region = "eu-west-2";
     S3ObjectInputStream inputStream = null;
 
     public void getSetFromIM2() throws ConfigManagerException, SQLException, IOException {
         ConfigManager.Initialize("IMv2Receiver");
-        getFilesFromS3();
+
+        AmazonS3 s3 = getS3Client();
+
+        List<String> filenames = getFileNamesFromS3(s3);
+
+        sortFileNames(filenames);
+
+        importFiles(s3, filenames);
     }
 
-    private void getFilesFromS3() throws IOException, SQLException {
-        List<String> filenames = new ArrayList<>();
-
-        String bucket = "im-inbound-dev";
-        String region = "eu-west-2";
+    private AmazonS3 getS3Client() throws IOException {
         String accessKey = "";
         String secretKey = "";
 
@@ -58,39 +61,35 @@ public class SetImporter {
         }
 
         BasicAWSCredentials awsCredentials = new BasicAWSCredentials(accessKey, secretKey);
-        final AmazonS3 s3 = AmazonS3ClientBuilder
-                .standard()
-                .withRegion(region)
-                .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
-                .build();
+        return AmazonS3ClientBuilder
+            .standard()
+            .withRegion(region)
+            .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
+            .build();
+    }
+
+    private List<String> getFileNamesFromS3(AmazonS3 s3) {
+        List<String> filenames = new ArrayList<>();
 
         ObjectListing objectsList = listObjects(bucket, s3);
 
         for(S3ObjectSummary os : objectsList.getObjectSummaries()) {
             filenames.add(os.getKey());
         }
-        sortFileNames(filenames);
 
-        for(String filename:filenames){
-            inputStream = DownloadFile(bucket, s3, filename);
-            readFile(inputStream);
-            DeleteFile(bucket, s3, filename);
-        }
-
+        return filenames;
     }
 
-    public ObjectListing listObjects(String bucket, AmazonS3 s3) {
+    protected ObjectListing listObjects(String bucket, AmazonS3 s3) {
         ObjectListing objectsList = new ObjectListing();
-        try{
-            LOG.debug("Listing all objects in S3");
-            objectsList = s3.listObjects(bucket);
-        } catch (AmazonServiceException e) {
-            LOG.error(e.getErrorMessage());
-        }
+
+        LOG.debug("Listing all objects in S3");
+        objectsList = s3.listObjects(bucket);
+
         return objectsList;
     }
 
-    public void sortFileNames(List<String> filenames){
+    protected void sortFileNames(List<String> filenames){
         filenames.sort(Comparator.comparing(this::getTimestamp));
     }
 
@@ -98,25 +97,18 @@ public class SetImporter {
         return filename.substring(0, filename.indexOf("_"));
     }
 
-    public S3ObjectInputStream DownloadFile(String bucket, AmazonS3 s3, String filename) {
-        try{
-            LOG.debug("Downloading " + filename + " from S3");
-            S3Object s3object = s3.getObject(bucket, filename);
-            inputStream = s3object.getObjectContent();
-        } catch (AmazonServiceException e) {
-            LOG.error(e.getErrorMessage());
+    private void importFiles(AmazonS3 s3, List<String> filenames) throws IOException, SQLException {
+        for(String filename: filenames){
+            inputStream = DownloadFile(bucket, s3, filename);
+            readFile(inputStream);
+            DeleteFile(bucket, s3, filename);
         }
-        return inputStream;
-
     }
 
-    private void DeleteFile(String bucket, AmazonS3 s3, String filename) {
-        try{
-            LOG.debug("Deleting " + filename + " from S3");
-            s3.deleteObject(bucket, filename);
-        } catch (AmazonServiceException e) {
-            LOG.error(e.getErrorMessage());
-        }
+    protected S3ObjectInputStream DownloadFile(String bucket, AmazonS3 s3, String filename) {
+        LOG.debug("Downloading " + filename + " from S3");
+        S3Object s3object = s3.getObject(bucket, filename);
+        return s3object.getObjectContent();
     }
 
     private void readFile(S3ObjectInputStream inputStream) throws IOException, SQLException {
@@ -176,4 +168,8 @@ public class SetImporter {
         }
     }
 
+    private void DeleteFile(String bucket, AmazonS3 s3, String filename) {
+        LOG.debug("Deleting " + filename + " from S3");
+        s3.deleteObject(bucket, filename);
+    }
 }
