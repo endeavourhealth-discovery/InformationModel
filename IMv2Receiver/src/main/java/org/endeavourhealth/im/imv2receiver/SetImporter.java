@@ -100,7 +100,7 @@ public class SetImporter {
     private void importFiles(AmazonS3 s3, List<String> filenames) throws IOException, SQLException {
         for(String filename: filenames){
             inputStream = DownloadFile(bucket, s3, filename);
-            readFile(inputStream);
+            processStream(inputStream);
             DeleteFile(bucket, s3, filename);
         }
     }
@@ -111,19 +111,31 @@ public class SetImporter {
         return s3object.getObjectContent();
     }
 
-    private void readFile(S3ObjectInputStream inputStream) throws IOException, SQLException {
+    private void processStream(S3ObjectInputStream inputStream) throws IOException, SQLException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        reader.readLine();      // NOSONAR - Skip header
         String line = reader.readLine();
+        String currentSetId="";
+        int valueSetDbid=0;
         while (line != null && !line.isEmpty()){
             String[] fields = line.split("\t");
             String setId = fields[0];
             String setName = fields[1];
             int memberDbid = Integer.parseInt(fields[2]);
-            int valueSetDbid = getValueSetDbid(setId);
-            if(valueSetDbid == 0){
-                insertValueSet(setId,setName);
+
+            // Are we onto a different set?
+            if (!currentSetId.equals(setId)) {
+                currentSetId = setId;
+                // Get/create set ID
                 valueSetDbid = getValueSetDbid(setId);
+                if (valueSetDbid == 0) {
+                    insertValueSet(setId, setName);
+                    valueSetDbid = getValueSetDbid(setId);
+                }
+                // Delete any existing members
+                deleteMembers(valueSetDbid);
             }
+
             insertValueSetMember(valueSetDbid, memberDbid);
             line = reader.readLine();
         }
@@ -157,9 +169,19 @@ public class SetImporter {
         }
     }
 
+    private void deleteMembers(int setDbid) throws SQLException {
+
+        String sql = "DELETE FROM value_set_member WHERE value_set = ?";
+        try(Connection conn = Objects.requireNonNull(ConnectionPool.getInstance()).pop();
+            PreparedStatement stmt = conn.prepareStatement(sql)){
+            stmt.setInt(1, setDbid);
+            stmt.executeUpdate();
+        }
+    }
+
     private void insertValueSetMember(int setDbid, int memberDbid) throws SQLException {
 
-        String sql = "INSERT INTO value_set_member (value_set, member) VALUES (?, ?)";
+        String sql = "INSERT INTO value_set_member (value_set, concept) VALUES (?, ?)";
         try(Connection conn = Objects.requireNonNull(ConnectionPool.getInstance()).pop();
             PreparedStatement stmt = conn.prepareStatement(sql)){
             stmt.setInt(1, setDbid);
