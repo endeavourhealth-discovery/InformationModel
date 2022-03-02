@@ -148,6 +148,15 @@ INSERT INTO map_context_meta (provider, `system`, `schema`, `table`, `column`, n
 VALUES ('CM_Org_LNWH', 'CM_Sys_Silverlink', null, null, 'discharge_destination_code', '/CDS/INPTNT/DSCHRG_DSTNTN');
 
 -- ******************** Treatment Function ********************
+-- ************ MISSING SPECIALITIES ****************
+-- Concepts
+SELECT @scm := dbid FROM concept WHERE id = 'CM_DiscoveryCode';
+
+INSERT IGNORE INTO concept
+(document, id, scheme, code, name, description)
+VALUES
+(1, 'CM_TrtmntFnc821', @scm, 'CM_TrtmntFnc821', 'Blood Transfusion', 'Blood Transfusion'),
+(1, 'CM_TrtmntFnc833', @scm, 'CM_TrtmntFnc833', 'Medical Microbiology', 'Medical Microbiology');
 
 -- Context
 INSERT INTO map_context_meta (provider, `system`, `schema`, `table`, `column`, node)
@@ -155,7 +164,7 @@ VALUES ('CM_Org_LNWH', 'CM_Sys_Silverlink', null, null, 'treatment_function_code
 
 -- Property
 INSERT INTO map_node_meta (node, concept)
-VALUES ('LNWH/SLVRLNK/TRTMNT_FNCTN', 'DM_treatmentFunctionAdmit');
+VALUES ('/LNWH/SLVRLNK/TRTMNT_FNCTN', 'DM_treatmentFunctionAdmit');
 
 -- Value maps
 INSERT INTO map_node_value_meta
@@ -383,32 +392,32 @@ VALUES ('/LNWH/SLVRLNK/LNGG', 'DM_language');
 INSERT INTO map_node_value_meta
 (node, value, scheme, concept)
 VALUES
-('LNWH/SLVRLNK/LNGG', 'ARA', 'LNWHSilverlink', 'FHIR_LANG_ar'),
-('LNWH/SLVRLNK/LNGG', 'BENG', 'LNWHSilverlink', 'FHIR_LANG_bn'),
-('LNWH/SLVRLNK/LNGG', 'GER', 'LNWHSilverlink', 'FHIR_LANG_de'),
-('LNWH/SLVRLNK/LNGG', 'GRE', 'LNWHSilverlink', 'FHIR_LANG_el'),
-('LNWH/SLVRLNK/LNGG', 'ENG', 'LNWHSilverlink', 'FHIR_LANG_en'),
-('LNWH/SLVRLNK/LNGG', 'SPA', 'LNWHSilverlink', 'FHIR_LANG_es'),
-('LNWH/SLVRLNK/LNGG', 'FRE', 'LNWHSilverlink', 'FHIR_LANG_fr'),
-('LNWH/SLVRLNK/LNGG', 'GUJ', 'LNWHSilverlink', 'FHIR_LANG_gu'),
-('LNWH/SLVRLNK/LNGG', 'HEB', 'LNWHSilverlink', 'FHIR_LANG_he'),
-('LNWH/SLVRLNK/LNGG', 'HIN', 'LNWHSilverlink', 'FHIR_LANG_hi'),
-('LNWH/SLVRLNK/LNGG', 'ITI', 'LNWHSilverlink', 'FHIR_LANG_it'),
-('LNWH/SLVRLNK/LNGG', 'JAP', 'LNWHSilverlink', 'FHIR_LANG_ja'),
-('LNWH/SLVRLNK/LNGG', 'KOR', 'LNWHSilverlink', 'FHIR_LANG_ko'),
-('LNWH/SLVRLNK/LNGG', 'DUT', 'LNWHSilverlink', 'FHIR_LANG_nl'),
-('LNWH/SLVRLNK/LNGG', 'PUN', 'LNWHSilverlink', 'FHIR_LANG_pa'),
-('LNWH/SLVRLNK/LNGG', 'POL', 'LNWHSilverlink', 'FHIR_LANG_pl'),
-('LNWH/SLVRLNK/LNGG', 'PASH', 'LNWHSilverlink', 'FHIR_LANG_ps'),
-('LNWH/SLVRLNK/LNGG', 'POR', 'LNWHSilverlink', 'FHIR_LANG_pt'),
-('LNWH/SLVRLNK/LNGG', 'RUSS', 'LNWHSilverlink', 'FHIR_LANG_ru'),
-('LNWH/SLVRLNK/LNGG', 'SING', 'LNWHSilverlink', 'FHIR_LANG_si'),
-('LNWH/SLVRLNK/LNGG', 'SOM', 'LNWHSilverlink', 'FHIR_LANG_so'),
-('LNWH/SLVRLNK/LNGG', 'ALB', 'LNWHSilverlink', 'FHIR_LANG_sq'),
-('LNWH/SLVRLNK/LNGG', 'SWAH', 'LNWHSilverlink', 'FHIR_LANG_sw'),
-('LNWH/SLVRLNK/LNGG', 'TAM', 'LNWHSilverlink', 'FHIR_LANG_ta'),
-('LNWH/SLVRLNK/LNGG', 'TURK', 'LNWHSilverlink', 'FHIR_LANG_tr'),
-('LNWH/SLVRLNK/LNGG', 'URD', 'LNWHSilverlink', 'FHIR_LANG_ur'),
-('LNWH/SLVRLNK/LNGG', 'VIE', 'LNWHSilverlink', 'FHIR_LANG_vi'),
-('LNWH/SLVRLNK/LNGG', 'DBSL', 'LNWHSilverlink', 'FHIR_LANG_q4');
+('/LNWH/SLVRLNK/LNGG', 'ARA', 'LNWHSilverlink', 'FHIR_LANG_ar'),
+('/LNWH/SLVRLNK/LNGG', 'BENG', 'LNWHSilverlink', 'FHIR_LANG_bn'),
+('/LNWH/SLVRLNK/LNGG', 'GER', 'LNWHSilverlink', 'FHIR_LANG_de'),
+('/LNWH/SLVRLNK/LNGG', 'GRE', 'LNWHSilverlink', 'FHIR_LANG_el'),
+('/LNWH/SLVRLNK/LNGG', 'ENG', 'LNWHSilverlink', 'FHIR_LANG_en'),
+('/LNWH/SLVRLNK/LNGG', 'SPA', 'LNWHSilverlink', 'FHIR_LANG_es'),
+('/LNWH/SLVRLNK/LNGG', 'FRE', 'LNWHSilverlink', 'FHIR_LANG_fr'),
+('/LNWH/SLVRLNK/LNGG', 'GUJ', 'LNWHSilverlink', 'FHIR_LANG_gu'),
+('/LNWH/SLVRLNK/LNGG', 'HEB', 'LNWHSilverlink', 'FHIR_LANG_he'),
+('/LNWH/SLVRLNK/LNGG', 'HIN', 'LNWHSilverlink', 'FHIR_LANG_hi'),
+('/LNWH/SLVRLNK/LNGG', 'ITI', 'LNWHSilverlink', 'FHIR_LANG_it'),
+('/LNWH/SLVRLNK/LNGG', 'JAP', 'LNWHSilverlink', 'FHIR_LANG_ja'),
+('/LNWH/SLVRLNK/LNGG', 'KOR', 'LNWHSilverlink', 'FHIR_LANG_ko'),
+('/LNWH/SLVRLNK/LNGG', 'DUT', 'LNWHSilverlink', 'FHIR_LANG_nl'),
+('/LNWH/SLVRLNK/LNGG', 'PUN', 'LNWHSilverlink', 'FHIR_LANG_pa'),
+('/LNWH/SLVRLNK/LNGG', 'POL', 'LNWHSilverlink', 'FHIR_LANG_pl'),
+('/LNWH/SLVRLNK/LNGG', 'PASH', 'LNWHSilverlink', 'FHIR_LANG_ps'),
+('/LNWH/SLVRLNK/LNGG', 'POR', 'LNWHSilverlink', 'FHIR_LANG_pt'),
+('/LNWH/SLVRLNK/LNGG', 'RUSS', 'LNWHSilverlink', 'FHIR_LANG_ru'),
+('/LNWH/SLVRLNK/LNGG', 'SING', 'LNWHSilverlink', 'FHIR_LANG_si'),
+('/LNWH/SLVRLNK/LNGG', 'SOM', 'LNWHSilverlink', 'FHIR_LANG_so'),
+('/LNWH/SLVRLNK/LNGG', 'ALB', 'LNWHSilverlink', 'FHIR_LANG_sq'),
+('/LNWH/SLVRLNK/LNGG', 'SWAH', 'LNWHSilverlink', 'FHIR_LANG_sw'),
+('/LNWH/SLVRLNK/LNGG', 'TAM', 'LNWHSilverlink', 'FHIR_LANG_ta'),
+('/LNWH/SLVRLNK/LNGG', 'TURK', 'LNWHSilverlink', 'FHIR_LANG_tr'),
+('/LNWH/SLVRLNK/LNGG', 'URD', 'LNWHSilverlink', 'FHIR_LANG_ur'),
+('/LNWH/SLVRLNK/LNGG', 'VIE', 'LNWHSilverlink', 'FHIR_LANG_vi'),
+('/LNWH/SLVRLNK/LNGG', 'DBSL', 'LNWHSilverlink', 'FHIR_LANG_q4');
 

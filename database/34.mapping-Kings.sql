@@ -232,7 +232,7 @@ VALUES
 
 -- Context
 INSERT INTO map_context_meta (provider, `system`, `schema`, `table`, `column`, node)
-VALUES ('CM_Org_Kings', 'CM_Sys_PIMS', null, null, 'patient_class', '/KINGS/PIMS/ENCNTR_TYP');    -- Local
+VALUES ('CM_Org_Kings', 'CM_Sys_PIMS', null, null, 'encounter_type', '/KINGS/PIMS/ENCNTR_TYP');    -- Local
 
 -- Property
 INSERT INTO map_node_meta (node, concept)

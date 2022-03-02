@@ -132,7 +132,15 @@ INSERT INTO map_context_meta (provider, `system`, `schema`, `table`, `column`, n
 VALUES ('CM_Org_THH', 'CM_Sys_Silverlink', null, null, 'discharge_destination_code', '/CDS/INPTNT/DSCHRG_DSTNTN');
 
 -- ******************** Treatment Function ********************
--- ************ TODO: TREATMENT FUNCTION CODES VS SPECIALITIES ****************
+-- ************ MISSING SPECIALITIES ****************
+-- Concepts
+SELECT @scm := dbid FROM concept WHERE id = 'CM_DiscoveryCode';
+
+INSERT IGNORE INTO concept
+(document, id, scheme, code, name, description)
+VALUES
+(1, 'CM_TrtmntFnc960', @scm, 'CM_TrtmntFnc960', 'Allied Health Professional', 'Allied Health Professional'),
+(1, 'CM_TrtmntFnc990', @scm, 'CM_TrtmntFnc990', 'Joint Consultant Clinics', 'Joint Consultant Clinics');
 
 -- Context
 INSERT INTO map_context_meta (provider, `system`, `schema`, `table`, `column`, node)
@@ -147,12 +155,12 @@ INSERT INTO map_node_value_meta
 (node, value, scheme, concept)
 VALUES
 ('/THH/SLVRLNK/TRTMNT_FNCTN', 'ANCPAED', 'THHSilverlink', 'CM_TrtmntFnc420'),
-('/THH/SLVRLNK/TRTMNT_FNCTN', 'FTDIAG', 'THHSilverlink', 'CM_TrtmntFnc960');    -- TODO: 960 is speciality NOT treatment function code
+('/THH/SLVRLNK/TRTMNT_FNCTN', 'FTDIAG', 'THHSilverlink', 'CM_TrtmntFnc960');
 
 -- ******************** Language ********************
 
 -- Concepts
-    SELECT @scm := dbid FROM concept WHERE id = 'THHSilverlink';
+SELECT @scm := dbid FROM concept WHERE id = 'THHSilverlink';
 
 INSERT IGNORE INTO concept
 (document, id, scheme, code, name, description)

@@ -18,7 +18,7 @@ CREATE TABLE map_node_meta(
   DEFAULT CHARSET = utf8;
 
 DROP TABLE IF EXISTS map_node_value_meta;
-CREATE TEMPORARY TABLE map_node_value_meta (
+CREATE TABLE map_node_value_meta (
     node    VARCHAR(200),
     value   VARCHAR(250),
     scheme  VARCHAR(150),
@@ -27,7 +27,7 @@ CREATE TEMPORARY TABLE map_node_value_meta (
   DEFAULT CHARSET = utf8;
 
 DROP TABLE IF EXISTS map_node_regex_meta;
-CREATE TEMPORARY TABLE map_node_regex_meta (
+CREATE TABLE map_node_regex_meta (
     node        VARCHAR(200),
     value       VARCHAR(250),
     scheme      VARCHAR(150),
@@ -38,7 +38,7 @@ CREATE TEMPORARY TABLE map_node_regex_meta (
   DEFAULT CHARSET = utf8;
 
 DROP TABLE IF EXISTS map_function_value_meta;
-CREATE TEMPORARY TABLE map_function_value_meta (
+CREATE TABLE map_function_value_meta (
     node    VARCHAR(200),
     scheme  VARCHAR(150),
     `function`  VARCHAR(200)
