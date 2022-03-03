@@ -2,7 +2,9 @@ version: 0.0
 os: linux
 files:
   - source: /api/target/api
-    destination: //opt/tomcat/webapps/information-model
+    destination: /opt/tomcat/webapps/information-model
+  - source: /IMv2Receiver/target/IMv2Receiver.jar
+    destination: /opt/IMv2Receiver
 hooks:
   BeforeInstall:
     - location: aws_scripts/cleanup
