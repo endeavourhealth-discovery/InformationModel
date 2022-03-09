@@ -40,6 +40,8 @@ public class SetImporter {
         sortFileNames(filenames);
 
         importFiles(s3, filenames);
+
+        LOG.debug("Done");
     }
 
     private AmazonS3 getS3Client() throws IOException {
@@ -157,7 +159,7 @@ public class SetImporter {
 
             insertValueSetMember(vsmInsert, valueSetDbid, memberDbid);
 
-            if (setCount++ % 5000 == 0)
+            if (++setCount % 5000 == 0)
                 LOG.debug("Imported {} members", setCount);
 
             line = reader.readLine();
