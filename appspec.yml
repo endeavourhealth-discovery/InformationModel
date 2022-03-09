@@ -4,7 +4,7 @@ files:
   - source: /api/target/api
     destination: /opt/tomcat/webapps/information-model
   - source: /IMv2Receiver/target/IMv2Receiver.jar
-    destination: /opt/IMv2Receiver
+    destination: /opt/IMv2Receiver/IMv2Receiver.jar
 hooks:
   BeforeInstall:
     - location: aws_scripts/cleanup
