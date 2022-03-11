@@ -104,7 +104,7 @@ public class SetImporter {
              PreparedStatement vsSelect = conn.prepareStatement("SELECT v.dbid FROM value_set v WHERE v.id = ?");
              PreparedStatement vsInsert = conn.prepareStatement("INSERT INTO value_set (id, name) VALUES (?, ?)");
              PreparedStatement vsmDelete = conn.prepareStatement("DELETE FROM value_set_member WHERE value_set = ?");
-             PreparedStatement vsmInsert = conn.prepareStatement("INSERT INTO value_set_member (value_set, concept) VALUES (?, ?)")
+             PreparedStatement vsmInsert = conn.prepareStatement("INSERT INTO value_set_member (value_set, concept) SELECT ?, dbid FROM concept WHERE id = ?")
         ) {
             for (String filename : filenames) {
                 inputStream = DownloadFile(bucket, s3, filename);
@@ -136,7 +136,7 @@ public class SetImporter {
             String[] fields = line.split("\t");
             String setId = fields[0];
             String setName = fields[1];
-            int memberDbid = Integer.parseInt(fields[2]);
+            String memberId = fields[2];
 
             // Are we onto a different set?
             if (!currentSetId.equals(setId)) {
@@ -157,7 +157,7 @@ public class SetImporter {
                 deleteMembers(vsmDelete, valueSetDbid);
             }
 
-            insertValueSetMember(vsmInsert, valueSetDbid, memberDbid);
+            insertValueSetMember(vsmInsert, valueSetDbid, memberId);
 
             if (++setCount % 5000 == 0)
                 LOG.debug("Imported {} members", setCount);
@@ -191,9 +191,9 @@ public class SetImporter {
         vsmDelete.executeUpdate();
     }
 
-    private void insertValueSetMember(PreparedStatement vsmInsert, int setDbid, int memberDbid) throws SQLException {
+    private void insertValueSetMember(PreparedStatement vsmInsert, int setDbid, String memberId) throws SQLException {
         vsmInsert.setInt(1, setDbid);
-        vsmInsert.setInt(2, memberDbid);
+        vsmInsert.setString(2, memberId);
         vsmInsert.executeUpdate();
     }
 
