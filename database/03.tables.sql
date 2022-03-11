@@ -177,32 +177,6 @@ CREATE TABLE data_type
 
 -- ------------------------------------------------------------------------------------------
 
-DROP TABLE IF EXISTS value_set;
-CREATE TABLE value_set
-(
-    dbid        INT AUTO_INCREMENT      COMMENT 'Value set DBID',
-    data        JSON NOT NULL           COMMENT 'Value set definition',
-
-    -- Exposed (know) JSON properties
-    id VARCHAR(140) COLLATE utf8_bin    GENERATED ALWAYS AS (`data` ->> '$.id') STORED NOT NULL,
-    name VARCHAR(255)                   GENERATED ALWAYS AS (`data` ->> '$.name') VIRTUAL,
-
-    PRIMARY KEY value_set_pk (dbid),
-    UNIQUE INDEX value_set_id (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS value_set_member;
-CREATE TABLE value_set_member
-(
-    dbid        INT AUTO_INCREMENT      COMMENT 'Value set member DBID',
-    value_set   INT NOT NULL ,
-    member      INT NOT NULL ,
-
-    PRIMARY KEY value_set_member_pk (dbid),
-    FOREIGN KEY value_set_member_fk (value_set) REFERENCES value_set (dbid),
-    FOREIGN KEY value_set_member_fk (member)    REFERENCES concept (dbid)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 DROP TABLE IF EXISTS cohort;
 CREATE TABLE cohort
 (

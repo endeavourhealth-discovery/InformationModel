@@ -17,8 +17,6 @@ CREATE TABLE value_set_member (
 
     PRIMARY KEY value_set_member_pk (dbid),
     UNIQUE INDEX value_set_member_value_set_uq (value_set, concept),
-
-    FOREIGN KEY value_set_member_value_set_idx (value_set) REFERENCES concept (dbid)
 ) ENGINE = InnoDB DEFAULT CHARSET=utf8;
 
 INSERT IGNORE INTO value_set (id, name) VALUES ('im:VSET_OCS', 'Oxford Covid Study value set');
