@@ -201,3 +201,52 @@ VALUES
 ('/THH/SLVRLNK/LNGG', 'DEAF', 'THHSilverlink', 'THH_Lang_DEAF');
 
 
+-- ******************** Encounter ********************
+
+-- Concepts
+SELECT @scm := dbid FROM concept WHERE id = 'THHSilverlink';
+
+INSERT IGNORE INTO concept
+(document, id, scheme, code, name, description)
+VALUES
+(1, 'THH_Enc_DayCase', @scm, 'THH_Enc_DayCase', 'Day case', 'Day case'),
+(1, 'THH_Enc_Inpatient', @scm, 'THH_Enc_Inpatient', 'Inpatient', 'Inpatient'),
+(1, 'THH_Enc_Maternity', @scm, 'THH_Enc_Maternity', 'Maternity', 'Maternity'),
+(1, 'THH_Enc_Newborn', @scm, 'THH_Enc_Newborn', 'Newborn', 'Newborn'),
+(1, 'THH_Enc_RegRDayAdm', @scm, 'THH_Enc_RegRDayAdm', 'Regular day admission', 'Regular day admission'),
+(1, 'THH_Enc_RegNghtAdm', @scm, 'THH_Enc_RegNghtAdm', 'Regular night admission', 'Regular night admission'),
+(1, 'THH_Enc_DirectRef', @scm, 'THH_Enc_DirectRef', 'Direct referral', 'Direct referral'),
+(1, 'THH_Enc_Emergency', @scm, 'THH_Enc_Emergency', 'Emergency department', 'Emergency department'),
+(1, 'THH_Enc_Outpatient', @scm, 'THH_Enc_Outpatient', 'Outpatient', 'Outpatient'),
+(1, 'THH_Enc_DCWL', @scm, 'THH_Enc_DCWL', 'Day case waiting list', 'Day case waiting list'),
+(1, 'THH_Enc_PreReg', @scm, 'THH_Enc_PreReg', 'Preregistration', 'Preregistration'),
+(1, 'THH_Enc_IPWL', @scm, 'THH_Enc_IPWL', 'Inpatient waiting list', 'Inpatient waiting list'),
+(1, 'THH_Enc_PreAdmit', @scm, 'THH_Enc_PreAdmit', 'Outpatient registration', 'Outpatient registration'),
+(1, 'THH_Enc_OPReferral', @scm, 'THH_Enc_OPReferral', 'Outpatient referral', 'Outpatient referral');
+
+-- Context
+INSERT INTO map_context_meta (provider, `system`, `schema`, `table`, `column`, node)
+VALUES ('CM_Org_THH', 'CM_Sys_Silverlink', null, null, 'encounter_type', '/THH/SLVRLNK/ENCNTR_TYP');    -- Local
+
+-- Property
+INSERT INTO map_node_meta (node, concept)
+VALUES ('/THH/SLVRLNK/ENCNTR_TYP', 'DM_admissionPatientClassification');
+
+-- Value maps
+INSERT INTO map_node_value_meta
+(node, value, scheme, concept)
+VALUES
+('/THH/SLVRLNK/ENCNTR_TYP', 'DAYCASE', 'THHSilverlink', 'THH_Enc_DayCase'),
+('/THH/SLVRLNK/ENCNTR_TYP', 'INPATIENT', 'THHSilverlink', 'THH_Enc_Inpatient'),
+('/THH/SLVRLNK/ENCNTR_TYP', 'MATERNITY', 'THHSilverlink', 'THH_Enc_Maternity'),
+('/THH/SLVRLNK/ENCNTR_TYP', 'NEWBORN', 'THHSilverlink', 'THH_Enc_Newborn'),
+('/THH/SLVRLNK/ENCNTR_TYP', 'REGRDAYADM', 'THHSilverlink', 'THH_Enc_RegRDayAdm'),
+('/THH/SLVRLNK/ENCNTR_TYP', 'REGNGHTADM', 'THHSilverlink', 'THH_Enc_RegNghtAdm'),
+('/THH/SLVRLNK/ENCNTR_TYP', 'DIRECTREF', 'THHSilverlink', 'THH_Enc_DirectRef'),
+('/THH/SLVRLNK/ENCNTR_TYP', 'EMERGENCY', 'THHSilverlink', 'THH_Enc_Emergency'),
+('/THH/SLVRLNK/ENCNTR_TYP', 'OUTPATIENT', 'THHSilverlink', 'THH_Enc_Outpatient'),
+('/THH/SLVRLNK/ENCNTR_TYP', 'DCWL', 'THHSilverlink', 'THH_Enc_DCWL'),
+('/THH/SLVRLNK/ENCNTR_TYP', 'PREREG', 'THHSilverlink', 'THH_Enc_PreReg'),
+('/THH/SLVRLNK/ENCNTR_TYP', 'IPWL', 'THHSilverlink', 'THH_Enc_IPWL'),
+('/THH/SLVRLNK/ENCNTR_TYP', 'PREADMIT', 'THHSilverlink', 'THH_Enc_PreAdmit'),
+('/THH/SLVRLNK/ENCNTR_TYP', 'OPREFERRAL', 'THHSilverlink', 'THH_Enc_OPReferral');
