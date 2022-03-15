@@ -64,3 +64,15 @@ WHERE n.node IS NULL
    OR s.id IS NULL
    OR c.id IS NULL;
 
+/*
+-- APPLY LOOKUP FIXES
+
+INSERT IGNORE INTO map_value_node_lookup (value_node, value, concept, draft)
+SELECT vn.id, m.value, c.dbid, false
+FROM map_node_value_meta m
+LEFT JOIN map_node n ON n.node = m.node
+LEFT JOIN map_value_node vn ON vn.node = n.id
+LEFT JOIN map_value_node_lookup l ON l.value_node = vn.id AND l.value = m.value
+LEFT JOIN concept c ON c.id = m.concept
+WHERE l.id IS NULL
+ */
