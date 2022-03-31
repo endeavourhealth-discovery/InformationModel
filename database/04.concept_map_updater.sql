@@ -3,6 +3,7 @@ DROP TABLE IF EXISTS concept_map_updater;
 CREATE TABLE concept_map_updater (
     last_completed DATETIME NOT NULL,
     last_run DATETIME,
+    last_update_cnt INT DEFAULT 0,
     rowcount INTEGER NOT NULL DEFAULT 1000,
     tables JSON
 ) ENGINE = InnoDB DEFAULT CHARSET=utf8;
@@ -76,6 +77,8 @@ BEGIN
 
         SET i = i + 1;
     END WHILE;
+
+    UPDATE concept_map_updater SET last_update_cnt = @changes;
 
     -- If no changes were made on any tables, mark as complete
     IF (@changes = 0) THEN
