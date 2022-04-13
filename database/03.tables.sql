@@ -225,7 +225,7 @@ CREATE TABLE state_definition
 DROP TABLE IF EXISTS concept_term_map;
 CREATE TABLE concept_term_map
 (
-    term      VARCHAR(250) NOT NULL,
+    term      VARCHAR(256) NOT NULL,
     type      INT          NOT NULL,
     target    INT          NOT NULL,
     draft     BOOLEAN      NOT NULL DEFAULT TRUE,
