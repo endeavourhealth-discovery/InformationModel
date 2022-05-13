@@ -186,6 +186,17 @@ VALUES
 ('/LNWH/SYMPHNY/TRTMNT_FNCTN', '710', 'LNWHSymphony', 'CM_TrtmntFnc710');
 
 -- ******************** Language ********************
+-- Concepts
+SELECT @scm := dbid FROM concept WHERE id = 'LNWHSymphony';
+
+INSERT IGNORE INTO concept
+(document, id, scheme, code, name, description)
+VALUES
+(1, 'LNWH_SY_Lng_OTH', @scm, 'LNWH_SY_Lng_OTH', 'Other', 'Other'),         -- New 12/05/2022 - ADTS-149
+(1, 'LNWH_SY_Lng_UNK', @scm, 'LNWH_SY_Lng_UNK', 'Unknown', 'Unknown'),     -- New 12/05/2022 - ADTS-149
+(1, 'LNWH_SY_Lng_ROMA', @scm, 'LNWH_SY_Lng_ROMA', 'Roma', 'Roma'),         -- New 12/05/2022 - ADTS-149
+(1, 'LNWH_SY_Lng_DEA', @scm, 'LNWH_SY_Lng_DEA', 'Dea', 'Dea'),             -- New 12/05/2022 - ADTS-149
+(1, 'LNWH_SY_Lng_DARI', @scm, 'LNWH_SY_Lng_DARI', 'Dari', 'Dari');         -- New 12/05/2022 - ADTS-149
 
 -- Context
 INSERT INTO map_context_meta (provider, `system`, `schema`, `table`, `column`, node)
@@ -226,7 +237,16 @@ VALUES
 ('/LNWH/SYMPHNY/LNGG', 'TURK', 'LNWHSymphony', 'FHIR_LANG_tr'),
 ('/LNWH/SYMPHNY/LNGG', 'URD', 'LNWHSymphony', 'FHIR_LANG_ur'),
 ('/LNWH/SYMPHNY/LNGG', 'VIE', 'LNWHSymphony', 'FHIR_LANG_vi'),
-('/LNWH/SYMPHNY/LNGG', 'DBSL', 'LNWHSymphony', 'FHIR_LANG_q4');
+('/LNWH/SYMPHNY/LNGG', 'DBSL', 'LNWHSymphony', 'FHIR_LANG_q4'),
+('/LNWH/SYMPHNY/LNGG', 'NEPA', 'LNWHSymphony', 'FHIR_LANG_ne'),       -- New 12/05/2022 - ADTS-149
+('/LNWH/SYMPHNY/LNGG', 'FARS', 'LNWHSymphony', 'FHIR_LANG_fa'),       -- New 12/05/2022 - ADTS-149
+
+-- Local
+('/LNWH/SYMPHNY/LNGG', 'OTH', 'LNWHSymphony', 'LNWH_SY_Lng_OTH'),     -- New 12/05/2022 - ADTS-149
+('/LNWH/SYMPHNY/LNGG', 'UNK', 'LNWHSymphony', 'LNWH_SY_Lng_UNK'),     -- New 12/05/2022 - ADTS-149
+('/LNWH/SYMPHNY/LNGG', 'ROMA', 'LNWHSymphony', 'LNWH_SY_Lng_ROMA'),   -- New 12/05/2022 - ADTS-149
+('/LNWH/SYMPHNY/LNGG', 'DEA', 'LNWHSymphony', 'LNWH_SY_Lng_DEA'),     -- New 12/05/2022 - ADTS-149
+('/LNWH/SYMPHNY/LNGG', 'DARI', 'LNWHSymphony', 'LNWH_SY_Lng_DARI');   -- New 12/05/2022 - ADTS-149
 
 -- ******************** Encounter ********************
 

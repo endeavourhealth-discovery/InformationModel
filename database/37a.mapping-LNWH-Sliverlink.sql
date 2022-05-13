@@ -379,6 +379,18 @@ VALUES
 ('/LNWH/SLVRLNK/TRTMNT_FNCTN', 'VASSURG', 'LNWHSilverlink', 'CM_TrtmntFnc107');
 
 -- ******************** Language ********************
+-- Concepts
+SELECT @scm := dbid FROM concept WHERE id = 'LNWHSilverlink';
+
+INSERT IGNORE INTO concept
+(document, id, scheme, code, name, description)
+VALUES
+(1, 'LNWH_SL_Lng_OTH', @scm, 'LNWH_SL_Lng_OTH', 'Other', 'Other'),         -- New 12/05/2022 - ADTS-149
+(1, 'LNWH_SL_Lng_UNK', @scm, 'LNWH_SL_Lng_UNK', 'Unknown', 'Unknown'),     -- New 12/05/2022 - ADTS-149
+(1, 'LNWH_SL_Lng_ROMA', @scm, 'LNWH_SL_Lng_ROMA', 'Roma', 'Roma'),         -- New 12/05/2022 - ADTS-149
+(1, 'LNWH_SL_Lng_DEA', @scm, 'LNWH_SL_Lng_DEA', 'Dea', 'Dea'),             -- New 12/05/2022 - ADTS-149
+(1, 'LNWH_SL_Lng_DARI', @scm, 'LNWH_SL_Lng_DARI', 'Dari', 'Dari');         -- New 12/05/2022 - ADTS-149
+
 
 -- Context
 INSERT INTO map_context_meta (provider, `system`, `schema`, `table`, `column`, node)
@@ -419,7 +431,16 @@ VALUES
 ('/LNWH/SLVRLNK/LNGG', 'TURK', 'LNWHSilverlink', 'FHIR_LANG_tr'),
 ('/LNWH/SLVRLNK/LNGG', 'URD', 'LNWHSilverlink', 'FHIR_LANG_ur'),
 ('/LNWH/SLVRLNK/LNGG', 'VIE', 'LNWHSilverlink', 'FHIR_LANG_vi'),
-('/LNWH/SLVRLNK/LNGG', 'DBSL', 'LNWHSilverlink', 'FHIR_LANG_q4');
+('/LNWH/SLVRLNK/LNGG', 'DBSL', 'LNWHSilverlink', 'FHIR_LANG_q4'),
+('/LNWH/SLVRLNK/LNGG', 'NEPA', 'LNWHSilverlink', 'FHIR_LANG_ne'),       -- New 12/05/2022 - ADTS-149
+('/LNWH/SLVRLNK/LNGG', 'FARS', 'LNWHSilverlink', 'FHIR_LANG_fa'),       -- New 12/05/2022 - ADTS-149
+
+-- Local
+('/LNWH/SLVRLNK/LNGG', 'OTH', 'LNWHSilverlink', 'LNWH_SL_Lng_OTH'),     -- New 12/05/2022 - ADTS-149
+('/LNWH/SLVRLNK/LNGG', 'UNK', 'LNWHSilverlink', 'LNWH_SL_Lng_UNK'),     -- New 12/05/2022 - ADTS-149
+('/LNWH/SLVRLNK/LNGG', 'ROMA', 'LNWHSilverlink', 'LNWH_SL_Lng_ROMA'),   -- New 12/05/2022 - ADTS-149
+('/LNWH/SLVRLNK/LNGG', 'DEA', 'LNWHSilverlink', 'LNWH_SL_Lng_DEA'),     -- New 12/05/2022 - ADTS-149
+('/LNWH/SLVRLNK/LNGG', 'DARI', 'LNWHSilverlink', 'LNWH_SL_Lng_DARI');   -- New 12/05/2022 - ADTS-149
 
 -- ******************** Encounter ********************
 

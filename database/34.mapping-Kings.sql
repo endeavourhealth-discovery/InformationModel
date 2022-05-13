@@ -77,6 +77,7 @@ VALUES
     ('/KINGS/PIMS/RLGN', 'C58', 'KingsPIMS', 'CM_ReligionC58'),
     ('/KINGS/PIMS/RLGN', 'C59', 'KingsPIMS', 'CM_ReligionC59'),
     ('/KINGS/PIMS/RLGN', 'C6',  'KingsPIMS', 'CM_ReligionC6'),
+    ('/KINGS/PIMS/RLGN', 'C60', 'KingsPIMS', 'CM_ReligionC60'), -- Added 9-May-22
     ('/KINGS/PIMS/RLGN', 'C61', 'KingsPIMS', 'CM_ReligionC61'),
     ('/KINGS/PIMS/RLGN', 'C62', 'KingsPIMS', 'CM_ReligionC62'),
     ('/KINGS/PIMS/RLGN', 'C63', 'KingsPIMS', 'CM_ReligionC63'),
@@ -305,6 +306,14 @@ VALUES
     ('/KINGS/PIMS/DSCHRG_DSTNTN', '88', 'KingsPIMS', 'CM_SrcAsmA10');
 
 -- ******************** Treatment Function ********************
+-- ************ MISSING SPECIALITIES ****************
+-- Concepts
+SELECT @scm := dbid FROM concept WHERE id = 'CM_DiscoveryCode';
+
+INSERT IGNORE INTO concept
+(document, id, scheme, code, name, description)
+VALUES
+    (1, 'CM_TrtmntFnc902', @scm, 'CM_TrtmntFnc902', 'Community Health Services Dental', 'Community Health Services Dental');
 
 -- Context
 INSERT INTO map_context_meta (provider, `system`, `schema`, `table`, `column`, node)
