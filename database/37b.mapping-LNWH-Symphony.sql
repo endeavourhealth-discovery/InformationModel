@@ -52,6 +52,16 @@ VALUES
 ('/LNWH/SYMPHNY/GNDR', '9', 'LNWHSymphony', 'FHIR_AG_other');
 
 -- ******************** Religion ********************
+-- Concepts
+SELECT @scm := dbid FROM concept WHERE id = 'LNWHSymphony';
+
+INSERT IGNORE INTO concept
+(document, id, scheme, code, name, description)
+VALUES
+(1, 'LNWH_SY_Rlgn_Pen', @scm, 'LNWH_SY_Rlgn_Pen', 'Pentecostal', 'Pentecostal'),                 -- New 26/05/2022 - DDSEUS-101
+(1, 'LNWH_SY_Rlgn_CofG', @scm, 'LNWH_SY_Rlgn_CofG', 'Church of God', 'Church of God'),          -- New 26/05/2022 - DDSEUS-101
+(1, 'LNWH_SY_Rlgn_CofC', @scm, 'LNWH_SY_Rlgn_CofC', 'Church of Christ', 'Church of Christ'),    -- New 26/05/2022 - DDSEUS-101
+(1, 'LNWH_SY_Rlgn_OF', @scm, 'LNWH_SY_Rlgn_OF', 'Other Free Church', 'Other Free Church');      -- New 26/05/2022 - DDSEUS-101
 
 -- Context
 INSERT INTO map_context_meta (provider, `system`, `schema`, `table`, `column`, node)
@@ -116,7 +126,14 @@ VALUES
 ('/LNWH/SYMPHNY/RLGN', 'SPIR', 'LNWHSymphony', 'CM_ReligionK27'),
 ('/LNWH/SYMPHNY/RLGN', 'UN', 'LNWHSymphony', 'CM_ReligionK30'),
 ('/LNWH/SYMPHNY/RLGN', 'ATH', 'LNWHSymphony', 'CM_ReligionL1'),
-('/LNWH/SYMPHNY/RLGN', 'UNK', 'LNWHSymphony', 'CM_ReligionN1');
+('/LNWH/SYMPHNY/RLGN', 'UNK', 'LNWHSymphony', 'CM_ReligionN1'),
+-- Added 26 May 2022 @ request of Michael Taylor - DDSEUS-101 --
+('/LNWH/SLVRLNK/RLGN', 'NK', 'LNWHSilverlink', 'CM_ReligionN1'),
+('/LNWH/SLVRLNK/RLGN', 'PEN', 'LNWHSilverlink', 'LNWH_SY_Rlgn_Pen'),
+('/LNWH/SLVRLNK/RLGN', 'NONE', 'LNWHSilverlink', 'CM_ReligionL1'),
+('/LNWH/SLVRLNK/RLGN', 'C/G', 'LNWHSilverlink', 'LNWH_SY_Rlgn_CofG'),
+('/LNWH/SLVRLNK/RLGN', 'COFC', 'LNWHSilverlink', 'LNWH_SY_Rlgn_CofC'),
+('/LNWH/SLVRLNK/RLGN', 'OF', 'LNWHSilverlink', 'LNWH_SY_Rlgn_OF');
 
 -- ******************** Ethnicity ********************
 
