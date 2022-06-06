@@ -4,11 +4,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.endeavourhealth.im.dal.IMMappingDAL;
 import org.endeavourhealth.im.dal.IMMappingJDBCDAL;
 import org.endeavourhealth.im.models.mapping.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
-import java.util.Set;
 
 public class MappingLogic {
+    private static final Logger LOG = LoggerFactory.getLogger(MappingLogic.class);
+
     public static String getShortString(String id) {
         // Handle concepts and standard prefixes
         if (id.startsWith("CM_Sys_")) id = id.substring(7);
@@ -84,14 +87,28 @@ public class MappingLogic {
         boolean wasCreated = false;
         MapColumnValueRequest valueRequest = request.getMapColumnValueRequest();
 
-        MapNode nodeData = getColumnNode(
+        MapResponse mapResponse = getColumnNode(
             valueRequest.getProvider(),
             valueRequest.getSystem(),
             valueRequest.getSchema(),
             valueRequest.getTable(),
             valueRequest.getColumn(),
             valueRequest.getTarget()
-        ).getNode();
+        );
+
+        if (mapResponse == null) {
+            LOG.error("Context not found: {}/{}/{}/{}/{}/{}",
+                valueRequest.getProvider(),
+                valueRequest.getSystem(),
+                valueRequest.getSchema(),
+                valueRequest.getTable(),
+                valueRequest.getColumn(),
+                valueRequest.getTarget()
+                );
+            throw new IllegalStateException("Context not found!");
+        }
+
+        MapNode nodeData = mapResponse.getNode();
 
         MapValueNode valueNode = dal.getValueNode(nodeData.getNode(), valueRequest.getValue().getScheme());
         if (valueNode == null) {

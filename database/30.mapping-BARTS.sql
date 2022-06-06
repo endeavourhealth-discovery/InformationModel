@@ -10,7 +10,8 @@ INSERT IGNORE INTO concept
 VALUES
 -- GENERAL/GLOBAL --
 (1, 'CM_Org_Barts', @scm, 'CM_Org_Barts', 'Barts Hospital', 'Barts NHS Trust Hospital'),
-(1, 'CM_Sys_Cerner', @scm, 'CM_Sys_Cerner', 'Cerner Millennium', 'Cerner Millennium system');
+(1, 'CM_Sys_Cerner', @scm, 'CM_Sys_Cerner', 'Cerner Millennium', 'Cerner Millennium system'),
+(1, 'DM_ambulanceNumber', @scm, 'DM_ambulanceNumber', 'Ambulance number', 'Ambulance number');
 
 -- ******************** EMERGENCY ********************
 
@@ -22,11 +23,21 @@ VALUES
 ('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'emergency', 'arrival_mode',             '/CDS/EMGCY/ARRVL_MD'),                 -- SNOMED
 ('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'emergency', 'attendance_category',      '/CDS/EMGCY/ATTNDNC_CTGRY'),            -- NHS DD
 ('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'emergency', 'attendance_source',        '/CDS/EMGCY/ATTNDNC_SRC'),              -- SNOMED
-('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'emergency', 'treatment_function_code',  '/BRTS/CRNR/CDS/TRTMNT_FNCTN'),   -- BARTS/CERNER code
+('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'emergency', 'treatment_function_code',  '/BRTS/CRNR/CDS/TRTMNT_FNCTN'),         -- BARTS/CERNER code
 ('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'emergency', 'discharge_status',         '/CDS/EMGCY/DSCHRG_STTS'),              -- SNOMED
 ('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'emergency', 'discharge_destination',    '/CDS/EMGCY/DSCHRG_DSTNTN'),            -- SNOMED
 ('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'emergency', 'discharge_follow_up',      '/CDS/EMGCY/DSCHRG_FLLW_UP'),           -- SNOMED
-('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'emergency', 'referred_to_services',     '/CDS/EMGCY/RFRRD_SRVCS');              -- SNOMED
+('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'emergency', 'referred_to_services',     '/CDS/EMGCY/RFRRD_SRVCS'),              -- SNOMED
+-- NEW CONTEXTS 30/05/2022
+-- ('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'emergency', 'follow_up',                '/CDS/EMGCY/FLLW_UP'),                  -- SNOMED
+('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'emergency', 'ambulance_number',         '/BRTS/CRNR/CDS/EMGCY/AMBLNC_NMBR');     -- Property only
+
+-- Node maps
+INSERT INTO map_node_meta
+(node, concept)
+VALUES
+    ('/BRTS/CRNR/CDS/EMGCY/AMBLNC_NMBR',    'DM_ambulanceNumber')   -- BARTS/CERNER code
+;
 
 -- ******************** INPATIENT ********************
 
@@ -40,12 +51,14 @@ VALUES
 ('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'inpatient', 'discharge_destination_code',    '/CDS/INPTNT/DSCHRG_DSTNTN'),          -- NHS DD
 ('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'inpatient', 'discharge_method',              '/CDS/INPTNT/DSCHRG_MTHD'),            -- NHS DD
 ('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'inpatient', 'administrative_category_code',  '/CDS/INPTNT/ADMNSTRV_CTGRY'),         -- NHS DD
-('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'inpatient', 'treatment_function_code',       '/BRTS/CRNR/CDS/TRTMNT_FNCTN'), -- BARTS LOCAL
+('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'inpatient', 'treatment_function_code',       '/BRTS/CRNR/CDS/TRTMNT_FNCTN'),        -- BARTS/CERNER code
 ('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'inpatient', 'live_or_still_birth_indicator', '/CDS/INPTNT/LV_STLL_BRTH_INDCTR'),    -- NHS DD
 ('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'inpatient', 'delivery_method',               '/CDS/INPTNT/DLVRY_MTHD'),             -- NHS DD
-('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'inpatient', 'gender',                        '/CDS/INPTNT/GNDR')                    -- NHS DD
-;
-
+('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'inpatient', 'gender',                        '/CDS/INPTNT/GNDR'),                   -- NHS DD
+-- NEW CONTEXTS 30/05/2022
+-- ('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'inpatient', 'wards',                         '/CDS/INPTNT/WRDS'),                   -- NHS DD
+-- ('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'inpatient', 'maternity_birth'                '/CDS/INPTNT/MTRNTY_BRTH'),            -- NHS DD
+-- ('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'inpatient', 'maternity_delivery',            '/CDS/INPTNT/MTRNTY_DLVRY');           -- NHS DD
 -- ******************** OUTPATIENT ********************
 
 -- Context maps
@@ -56,8 +69,7 @@ VALUES
 ('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'outpatient', 'appt_outcome_code',            '/CDS/OUTPTNT/OUTCM'),                 -- NHS DD
 ('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'outpatient', 'administrative_category_code', '/CDS/OUTPTNT/ADMNSTRTV_CTGRY'),       -- NHS DD
 ('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'outpatient', 'referral_source',              '/CDS/OUTPTNT/RFRRL_SRC'),             -- NHS DD
-('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'outpatient', 'treatment_function_code',      '/BRTS/CRNR/CDS/TRTMNT_FNCTN') -- BARTS/CERNER code
-;
+('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'outpatient', 'treatment_function_code',      '/BRTS/CRNR/CDS/TRTMNT_FNCTN');        -- BARTS/CERNER code
 
 -- ******************** CRITICAL CARE ********************
 
@@ -72,8 +84,10 @@ VALUES
 ('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'critical', 'admission_location',             '/CDS/CRTCL/ADMSSN_LCTN'),     -- NHS DD
 ('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'critical', 'discharge_status_code',          '/CDS/CRTCL/DSCHRG_STTS'),     -- NHS DD
 ('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'critical', 'discharge_destination',          '/CDS/CRTCL/DSCHRG_DSTNTN'),   -- NHS DD
-('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'critical', 'discharge_location',             '/CDS/CRTCL/DSCHRG_LCTN')      -- NHS DD
-;
+('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'critical', 'discharge_location',             '/CDS/CRTCL/DSCHRG_LCTN'),     -- NHS DD
+-- NEW CONTEXTS 30/05/2022
+-- ('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'critical', 'critical_care_type',             '/CDS/CRTCL/CRTCL_CR_TYP'),    -- NHS DD
+-- ('CM_Org_Barts', 'CM_Sys_Cerner', 'CDS', 'critical', 'critical_care',                  '/CDS/CRTCL/CRTCL_CR');        -- NHS DD
 
 -- ******************** TREATMENT FUNCTION CODES ********************
 
