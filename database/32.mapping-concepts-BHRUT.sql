@@ -49,7 +49,7 @@ VALUES
 ('CM_Org_BHRUT', 'CM_Sys_Medway', 'MedwayBI', 'Episodes', 'EPISODE_END_WARD_CODE',          '/BHRUT/MDWY/MDWYBI/EPSDS/EPSD_END_WRD'),   -- Property Only    Added 6/6/22
 -- ******************** Outpatients ********************
 ('CM_Org_BHRUT', 'CM_Sys_Medway', 'MedwayBI', 'Outpatients', 'admin_category_code',          '/CDS/INPTNT/ADMNSTRV_CTGRY'),      -- NHS DD
-('CM_Org_BHRUT', 'CM_Sys_Medway', 'MedwayBI', 'Outpatients', 'appointment_status_code',      '/CDS/INPTNT/APPNTMNT_STTS_CD')     -- NHS DD
+('CM_Org_BHRUT', 'CM_Sys_Medway', 'MedwayBI', 'Outpatients', 'appointment_status_code',      '/CDS/OUTPTNT/APPT_ATTNDD')     -- NHS DD
 ;
 
 -- Node maps

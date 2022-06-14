@@ -11,6 +11,12 @@ FROM map_node_meta m
          LEFT JOIN concept c ON c.id = m.concept
 WHERE c.dbid IS NULL;
 
+SELECT c.*
+FROM map_context_meta c
+         LEFT JOIN map_node_meta nm ON nm.node = c.node
+         LEFT JOIN map_node n ON n.node = c.node
+WHERE nm.node IS NULL AND n.node IS NULL;
+
 SELECT DISTINCT m.scheme, s.dbid, m.concept, c.dbid
 FROM map_node_value_meta m
          LEFT JOIN concept s ON s.id = m.scheme
