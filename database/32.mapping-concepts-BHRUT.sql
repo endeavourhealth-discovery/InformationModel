@@ -48,8 +48,14 @@ VALUES
 ('CM_Org_BHRUT', 'CM_Sys_Medway', 'MedwayBI', 'Episodes', 'EPISODE_START_WARD_CODE',        '/BHRUT/MDWY/MDWYBI/EPSDS/EPSD_STRT_WRD'),  -- Property Only    Added 6/6/22
 ('CM_Org_BHRUT', 'CM_Sys_Medway', 'MedwayBI', 'Episodes', 'EPISODE_END_WARD_CODE',          '/BHRUT/MDWY/MDWYBI/EPSDS/EPSD_END_WRD'),   -- Property Only    Added 6/6/22
 -- ******************** Outpatients ********************
-('CM_Org_BHRUT', 'CM_Sys_Medway', 'MedwayBI', 'Outpatients', 'admin_category_code',          '/CDS/INPTNT/ADMNSTRV_CTGRY'),      -- NHS DD
-('CM_Org_BHRUT', 'CM_Sys_Medway', 'MedwayBI', 'Outpatients', 'appointment_status_code',      '/CDS/OUTPTNT/APPT_ATTNDD')     -- NHS DD
+('CM_Org_BHRUT', 'CM_Sys_Medway', 'MedwayBI', 'Outpatients', 'admin_category_code',          '/CDS/INPTNT/ADMNSTRV_CTGRY'),     -- NHS DD
+('CM_Org_BHRUT', 'CM_Sys_Medway', 'MedwayBI', 'Outpatients', 'appointment_status_code',      '/CDS/OUTPTNT/APPT_ATTNDD'),       -- NHS DD
+-- ******************** Accident & Emergency ********************
+('CM_Org_BHRUT', 'CM_Sys_Medway', 'MedwayBI', 'AandeAttendances', 'arrival_mode',           '/BHRUT/MDWY/MDWYBI/EMGCY/ARRVL_MD'),       -- Property Only    Added 14/6/22
+('CM_Org_BHRUT', 'CM_Sys_Medway', 'MedwayBI', 'AandeAttendances', 'attendance_type',        '/BHRUT/MDWY/MDWYBI/EMGCY/ATTNDNC_CTGRY'),  -- Property Only    Added 14/6/22
+('CM_Org_BHRUT', 'CM_Sys_Medway', 'MedwayBI', 'AandeAttendances', 'referral_source',        '/BHRUT/MDWY/MDWYBI/EMGCY/RFRRL_SRC'),      -- Property Only    Added 14/6/22
+('CM_Org_BHRUT', 'CM_Sys_Medway', 'MedwayBI', 'AandeAttendances', 'recorded_outcome',       '/BHRUT/MDWY/MDWYBI/EMGCY/RCRDD_OTCM'),     -- Property Only    Added 14/6/22
+('CM_Org_BHRUT', 'CM_Sys_Medway', 'MedwayBI', 'AandeAttendances', 'discharge_destination',  '/BHRUT/MDWY/MDWYBI/EMGCY/DSCHRG_DSTNTN')   -- Property Only    Added 14/6/22
 ;
 
 -- Node maps
@@ -64,5 +70,11 @@ VALUES
 ('/BHRUT/MDWY/MDWYBI/SPLLS/ADMSSN_WRD_CD',      'DM_AdmissionWardCode'),    -- Property Only    Added 6/6/22
 ('/BHRUT/MDWY/MDWYBI/SPLLS/DSCHRG_WRD_CD',      'DM_DischargeWardCode'),    -- Property Only    Added 6/6/22
 ('/BHRUT/MDWY/MDWYBI/EPSDS/EPSD_STRT_WRD',      'DM_EpisodeStartWard'),     -- Property Only    Added 6/6/22
-('/BHRUT/MDWY/MDWYBI/EPSDS/EPSD_END_WRD',       'DM_EpisodeEndWard')        -- Property Only    Added 6/6/22
+('/BHRUT/MDWY/MDWYBI/EPSDS/EPSD_END_WRD',       'DM_EpisodeEndWard'),       -- Property Only    Added 6/6/22
+
+('/BHRUT/MDWY/MDWYBI/EMGCY/ARRVL_MD',           'DM_arrivalMode'),              -- Property Only    Added 14/6/22
+('/BHRUT/MDWY/MDWYBI/EMGCY/ATTNDNC_CTGRY',      'DM_aeAttendanceCategory'),     -- Property Only    Added 14/6/22
+('/BHRUT/MDWY/MDWYBI/EMGCY/RFRRL_SRC',          'DM_referralSource'),           -- Property Only    Added 14/6/22
+('/BHRUT/MDWY/MDWYBI/EMGCY/RCRDD_OTCM',         'DM_hasAttendanceOutcome'),     -- Property Only    Added 14/6/22
+('/BHRUT/MDWY/MDWYBI/EMGCY/DSCHRG_DSTNTN',      'DM_hasDischargeDestination')   -- Property Only    Added 14/6/22
 ;

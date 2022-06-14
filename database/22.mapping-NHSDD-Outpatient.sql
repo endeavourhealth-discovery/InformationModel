@@ -69,7 +69,7 @@ VALUES
 ('/CDS/OUTPTNT/APPT_ATTNDD',             'DM_attendanceStatus'),                -- NHS DD
 ('/CDS/OUTPTNT/OUTCM',                   'DM_hasAttendanceOutcome'),            -- NHS DD
 ('/CDS/OUTPTNT/ADMNSTRTV_CTGRY',         'DM_adminCategoryonAdmission'),        -- NHS DD
-('/CDS/OUTPTNT/RFRRL_SRC',               'DM_outpatientReferralSource')         -- NHS DD
+('/CDS/OUTPTNT/RFRRL_SRC',               'DM_referralSource')         -- NHS DD
 ;
 
 -- Value maps
