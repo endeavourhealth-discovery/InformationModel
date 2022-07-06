@@ -64,6 +64,13 @@ WHERE n.node IS NULL
    OR s.id IS NULL
    OR c.id IS NULL;
 
+--
+
+SELECT l.value_node, l.value, COUNT(1)
+FROM map_value_node_lookup l
+GROUP BY l.value_node, l.value
+HAVING COUNT(1) > 1;
+
 /*
 -- APPLY LOOKUP FIXES
 
