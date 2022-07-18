@@ -141,7 +141,7 @@ VALUES
 (1, 'THH_TrtmntFnc92', @scm, 'THH_TrtmntFnc92', 'Eating Disorders', 'Eating Disorders'),
 (1, 'THH_TrtmntFnc20', @scm, 'THH_TrtmntFnc20', 'Care of the Elderly', 'Care of the Elderly'),
 (1, 'THH_TrtmntFnc91', @scm, 'THH_TrtmntFnc91', 'Community Midwives', 'Community Midwives'),
-(1, 'THH_TrtmntFnc10', @scm, 'THH_TrtmntFnc10', 'Other', 'Other'); -- ***************************** ???????
+(1, 'THH_TrtmntFnc10', @scm, 'THH_TrtmntFnc10', 'Other', 'Other'); -- Confirmed by EMail - Mike 18-Jul-2022
 
 -- Context
 INSERT INTO map_context_meta (provider, `system`, `schema`, `table`, `column`, node)
@@ -281,13 +281,13 @@ VALUES
 ('/THH/SLVRLNK/TRTMNT_FNCTN', 'COMMW', 'THHSilverlink', 'CM_TrtmntFnc560'),
 ('/THH/SLVRLNK/TRTMNT_FNCTN', 'OCH', 'THHSilverlink', 'CM_TrtmntFnc901'),
 -- CUSTOM/LOCAL TREATMENT FUNCTIONS
-('/THH/SLVRLNK/TRTMNT_FNCTN', 'ESD', 'THHSilverlink', 'CM_TrtmntFnc92'),
-('/THH/SLVRLNK/TRTMNT_FNCTN', 'COE', 'THHSilverlink', 'CM_TrtmntFnc20'),
-('/THH/SLVRLNK/TRTMNT_FNCTN', 'GOP', 'THHSilverlink', 'CM_TrtmntFnc10'),
-('/THH/SLVRLNK/TRTMNT_FNCTN', 'GMP', 'THHSilverlink', 'CM_TrtmntFnc10'),
-('/THH/SLVRLNK/TRTMNT_FNCTN', 'HHTH', 'THHSilverlink', 'CM_TrtmntFnc10'),
-('/THH/SLVRLNK/TRTMNT_FNCTN', 'MVTH', 'THHSilverlink', 'CM_TrtmntFnc10'),
-('/THH/SLVRLNK/TRTMNT_FNCTN', 'COMM', 'THHSilverlink', 'CM_TrtmntFnc91');
+('/THH/SLVRLNK/TRTMNT_FNCTN', 'ESD', 'THHSilverlink', 'THH_TrtmntFnc92'),
+('/THH/SLVRLNK/TRTMNT_FNCTN', 'COE', 'THHSilverlink', 'THH_TrtmntFnc20'),
+('/THH/SLVRLNK/TRTMNT_FNCTN', 'GOP', 'THHSilverlink', 'THH_TrtmntFnc10'),
+('/THH/SLVRLNK/TRTMNT_FNCTN', 'GMP', 'THHSilverlink', 'THH_TrtmntFnc10'),
+('/THH/SLVRLNK/TRTMNT_FNCTN', 'HHTH', 'THHSilverlink', 'THH_TrtmntFnc10'),
+('/THH/SLVRLNK/TRTMNT_FNCTN', 'MVTH', 'THHSilverlink', 'THH_TrtmntFnc10'),
+('/THH/SLVRLNK/TRTMNT_FNCTN', 'COMM', 'THHSilverlink', 'THH_TrtmntFnc91');
 
 -- ******************** Language ********************
 

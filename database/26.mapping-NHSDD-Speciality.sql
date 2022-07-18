@@ -218,5 +218,7 @@ VALUES
 (1, 'CM_TrtmntFnc903', @scm, 'CM_TrtmntFnc903', 'Public Health Medicine', 'Public Health Medicine'),
 (1, 'CM_TrtmntFnc950', @scm, 'CM_TrtmntFnc950', 'Nursing', 'Nursing'),
 (1, 'CM_TrtmntFnc960', @scm, 'CM_TrtmntFnc960', 'Allied Health Professional', 'Allied Health Professional'),
-(1, 'CM_TrtmntFnc990', @scm, 'CM_TrtmntFnc990', 'Joint Consultant Clinics', 'Joint Consultant Clinics');
-
+(1, 'CM_TrtmntFnc990', @scm, 'CM_TrtmntFnc990', 'Joint Consultant Clinics', 'Joint Consultant Clinics'),
+-- Added 17 Jul 2022
+(1, 'CM_TrtmntFnc600', @scm, 'CM_TrtmntFnc600', 'General Medical Practice', 'General Medical Practice'),
+(1, 'CM_TrtmntFnc810', @scm, 'CM_TrtmntFnc810', 'Radiology', 'Radiology');
