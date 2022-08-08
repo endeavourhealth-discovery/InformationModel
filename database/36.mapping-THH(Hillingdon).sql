@@ -243,10 +243,6 @@ VALUES
     ('/THH/SLVRLNK/DSCHRG_MTHD', '63238001', 'THHSilverlink', 'CM_DisMethod4'),
     ('/THH/SLVRLNK/DSCHRG_MTHD', '75004002', 'THHSilverlink', 'CM_DisMethod4');
 
--- Context
-INSERT INTO map_context_meta (provider, `system`, `schema`, `table`, `column`, node)
-VALUES ('CM_Org_THH', 'CM_Sys_Silverlink', null, null, 'discharge_method', '/CDS/INPTNT/DSCHRG_MTHD');
-
 -- ******************** Discharge Destination ********************
 -- 5 Aug 2022 - Migrate from NHSDD to Local (new local codes)
 
@@ -298,7 +294,7 @@ VALUES
     ('/THH/SLVRLNK/DSCHRG_DSTNTN', '1066371000000106', 'THHSilverlink', 'CM_DisDest51'),
     ('/THH/SLVRLNK/DSCHRG_DSTNTN', '1066381000000108', 'THHSilverlink', 'CM_DisDest51'),
     ('/THH/SLVRLNK/DSCHRG_DSTNTN', '1066391000000105', 'THHSilverlink', 'CM_DisDest51'),
-    ('/THH/SLVRLNK/DSCHRG_DSTNTN', '1066401000000108', 'THHSilverlink', 'CM_DisDest52'),
+    ('/THH/SLVRLNK/DSCHRG_DSTNTN', '1066401000000108', 'THHSilverlink', 'CM_SrcAdmA2'),
     ('/THH/SLVRLNK/DSCHRG_DSTNTN', '19712007', 'THHSilverlink', 'CM_DisDest51'),
     ('/THH/SLVRLNK/DSCHRG_DSTNTN', '305398007', 'THHSilverlink', 'CM_DisDest79');
 

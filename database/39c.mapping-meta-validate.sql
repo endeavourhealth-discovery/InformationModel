@@ -71,6 +71,15 @@ FROM map_value_node_lookup l
 GROUP BY l.value_node, l.value
 HAVING COUNT(1) > 1;
 
+--
+
+SELECT p.id AS provider, s.id AS `system`, `schema`, `table`, `column`, COUNT(1)
+FROM map_context c
+JOIN concept p ON p.dbid = c.provider
+JOIN concept s ON s.dbid = c.`system`
+GROUP BY `provider`, `system`, `schema`, `table`, `column`
+HAVING COUNT(1) > 1
+
 /*
 -- APPLY LOOKUP FIXES
 
