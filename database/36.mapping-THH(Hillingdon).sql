@@ -65,7 +65,24 @@ VALUES
 ('/THH/SLVRLNK/RLGN', 'SIKH', 'THHSilverlink', 'CM_ReligionI1'),
 ('/THH/SLVRLNK/RLGN', 'SP', 'THHSilverlink', 'CM_ReligionK27'),
 ('/THH/SLVRLNK/RLGN', 'UN', 'THHSilverlink', 'CM_ReligionC78'),
-('/THH/SLVRLNK/RLGN', 'URC', 'THHSilverlink', 'CM_ReligionC79');
+('/THH/SLVRLNK/RLGN', 'URC', 'THHSilverlink', 'CM_ReligionC79'),
+-- 5 Aug 2022 - New entries per v8
+('/THH/SLVRLNK/RLGN', 'AC', 'THHSilverlink', 'CM_ReligionC6'),
+('/THH/SLVRLNK/RLGN', 'BAP', 'THHSilverlink', 'CM_ReligionC8'),
+('/THH/SLVRLNK/RLGN', 'BUD', 'THHSilverlink', 'CM_ReligionB1'),
+('/THH/SLVRLNK/RLGN', 'C/E', 'THHSilverlink', 'CM_ReligionC22'),
+('/THH/SLVRLNK/RLGN', 'C/G', 'THHSilverlink', 'CM_ReligionC23'),
+('/THH/SLVRLNK/RLGN', 'C/I', 'THHSilverlink', 'CM_ReligionC24'),
+('/THH/SLVRLNK/RLGN', 'C/S', 'THHSilverlink', 'CM_ReligionC25'),
+('/THH/SLVRLNK/RLGN', 'C/W', 'THHSilverlink', 'CM_ReligionC21'),
+('/THH/SLVRLNK/RLGN', 'CH', 'THHSilverlink', 'CM_ReligionC16'),
+('/THH/SLVRLNK/RLGN', 'CHR', 'THHSilverlink', 'CM_ReligionC1'),
+('/THH/SLVRLNK/RLGN', 'CHSC', 'THHSilverlink', 'CM_ReligionC19'),
+('/THH/SLVRLNK/RLGN', 'HIN', 'THHSilverlink', 'CM_ReligionD1'),
+('/THH/SLVRLNK/RLGN', 'JAIN', 'THHSilverlink', 'CM_ReligionE1'),
+('/THH/SLVRLNK/RLGN', 'JEW', 'THHSilverlink', 'CM_ReligionF1'),
+('/THH/SLVRLNK/RLGN', 'JWIT', 'THHSilverlink', 'CM_ReligionC44'),
+('/THH/SLVRLNK/RLGN', 'METH', 'THHSilverlink', 'CM_ReligionC49');
 
 -- ******************** Ethnicity ********************
 
@@ -74,10 +91,44 @@ INSERT INTO map_context_meta (provider, `system`, `schema`, `table`, `column`, n
 VALUES ('CM_Org_THH', 'CM_Sys_Silverlink', null, null, 'ethnicity', '/CDS/PTNT/ETHNC_CTGRY');
 
 -- ******************** Admission Method ********************
+-- 5 Aug 2022 - Migrate from NHSDD to Local (4 x new local codes, F|R|U|P)
 
 -- Context
 INSERT INTO map_context_meta (provider, `system`, `schema`, `table`, `column`, node)
-VALUES ('CM_Org_THH', 'CM_Sys_Silverlink', null, null, 'admission_method_code', '/CDS/INPTNT/ADMSSN_MTHD');
+VALUES ('CM_Org_THH', 'CM_Sys_Silverlink', null, null, 'admission_method_code', '/THH/SLVRLNK/ADMSSN_MTHD');
+
+-- Property
+INSERT INTO map_node_meta (node, concept)
+VALUES ('/THH/SLVRLNK/ADMSSN_MTHD', 'DM_methodOfAdmssion');
+
+-- Value maps
+INSERT INTO map_node_value_meta
+(node, value, scheme, concept)
+VALUES
+    -- 5 Aug 2022 - Existing entries migrated from NHSDD -> Local
+    ('/THH/SLVRLNK/ADMSSN_MTHD', '11', 'THHSilverlink', 'CM_AdmMethWa'),
+    ('/THH/SLVRLNK/ADMSSN_MTHD', '12', 'THHSilverlink', 'CM_AdmMetBooked'),
+    ('/THH/SLVRLNK/ADMSSN_MTHD', '13', 'THHSilverlink', 'CM_AdmMetPlanned'),
+    ('/THH/SLVRLNK/ADMSSN_MTHD', '21', 'THHSilverlink', 'CM_AdmMetCasSame'),
+    ('/THH/SLVRLNK/ADMSSN_MTHD', '22', 'THHSilverlink', 'CM_AdmMetGpDirect'),
+    ('/THH/SLVRLNK/ADMSSN_MTHD', '23', 'THHSilverlink', 'CM_AdmMetBedBureau'),
+    ('/THH/SLVRLNK/ADMSSN_MTHD', '24', 'THHSilverlink', 'CM_AdmMetConClin'),
+    ('/THH/SLVRLNK/ADMSSN_MTHD', '28', 'THHSilverlink', 'CM_AdmMetEMore'),
+    ('/THH/SLVRLNK/ADMSSN_MTHD', '31', 'THHSilverlink', 'CM_AdmMetMatAP'),
+    ('/THH/SLVRLNK/ADMSSN_MTHD', '32', 'THHSilverlink', 'CM_AdmMetMatPP'),
+    ('/THH/SLVRLNK/ADMSSN_MTHD', '82', 'THHSilverlink', 'CM_AdmMetBirthHere'),
+    ('/THH/SLVRLNK/ADMSSN_MTHD', '83', 'THHSilverlink', 'CM_AdmMetBirthOut'),
+    ('/THH/SLVRLNK/ADMSSN_MTHD', '81', 'THHSilverlink', 'CM_AdmNonETransfer'),
+    ('/THH/SLVRLNK/ADMSSN_MTHD', '2A', 'THHSilverlink', 'CM_AdmMetCasElsewhere'),
+    ('/THH/SLVRLNK/ADMSSN_MTHD', '2B', 'THHSilverlink', 'CM_AdmMetHosTran'),
+    ('/THH/SLVRLNK/ADMSSN_MTHD', '2C', 'THHSilverlink', 'CM_AdmMetBBhok'),
+    ('/THH/SLVRLNK/ADMSSN_MTHD', '2D', 'THHSilverlink', 'CM_AdmMetEMore'),
+
+    -- 5 Aug 2022 - New entries per v8
+    ('/THH/SLVRLNK/ADMSSN_MTHD', 'F', 'THHSilverlink', 'CM_AdmMetCasSame'),
+    ('/THH/SLVRLNK/ADMSSN_MTHD', 'R', 'THHSilverlink', 'CM_AdmMetCasSame'),
+    ('/THH/SLVRLNK/ADMSSN_MTHD', 'U', 'THHSilverlink', 'CM_AdmMetCasSame'),
+    ('/THH/SLVRLNK/ADMSSN_MTHD', 'P', 'THHSilverlink', 'CM_AdmMetCasSame');
 
 -- ******************** Admission Source ********************
 
@@ -117,19 +168,140 @@ VALUES
 ('/THH/SLVRLNK/ADMSSN_SRC', '87', 'THHSilverlink', 'CM_SrcAdmA9'),
 ('/THH/SLVRLNK/ADMSSN_SRC', '88', 'THHSilverlink', 'CM_SrcAsmA10'),
 ('/THH/SLVRLNK/ADMSSN_SRC', '98', 'THHSilverlink', 'THH_AdmssnSrc98'),
-('/THH/SLVRLNK/ADMSSN_SRC', '99', 'THHSilverlink', 'THH_AdmssnSrc99');
+('/THH/SLVRLNK/ADMSSN_SRC', '99', 'THHSilverlink', 'THH_AdmssnSrc99'),
+-- 5 Aug 2022 - New entries per v8
+('/THH/SLVRLNK/ADMSSN_SRC', '1052681000000100', 'THHSilverlink', 'CM_SrcAdmUsual'),
+('/THH/SLVRLNK/ADMSSN_SRC', '1065391000000100', 'THHSilverlink', 'CM_SrcAdmUsual'),
+('/THH/SLVRLNK/ADMSSN_SRC', '1065401000000100', 'THHSilverlink', 'CM_SrcAdmUsual'),
+('/THH/SLVRLNK/ADMSSN_SRC', '1065991000000100', 'THHSilverlink', 'CM_SrcAdmUsual'),
+('/THH/SLVRLNK/ADMSSN_SRC', '1066001000000100', 'THHSilverlink', 'CM_SrcAdmPePoCo'),
+('/THH/SLVRLNK/ADMSSN_SRC', '1066011000000100', 'THHSilverlink', 'CM_SrcAdmPePoCo'),
+('/THH/SLVRLNK/ADMSSN_SRC', '1066021000000100', 'THHSilverlink', 'CM_SrcAdmUsual'),
+('/THH/SLVRLNK/ADMSSN_SRC', '1066031000000100', 'THHSilverlink', 'CM_SrcAdmUsual'),
+('/THH/SLVRLNK/ADMSSN_SRC', '1066041000000100', 'THHSilverlink', 'CM_SrcAdmUsual'),
+('/THH/SLVRLNK/ADMSSN_SRC', '1066051000000100', 'THHSilverlink', 'CM_SrcAdmUsual'),
+('/THH/SLVRLNK/ADMSSN_SRC', '1066061000000100', 'THHSilverlink', 'CM_SrcAdmUsual'),
+('/THH/SLVRLNK/ADMSSN_SRC', '1066431000000100', 'THHSilverlink', 'CM_SrcAdmA1'),
+('/THH/SLVRLNK/ADMSSN_SRC', '1066441000000100', 'THHSilverlink', 'CM_SrcAdmA1'),
+('/THH/SLVRLNK/ADMSSN_SRC', '1077191000000100', 'THHSilverlink', 'CM_SrcAdmUsual'),
+('/THH/SLVRLNK/ADMSSN_SRC', '1077201000000100', 'THHSilverlink', 'CM_SrcAdmUsual'),
+('/THH/SLVRLNK/ADMSSN_SRC', '1077211000000100', 'THHSilverlink', 'CM_SrcAdmUsual'),
+('/THH/SLVRLNK/ADMSSN_SRC', '1077761000000100', 'THHSilverlink', 'CM_SrcAdmUsual'),
+('/THH/SLVRLNK/ADMSSN_SRC', '1079521000000100', 'THHSilverlink', 'CM_SrcAdmA1'),
+('/THH/SLVRLNK/ADMSSN_SRC', '166941000000106', 'THHSilverlink', 'CM_SrcAdmUsual'),
+('/THH/SLVRLNK/ADMSSN_SRC', '185363009', 'THHSilverlink', 'CM_SrcAdmUsual'),
+('/THH/SLVRLNK/ADMSSN_SRC', '185366001', 'THHSilverlink', 'CM_SrcAdmUsual'),
+('/THH/SLVRLNK/ADMSSN_SRC', '185368000', 'THHSilverlink', 'CM_SrcAdmUsual'),
+('/THH/SLVRLNK/ADMSSN_SRC', '185369008', 'THHSilverlink', 'CM_SrcAdmUsual'),
+('/THH/SLVRLNK/ADMSSN_SRC', '198261000000104', 'THHSilverlink', 'CM_SrcAdmUsual'),
+('/THH/SLVRLNK/ADMSSN_SRC', '276491000', 'THHSilverlink', 'CM_SrcAdmUsual'),
+('/THH/SLVRLNK/ADMSSN_SRC', '315261000000101', 'THHSilverlink', 'CM_SrcAdmUsual'),
+('/THH/SLVRLNK/ADMSSN_SRC', '507291000000100', 'THHSilverlink', 'CM_SrcAdmUsual'),
+('/THH/SLVRLNK/ADMSSN_SRC', '835091000000109', 'THHSilverlink', 'CM_SrcAdmA1'),
+('/THH/SLVRLNK/ADMSSN_SRC', '835101000000101', 'THHSilverlink', 'CM_SrcAdmA1'),
+('/THH/SLVRLNK/ADMSSN_SRC', '877171000000103', 'THHSilverlink', 'CM_SrcAdmUsual'),
+('/THH/SLVRLNK/ADMSSN_SRC', '879591000000102', 'THHSilverlink', 'CM_SrcAdmUsual'),
+('/THH/SLVRLNK/ADMSSN_SRC', '889801000000100', 'THHSilverlink', 'CM_SrcAdmUsual');
 
 -- ******************** Discharge Method ********************
+-- 5 Aug 2022 - Migrate from NHSDD to Local (new local codes)
+
+-- Concepts
+SELECT @scm := dbid FROM concept WHERE id = 'THHSilverlink';
+
+-- Context
+INSERT INTO map_context_meta (provider, `system`, `schema`, `table`, `column`, node)
+VALUES ('CM_Org_THH', 'CM_Sys_Silverlink', null, null, 'discharge_method', '/THH/SLVRLNK/DSCHRG_MTHD');
+
+-- Property
+INSERT INTO map_node_meta (node, concept)
+VALUES ('/THH/SLVRLNK/DSCHRG_MTHD', 'DM_hasDischargeMethod');
+
+-- Value maps
+INSERT INTO map_node_value_meta
+(node, value, scheme, concept)
+VALUES
+    ('/THH/SLVRLNK/DSCHRG_MTHD', '1', 'THHSilverlink', 'CM_DisMethod1'),
+    ('/THH/SLVRLNK/DSCHRG_MTHD', '2', 'THHSilverlink', 'CM_DisMethod2'),
+    ('/THH/SLVRLNK/DSCHRG_MTHD', '3', 'THHSilverlink', 'CM_DisMethod3'),
+    ('/THH/SLVRLNK/DSCHRG_MTHD', '4', 'THHSilverlink', 'CM_DisMethod4'),
+    ('/THH/SLVRLNK/DSCHRG_MTHD', '5', 'THHSilverlink', 'CM_DisMethod5'),
+    ('/THH/SLVRLNK/DSCHRG_MTHD', '182992009', 'THHSilverlink', 'CM_DisMethod1'),
+    ('/THH/SLVRLNK/DSCHRG_MTHD', '1077021000000100', 'THHSilverlink', 'CM_DisMethod1'),
+    ('/THH/SLVRLNK/DSCHRG_MTHD', '1077031000000103', 'THHSilverlink', 'CM_DisMethod1'),
+    ('/THH/SLVRLNK/DSCHRG_MTHD', '1077781000000101', 'THHSilverlink', 'CM_DisMethod1'),
+    ('/THH/SLVRLNK/DSCHRG_MTHD', '1077081000000104', 'THHSilverlink', 'CM_DisMethod1'),
+    ('/THH/SLVRLNK/DSCHRG_MTHD', '1077091000000102', 'THHSilverlink', 'CM_DisMethod1'),
+    ('/THH/SLVRLNK/DSCHRG_MTHD', '1077101000000105', 'THHSilverlink', 'CM_DisMethod1'),
+    ('/THH/SLVRLNK/DSCHRG_MTHD', '1077041000000107', 'THHSilverlink', 'CM_DisMethod1'),
+    ('/THH/SLVRLNK/DSCHRG_MTHD', '1077071000000101', 'THHSilverlink', 'CM_DisMethod1'),
+    ('/THH/SLVRLNK/DSCHRG_MTHD', '1077051000000105', 'THHSilverlink', 'CM_DisMethod1'),
+    ('/THH/SLVRLNK/DSCHRG_MTHD', '1077061000000108', 'THHSilverlink', 'CM_DisMethod1'),
+    ('/THH/SLVRLNK/DSCHRG_MTHD', '1066301000000103', 'THHSilverlink', 'CM_DisMethod2'),
+    ('/THH/SLVRLNK/DSCHRG_MTHD', '1066311000000101', 'THHSilverlink', 'CM_DisMethod2'),
+    ('/THH/SLVRLNK/DSCHRG_MTHD', '1066321000000107', 'THHSilverlink', 'CM_DisMethod2'),
+    ('/THH/SLVRLNK/DSCHRG_MTHD', '63238001', 'THHSilverlink', 'CM_DisMethod4'),
+    ('/THH/SLVRLNK/DSCHRG_MTHD', '75004002', 'THHSilverlink', 'CM_DisMethod4');
 
 -- Context
 INSERT INTO map_context_meta (provider, `system`, `schema`, `table`, `column`, node)
 VALUES ('CM_Org_THH', 'CM_Sys_Silverlink', null, null, 'discharge_method', '/CDS/INPTNT/DSCHRG_MTHD');
 
 -- ******************** Discharge Destination ********************
+-- 5 Aug 2022 - Migrate from NHSDD to Local (new local codes)
+
+-- Concepts
+SELECT @scm := dbid FROM concept WHERE id = 'THHSilverlink';
 
 -- Context
 INSERT INTO map_context_meta (provider, `system`, `schema`, `table`, `column`, node)
-VALUES ('CM_Org_THH', 'CM_Sys_Silverlink', null, null, 'discharge_destination_code', '/CDS/INPTNT/DSCHRG_DSTNTN');
+VALUES ('CM_Org_THH', 'CM_Sys_Silverlink', null, null, 'discharge_destination_code', '/THH/SLVRLNK/DSCHRG_DSTNTN');
+
+-- Property
+INSERT INTO map_node_meta (node, concept)
+VALUES ('/THH/SLVRLNK/DSCHRG_DSTNTN', 'DM_hasDischargeDestination');
+
+-- Value maps
+INSERT INTO map_node_value_meta
+(node, value, scheme, concept)
+VALUES
+    ('/THH/SLVRLNK/DSCHRG_DSTNTN', '19', 'THHSilverlink', 'CM_SrcAdmUsual'),
+    ('/THH/SLVRLNK/DSCHRG_DSTNTN', '29', 'THHSilverlink', 'CM_SrcAdmTempR'),
+    ('/THH/SLVRLNK/DSCHRG_DSTNTN', '30', 'THHSilverlink', 'CM_DisDest30'),
+    ('/THH/SLVRLNK/DSCHRG_DSTNTN', '37', 'THHSilverlink', 'CM_SrcAdmCo'),
+    ('/THH/SLVRLNK/DSCHRG_DSTNTN', '38', 'THHSilverlink', 'CM_DisDest38'),
+    ('/THH/SLVRLNK/DSCHRG_DSTNTN', '48', 'THHSilverlink', 'CM_DisDest48'),
+    ('/THH/SLVRLNK/DSCHRG_DSTNTN', '49', 'THHSilverlink', 'CM_DisDest49'),
+    ('/THH/SLVRLNK/DSCHRG_DSTNTN', '50', 'THHSilverlink', 'CM_DisDest50'),
+    ('/THH/SLVRLNK/DSCHRG_DSTNTN', '51', 'THHSilverlink', 'CM_DisDest51'),
+    ('/THH/SLVRLNK/DSCHRG_DSTNTN', '52', 'THHSilverlink', 'CM_SrcAdmA2'),
+    ('/THH/SLVRLNK/DSCHRG_DSTNTN', '53', 'THHSilverlink', 'CM_SrcAdmA3'),
+    ('/THH/SLVRLNK/DSCHRG_DSTNTN', '54', 'THHSilverlink', 'CM_SrcAdmA4'),
+    ('/THH/SLVRLNK/DSCHRG_DSTNTN', '65', 'THHSilverlink', 'CM_SrcAdmA5'),
+    ('/THH/SLVRLNK/DSCHRG_DSTNTN', '66', 'THHSilverlink', 'CM_SrcAdmA6'),
+    ('/THH/SLVRLNK/DSCHRG_DSTNTN', '79', 'THHSilverlink', 'CM_DisDest79'),
+    ('/THH/SLVRLNK/DSCHRG_DSTNTN', '84', 'THHSilverlink', 'CM_DisDest84'),
+    ('/THH/SLVRLNK/DSCHRG_DSTNTN', '85', 'THHSilverlink', 'CM_SrcAdmA8'),
+    ('/THH/SLVRLNK/DSCHRG_DSTNTN', '87', 'THHSilverlink', 'CM_SrcAdmA9'),
+    ('/THH/SLVRLNK/DSCHRG_DSTNTN', '88', 'THHSilverlink', 'CM_SrcAsmA10'),
+    ('/THH/SLVRLNK/DSCHRG_DSTNTN', '183919006', 'THHSilverlink', 'CM_SrcAsmA10'),
+    ('/THH/SLVRLNK/DSCHRG_DSTNTN', '306689006', 'THHSilverlink', 'CM_SrcAdmUsual'),
+    ('/THH/SLVRLNK/DSCHRG_DSTNTN', '306691003', 'THHSilverlink', 'CM_SrcAdmA5'),
+    ('/THH/SLVRLNK/DSCHRG_DSTNTN', '306694006', 'THHSilverlink', 'CM_SrcAdmA5'),
+    ('/THH/SLVRLNK/DSCHRG_DSTNTN', '306705005', 'THHSilverlink', 'CM_DisDest38'),
+    ('/THH/SLVRLNK/DSCHRG_DSTNTN', '50861005', 'THHSilverlink', 'CM_DisDest38'),
+    ('/THH/SLVRLNK/DSCHRG_DSTNTN', '1066331000000109', 'THHSilverlink', 'CM_DisDest51'),
+    ('/THH/SLVRLNK/DSCHRG_DSTNTN', '1066341000000100', 'THHSilverlink', 'CM_DisDest51'),
+    ('/THH/SLVRLNK/DSCHRG_DSTNTN', '1066351000000102', 'THHSilverlink', 'CM_DisDest51'),
+    ('/THH/SLVRLNK/DSCHRG_DSTNTN', '306706006', 'THHSilverlink', 'CM_DisDest51'),
+    ('/THH/SLVRLNK/DSCHRG_DSTNTN', '1066361000000104', 'THHSilverlink', 'CM_DisDest51'),
+    ('/THH/SLVRLNK/DSCHRG_DSTNTN', '1066371000000106', 'THHSilverlink', 'CM_DisDest51'),
+    ('/THH/SLVRLNK/DSCHRG_DSTNTN', '1066381000000108', 'THHSilverlink', 'CM_DisDest51'),
+    ('/THH/SLVRLNK/DSCHRG_DSTNTN', '1066391000000105', 'THHSilverlink', 'CM_DisDest51'),
+    ('/THH/SLVRLNK/DSCHRG_DSTNTN', '1066401000000108', 'THHSilverlink', 'CM_DisDest52'),
+    ('/THH/SLVRLNK/DSCHRG_DSTNTN', '19712007', 'THHSilverlink', 'CM_DisDest51'),
+    ('/THH/SLVRLNK/DSCHRG_DSTNTN', '305398007', 'THHSilverlink', 'CM_DisDest79');
+
 
 -- ******************** Treatment Function ********************
 -- Concepts
@@ -312,6 +484,8 @@ VALUES ('/THH/SLVRLNK/LNGG', 'DM_language');
 INSERT INTO map_node_value_meta
 (node, value, scheme, concept)
 VALUES
+('/THH/SLVRLNK/LNGG', 'AMH', 'THHSilverlink', 'FHIR_LANG_am'),
+('/THH/SLVRLNK/LNGG', 'BEN', 'THHSilverlink', 'FHIR_LANG_bn'),
 ('/THH/SLVRLNK/LNGG', 'CS', 'THHSilverlink', 'FHIR_LANG_cs'),
 ('/THH/SLVRLNK/LNGG', 'DUT', 'THHSilverlink', 'FHIR_LANG_nl'),
 ('/THH/SLVRLNK/LNGG', 'FARS', 'THHSilverlink', 'FHIR_LANG_fa'),
