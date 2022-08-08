@@ -17,7 +17,8 @@ FROM concept c
 JOIN concept p ON p.id = 'code_prefix'
 WHERE c.id IN ('CM_DiscoveryCode', 'CM_NHS_DD');
 
--- TREATMENT FUNCTION --  https://datadictionary.nhs.uk/attributes/treatment_function_code.html
+-- TREATMENT FUNCTION -- https://datadictionary.nhs.uk/attributes/treatment_function_code.html
+-- MAIN SPECIALITY    -- https://www.datadictionary.nhs.uk/supporting_information/main_specialty_and_treatment_function_codes_table.html
 INSERT IGNORE INTO concept (document, id, scheme, code, name, description)
 VALUES
 (1, 'DM_treatmentFunctionAdmit', @scm, 'DM_treatmentFunctionAdmit', 'Treatment function', 'Treatment function code'),
@@ -215,6 +216,7 @@ VALUES
 (1, 'CM_TrtmntFnc833', @scm, 'CM_TrtmntFnc833', 'Medical Microbiology', 'Medical Microbiology'),
 (1, 'CM_TrtmntFnc900', @scm, 'CM_TrtmntFnc900', 'Community Medicine', 'Community Medicine'),
 (1, 'CM_TrtmntFnc901', @scm, 'CM_TrtmntFnc901', 'Occupational Medicine', 'Occupational Medicine'),
+(1, 'CM_TrtmntFnc902', @scm, 'CM_TrtmntFnc902', 'Community Health Services Dental', 'Community Health Services Dental'),
 (1, 'CM_TrtmntFnc903', @scm, 'CM_TrtmntFnc903', 'Public Health Medicine', 'Public Health Medicine'),
 (1, 'CM_TrtmntFnc950', @scm, 'CM_TrtmntFnc950', 'Nursing', 'Nursing'),
 (1, 'CM_TrtmntFnc960', @scm, 'CM_TrtmntFnc960', 'Allied Health Professional', 'Allied Health Professional'),
