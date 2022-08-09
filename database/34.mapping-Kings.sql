@@ -446,7 +446,8 @@ VALUES
     ('/KINGS/PIMS/TRTMNT_FNCTN', '800', 'KingsPIMS', 'CM_TrtmntFnc800'),
     ('/KINGS/PIMS/TRTMNT_FNCTN', '811', 'KingsPIMS', 'CM_TrtmntFnc811'),
     ('/KINGS/PIMS/TRTMNT_FNCTN', '822', 'KingsPIMS', 'CM_TrtmntFnc822'),
-    ('/KINGS/PIMS/TRTMNT_FNCTN', '840', 'KingsPIMS', 'CM_TrtmntFnc840');
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '840', 'KingsPIMS', 'CM_TrtmntFnc840'),
+    ('/KINGS/PIMS/TRTMNT_FNCTN', '902', 'KingsPIMS', 'CM_TrtmntFnc902');
 
 -- ******************** Language ********************
 
