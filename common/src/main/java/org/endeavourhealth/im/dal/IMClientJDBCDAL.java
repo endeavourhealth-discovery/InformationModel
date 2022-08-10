@@ -34,8 +34,10 @@ public class IMClientJDBCDAL {
                     statement.setString(2, code);
 
                     try (ResultSet resultSet = statement.executeQuery()) {
-                        if (resultSet.next())
+                        if (resultSet.next()) {
                             dbid = resultSet.getInt(1);
+                            tickConcept(conn, dbid);
+                        }
                     }
                 }
 
@@ -117,8 +119,11 @@ public class IMClientJDBCDAL {
             statement.setString(2, code);
 
             try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next())
-                    return resultSet.getInt(1);
+                if (resultSet.next()) {
+                    int dbid = resultSet.getInt(1);
+                    tickConcept(conn, dbid);
+                    return dbid;
+                }
                 else
                     return null;
             }
@@ -135,8 +140,10 @@ public class IMClientJDBCDAL {
             statement.setInt(1, dbid);
 
             try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next())
+                if (resultSet.next()) {
+                    tickConcept(conn, dbid);
                     return resultSet.getString(1);
+                }
                 else
                     return null;
             }
@@ -160,6 +167,7 @@ public class IMClientJDBCDAL {
                 try (ResultSet resultSet = statement.executeQuery()) {
                     if (resultSet.next()) {
                         dbid = resultSet.getInt("target");
+                        tickConcept(conn, dbid);
                     } else if (autoCreate)
                         dbid = createTypeTermConcept(conn, type, term);
                 }
@@ -237,9 +245,11 @@ public class IMClientJDBCDAL {
             statement.setString(2, type);
 
             try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next())
-                    return resultSet.getInt("value");
-                else
+                if (resultSet.next()) {
+                    int dbid = resultSet.getInt("value");
+                    tickConcept(conn, dbid);
+                    return dbid;
+                } else
                     return null;
             }
         }
@@ -259,16 +269,18 @@ public class IMClientJDBCDAL {
             stmt.setString(1, code);
             stmt.setString(2, scheme);
             try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next())
-                    return rs.getString("id");
-                else
+                if (rs.next()) {
+                    String id = rs.getString("id");
+                    tickConcept(conn, id);
+                    return id;
+                } else
                     return null;
             }
         }
     }
 
     public String getMappedCoreCodeForSchemeCode(String scheme, String code, boolean snomedOnly) throws SQLException {
-        String sql = "SELECT c.code\n" +
+        String sql = "SELECT c.dbid, c.code\n" +
             "FROM concept l\n" +
             "JOIN concept s ON s.dbid = l.scheme\n" +
             "JOIN concept_property_object o ON o.dbid = l.dbid\n" +
@@ -286,16 +298,17 @@ public class IMClientJDBCDAL {
             stmt.setString(1, code);
             stmt.setString(2, scheme);
             try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next())
+                if (rs.next()) {
+                    tickConcept(conn, rs.getInt("dbid"));
                     return rs.getString("code");
-                else
+                } else
                     return null;
             }
         }
     }
 
     public String getCodeForTypeTerm(String scheme, String context, String term, boolean autoCreate) throws SQLException, NoSuchAlgorithmException {
-        String sql = "SELECT t.code\n" +
+        String sql = "SELECT t.dbid, t.code\n" +
             "FROM concept c\n" +
             "JOIN concept s ON s.dbid = c.scheme AND s.id = ?\n" +
             "JOIN concept_term_map m on m.type = c.dbid\n" +
@@ -312,9 +325,10 @@ public class IMClientJDBCDAL {
                 stmt.setString(2, context);
                 stmt.setString(3, term);
                 try (ResultSet rs = stmt.executeQuery()) {
-                    if (rs.next())
+                    if (rs.next()) {
+                        tickConcept(conn, rs.getInt("dbid"));
                         result = rs.getString("code");
-                    else {
+                    } else {
                         if (autoCreate)
                             result = createTermTypeConceptAndMap(conn, scheme, context, term);
                     }
@@ -375,5 +389,21 @@ public class IMClientJDBCDAL {
         }
 
         return code;
+    }
+
+
+    // Usage
+    public void tickConcept(Connection conn, String id) throws SQLException {
+        try (PreparedStatement stmt = conn.prepareStatement("UPDATE concept SET use_count = use_count + 1 WHERE id = ?")) {
+            stmt.setString(1, id);
+            stmt.executeUpdate();
+        }
+    }
+
+    public void tickConcept(Connection conn, int dbid) throws SQLException {
+        try (PreparedStatement stmt = conn.prepareStatement("UPDATE concept SET use_count = use_count + 1 WHERE dbid = ?")) {
+            stmt.setInt(1, dbid);
+            stmt.executeUpdate();
+        }
     }
 }
