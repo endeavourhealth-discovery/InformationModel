@@ -45,8 +45,8 @@ public class SetImporter {
     }
 
     private AmazonS3 getS3Client() throws IOException {
-        String accessKey = "";
-        String secretKey = "";
+        String accessKey = null;
+        String secretKey = null;
 
         try {
             JsonNode config = ConfigManager.getConfigurationAsJson("S3Config");
@@ -55,19 +55,23 @@ public class SetImporter {
             } else {
                 bucket = config.get("bucket").asText();
                 region = config.get("region").asText();
-                accessKey = config.get("accessKey").asText();
-                secretKey = config.get("secretKey").asText();
+                if (config.has("accessKey"))
+                    accessKey = config.get("accessKey").asText();
+                if (config.has("secretKey"))
+                    secretKey = config.get("secretKey").asText();
             }
         } catch (JsonProcessingException e) {
             LOG.debug("No S3 config found, reverting to defaults");
         }
 
-        BasicAWSCredentials awsCredentials = new BasicAWSCredentials(accessKey, secretKey);
-        return AmazonS3ClientBuilder
+        AmazonS3ClientBuilder s3Builder = AmazonS3ClientBuilder
             .standard()
-            .withRegion(region)
-            .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
-            .build();
+            .withRegion(region);
+
+        if (accessKey != null && !accessKey.isEmpty() && secretKey != null && !secretKey.isEmpty())
+            s3Builder.withCredentials(new AWSStaticCredentialsProvider(new BasicAWSCredentials(accessKey, secretKey)));
+
+        return s3Builder.build();
     }
 
     private List<String> getFileNamesFromS3(AmazonS3 s3) {
