@@ -11,6 +11,8 @@ VALUES
 -- GENERAL/GLOBAL --
 (1, 'CM_Org_BHRUT', @scm, 'CM_Org_BHRUT', 'BHRUT', 'Barking, Havering and Redbridge Univerity Trust'),
 (1, 'CM_Sys_Medway', @scm, 'CM_Sys_Medway', 'Medway', 'Medway patient administration system'),
+(1, 'DM_AppointmentType', @scm, 'DM_AppointmentType', 'Appointment type', 'The type of the appointment'),                                       -- Property Only    Added 26/8/22
+(1, 'DM_ReferringConsultant', @scm, 'DM_ReferringConsultant', 'Referring Consultant', 'The consultant referring the patient to the encounter'), -- Property Only    Added 26/8/22
 -- MORBIDITY --
 (1, 'DM_CauseOfDeath', @scm, 'DM_CauseOfDeath', 'Cause of death - I(a)', 'Disease or condition leading directly to death - MCCD I(a)'),
 (1, 'DM_CauseOfDeath1b', @scm, 'DM_CauseOfDeath1b', 'Cause of death - I(b)', 'Other disease or condition, if any, leading to I(a) - MCCD I(b)'),
@@ -18,11 +20,11 @@ VALUES
 (1, 'DM_CauseOfDeath2', @scm, 'DM_CauseOfDeath2', 'Contributing to death - II', 'Other significant condition contributing to death but not related to the disease or condition causing it - MCCD II'),
 (1, 'DM_InfectionStatus', @scm, 'DM_InfectionStatus', 'Infection status', 'Infection status (in cases of repatriation request for example)'),
 -- ******************** Spells ********************
-(1, 'DM_AdmissionWardCode', @scm, 'DM_AdmissionWardCode', 'Admission ward code', 'Ward code where the patient was admitted'),   -- Property Only    Added 6/6/22
-(1, 'DM_DischargeWardCode', @scm, 'DM_DischargeWardCode', 'Discharge ward code', 'Ward code the patient was discharged from'),  -- Property Only    Added 6/6/22
+(1, 'DM_AdmissionWardCode', @scm, 'DM_AdmissionWardCode', 'Admission ward code', 'Ward code where the patient was admitted'),           -- Property Only    Added 6/6/22
+(1, 'DM_DischargeWardCode', @scm, 'DM_DischargeWardCode', 'Discharge ward code', 'Ward code the patient was discharged from'),          -- Property Only    Added 6/6/22
     -- ******************** Episodes ********************
-(1, 'DM_EpisodeStartWard', @scm, 'DM_EpisodeStartWard', 'Episode start ward', 'Ward code of the patient at the start of the episode'),   -- Property Only    Added 6/6/22
-(1, 'DM_EpisodeEndWard', @scm, 'DM_EpisodeEndWard', 'Episode end ward', 'Ward code of the patient at the end of the episode')   -- Property Only    Added 6/6/22
+(1, 'DM_EpisodeStartWard', @scm, 'DM_EpisodeStartWard', 'Episode start ward', 'Ward code of the patient at the start of the episode'),  -- Property Only    Added 6/6/22
+(1, 'DM_EpisodeEndWard', @scm, 'DM_EpisodeEndWard', 'Episode end ward', 'Ward code of the patient at the end of the episode')           -- Property Only    Added 6/6/22
 ;
 
 -- Context maps
@@ -30,26 +32,29 @@ INSERT INTO map_context_meta
 (provider, `system`, `schema`, `table`, `column`, node)
 VALUES
 -- ******************** Morbidity ********************
-('CM_Org_BHRUT', 'CM_Sys_Medway', 'MedwayBI', 'PMI', 'CAUSEOFDEATH',                    '/BHRUT/MDWY/MDWYBI/PMI/CS_DTH'),
-('CM_Org_BHRUT', 'CM_Sys_Medway', 'MedwayBI', 'PMI', 'CAUSEOFDEATH 1B',                 '/BHRUT/MDWY/MDWYBI/PMI/CS_DTH_1B'),
-('CM_Org_BHRUT', 'CM_Sys_Medway', 'MedwayBI', 'PMI', 'CAUSEOFDEATH 1c',                 '/BHRUT/MDWY/MDWYBI/PMI/CS_DTH_1C'),
-('CM_Org_BHRUT', 'CM_Sys_Medway', 'MedwayBI', 'PMI', 'CAUSEOFDEATH 2',                  '/BHRUT/MDWY/MDWYBI/PMI/CS_DTH_2'),
-('CM_Org_BHRUT', 'CM_Sys_Medway', 'MedwayBI', 'PMI', 'INFECTION_STATUS',                '/BHRUT/MDWY/MDWYBI/PMI/INFCTN_STTS'),
+('CM_Org_BHRUT', 'CM_Sys_Medway', 'MedwayBI', 'PMI', 'CAUSEOFDEATH',        '/BHRUT/MDWY/MDWYBI/PMI/CS_DTH'),
+('CM_Org_BHRUT', 'CM_Sys_Medway', 'MedwayBI', 'PMI', 'CAUSEOFDEATH 1B',     '/BHRUT/MDWY/MDWYBI/PMI/CS_DTH_1B'),
+('CM_Org_BHRUT', 'CM_Sys_Medway', 'MedwayBI', 'PMI', 'CAUSEOFDEATH 1c',     '/BHRUT/MDWY/MDWYBI/PMI/CS_DTH_1C'),
+('CM_Org_BHRUT', 'CM_Sys_Medway', 'MedwayBI', 'PMI', 'CAUSEOFDEATH 2',      '/BHRUT/MDWY/MDWYBI/PMI/CS_DTH_2'),
+('CM_Org_BHRUT', 'CM_Sys_Medway', 'MedwayBI', 'PMI', 'INFECTION_STATUS',    '/BHRUT/MDWY/MDWYBI/PMI/INFCTN_STTS'),
 -- ******************** Spells ********************
-('CM_Org_BHRUT', 'CM_Sys_Medway', 'MedwayBI', 'Spells', 'patient_class',                '/CDS/INPTNT/PTNT_CLSSFCTN'),       -- NHS DD
-('CM_Org_BHRUT', 'CM_Sys_Medway', 'MedwayBI', 'Spells', 'admission_source_code',        '/CDS/INPTNT/ADMSSN_SRC'),          -- NHS DD
-('CM_Org_BHRUT', 'CM_Sys_Medway', 'MedwayBI', 'Spells', 'admission_method_code',        '/CDS/INPTNT/ADMSSN_MTHD'),         -- NHS DD
-('CM_Org_BHRUT', 'CM_Sys_Medway', 'MedwayBI', 'Spells', 'discharge_method_code',        '/CDS/INPTNT/DSCHRG_MTHD'),         -- NHS DD
-('CM_Org_BHRUT', 'CM_Sys_Medway', 'MedwayBI', 'Spells', 'discharge_destination_code',   '/CDS/INPTNT/DSCHRG_DSTNTN'),       -- NHS DD
-('CM_Org_BHRUT', 'CM_Sys_Medway', 'MedwayBI', 'Spells', 'ADMISSION_WARD_CODE',          '/BHRUT/MDWY/MDWYBI/SPLLS/ADMSSN_WRD_CD'),       -- Property Only    Added 6/6/22
-('CM_Org_BHRUT', 'CM_Sys_Medway', 'MedwayBI', 'Spells', 'DISCHARGE_WARD_CODE',          '/BHRUT/MDWY/MDWYBI/SPLLS/DSCHRG_WRD_CD'),       -- Property Only    Added 6/6/22
+('CM_Org_BHRUT', 'CM_Sys_Medway', 'MedwayBI', 'Spells', 'patient_class',                '/CDS/INPTNT/PTNT_CLSSFCTN'),                   -- NHS DD
+('CM_Org_BHRUT', 'CM_Sys_Medway', 'MedwayBI', 'Spells', 'admission_source_code',        '/CDS/INPTNT/ADMSSN_SRC'),                      -- NHS DD
+('CM_Org_BHRUT', 'CM_Sys_Medway', 'MedwayBI', 'Spells', 'admission_method_code',        '/CDS/INPTNT/ADMSSN_MTHD'),                     -- NHS DD
+('CM_Org_BHRUT', 'CM_Sys_Medway', 'MedwayBI', 'Spells', 'discharge_method_code',        '/CDS/INPTNT/DSCHRG_MTHD'),                     -- NHS DD
+('CM_Org_BHRUT', 'CM_Sys_Medway', 'MedwayBI', 'Spells', 'discharge_destination_code',   '/CDS/INPTNT/DSCHRG_DSTNTN'),                   -- NHS DD
+('CM_Org_BHRUT', 'CM_Sys_Medway', 'MedwayBI', 'Spells', 'ADMISSION_WARD_CODE',          '/BHRUT/MDWY/MDWYBI/SPLLS/ADMSSN_WRD_CD'),      -- Property Only - Added 6/6/22
+('CM_Org_BHRUT', 'CM_Sys_Medway', 'MedwayBI', 'Spells', 'DISCHARGE_WARD_CODE',          '/BHRUT/MDWY/MDWYBI/SPLLS/DSCHRG_WRD_CD'),      -- Property Only - Added 6/6/22
+('CM_Org_BHRUT', 'CM_Sys_Medway', 'MedwayBI', 'Spells', 'ADMISSION_SPECIALTY_CODE',     '/CDS/INPTNT/MN_SPCLTY'),                       -- NHS DD - Added 26/8/22
 -- ******************** Episodes ********************
 ('CM_Org_BHRUT', 'CM_Sys_Medway', 'MedwayBI', 'Episodes', 'administrative_category_code',   '/CDS/INPTNT/ADMNSTRV_CTGRY'),              -- NHS DD
 ('CM_Org_BHRUT', 'CM_Sys_Medway', 'MedwayBI', 'Episodes', 'EPISODE_START_WARD_CODE',        '/BHRUT/MDWY/MDWYBI/EPSDS/EPSD_STRT_WRD'),  -- Property Only    Added 6/6/22
 ('CM_Org_BHRUT', 'CM_Sys_Medway', 'MedwayBI', 'Episodes', 'EPISODE_END_WARD_CODE',          '/BHRUT/MDWY/MDWYBI/EPSDS/EPSD_END_WRD'),   -- Property Only    Added 6/6/22
+('CM_Org_BHRUT', 'CM_Sys_Medway', 'MedwayBI', 'Episodes', 'EPISODE_SPECIALTY_CODE',         '/CDS/INPTNT/MN_SPCLTY'),                   -- NHS DD - Added 26/8/22
 -- ******************** Outpatients ********************
-('CM_Org_BHRUT', 'CM_Sys_Medway', 'MedwayBI', 'Outpatients', 'admin_category_code',          '/CDS/INPTNT/ADMNSTRV_CTGRY'),     -- NHS DD
-('CM_Org_BHRUT', 'CM_Sys_Medway', 'MedwayBI', 'Outpatients', 'appointment_status_code',      '/CDS/OUTPTNT/APPT_ATTNDD'),       -- NHS DD
+('CM_Org_BHRUT', 'CM_Sys_Medway', 'MedwayBI', 'Outpatients', 'admin_category_code',         '/CDS/INPTNT/ADMNSTRV_CTGRY'),              -- NHS DD
+('CM_Org_BHRUT', 'CM_Sys_Medway', 'MedwayBI', 'Outpatients', 'appointment_status_code',     '/CDS/OUTPTNT/APPT_ATTNDD'),                -- NHS DD
+('CM_Org_BHRUT', 'CM_Sys_Medway', 'MedwayBI', 'Outpatients', 'SPECIALTY_CODE',              '/CDS/INPTNT/MN_SPCLTY'),                   -- NHS DD - Added 26/8/22
 -- ******************** Accident & Emergency ********************
 ('CM_Org_BHRUT', 'CM_Sys_Medway', 'MedwayBI', 'AandeAttendances', 'arrival_mode',           '/BHRUT/MDWY/MDWYBI/EMGCY/ARRVL_MD'),       -- Property Only    Added 14/6/22
 ('CM_Org_BHRUT', 'CM_Sys_Medway', 'MedwayBI', 'AandeAttendances', 'attendance_type',        '/BHRUT/MDWY/MDWYBI/EMGCY/ATTNDNC_CTGRY'),  -- Property Only    Added 14/6/22
@@ -78,3 +83,4 @@ VALUES
 ('/BHRUT/MDWY/MDWYBI/EMGCY/RCRDD_OTCM',         'DM_hasAttendanceOutcome'),     -- Property Only    Added 14/6/22
 ('/BHRUT/MDWY/MDWYBI/EMGCY/DSCHRG_DSTNTN',      'DM_hasDischargeDestination')   -- Property Only    Added 14/6/22
 ;
+
