@@ -136,10 +136,17 @@ public class ConceptExport {
 
     private static void pushFileToGit(String conceptDir) throws IOException, InterruptedException {
         LOG.info("Pushing to GIT");
+        // Rollback any local/pending in case of failed previous run
+        git("fetch", conceptDir);
+        git("reset --hard origin/main", conceptDir);
+
+        // Stage changed file
         git("add " + conceptDir + "concepts.zip", conceptDir);
 
+        // Commit local
         git("commit -m \"ConceptExport\"", conceptDir);
 
+        // Push remote
         git("push -u origin master", conceptDir);
     }
 
