@@ -161,6 +161,8 @@ public class ConceptExport {
         cmd.add("git");
         cmd.addAll(Arrays.asList(params));
 
+        LOG.info("Command [{}]", String.join(" ", cmd));
+
         ProcessBuilder builder = new ProcessBuilder();
         builder.command(cmd);
         builder.directory(new File(conceptDir));
