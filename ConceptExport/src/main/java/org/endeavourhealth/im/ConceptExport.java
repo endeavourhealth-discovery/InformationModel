@@ -81,10 +81,13 @@ public class ConceptExport {
             if (startDbid != null)
                 stmt.setInt(1, startDbid);
 
-            LOG.info("Exporting....");
+            stmt.setFetchSize(1000);
+
+            LOG.info("Executing....");
             int count = 0;
             try (ResultSet rs = stmt.executeQuery()) {
                 ResultSetMetaData meta = rs.getMetaData();
+                LOG.info("Fetching....");
                 while (rs.next()) {
                     if (++count % 1000 == 0)
                         LOG.info("...{}...", count);

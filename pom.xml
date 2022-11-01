@@ -18,7 +18,7 @@
   </modules>
 
   <properties>
-    <java.version>1.8</java.version>
+    <java.version>11</java.version>
     <maven-aspectj-plugin.version>1.10</maven-aspectj-plugin.version>
     <maven-compiler-plugin.version>3.1</maven-compiler-plugin.version>
     <maven-dependency-plugin.version>3.1.1</maven-dependency-plugin.version>
