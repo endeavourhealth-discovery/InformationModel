@@ -65,6 +65,7 @@ public class ConceptExport {
     }
 
     private static Integer exportNewData(String conceptFile, Integer startDbid) throws SQLException, IOException {
+        LOG.info("Checking for new concepts...");
         StringJoiner sql = new StringJoiner(System.lineSeparator())
             .add("SELECT *")
             .add("FROM concept");
@@ -73,7 +74,7 @@ public class ConceptExport {
             sql.add("WHERE dbid > ?");
 
         try (Connection conn = getIMv1Connection();
-             PreparedStatement stmt = conn.prepareStatement(sql.toString());
+             PreparedStatement stmt = conn.prepareStatement(sql.toString(), ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
              FileWriter fw = new FileWriter(conceptFile + "concepts.txt");
              BufferedWriter bw = new BufferedWriter(fw);
              PrintWriter out = new PrintWriter(bw)) {
@@ -81,9 +82,12 @@ public class ConceptExport {
                 stmt.setInt(1, startDbid);
 
             LOG.info("Exporting....");
+            int count = 0;
             try (ResultSet rs = stmt.executeQuery()) {
                 ResultSetMetaData meta = rs.getMetaData();
                 while (rs.next()) {
+                    if (++count % 1000 == 0)
+                        LOG.info("...{}...", count);
                     startDbid = rs.getInt("dbid");
                     StringJoiner row = new StringJoiner("\t");
 
@@ -93,6 +97,8 @@ public class ConceptExport {
 
                     out.println(row);
                 }
+
+                LOG.info("{} new concepts", count);
             }
         }
 
@@ -125,6 +131,7 @@ public class ConceptExport {
 
     private static void pushFileToGit(String conceptDir) throws IOException, InterruptedException {
         LOG.info("Pushing to GIT");
+        git("pull", conceptDir);
         git("add " + conceptDir + "concepts.zip", conceptDir);
 
         Date now = new Date();
