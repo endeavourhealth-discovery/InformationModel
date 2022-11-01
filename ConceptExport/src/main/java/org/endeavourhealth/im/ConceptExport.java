@@ -17,7 +17,7 @@ public class ConceptExport {
 
     private static final String APP_ID = "ConceptExport";
     private static final String LAST_DBID = "LastDbid";
-    private static final Integer BATCH_SIZE = 5000;
+    private static final Integer BATCH_SIZE = 50000;
     private static final Integer ZIP_BUFFER = 1024 * 32;
 
     private static ConfigHelper config;
@@ -136,48 +136,28 @@ public class ConceptExport {
 
     private static void pushFileToGit(String conceptDir) throws IOException, InterruptedException {
         LOG.info("Pushing to GIT");
-        git(conceptDir, "pull");
-        git(conceptDir, "add", conceptDir + "concepts.zip");
+        git("add " + conceptDir + "concepts.zip", conceptDir);
 
+        git("commit -m \"ConceptExport\"", conceptDir);
 
-        Date now = new Date();
-        SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String commitMessage = "New concepts as of " + sf.format(now);
-        git(conceptDir, "commit", "-m", commitMessage);
-
-        git(conceptDir, "push", "-u", "origin", "master");
+        git("push -u origin master", conceptDir);
     }
 
-    private static void git(String conceptDir, String... params) throws IOException, InterruptedException {
-        List<String> cmd = new ArrayList<>();
-        if (System.getProperty("os.name").toLowerCase().startsWith("windows")) {
-            cmd.add("cmd.exe");
-            cmd.add("/c");
-        } else {
-            cmd.add("sh");
-            cmd.add("-c");
-        }
+    private static void git(String command, String conceptDir) throws IOException, InterruptedException {
+        String gitCmd = "git " + command;
+        LOG.info("Command [{}]", gitCmd);
 
-        cmd.add("git");
-        cmd.addAll(Arrays.asList(params));
-
-        LOG.info("Command [{}]", String.join(" ", cmd));
-
-        ProcessBuilder builder = new ProcessBuilder();
-        builder.command(cmd);
-        builder.directory(new File(conceptDir));
-
-        Process proc = builder.start();
-        int exitCode = proc.waitFor();
+        Runtime rt = Runtime.getRuntime();
+        Process proc = rt.exec(gitCmd, null, new File(conceptDir));
+        proc.waitFor();
 
         LOG.debug(getStreamAsString(proc.getInputStream()));
         LOG.error(getStreamAsString(proc.getErrorStream()));
 
-        if (exitCode != 0) {
+        if (proc.exitValue() != 0) {
             LOG.error("Git command failed - {}", proc.exitValue());
             System.exit(-1);
         }
-
     }
 
     private static String getStreamAsString(InputStream is) throws IOException {
