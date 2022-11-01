@@ -7,8 +7,8 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.sql.*;
 import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.Date;
-import java.util.StringJoiner;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -136,30 +136,42 @@ public class ConceptExport {
 
     private static void pushFileToGit(String conceptDir) throws IOException, InterruptedException {
         LOG.info("Pushing to GIT");
-        git("pull", conceptDir);
-        git("add " + conceptDir + "concepts.zip", conceptDir);
+        git(conceptDir, "pull");
+        git(conceptDir, "add", conceptDir + "concepts.zip");
+
 
         Date now = new Date();
         SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String commitMessage = "New concepts as of " + sf.format(now);
-        git("commit -m '" + commitMessage + "'", conceptDir);
+        git(conceptDir, "commit", "-m", commitMessage);
 
-        git("push -u origin master", conceptDir);
+        git(conceptDir, "push", "-u", "origin", "master");
     }
 
-    private static void git(String command, String conceptDir) throws IOException, InterruptedException {
-        Runtime rt = Runtime.getRuntime();
+    private static void git(String conceptDir, String... params) throws IOException, InterruptedException {
+        List<String> cmd = new ArrayList<>();
+        if (System.getProperty("os.name").toLowerCase().startsWith("windows")) {
+            cmd.add("cmd.exe");
+            cmd.add("/c");
+        } else {
+            cmd.add("sh");
+            cmd.add("-c");
+        }
 
-        String cmd = "git " + command;
-        LOG.info("Executing command [{}]", cmd);
+        cmd.add("git");
+        cmd.addAll(Arrays.asList(params));
 
-        Process proc = rt.exec(cmd, null, new File(conceptDir));
-        proc.waitFor();
+        ProcessBuilder builder = new ProcessBuilder();
+        builder.command(cmd);
+        builder.directory(new File(conceptDir));
+
+        Process proc = builder.start();
+        int exitCode = proc.waitFor();
 
         LOG.debug(getStreamAsString(proc.getInputStream()));
         LOG.error(getStreamAsString(proc.getErrorStream()));
 
-        if (proc.exitValue() != 0) {
+        if (exitCode != 0) {
             LOG.error("Git command failed - {}", proc.exitValue());
             System.exit(-1);
         }
