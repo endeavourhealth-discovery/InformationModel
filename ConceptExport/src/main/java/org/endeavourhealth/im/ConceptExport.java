@@ -15,7 +15,7 @@ import java.util.zip.ZipOutputStream;
 public class ConceptExport {
     private static final Logger LOG = LoggerFactory.getLogger(ConceptExport.class);
 
-    private static final String APP_ID = "IMv1Sender";
+    private static final String APP_ID = "ConceptExport";
     private static final String LAST_DBID = "LastDbid";
 
     private static ConfigHelper config;
@@ -81,7 +81,7 @@ public class ConceptExport {
             if (startDbid != null)
                 stmt.setInt(1, startDbid);
 
-            stmt.setFetchSize(1000);
+            stmt.setFetchSize(Integer.MIN_VALUE);
 
             LOG.info("Executing....");
             int count = 0;
