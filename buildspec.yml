@@ -24,3 +24,4 @@ artifacts:
     - aws_scripts/**/*
     - api/target/api/**/*
     - IMv2Receiver/target/IMv2Receiver.jar
+    - ConceptExport/target/ConceptExport.jar

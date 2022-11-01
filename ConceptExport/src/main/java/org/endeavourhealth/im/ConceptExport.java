@@ -4,67 +4,99 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Date;
+import java.io.*;
 import java.sql.*;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.StringJoiner;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 public class ConceptExport {
     private static final Logger LOG = LoggerFactory.getLogger(ConceptExport.class);
 
     private static final String APP_ID = "IMv1Sender";
-    private static final String LAST_DATE = "LastDate";
-    private static final String S3_CONFIG = "S3Config";
+    private static final String LAST_DBID = "LastDbid";
 
     private static ConfigHelper config;
-    private static AWSHelper s3;
-    private static Date lastExport;
-    private static Date now;
-    private static String baseName;
 
     public static void main(String[] argv) throws Exception {
-        LOG.info("Exporting latest IM(v1) concept data to S3");
+        if (argv.length != 1) {
+            LOG.error("Usage: ConceptExport <folder>");
+            System.exit(-1);
+        }
+
+        String conceptDir = argv[0];
+        if (!conceptDir.endsWith("/"))
+            conceptDir += "/";
+
+        LOG.info("Exporting new concepts from IM1");
+        LOG.debug("Working directory [{}]", conceptDir);
 
         config = new ConfigHelper(APP_ID);
-        s3 = getS3Helper();
-        lastExport = getLastExportedDateTimeFromConfig();
-        now = new Date();
-        SimpleDateFormat sf = new SimpleDateFormat("yyyyMMddHHmmss");
-        baseName = sf.format(lastExport) + "-" + sf.format(now) + "_";
+        Integer lastDbid = getLastExportedDbidFromConfig();
 
-        exportNewDataToS3BetweenDates();
+        Integer newDbid = exportNewData(conceptDir, lastDbid);
 
-        saveLastExportedDateTimeToConfig();
+        if (newDbid != null && newDbid.equals(lastDbid)) {
+            LOG.info("No new concepts");
+        } else {
+            LOG.warn("New concepts added");
+            zipConceptFile(conceptDir);
+            pushFileToGit(conceptDir);
+            saveLastExportedDbidToConfig(newDbid);
+        }
 
         LOG.info("Export complete");
     }
 
-    private static AWSHelper getS3Helper() throws SQLException, JsonProcessingException {
-        LOG.debug("Retrieving S3 config...");
-        AWSConfig s3Config = config.get(S3_CONFIG, AWSConfig.class);
-        return new AWSHelper(s3Config);
-    }
+    private static Integer getLastExportedDbidFromConfig() throws SQLException, JsonProcessingException {
+        LOG.debug("Retrieving last exported DBID...");
 
-    private static Date getLastExportedDateTimeFromConfig() throws SQLException, JsonProcessingException {
-        LOG.debug("Retrieving last exported DateTime...");
+        Integer dbid = config.get(LAST_DBID, Integer.class);
 
-        Date lastDbid = config.get(LAST_DATE, Date.class);
-
-        if (lastDbid == null) {
-            LOG.warn("...not found, defaulting to 1-Jan-1970");
-            return new Date(0);
+        if (dbid == null) {
+            LOG.warn("First run, exporting all concepts");
         } else {
-            LOG.debug("...got:-{}", lastDbid);
-            return lastDbid;
+            LOG.info("Continuing from {}", dbid);
         }
+
+        return dbid;
     }
 
-    private static void exportNewDataToS3BetweenDates() throws SQLException, JsonProcessingException {
-        try (Connection conn = getIMv1Connection()) {
-            exportQueryResultsToS3BetweenDates(conn, "concept");
-            exportQueryResultsToS3BetweenDates(conn, "concept_property_object");
-            exportQueryResultsToS3BetweenDates(conn, "concept_property_data");
+    private static Integer exportNewData(String conceptFile, Integer startDbid) throws SQLException, IOException {
+        StringJoiner sql = new StringJoiner(System.lineSeparator())
+            .add("SELECT *")
+            .add("FROM concept");
+
+        if (startDbid != null)
+            sql.add("WHERE dbid > ?");
+
+        try (Connection conn = getIMv1Connection();
+             PreparedStatement stmt = conn.prepareStatement(sql.toString());
+             FileWriter fw = new FileWriter(conceptFile + "concepts.txt");
+             BufferedWriter bw = new BufferedWriter(fw);
+             PrintWriter out = new PrintWriter(bw)) {
+            if (startDbid != null)
+                stmt.setInt(1, startDbid);
+
+            LOG.info("Exporting....");
+            try (ResultSet rs = stmt.executeQuery()) {
+                ResultSetMetaData meta = rs.getMetaData();
+                while (rs.next()) {
+                    startDbid = rs.getInt("dbid");
+                    StringJoiner row = new StringJoiner("\t");
+
+                    for (int i = 1; i <= meta.getColumnCount(); i++) {
+                        row.add(rs.getString(i));
+                    }
+
+                    out.println(row);
+                }
+            }
         }
+
+        return startDbid;
     }
 
     private static Connection getIMv1Connection() throws SQLException, JsonProcessingException {
@@ -74,56 +106,58 @@ public class ConceptExport {
         return DriverManager.getConnection(v1Conn.getUrl(), v1Conn.getUsername(), v1Conn.getPassword());
     }
 
-    private static void exportQueryResultsToS3BetweenDates(Connection conn, String table) throws SQLException {
-        LOG.info("Exporting from {}...", table);
+    private static void zipConceptFile(String conceptDir) throws IOException {
+        LOG.info("Zipping concepts...");
+        File fileToZip = new File(conceptDir + "concepts.txt");
+        try (FileOutputStream fos = new FileOutputStream(conceptDir + "concepts.zip");
+             ZipOutputStream zipOut = new ZipOutputStream(fos);
+             FileInputStream fis = new FileInputStream(fileToZip)) {
 
-        try (PreparedStatement stmt = conn.prepareStatement("SELECT * FROM " + table + " WHERE updated BETWEEN ? AND ?")) {
-            stmt.setDate(1, new java.sql.Date(lastExport.getTime()));
-            stmt.setDate(2, new java.sql.Date(now.getTime()));
-            LOG.debug("Running SQL...");
-            try (ResultSet rs = stmt.executeQuery()) {
-                LOG.debug("Collecting data...");
-                StringJoiner data = new StringJoiner("\n");
-                data.add(getHeader(rs));
-
-                while(rs.next()) {
-                    data.add(getRow(rs));
-                }
-
-                LOG.debug("Sending to S3...");
-                s3.put(baseName + table + ".csv", data.toString());
+            ZipEntry zipEntry = new ZipEntry(fileToZip.getName());
+            zipOut.putNextEntry(zipEntry);
+            byte[] bytes = new byte[1024 * 32];
+            int length;
+            while ((length = fis.read(bytes)) >= 0) {
+                zipOut.write(bytes, 0, length);
             }
         }
     }
 
-    private static String getHeader(ResultSet resultSet) throws SQLException {
-        ResultSetMetaData meta = resultSet.getMetaData();
-        int cols = meta.getColumnCount();
+    private static void pushFileToGit(String conceptDir) throws IOException, InterruptedException {
+        LOG.info("Pushing to GIT");
+        git("add " + conceptDir + "concepts.zip", conceptDir);
 
-        StringJoiner row = new StringJoiner("\t");
+        Date now = new Date();
+        SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String commitMessage = "New concepts as of " + sf.format(now);
+        git("commit -m \"" + commitMessage + "\"", conceptDir);
 
-        for (int i = 1; i <= cols; i++)
-            row.add(meta.getColumnName(i));
-
-        return row.toString();
+        git("push -u origin master", conceptDir);
     }
 
-    private static String getRow(ResultSet resultSet) throws SQLException {
-        ResultSetMetaData meta = resultSet.getMetaData();
-        int cols = meta.getColumnCount();
+    private static void git(String command, String conceptDir) throws IOException, InterruptedException {
+        Runtime rt = Runtime.getRuntime();
 
-        StringJoiner row = new StringJoiner("\t");
+        Process proc = rt.exec("git " + command, null, new File(conceptDir));
+        proc.waitFor();
 
-        for (int i = 1; i <= cols; i++) {
-            String cell = resultSet.getString(i);
-            row.add(resultSet.wasNull() ? "" : cell);
+        LOG.debug(getStreamAsString(proc.getInputStream()));
+        LOG.error(getStreamAsString(proc.getErrorStream()));
+
+        if (proc.exitValue() != 0) {
+            LOG.error("Git command failed - {}", proc.exitValue());
+            System.exit(-1);
         }
 
-        return row.toString();
     }
 
-    private static void saveLastExportedDateTimeToConfig() throws SQLException, JsonProcessingException {
+    private static String getStreamAsString(InputStream is) throws IOException {
+        byte b[]=new byte[is.available()];
+        is.read(b,0,b.length);
+        return new String(b);
+    }
+    private static void saveLastExportedDbidToConfig(Integer lastDbid) throws SQLException, JsonProcessingException {
         LOG.info("Updating config with latest ID..");
-        config.set(LAST_DATE, new SimpleDateFormat("'\"'yyyy-MM-dd'T'HH:mm:ss'\"'").format(now));
+        config.set(LAST_DBID, lastDbid);
     }
 }

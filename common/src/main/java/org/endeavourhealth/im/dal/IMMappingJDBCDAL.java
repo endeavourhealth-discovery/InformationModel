@@ -161,8 +161,10 @@ public class IMMappingJDBCDAL implements IMMappingDAL {
             stmt.setInt(1, valueNode.getId());
             if (hasValue(value.getCode()))
                 stmt.setString(2, value.getCode());
-            else
+            else if (hasValue(value.getTerm()))
                 stmt.setString(2, value.getTerm());
+            else
+                stmt.setNull(2, Types.VARCHAR);
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next())
