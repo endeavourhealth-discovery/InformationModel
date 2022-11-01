@@ -44,6 +44,7 @@ public class ConceptExport {
             LOG.info("No new concepts");
         } else {
             LOG.warn("New concepts added");
+            prepareGit(conceptDir);
             zipConceptFile(conceptDir);
             pushFileToGit(conceptDir);
             saveLastExportedDbidToConfig(newDbid);
@@ -77,7 +78,7 @@ public class ConceptExport {
 
         try (Connection conn = getIMv1Connection();
              PreparedStatement stmt = conn.prepareStatement(sql.toString(), ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
-             FileWriter fw = new FileWriter(conceptFile + "concepts.txt");
+             FileWriter fw = new FileWriter(conceptFile + "IMv1/concepts.txt");
              BufferedWriter bw = new BufferedWriter(fw);
              PrintWriter out = new PrintWriter(bw)) {
             if (startDbid != null)
@@ -117,10 +118,16 @@ public class ConceptExport {
         return DriverManager.getConnection(v1Conn.getUrl(), v1Conn.getUsername(), v1Conn.getPassword());
     }
 
+    private static void prepareGit(String conceptDir) throws IOException, InterruptedException {
+        LOG.info("Preparing GIT");
+        // Rollback any local/pending in case of failed previous run
+        git("fetch", conceptDir);
+        git("reset --hard origin/main", conceptDir);
+    }
     private static void zipConceptFile(String conceptDir) throws IOException {
         LOG.info("Zipping concepts...");
-        File fileToZip = new File(conceptDir + "concepts.txt");
-        try (FileOutputStream fos = new FileOutputStream(conceptDir + "concepts.zip");
+        File fileToZip = new File(conceptDir + "IMv1/concepts.txt");
+        try (FileOutputStream fos = new FileOutputStream(conceptDir + "IMv1/concepts.zip");
              ZipOutputStream zipOut = new ZipOutputStream(fos);
              FileInputStream fis = new FileInputStream(fileToZip)) {
 
@@ -136,12 +143,9 @@ public class ConceptExport {
 
     private static void pushFileToGit(String conceptDir) throws IOException, InterruptedException {
         LOG.info("Pushing to GIT");
-        // Rollback any local/pending in case of failed previous run
-        git("fetch", conceptDir);
-        git("reset --hard origin/main", conceptDir);
 
         // Stage changed file
-        git("add " + conceptDir + "concepts.zip", conceptDir);
+        git("add IMv1/concepts.zip", conceptDir);
 
         // Commit local
         git("commit -m \"ConceptExport\"", conceptDir);
