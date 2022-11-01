@@ -151,7 +151,7 @@ public class ConceptExport {
         git("commit -m \"ConceptExport\"", conceptDir);
 
         // Push remote
-        git("push -u origin master", conceptDir);
+        git("push -u origin main", conceptDir);
     }
 
     private static void git(String command, String conceptDir) throws IOException, InterruptedException {
