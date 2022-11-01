@@ -17,6 +17,8 @@ public class ConceptExport {
 
     private static final String APP_ID = "ConceptExport";
     private static final String LAST_DBID = "LastDbid";
+    private static final Integer BATCH_SIZE = 5000;
+    private static final Integer ZIP_BUFFER = 1024 * 32;
 
     private static ConfigHelper config;
 
@@ -89,7 +91,7 @@ public class ConceptExport {
                 ResultSetMetaData meta = rs.getMetaData();
                 LOG.info("Fetching....");
                 while (rs.next()) {
-                    if (++count % 1000 == 0)
+                    if (++count % BATCH_SIZE == 0)
                         LOG.info("...{}...", count);
                     startDbid = rs.getInt("dbid");
                     StringJoiner row = new StringJoiner("\t");
@@ -124,7 +126,7 @@ public class ConceptExport {
 
             ZipEntry zipEntry = new ZipEntry(fileToZip.getName());
             zipOut.putNextEntry(zipEntry);
-            byte[] bytes = new byte[1024 * 32];
+            byte[] bytes = new byte[ZIP_BUFFER];
             int length;
             while ((length = fis.read(bytes)) >= 0) {
                 zipOut.write(bytes, 0, length);
@@ -140,7 +142,7 @@ public class ConceptExport {
         Date now = new Date();
         SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String commitMessage = "New concepts as of " + sf.format(now);
-        git("commit -m \"" + commitMessage + "\"", conceptDir);
+        git("commit -m '" + commitMessage + "'", conceptDir);
 
         git("push -u origin master", conceptDir);
     }
@@ -148,7 +150,10 @@ public class ConceptExport {
     private static void git(String command, String conceptDir) throws IOException, InterruptedException {
         Runtime rt = Runtime.getRuntime();
 
-        Process proc = rt.exec("git " + command, null, new File(conceptDir));
+        String cmd = "git " + command;
+        LOG.info("Executing command [{}]", cmd);
+
+        Process proc = rt.exec(cmd, null, new File(conceptDir));
         proc.waitFor();
 
         LOG.debug(getStreamAsString(proc.getInputStream()));
