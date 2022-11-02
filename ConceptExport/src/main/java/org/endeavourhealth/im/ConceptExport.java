@@ -6,9 +6,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.sql.*;
-import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.Date;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -16,7 +14,6 @@ public class ConceptExport {
     private static final Logger LOG = LoggerFactory.getLogger(ConceptExport.class);
 
     private static final String APP_ID = "ConceptExport";
-    private static final String LAST_DBID = "LastDbid";
     private static final Integer BATCH_SIZE = 50000;
     private static final Integer ZIP_BUFFER = 1024 * 32;
 
@@ -28,6 +25,8 @@ public class ConceptExport {
             System.exit(-1);
         }
 
+        config = new ConfigHelper(APP_ID);
+
         String conceptDir = argv[0];
         if (!conceptDir.endsWith("/"))
             conceptDir += "/";
@@ -35,54 +34,75 @@ public class ConceptExport {
         LOG.info("Exporting new concepts from IM1");
         LOG.debug("Working directory [{}]", conceptDir);
 
-        config = new ConfigHelper(APP_ID);
-        Integer lastDbid = getLastExportedDbidFromConfig();
+        cleanupGit(conceptDir);
 
-        Integer newDbid = exportNewData(conceptDir, lastDbid);
+        int lastDbid = getLastDbidFromConceptFile(conceptDir);
+        int currDbid = getLatestDbidFromDatabase();
+        int newConcepts = currDbid - lastDbid;
 
-        if (newDbid != null && newDbid.equals(lastDbid)) {
-            LOG.info("No new concepts");
+        if (newConcepts < 0) {
+            LOG.error("File in GIT has more concepts than database!!");
+        } else if (newConcepts == 0) {
+            LOG.info("No changes");
         } else {
-            LOG.warn("New concepts added");
-            prepareGit(conceptDir);
+            LOG.info("{} new concepts added", newConcepts);
+            exportNewData(conceptDir);
             zipConceptFile(conceptDir);
             pushFileToGit(conceptDir);
-            saveLastExportedDbidToConfig(newDbid);
         }
-
-        LOG.info("Export complete");
+        LOG.info("Finished");
     }
 
-    private static Integer getLastExportedDbidFromConfig() throws SQLException, JsonProcessingException {
+    private static int getLastDbidFromConceptFile(String conceptDir) throws IOException {
         LOG.debug("Retrieving last exported DBID...");
 
-        Integer dbid = config.get(LAST_DBID, Integer.class);
+        String lastLine = null;
+        try (FileReader fr = new FileReader(conceptDir + "IMv1/concepts.txt");
+             BufferedReader br = new BufferedReader(fr)) {
 
-        if (dbid == null) {
-            LOG.warn("First run, exporting all concepts");
-        } else {
-            LOG.info("Continuing from {}", dbid);
+            String current;
+            while ((current = br.readLine()) != null) {
+                lastLine = current;
+            }
         }
 
-        return dbid;
+        if (lastLine == null) {
+            LOG.warn("First run, exporting all concepts");
+            return 0;
+        } else {
+            int dbid = Integer.parseInt(lastLine.split("\t")[0]);
+            LOG.info("Latest on git {}", dbid);
+            return dbid;
+        }
     }
 
-    private static Integer exportNewData(String conceptFile, Integer startDbid) throws SQLException, IOException {
+    private static int getLatestDbidFromDatabase() throws SQLException, JsonProcessingException {
+        LOG.debug("Retrieving latest DBID from database...");
+        try (Connection conn = getIMv1Connection();
+             PreparedStatement stmt = conn.prepareStatement("SELECT MAX(dbid) FROM concept");
+             ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                int dbid = rs.getInt(1);
+                LOG.info("Latest in database {}", dbid);
+                return dbid;
+            } else {
+                LOG.error("Database table empty!");
+                return 0;
+            }
+        }
+    }
+
+    private static void exportNewData(String conceptFile) throws SQLException, IOException {
         LOG.info("Checking for new concepts...");
         StringJoiner sql = new StringJoiner(System.lineSeparator())
             .add("SELECT *")
             .add("FROM concept");
-
-        if (startDbid != null)
-            sql.add("WHERE dbid > ?");
 
         try (Connection conn = getIMv1Connection();
              PreparedStatement stmt = conn.prepareStatement(sql.toString(), ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
              FileWriter fw = new FileWriter(conceptFile + "IMv1/concepts.txt");
              BufferedWriter bw = new BufferedWriter(fw);
              PrintWriter out = new PrintWriter(bw)) {
-            if (startDbid != null)
-                stmt.setInt(1, startDbid);
 
             stmt.setFetchSize(Integer.MIN_VALUE);
 
@@ -94,7 +114,7 @@ public class ConceptExport {
                 while (rs.next()) {
                     if (++count % BATCH_SIZE == 0)
                         LOG.info("...{}...", count);
-                    startDbid = rs.getInt("dbid");
+
                     StringJoiner row = new StringJoiner("\t");
 
                     for (int i = 1; i <= meta.getColumnCount(); i++) {
@@ -107,8 +127,6 @@ public class ConceptExport {
                 LOG.info("{} new concepts", count);
             }
         }
-
-        return startDbid;
     }
 
     private static Connection getIMv1Connection() throws SQLException, JsonProcessingException {
@@ -118,8 +136,8 @@ public class ConceptExport {
         return DriverManager.getConnection(v1Conn.getUrl(), v1Conn.getUsername(), v1Conn.getPassword());
     }
 
-    private static void prepareGit(String conceptDir) throws IOException, InterruptedException {
-        LOG.info("Preparing GIT");
+    private static void cleanupGit(String conceptDir) throws IOException, InterruptedException {
+        LOG.info("Cleaning up local GIT repository...");
         // Rollback any local/pending in case of failed previous run
         git("fetch", conceptDir);
         git("reset --hard origin/main", conceptDir);
@@ -156,7 +174,7 @@ public class ConceptExport {
 
     private static void git(String command, String conceptDir) throws IOException, InterruptedException {
         String gitCmd = "git " + command;
-        LOG.info("Command [{}]", gitCmd);
+        LOG.debug("Command [{}]", gitCmd);
 
         Runtime rt = Runtime.getRuntime();
         Process proc = rt.exec(gitCmd, null, new File(conceptDir));
@@ -172,12 +190,8 @@ public class ConceptExport {
     }
 
     private static String getStreamAsString(InputStream is) throws IOException {
-        byte b[]=new byte[is.available()];
+        byte[] b=new byte[is.available()];
         is.read(b,0,b.length);
         return new String(b);
-    }
-    private static void saveLastExportedDbidToConfig(Integer lastDbid) throws SQLException, JsonProcessingException {
-        LOG.info("Updating config with latest ID..");
-        config.set(LAST_DBID, lastDbid);
     }
 }
