@@ -14,7 +14,7 @@ public class ConceptExport {
     private static final Logger LOG = LoggerFactory.getLogger(ConceptExport.class);
 
     private static final String APP_ID = "ConceptExport";
-    private static final Integer BATCH_SIZE = 50000;
+    private static final Integer BATCH_SIZE = 100000;
     private static final Integer ZIP_BUFFER = 1024 * 32;
 
     private static ConfigHelper config;
@@ -113,7 +113,7 @@ public class ConceptExport {
                 LOG.info("Fetching....");
                 while (rs.next()) {
                     if (++count % BATCH_SIZE == 0)
-                        LOG.info("...{}...", count);
+                        LOG.trace("...{}...", count);
 
                     StringJoiner row = new StringJoiner("\t");
 
