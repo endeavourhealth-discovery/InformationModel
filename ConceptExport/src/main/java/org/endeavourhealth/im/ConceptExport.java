@@ -95,8 +95,9 @@ public class ConceptExport {
     private static void exportNewData(String conceptFile) throws SQLException, IOException {
         LOG.info("Checking for new concepts...");
         StringJoiner sql = new StringJoiner(System.lineSeparator())
-            .add("SELECT *")
-            .add("FROM concept");
+            .add("SELECT c.dbid, c.id, c.name, c.description, s.id AS scheme, c.code, c.use_count, c.draft")
+            .add("FROM concept c")
+            .add("LEFT JOIN concept s ON s.dbid = c.scheme");
 
         try (Connection conn = getIMv1Connection();
              PreparedStatement stmt = conn.prepareStatement(sql.toString(), ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
@@ -118,10 +119,7 @@ public class ConceptExport {
                     StringJoiner row = new StringJoiner("\t");
 
                     for (int i = 1; i <= meta.getColumnCount(); i++) {
-                        String data = rs.getString(i);
-                        if (data != null)
-                            data = data.replace("\n", "\\n").replace("\r", "\\r");
-                        row.add(data);
+                        row.add(rs.getString(i));
                     }
 
                     out.println(row);
