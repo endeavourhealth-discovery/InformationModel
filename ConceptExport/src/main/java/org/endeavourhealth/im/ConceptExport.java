@@ -118,7 +118,7 @@ public class ConceptExport {
                     StringJoiner row = new StringJoiner("\t");
 
                     for (int i = 1; i <= meta.getColumnCount(); i++) {
-                        row.add(rs.getString(i));
+                        row.add(rs.getString(i).replace("\n", "\\n").replace("\r", "\\r"));
                     }
 
                     out.println(row);
