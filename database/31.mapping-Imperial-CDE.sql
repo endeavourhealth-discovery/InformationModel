@@ -375,18 +375,18 @@ INSERT IGNORE INTO concept
 VALUES
 (1, 'IC_Enc_DayCase', @scm, 'IC_Enc_DayCase', 'Day case', 'Day case'),
 (1, 'IC_Enc_Inpatient', @scm, 'IC_Enc_Inpatient', 'Inpatient', 'Inpatient'),
-(1, 'IC_Enc_Maternity', @scm, 'IC_Enc_Maternity', 'Maternity', 'Maternity'),
 (1, 'IC_Enc_Newborn', @scm, 'IC_Enc_Newborn', 'Newborn', 'Newborn'),
+(1, 'IC_Enc_Maternity', @scm, 'IC_Enc_Maternity', 'Maternity', 'Maternity'),
 (1, 'IC_Enc_RegRDayAdm', @scm, 'IC_Enc_RegRDayAdm', 'Regular day admission', 'Regular day admission'),
+(1, 'IC_Enc_Emergency', @scm, 'IC_Enc_Emergency', 'Emergency department', 'Emergency department'),
+(1, 'IC_Enc_IPWL', @scm, 'IC_Enc_IPWL', 'Inpatient waiting list', 'Inpatient waiting list'),
+(1, 'IC_Enc_DCWL', @scm, 'IC_Enc_DCWL', 'Day case waiting list', 'Day case waiting list'),
+(1, 'IC_Enc_OPReferral', @scm, 'IC_Enc_OPReferral', 'Outpatient referral', 'Outpatient referral'),
+(1, 'IC_Enc_PreReg', @scm, 'IC_Enc_PreReg', 'Preregistration', 'Preregistration'),
 (1, 'IC_Enc_RegNghtAdm', @scm, 'IC_Enc_RegNghtAdm', 'Regular night admission', 'Regular night admission'),
 (1, 'IC_Enc_DirectRef', @scm, 'IC_Enc_DirectRef', 'Direct referral', 'Direct referral'),
-(1, 'IC_Enc_Emergency', @scm, 'IC_Enc_Emergency', 'Emergency department', 'Emergency department'),
-(1, 'IC_Enc_Outpatient', @scm, 'IC_Enc_Outpatient', 'Outpatient', 'Outpatient'),
-(1, 'IC_Enc_DCWL', @scm, 'IC_Enc_DCWL', 'Day case waiting list', 'Day case waiting list'),
-(1, 'IC_Enc_PreReg', @scm, 'IC_Enc_PreReg', 'Preregistration', 'Preregistration'),
-(1, 'IC_Enc_IPWL', @scm, 'IC_Enc_IPWL', 'Inpatient waiting list', 'Inpatient waiting list'),
 (1, 'IC_Enc_PreAdmit', @scm, 'IC_Enc_PreAdmit', 'Outpatient registration', 'Outpatient registration'),
-(1, 'IC_Enc_OPReferral', @scm, 'IC_Enc_OPReferral', 'Outpatient referral', 'Outpatient referral');
+(1, 'IC_Enc_Outpatient', @scm, 'IC_Enc_Outpatient', 'Outpatient', 'Outpatient');
 
 -- Context
 INSERT INTO map_context_meta (provider, `system`, `schema`, `table`, `column`, node)
@@ -408,11 +408,10 @@ VALUES
 ('/IMPRL/CRNR/CDE/ENCNTR_TYP', '9033727', 'ImperialCerner', 'IC_Enc_Emergency'),
 ('/IMPRL/CRNR/CDE/ENCNTR_TYP', '9033735', 'ImperialCerner', 'IC_Enc_IPWL'),
 ('/IMPRL/CRNR/CDE/ENCNTR_TYP', '9033737', 'ImperialCerner', 'IC_Enc_DCWL'),
-('/IMPRL/CRNR/CDE/ENCNTR_TYP', '9033741', 'ImperialCerner', 'IC_Enc_OPReferral');
+('/IMPRL/CRNR/CDE/ENCNTR_TYP', '9033741', 'ImperialCerner', 'IC_Enc_OPReferral'),
+('/IMPRL/CRNR/CDE/ENCNTR_TYP', '9033731', 'ImperialCerner', 'IC_Enc_PreReg'),
+('/IMPRL/CRNR/CDE/ENCNTR_TYP', '9033721', 'ImperialCerner', 'IC_Enc_RegNghtAdm'),
+('/IMPRL/CRNR/CDE/ENCNTR_TYP', '9033725', 'ImperialCerner', 'IC_Enc_DirectRef'),
+('/IMPRL/CRNR/CDE/ENCNTR_TYP', '9033733', 'ImperialCerner', 'IC_Enc_PreAdmit'),
+('/IMPRL/CRNR/CDE/ENCNTR_TYP', '9033739', 'ImperialCerner', 'IC_Enc_Outpatient');
 
-
-/*('/IMPRL/CRNR/CDE/ENCNTR_TYP', 'REGNGHTADM', 'ImperialCerner', 'IC_Enc_RegNghtAdm'),
-('/IMPRL/CRNR/CDE/ENCNTR_TYP', 'DIRECTREF', 'ImperialCerner', 'IC_Enc_DirectRef'),
-('/IMPRL/CRNR/CDE/ENCNTR_TYP', 'OUTPATIENT', 'ImperialCerner', 'IC_Enc_Outpatient'),
-('/IMPRL/CRNR/CDE/ENCNTR_TYP', 'PREREG', 'ImperialCerner', 'IC_Enc_PreReg'),
-('/IMPRL/CRNR/CDE/ENCNTR_TYP', 'PREADMIT', 'ImperialCerner', 'IC_Enc_PreAdmit'),*/
