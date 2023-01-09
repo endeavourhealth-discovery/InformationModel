@@ -262,15 +262,15 @@ VALUES
     ('/IMPRL/CRNR/CDE/TRTMNT_FNCTN', '13835811', 'ImperialCerner', 'CM_TrtmntFnc920'),
     ('/IMPRL/CRNR/CDE/TRTMNT_FNCTN', '375171001', 'ImperialCerner', 'CM_TrtmntFnc654'),
     ('/IMPRL/CRNR/CDE/TRTMNT_FNCTN', '375170775', 'ImperialCerner', 'CM_TrtmntFnc654'),
-    ('/IMPRL/CRNR/CDE/TRTMNT_FNCTN', '11955726', 'ImperialCerner', 'CM_TrtmntFnc147L'),
-    ('/IMPRL/CRNR/CDE/TRTMNT_FNCTN', '11953903', 'ImperialCerner', 'CM_TrtmntFnc820L'),
-    ('/IMPRL/CRNR/CDE/TRTMNT_FNCTN', '11953911', 'ImperialCerner', 'CM_TrtmntFnc823L'),
-    ('/IMPRL/CRNR/CDE/TRTMNT_FNCTN', '11953913', 'ImperialCerner', 'CM_TrtmntFnc824L'),
-    ('/IMPRL/CRNR/CDE/TRTMNT_FNCTN', '11953917', 'ImperialCerner', 'CM_TrtmntFnc831L'),
-    ('/IMPRL/CRNR/CDE/TRTMNT_FNCTN', '11953925', 'ImperialCerner', 'CM_TrtmntFnc900L'),
-    ('/IMPRL/CRNR/CDE/TRTMNT_FNCTN', '11953927', 'ImperialCerner', 'CM_TrtmntFnc901L'),
-    ('/IMPRL/CRNR/CDE/TRTMNT_FNCTN', '11953935', 'ImperialCerner', 'CM_TrtmntFnc903L'),
-    ('/IMPRL/CRNR/CDE/TRTMNT_FNCTN', '11953940', 'ImperialCerner', 'CM_TrtmntFnc950L');
+    ('/IMPRL/CRNR/CDE/TRTMNT_FNCTN', '11955726', 'ImperialCerner', 'CM_TrtmntFnc147'),
+    ('/IMPRL/CRNR/CDE/TRTMNT_FNCTN', '11953903', 'ImperialCerner', 'CM_TrtmntFnc820'),
+    ('/IMPRL/CRNR/CDE/TRTMNT_FNCTN', '11953911', 'ImperialCerner', 'CM_TrtmntFnc823'),
+    ('/IMPRL/CRNR/CDE/TRTMNT_FNCTN', '11953913', 'ImperialCerner', 'CM_TrtmntFnc824'),
+    ('/IMPRL/CRNR/CDE/TRTMNT_FNCTN', '11953917', 'ImperialCerner', 'CM_TrtmntFnc831'),
+    ('/IMPRL/CRNR/CDE/TRTMNT_FNCTN', '11953925', 'ImperialCerner', 'CM_TrtmntFnc900'),
+    ('/IMPRL/CRNR/CDE/TRTMNT_FNCTN', '11953927', 'ImperialCerner', 'CM_TrtmntFnc901'),
+    ('/IMPRL/CRNR/CDE/TRTMNT_FNCTN', '11953935', 'ImperialCerner', 'CM_TrtmntFnc903'),
+    ('/IMPRL/CRNR/CDE/TRTMNT_FNCTN', '11953940', 'ImperialCerner', 'CM_TrtmntFnc950');
 
 -- ******************** Language ********************
 
