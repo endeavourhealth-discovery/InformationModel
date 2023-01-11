@@ -21,7 +21,8 @@ VALUES
 -- GENERAL/GLOBAL --
 (1, 'CM_Org_Imperial', @scm, 'CM_Org_Imperial', 'Imperial College', 'Imperial College Hospital, London'),
 (1, 'CM_Sys_Cerner', @scm, 'CM_Sys_Cerner', 'Cerner Millennium', 'Cerner Millennium system'),
-(1, 'ImperialCerner', @scm, 'ImperialCerner', 'Imperial Local Codes', 'Imperial Cerner local code scheme');
+(1, 'ImperialCerner', @scm, 'ImperialCerner', 'Imperial Local Codes', 'Imperial Cerner local code scheme'),
+(1, 'DM_patientFIN', @scm, 'DM_patientFIN', 'Patient FIN', 'Patient FIN');
 
 INSERT IGNORE INTO concept_property_data
 (`dbid`, `group`, `property`, `value`)
@@ -29,6 +30,16 @@ SELECT c.dbid, 0 AS `group`, p.dbid AS `property`, 'IC_' AS `value`
 FROM concept c
          JOIN concept p ON p.id = 'code_prefix'
 WHERE c.id = 'ImperialCerner';
+
+-- ******************** FIN Number ********************
+
+-- Context
+INSERT INTO map_context_meta (provider, `system`, `schema`, `table`, `column`, node)
+VALUES ('CM_Org_Imperial', 'CM_Sys_Cerner', 'CDE', null, 'fin_number', '/IMPRL/CRNR/FN_NMBR');    -- Local
+
+-- Property
+INSERT INTO map_node_meta (node, concept)
+VALUES ('/IMPRL/CRNR/FN_NMBR',   'DM_patientFIN');
 
 -- ******************** Religion ********************
 
@@ -70,7 +81,7 @@ VALUES ('CM_Org_Imperial', 'CM_Sys_Cerner', 'CDE', null, 'ethnicity', '/IMPRL/CR
 
 -- Property
 INSERT INTO map_node_meta (node, concept)
-VALUES ('/IMPRL/CRNR/CDE/ETHNC_CTGRY', 'DM_religion');
+VALUES ('/IMPRL/CRNR/CDE/ETHNC_CTGRY', 'DM_ethnicity');
 
 -- Value maps
 INSERT INTO map_node_value_meta
@@ -307,63 +318,64 @@ VALUES
 ('/IMPRL/CRNR/CDE/LNGG', '9031950', 'ImperialCerner', 'FHIR_LANG_ak'),
 ('/IMPRL/CRNR/CDE/LNGG', '9031952', 'ImperialCerner', 'FHIR_LANG_am'),
 ('/IMPRL/CRNR/CDE/LNGG', '9031954', 'ImperialCerner', 'FHIR_LANG_ar'),
-('/IMPRL/CRNR/CDE/LNGG', '5', 'ImperialCerner', 'FHIR_LANG_bn'),
-('/IMPRL/CRNR/CDE/LNGG', '59', 'ImperialCerner', 'FHIR_LANG_cy'),
-('/IMPRL/CRNR/CDE/LNGG', '20', 'ImperialCerner', 'FHIR_LANG_de'),
-('/IMPRL/CRNR/CDE/LNGG', '21', 'ImperialCerner', 'FHIR_LANG_el'),
-('/IMPRL/CRNR/CDE/LNGG', '12', 'ImperialCerner', 'FHIR_LANG_en'),
-('/IMPRL/CRNR/CDE/LNGG', '48', 'ImperialCerner', 'FHIR_LANG_es'),
-('/IMPRL/CRNR/CDE/LNGG', '14', 'ImperialCerner', 'FHIR_LANG_fa'),
-('/IMPRL/CRNR/CDE/LNGG', '15', 'ImperialCerner', 'FHIR_LANG_fi'),
-('/IMPRL/CRNR/CDE/LNGG', '17', 'ImperialCerner', 'FHIR_LANG_fr'),
-('/IMPRL/CRNR/CDE/LNGG', '19', 'ImperialCerner', 'FHIR_LANG_gd'),
-('/IMPRL/CRNR/CDE/LNGG', '22', 'ImperialCerner', 'FHIR_LANG_gu'),
-('/IMPRL/CRNR/CDE/LNGG', '24', 'ImperialCerner', 'FHIR_LANG_ha'),
-('/IMPRL/CRNR/CDE/LNGG', '25', 'ImperialCerner', 'FHIR_LANG_he'),
-('/IMPRL/CRNR/CDE/LNGG', '26', 'ImperialCerner', 'FHIR_LANG_hi'),
-('/IMPRL/CRNR/CDE/LNGG', '27', 'ImperialCerner', 'FHIR_LANG_ig'),
-('/IMPRL/CRNR/CDE/LNGG', '28', 'ImperialCerner', 'FHIR_LANG_it'),
-('/IMPRL/CRNR/CDE/LNGG', '29', 'ImperialCerner', 'FHIR_LANG_ja'),
-('/IMPRL/CRNR/CDE/LNGG', '30', 'ImperialCerner', 'FHIR_LANG_ko'),
-('/IMPRL/CRNR/CDE/LNGG', '31', 'ImperialCerner', 'FHIR_LANG_ku'),
-('/IMPRL/CRNR/CDE/LNGG', '32', 'ImperialCerner', 'FHIR_LANG_ln'),
-('/IMPRL/CRNR/CDE/LNGG', '35', 'ImperialCerner', 'FHIR_LANG_ml'),
-('/IMPRL/CRNR/CDE/LNGG', '11', 'ImperialCerner', 'FHIR_LANG_nl'),
-('/IMPRL/CRNR/CDE/LNGG', '16', 'ImperialCerner', 'FHIR_LANG_nl'),
-('/IMPRL/CRNR/CDE/LNGG', '37', 'ImperialCerner', 'FHIR_LANG_no'),
-('/IMPRL/CRNR/CDE/LNGG', '42', 'ImperialCerner', 'FHIR_LANG_pa'),
-('/IMPRL/CRNR/CDE/LNGG', '40', 'ImperialCerner', 'FHIR_LANG_pl'),
-('/IMPRL/CRNR/CDE/LNGG', '38', 'ImperialCerner', 'FHIR_LANG_ps'),
-('/IMPRL/CRNR/CDE/LNGG', '41', 'ImperialCerner', 'FHIR_LANG_pt'),
-('/IMPRL/CRNR/CDE/LNGG', '43', 'ImperialCerner', 'FHIR_LANG_ru'),
-('/IMPRL/CRNR/CDE/LNGG', '45', 'ImperialCerner', 'FHIR_LANG_si'),
-('/IMPRL/CRNR/CDE/LNGG', '6', 'ImperialCerner', 'FHIR_LANG_so'),
-('/IMPRL/CRNR/CDE/LNGG', '46', 'ImperialCerner', 'FHIR_LANG_so'),
-('/IMPRL/CRNR/CDE/LNGG', '2', 'ImperialCerner', 'FHIR_LANG_sq'),
-('/IMPRL/CRNR/CDE/LNGG', '50', 'ImperialCerner', 'FHIR_LANG_sv'),
-('/IMPRL/CRNR/CDE/LNGG', '49', 'ImperialCerner', 'FHIR_LANG_sw'),
-('/IMPRL/CRNR/CDE/LNGG', '53', 'ImperialCerner', 'FHIR_LANG_ta'),
-('/IMPRL/CRNR/CDE/LNGG', '54', 'ImperialCerner', 'FHIR_LANG_th'),
-('/IMPRL/CRNR/CDE/LNGG', '55', 'ImperialCerner', 'FHIR_LANG_ti'),
-('/IMPRL/CRNR/CDE/LNGG', '52', 'ImperialCerner', 'FHIR_LANG_tl'),
-('/IMPRL/CRNR/CDE/LNGG', '56', 'ImperialCerner', 'FHIR_LANG_tr'),
-('/IMPRL/CRNR/CDE/LNGG', '57', 'ImperialCerner', 'FHIR_LANG_ur'),
-('/IMPRL/CRNR/CDE/LNGG', '9', 'ImperialCerner', 'FHIR_LANG_vi'),
-('/IMPRL/CRNR/CDE/LNGG', '58', 'ImperialCerner', 'FHIR_LANG_vi'),
-('/IMPRL/CRNR/CDE/LNGG', '60', 'ImperialCerner', 'FHIR_LANG_yo'),
-('/IMPRL/CRNR/CDE/LNGG', '7', 'ImperialCerner', 'FHIR_LANG_q4'),
-('/IMPRL/CRNR/CDE/LNGG', '34', 'ImperialCerner', 'FHIR_LANG_q5'),
+('/IMPRL/CRNR/CDE/LNGG', '9031956', 'ImperialCerner', 'FHIR_LANG_bn'),
+('/IMPRL/CRNR/CDE/LNGG', '9031958', 'ImperialCerner', 'FHIR_LANG_cy'),
+('/IMPRL/CRNR/CDE/LNGG', '9031960', 'ImperialCerner', 'FHIR_LANG_de'),
+('/IMPRL/CRNR/CDE/LNGG', '9031962', 'ImperialCerner', 'FHIR_LANG_el'),
+('/IMPRL/CRNR/CDE/LNGG', '151', 'ImperialCerner', 'FHIR_LANG_en'),
+('/IMPRL/CRNR/CDE/LNGG', '9031965', 'ImperialCerner', 'FHIR_LANG_es'),
+('/IMPRL/CRNR/CDE/LNGG', '9031967', 'ImperialCerner', 'FHIR_LANG_fa'),
+('/IMPRL/CRNR/CDE/LNGG', '9031969', 'ImperialCerner', 'FHIR_LANG_fi'),
+('/IMPRL/CRNR/CDE/LNGG', '9031971', 'ImperialCerner', 'FHIR_LANG_fr'),
+('/IMPRL/CRNR/CDE/LNGG', '9031973', 'ImperialCerner', 'FHIR_LANG_gd'),
+('/IMPRL/CRNR/CDE/LNGG', '9031975', 'ImperialCerner', 'FHIR_LANG_gu'),
+('/IMPRL/CRNR/CDE/LNGG', '9031977', 'ImperialCerner', 'FHIR_LANG_ha'),
+('/IMPRL/CRNR/CDE/LNGG', '9031979', 'ImperialCerner', 'FHIR_LANG_he'),
+('/IMPRL/CRNR/CDE/LNGG', '9031981', 'ImperialCerner', 'FHIR_LANG_hi'),
+('/IMPRL/CRNR/CDE/LNGG', '9031983', 'ImperialCerner', 'FHIR_LANG_ig'),
+('/IMPRL/CRNR/CDE/LNGG', '9031985', 'ImperialCerner', 'FHIR_LANG_it'),
+('/IMPRL/CRNR/CDE/LNGG', '9031987', 'ImperialCerner', 'FHIR_LANG_ja'),
+('/IMPRL/CRNR/CDE/LNGG', '9031989', 'ImperialCerner', 'FHIR_LANG_ko'),
+('/IMPRL/CRNR/CDE/LNGG', '9031991', 'ImperialCerner', 'FHIR_LANG_ku'),
+('/IMPRL/CRNR/CDE/LNGG', '9031993', 'ImperialCerner', 'FHIR_LANG_ln'),
+('/IMPRL/CRNR/CDE/LNGG', '9031995', 'ImperialCerner', 'FHIR_LANG_ml'),
+('/IMPRL/CRNR/CDE/LNGG', '9031997', 'ImperialCerner', 'FHIR_LANG_nl'),
+('/IMPRL/CRNR/CDE/LNGG', '9031999', 'ImperialCerner', 'FHIR_LANG_nl'),
+('/IMPRL/CRNR/CDE/LNGG', '9032001', 'ImperialCerner', 'FHIR_LANG_no'),
+('/IMPRL/CRNR/CDE/LNGG', '9032003', 'ImperialCerner', 'FHIR_LANG_pa'),
+('/IMPRL/CRNR/CDE/LNGG', '9032005', 'ImperialCerner', 'FHIR_LANG_pl'),
+('/IMPRL/CRNR/CDE/LNGG', '9031940', 'ImperialCerner', 'FHIR_LANG_ps'),
+('/IMPRL/CRNR/CDE/LNGG', '9032007', 'ImperialCerner', 'FHIR_LANG_pt'),
+('/IMPRL/CRNR/CDE/LNGG', '9032009', 'ImperialCerner', 'FHIR_LANG_ru'),
+('/IMPRL/CRNR/CDE/LNGG', '9032011', 'ImperialCerner', 'FHIR_LANG_si'),
+('/IMPRL/CRNR/CDE/LNGG', '9032015', 'ImperialCerner', 'FHIR_LANG_so'),
+('/IMPRL/CRNR/CDE/LNGG', '9032013', 'ImperialCerner', 'FHIR_LANG_so'),
+('/IMPRL/CRNR/CDE/LNGG', '9032017', 'ImperialCerner', 'FHIR_LANG_sq'),
+('/IMPRL/CRNR/CDE/LNGG', '9032019', 'ImperialCerner', 'FHIR_LANG_sv'),
+('/IMPRL/CRNR/CDE/LNGG', '9032021', 'ImperialCerner', 'FHIR_LANG_sw'),
+('/IMPRL/CRNR/CDE/LNGG', '9032023', 'ImperialCerner', 'FHIR_LANG_ta'),
+('/IMPRL/CRNR/CDE/LNGG', '9032025', 'ImperialCerner', 'FHIR_LANG_th'),
+('/IMPRL/CRNR/CDE/LNGG', '9032027', 'ImperialCerner', 'FHIR_LANG_ti'),
+('/IMPRL/CRNR/CDE/LNGG', '9032029', 'ImperialCerner', 'FHIR_LANG_tl'),
+('/IMPRL/CRNR/CDE/LNGG', '9032031', 'ImperialCerner', 'FHIR_LANG_tr'),
+('/IMPRL/CRNR/CDE/LNGG', '9032033', 'ImperialCerner', 'FHIR_LANG_ur'),
+('/IMPRL/CRNR/CDE/LNGG', '9032037', 'ImperialCerner', 'FHIR_LANG_vi'),
+('/IMPRL/CRNR/CDE/LNGG', '9032035', 'ImperialCerner', 'FHIR_LANG_vi'),
+('/IMPRL/CRNR/CDE/LNGG', '9032039', 'ImperialCerner', 'FHIR_LANG_yo'),
+('/IMPRL/CRNR/CDE/LNGG', '9031942', 'ImperialCerner', 'FHIR_LANG_q4'),
+('/IMPRL/CRNR/CDE/LNGG', '9031928', 'ImperialCerner', 'FHIR_LANG_q5'),
 -- Local
-('/IMPRL/CRNR/CDE/LNGG', '8', 'ImperialCerner', 'IC_Lang_8'),
-('/IMPRL/CRNR/CDE/LNGG', '10', 'ImperialCerner', 'IC_Lang_10'),
-('/IMPRL/CRNR/CDE/LNGG', '13', 'ImperialCerner', 'IC_Lang_13'),
-('/IMPRL/CRNR/CDE/LNGG', '18', 'ImperialCerner', 'IC_Lang_18'),
-('/IMPRL/CRNR/CDE/LNGG', '23', 'ImperialCerner', 'IC_Lang_23'),
-('/IMPRL/CRNR/CDE/LNGG', '33', 'ImperialCerner', 'IC_Lang_33'),
-('/IMPRL/CRNR/CDE/LNGG', '36', 'ImperialCerner', 'IC_Lang_36'),
-('/IMPRL/CRNR/CDE/LNGG', '200', 'ImperialCerner', 'IC_Lang_200'),
-('/IMPRL/CRNR/CDE/LNGG', '39', 'ImperialCerner', 'IC_Lang_39'),
-('/IMPRL/CRNR/CDE/LNGG', '51', 'ImperialCerner', 'IC_Lang_51');
+('/IMPRL/CRNR/CDE/LNGG', '9031924', 'ImperialCerner', 'IC_Lang_8'),
+('/IMPRL/CRNR/CDE/LNGG', '9031944', 'ImperialCerner', 'IC_Lang_10'),
+('/IMPRL/CRNR/CDE/LNGG', '9031946', 'ImperialCerner', 'IC_Lang_13'),
+('/IMPRL/CRNR/CDE/LNGG', '9031948', 'ImperialCerner', 'IC_Lang_18'),
+('/IMPRL/CRNR/CDE/LNGG', '9031936', 'ImperialCerner', 'IC_Lang_23'),
+('/IMPRL/CRNR/CDE/LNGG', '9031938', 'ImperialCerner', 'IC_Lang_33'),
+('/IMPRL/CRNR/CDE/LNGG', '9031934', 'ImperialCerner', 'IC_Lang_36'),
+('/IMPRL/CRNR/CDE/LNGG', '9031922', 'ImperialCerner', 'IC_Lang_200'),
+('/IMPRL/CRNR/CDE/LNGG', '9031930', 'ImperialCerner', 'IC_Lang_39'),
+('/IMPRL/CRNR/CDE/LNGG', '9031926', 'ImperialCerner', 'IC_Lang_44'),
+('/IMPRL/CRNR/CDE/LNGG', '9031932', 'ImperialCerner', 'IC_Lang_51');
 
 -- ******************** Encounter ********************
 
