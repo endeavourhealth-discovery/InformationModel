@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.sql.*;
 import java.util.StringJoiner;
 import java.util.zip.ZipEntry;
@@ -177,5 +178,6 @@ public abstract class BaseExporter {
                 zipOut.write(bytes, 0, length);
             }
         }
+        Files.delete(fileToZip.toPath());
     }
 }
