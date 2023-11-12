@@ -26,6 +26,7 @@ public class ConceptExport {
 
         new NewConceptExporter().execute(conceptDir + "IMv1/concepts.txt", conceptDir + "IMv1/concepts.zip");
         new EmisMapExporter().execute(conceptDir + "EMIS/emis_codes.txt", conceptDir + "EMIS/emis_codes.zip");
+        new EmisDrugExporter().execute(conceptDir + "EMIS/EMISDrugs.txt", conceptDir + "EMIS/EMISDrugs.zip");
 
         pushChangesToGit(conceptDir);
         LOG.info("Finished");
