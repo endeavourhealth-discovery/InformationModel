@@ -56,7 +56,10 @@ CREATE TABLE read_v2_map (
                              status BOOLEAN NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-LOAD DATA LOCAL INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 5.7\\Uploads\\nhs_datamigration\\Mapping Tables\\Updated\\Clinically Assured\\rcsctmap2_uk_20181031000001.txt'
+SET GLOBAL local_infile=ON;
+
+-- LOAD DATA LOCAL INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 5.7\\Uploads\\nhs_datamigration\\Mapping Tables\\Updated\\Clinically Assured\\rcsctmap2_uk_20181031000001.txt'
+LOAD DATA INFILE 'Z:\\ImportData\\TRUD\\MAPS\\2020-04-01\\Mapping Tables\\Updated\\Clinically Assured\\rcsctmap2_uk_20200401000001.txt'
     INTO TABLE read_v2_map
     FIELDS TERMINATED BY '\t'
     LINES TERMINATED BY '\r\n'
@@ -76,7 +79,10 @@ CREATE TABLE read_v2_alt_map (
                                  PRIMARY KEY read_v2_alt_map_pk (readCode, termCode)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-LOAD DATA LOCAL INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 5.7\\Uploads\\SNOMED\\codesWithValues_AlternateMaps_READ2_20180401000001.txt'
+SET GLOBAL local_infile=ON;
+
+-- LOAD DATA LOCAL INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 5.7\\Uploads\\SNOMED\\codesWithValues_AlternateMaps_READ2_20180401000001.txt'
+LOAD DATA INFILE 'Z:\\ImportData\\TRUD\\MAPS\\2020-04-01\\Mapping Tables\\Updated\\Clinically Assured\\codesWithValues_AlternateMaps_READ2_20200401000001.txt'
     INTO TABLE read_v2_alt_map
     FIELDS TERMINATED BY '\t'
     LINES TERMINATED BY '\r\n'

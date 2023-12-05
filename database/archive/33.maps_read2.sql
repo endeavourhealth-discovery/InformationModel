@@ -7,7 +7,7 @@ CREATE TABLE read_v2_map_tmp (
 
 INSERT INTO read_v2_map_tmp
 (readCode, conceptId)
-SELECT m.readCode, m.conceptId
+SELECT DISTINCT m.readCode, m.conceptId
 FROM read_v2_map m
 JOIN concept c ON c.id = CONCAT('SN_', m.conceptId)
 WHERE m.assured = 1
@@ -24,7 +24,9 @@ CREATE TABLE read_v2_map_summary (
     INDEX read_v2_map_summary_multi_idx (multi)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-SELECT t.readCode, COUNT(DISTINCT c.dbid) > 1 as multi, c.dbid, IF(c.dbid is null, null, a.conceptId) as conceptId
+INSERT INTO read_v2_map_summary
+(readCode, multi, altConceptId)
+SELECT t.readCode, COUNT(t.readCode) > 1 as multi, IF(c.dbid is null, null, a.conceptId) as conceptId
 FROM read_v2_map_tmp t
 LEFT JOIN read_v2_alt_map a ON a.readCode = t.readCode AND a.termCode = '00' AND a.conceptId IS NOT NULL AND a.useAlt = 'Y'
 LEFT JOIN concept c ON c.id = CONCAT('SN_', a.conceptId)
@@ -32,7 +34,8 @@ GROUP BY t.readCode;
 
 -- Add 1:1 maps
 SET @prop = get_dbid('is_equivalent_to');
-INSERT INTO concept_property_object
+
+INSERT INTO concept_property_object_new
 (dbid, property, value)
 SELECT c.dbid, @prop, v.dbid
 FROM read_v2_map_summary s
@@ -42,7 +45,7 @@ JOIN concept v ON v.id = CONCAT('SN_', t.conceptId)
 WHERE s.multi = FALSE;
 
 -- Add 1:n maps with alternative overrides
-INSERT INTO concept_property_object
+INSERT INTO concept_property_object_new
 (dbid, property, value)
 SELECT c.dbid, @prop, v.dbid
 FROM read_v2_map_summary s
@@ -59,12 +62,12 @@ INSERT INTO document
 VALUES
 ('http://DiscoveryDataService/InformationModel/dm/R2-proxy/1.0.1');
 
-SELECT @doc := LAST_INSERT_ID();
+SELECT @doc := 1;
 
 -- Create proxy concepts
 INSERT INTO concept
 (document, id)
-SELECT @doc, CONCAT('DS_R2_', s.readCode)
+SELECT @doc, CONCAT('MISSING_DS_R2_', s.readCode)
 FROM read_v2_map_summary s
 WHERE s.multi = TRUE
   AND s.altConceptId IS NULL;
@@ -116,3 +119,27 @@ JOIN concept v ON v.id = CONCAT('DS_R2_', s.readCode)
 WHERE s.multi = TRUE
   AND s.altConceptId IS NULL;
 
+
+/* PATCH SCRATCH
+CREATE TABLE im_patch.r2fix
+SELECT r.dbid as readDbid, r.id as readCode, r.name as readTerm, so.dbid AS oldSnomedDbid, so.id as oldSnomedIid, so.name as oldSnomedTerm, sn.dbid AS newSnomedDbid, sn.id as newSnomedId, sn.name as newSnomedTerm
+FROM concept_property_object_new n
+JOIN concept_property_object o ON o.dbid = n.dbid AND o.property = 50
+JOIN concept r ON r.dbid = n.dbid
+JOIN concept so ON so.dbid = o.value
+JOIN concept sn ON sn.dbid = n.value
+WHERE n.value != o.value;
+
+UPDATE concept_property_object cpo
+JOIN im_patch.r2fix f ON cpo.dbid = f.readDbid AND property = 50
+JOIN concept r ON r.dbid = f.readDbid
+SET cpo.value = f.newSnomedDbid
+WHERE cpo.value = f.oldSnomedDbid;
+
+UPDATE concept_map m
+JOIN im_patch.r2fix f ON m.legacy = f.readDbid
+SET m.core = f.newSnomedDbid
+WHERE m.core = f.oldSnomedDbid;
+
+
+ */
