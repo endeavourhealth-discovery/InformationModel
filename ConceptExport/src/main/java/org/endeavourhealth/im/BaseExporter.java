@@ -10,7 +10,6 @@ import java.sql.*;
 import java.util.StringJoiner;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-import java.util.zip.ZipOutputStream;
 
 public abstract class BaseExporter {
     private static final Logger LOG = LoggerFactory.getLogger(BaseExporter.class);
@@ -20,10 +19,10 @@ public abstract class BaseExporter {
 
     private static ConfigHelper config;
 
-    public void execute(String datafile) throws IOException, SQLException {
+    public void execute(String datafile) throws IOException, SQLException, InterruptedException {
         execute(datafile, null);
     }
-    public int execute(String dataFile, String zipFile) throws IOException, SQLException {
+    public int execute(String dataFile, String zipFile) throws IOException, SQLException, InterruptedException {
         try (Connection conn = getDbConnection()) {
             if (zipFile != null)
                 unzipFile(zipFile, dataFile);
@@ -165,21 +164,36 @@ public abstract class BaseExporter {
     }
     abstract String getNewRowSql();
 
-    protected void zipFile(String sourceFile, String destZip) throws IOException {
+    protected void zipFile(String sourceFile, String destZip) throws IOException, InterruptedException {
         LOG.info("Zipping {} to {}...", sourceFile, destZip);
-        File fileToZip = new File(sourceFile);
-        try (FileOutputStream fos = new FileOutputStream(destZip);
-             ZipOutputStream zipOut = new ZipOutputStream(fos);
-             FileInputStream fis = new FileInputStream(fileToZip)) {
 
-            ZipEntry zipEntry = new ZipEntry(fileToZip.getName());
-            zipOut.putNextEntry(zipEntry);
-            byte[] bytes = new byte[ZIP_BUFFER];
-            int length;
-            while ((length = fis.read(bytes)) >= 0) {
-                zipOut.write(bytes, 0, length);
-            }
+        String zipCmd = "zip -s 25m " + destZip + " " + sourceFile;
+
+        Runtime rt = Runtime.getRuntime();
+        Process proc = rt.exec(zipCmd);
+        proc.waitFor();
+
+        String output = getStreamAsString(proc.getInputStream());
+        if (!output.isEmpty())
+            LOG.debug(output);
+
+        String error = getStreamAsString(proc.getErrorStream());
+        if (!error.isEmpty())
+            LOG.error(error);
+
+        if (proc.exitValue() != 0) {
+            LOG.error("Zip command failed - {}", proc.exitValue());
+            System.exit(-1);
         }
+
+        File fileToZip = new File(sourceFile);
         Files.delete(fileToZip.toPath());
     }
+
+    static String getStreamAsString(InputStream is) throws IOException {
+        byte[] b=new byte[is.available()];
+        is.read(b,0,b.length);
+        return new String(b);
+    }
+
 }
