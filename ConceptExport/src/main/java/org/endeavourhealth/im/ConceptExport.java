@@ -24,11 +24,16 @@ public class ConceptExport {
 
         cleanupGit(conceptDir);
 
-        new NewConceptExporter().execute(conceptDir + "IMv1/concepts.txt", conceptDir + "IMv1/concepts.zip");
-        new EmisMapExporter().execute(conceptDir + "EMIS/emis_codes.txt", conceptDir + "EMIS/emis_codes.zip");
-        new EmisDrugExporter().execute(conceptDir + "EMIS/EMISDrugs.txt", conceptDir + "EMIS/EMISDrugs.zip");
+        int deltaRows = 0;
 
-        pushChangesToGit(conceptDir);
+        deltaRows += new NewConceptExporter().execute(conceptDir + "IMv1/concepts.txt", conceptDir + "IMv1/concepts.zip");
+        deltaRows += new EmisMapExporter().execute(conceptDir + "EMIS/emis_codes.txt", conceptDir + "EMIS/emis_codes.zip");
+        deltaRows += new EmisDrugExporter().execute(conceptDir + "EMIS/EMISDrugs.txt", conceptDir + "EMIS/EMISDrugs.zip");
+
+        if (deltaRows > 0) {
+            LOG.info("Total {} new rows", deltaRows);
+            pushChangesToGit(conceptDir);
+        }
         LOG.info("Finished");
     }
 
@@ -40,13 +45,6 @@ public class ConceptExport {
     }
 
     private static void pushChangesToGit(String conceptDir) throws IOException, InterruptedException {
-        LOG.info("Checking for changes");
-
-        if (!git("diff", conceptDir).contains("differ")) {
-            LOG.info("No changes detected");
-            return;
-        }
-
         LOG.info("Pushing to GIT");
 
         // Stage changed files

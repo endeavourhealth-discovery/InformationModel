@@ -23,7 +23,7 @@ public abstract class BaseExporter {
     public void execute(String datafile) throws IOException, SQLException {
         execute(datafile, null);
     }
-    public void execute(String dataFile, String zipFile) throws IOException, SQLException {
+    public int execute(String dataFile, String zipFile) throws IOException, SQLException {
         try (Connection conn = getDbConnection()) {
             if (zipFile != null)
                 unzipFile(zipFile, dataFile);
@@ -44,6 +44,8 @@ public abstract class BaseExporter {
                 if (zipFile != null)
                     zipFile(dataFile, zipFile);
             }
+
+            return newRows;
         }
     }
 
