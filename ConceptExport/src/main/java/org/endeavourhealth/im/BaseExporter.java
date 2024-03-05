@@ -183,8 +183,8 @@ public abstract class BaseExporter {
     static void deleteZipParts(String zipFile) throws IOException {
         File zip = new File(zipFile);
         File zipPath = new File(zip.getParent());
-        final String delPattern = zip.getName().substring(0, zip.getName().length() - 4) + ".z*";
-        LOG.info("Removing files matching {}/{}", zipPath, delPattern);
+        final String delPattern = zip.getName().substring(0, zip.getName().length() - 4) + ".z";
+        LOG.info("Removing files matching {}/{}*", zipPath, delPattern);
         for (File f: zipPath.listFiles((d,f) -> f.startsWith(delPattern))) {
             LOG.info("Deleting {} ...", f);
             Files.delete(f.toPath());
