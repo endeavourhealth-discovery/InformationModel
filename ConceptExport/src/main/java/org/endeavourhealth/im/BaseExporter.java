@@ -167,26 +167,29 @@ public abstract class BaseExporter {
     abstract String getNewRowSql();
 
     protected void zipFile(String sourceFile, String destZip) throws IOException, InterruptedException {
-        Runtime rt = Runtime.getRuntime();
-
-        String deletePattern = destZip.substring(0, destZip.length() - 4) + ".z";
-        LOG.info("Removing old zip file(s) {}...", deletePattern);
-
-        try {
-            for (File f : new File(".").listFiles((d, f) -> f.startsWith(deletePattern))) {
-                LOG.info("{}...", f);
-                Files.delete(f.toPath());
-            }
-        } catch (Exception e) {
-            LOG.info("Failed to delete file!");
+        String deletePattern = destZip.substring(0, destZip.length() - 4) + ".z??";
+        LOG.info("Removing old zip file(s) \"{}\" ...", deletePattern);
+        if (execCmd("rm " + deletePattern) != 0) {
+            LOG.error("Failed to delete file(s)!");
             System.exit(-1);
         }
 
         LOG.info("Zipping {} to {}...", sourceFile, destZip);
 
         String zipCmd = "zip -s 25m " + destZip + " " + sourceFile;
+        if (execCmd(zipCmd) != 0) {
+            LOG.error("Zip command failed!");
+            System.exit(-1);
+        }
 
-        Process proc = rt.exec(zipCmd);
+        File fileToZip = new File(sourceFile);
+        Files.delete(fileToZip.toPath());
+    }
+
+    static int execCmd(String command) throws InterruptedException, IOException {
+        Runtime rt = Runtime.getRuntime();
+
+        Process proc = rt.exec(command);
         proc.waitFor();
 
         String output = getStreamAsString(proc.getInputStream());
@@ -197,13 +200,7 @@ public abstract class BaseExporter {
         if (!error.isEmpty())
             LOG.error(error);
 
-        if (proc.exitValue() != 0) {
-            LOG.error("Zip command failed - {}", proc.exitValue());
-            System.exit(-1);
-        }
-
-        File fileToZip = new File(sourceFile);
-        Files.delete(fileToZip.toPath());
+        return proc.exitValue();
     }
 
     static String getStreamAsString(InputStream is) throws IOException {
