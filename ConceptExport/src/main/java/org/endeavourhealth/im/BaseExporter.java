@@ -6,6 +6,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Paths;
 import java.sql.*;
 import java.util.StringJoiner;
 import java.util.zip.ZipEntry;
@@ -165,11 +167,25 @@ public abstract class BaseExporter {
     abstract String getNewRowSql();
 
     protected void zipFile(String sourceFile, String destZip) throws IOException, InterruptedException {
+        Runtime rt = Runtime.getRuntime();
+
+        String deletePattern = destZip.substring(0, destZip.length() - 4) + ".z";
+        LOG.info("Removing old zip file(s) {}...", deletePattern);
+
+        try {
+            for (File f : new File(".").listFiles((d, f) -> f.startsWith(deletePattern))) {
+                LOG.info("{}...", f);
+                Files.delete(f.toPath());
+            }
+        } catch (Exception e) {
+            LOG.info("Failed to delete file!");
+            System.exit(-1);
+        }
+
         LOG.info("Zipping {} to {}...", sourceFile, destZip);
 
         String zipCmd = "zip -s 25m " + destZip + " " + sourceFile;
 
-        Runtime rt = Runtime.getRuntime();
         Process proc = rt.exec(zipCmd);
         proc.waitFor();
 
