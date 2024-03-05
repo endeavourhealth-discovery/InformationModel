@@ -167,15 +167,9 @@ public abstract class BaseExporter {
     abstract String getNewRowSql();
 
     protected void zipFile(String sourceFile, String destZip) throws IOException, InterruptedException {
-        String deletePattern = destZip.substring(0, destZip.length() - 4) + ".z??";
-        LOG.info("Removing old zip file(s) \"{}\" ...", deletePattern);
-        if (execCmd("rm " + deletePattern) != 0) {
-            LOG.error("Failed to delete file(s)!");
-            System.exit(-1);
-        }
+        deleteZipParts(destZip);
 
         LOG.info("Zipping {} to {}...", sourceFile, destZip);
-
         String zipCmd = "zip -s 25m " + destZip + " " + sourceFile;
         if (execCmd(zipCmd) != 0) {
             LOG.error("Zip command failed!");
@@ -184,6 +178,16 @@ public abstract class BaseExporter {
 
         File fileToZip = new File(sourceFile);
         Files.delete(fileToZip.toPath());
+    }
+
+    static void deleteZipParts(String zipFile) {
+        File zip = new File(zipFile);
+        File zipPath = new File(zip.getParent());
+        final String delPattern = zip.getName().substring(0, zip.getName().length() - 4) + ".z";
+        LOG.info("Removing files matching {}/{}", zipPath, delPattern);
+        for (File f: zipPath.listFiles((d,f) -> f.startsWith(delPattern))) {
+            LOG.info("Deleting {} ...", f);
+        }
     }
 
     static int execCmd(String command) throws InterruptedException, IOException {
