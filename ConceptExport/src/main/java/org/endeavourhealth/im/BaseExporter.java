@@ -33,18 +33,21 @@ public abstract class BaseExporter {
             int dbRows = getRowCountFromDatabase(conn);
             int newRows = dbRows - fileRows;
 
-            if (newRows < 0) {
-                LOG.error("File in GIT has more rows than database!!");
-                System.exit(-1);
-            } else if (newRows == 0) {
+            if (newRows == 0) {
                 LOG.info("No changes");
+                return 0;
+            }
+
+            if (newRows < 0) {
+                LOG.warn("Rows in database appears to have reduced from {} to {} ({})", fileRows, dbRows, newRows);
             } else {
                 LOG.info("{} new rows added", newRows);
-                exportNewRows(conn, dataFile);
-
-                if (zipFile != null)
-                    zipFile(dataFile, zipFile);
             }
+
+            exportNewRows(conn, dataFile);
+
+            if (zipFile != null)
+                zipFile(dataFile, zipFile);
 
             return newRows;
         }
