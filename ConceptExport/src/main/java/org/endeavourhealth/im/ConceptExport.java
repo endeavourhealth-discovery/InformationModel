@@ -26,9 +26,9 @@ public class ConceptExport {
 
         int deltaRows = 0;
 
-        deltaRows += new NewConceptExporter().execute(conceptDir + "IMv1/concepts.txt", conceptDir + "IMv1/concepts.zip");
-        deltaRows += new EmisMapExporter().execute(conceptDir + "EMIS/emis_codes.txt", conceptDir + "EMIS/emis_codes.zip");
-        deltaRows += new EmisDrugExporter().execute(conceptDir + "EMIS/EMISDrugs.txt", conceptDir + "EMIS/EMISDrugs.zip");
+        deltaRows += new NewConceptExporter().execute(conceptDir + "concepts.txt", conceptDir + "concepts.zip", new File(conceptDir + "IMv1/"));
+        deltaRows += new EmisMapExporter().execute(conceptDir + "emis_codes.txt", conceptDir + "emis_codes.zip", new File(conceptDir + "EMIS/"));
+        deltaRows += new EmisDrugExporter().execute(conceptDir + "EMISDrugs.txt", conceptDir + "EMISDrugs.zip", new File(conceptDir + "EMIS/"));
 
         if (deltaRows > 0) {
             LOG.info("Total {} new rows", deltaRows);

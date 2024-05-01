@@ -21,10 +21,7 @@ public abstract class BaseExporter {
 
     private static ConfigHelper config;
 
-    public void execute(String datafile) throws IOException, SQLException, InterruptedException {
-        execute(datafile, null);
-    }
-    public int execute(String dataFile, String zipFile) throws IOException, SQLException, InterruptedException {
+    public int execute(String dataFile, String zipFile, File workDir) throws IOException, SQLException, InterruptedException {
         try (Connection conn = getDbConnection()) {
             if (zipFile != null)
                 unzipFile(zipFile, dataFile);
@@ -47,7 +44,7 @@ public abstract class BaseExporter {
             exportNewRows(conn, dataFile);
 
             if (zipFile != null)
-                zipFile(dataFile, zipFile);
+                zipFile(dataFile, zipFile, workDir);
 
             return newRows;
         }
@@ -169,12 +166,12 @@ public abstract class BaseExporter {
     }
     abstract String getNewRowSql();
 
-    protected void zipFile(String sourceFile, String destZip) throws IOException, InterruptedException {
+    protected void zipFile(String sourceFile, String destZip, File workDir) throws IOException, InterruptedException {
         deleteZipParts(destZip);
 
         LOG.info("Zipping {} to {}...", sourceFile, destZip);
         String zipCmd = "zip -s 25m " + destZip + " " + sourceFile;
-        if (execCmd(zipCmd) != 0) {
+        if (execCmd(zipCmd, workDir) != 0) {
             LOG.error("Zip command failed!");
             System.exit(-1);
         }
@@ -194,10 +191,10 @@ public abstract class BaseExporter {
         }
     }
 
-    static int execCmd(String command) throws InterruptedException, IOException {
+    static int execCmd(String command, File workingDir) throws InterruptedException, IOException {
         Runtime rt = Runtime.getRuntime();
 
-        Process proc = rt.exec(command);
+        Process proc = rt.exec(command, null, workingDir);
         proc.waitFor();
 
         String output = getStreamAsString(proc.getInputStream());
