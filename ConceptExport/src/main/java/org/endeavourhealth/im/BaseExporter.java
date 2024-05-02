@@ -6,8 +6,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Paths;
 import java.sql.*;
 import java.util.StringJoiner;
 import java.util.zip.ZipEntry;
@@ -26,7 +24,7 @@ public abstract class BaseExporter {
             if (zipFile != null)
                 unzipFile(zipFile, dataFile);
 
-            int fileRows = getRowCountFromFile(dataFile);
+            int fileRows = getRowCountFromFile(workDir + dataFile);
             int dbRows = getRowCountFromDatabase(conn);
             int newRows = dbRows - fileRows;
 
