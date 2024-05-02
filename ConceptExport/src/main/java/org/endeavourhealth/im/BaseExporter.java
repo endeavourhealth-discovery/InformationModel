@@ -19,10 +19,10 @@ public abstract class BaseExporter {
 
     private static ConfigHelper config;
 
-    public int execute(String dataFile, String zipFile, File workDir) throws IOException, SQLException, InterruptedException {
+    public int execute(String dataFile, String zipFile, String workDir) throws IOException, SQLException, InterruptedException {
         try (Connection conn = getDbConnection()) {
             if (zipFile != null)
-                unzipFile(zipFile, dataFile);
+                unzipFile(zipFile, dataFile, workDir);
 
             int fileRows = getRowCountFromFile(workDir + dataFile);
             int dbRows = getRowCountFromDatabase(conn);
@@ -68,12 +68,12 @@ public abstract class BaseExporter {
         return config.get(configId, valueType);
     }
 
-    protected void unzipFile(String sourceZip, String destFile) throws IOException {
+    protected void unzipFile(String sourceZip, String destFile, String workDir) throws IOException {
         LOG.info("Unzipping {} to {}...", sourceZip, destFile);
-        File fileToUnzip = new File(sourceZip);
+        File fileToUnzip = new File(workDir + sourceZip);
         try (FileInputStream fis = new FileInputStream(fileToUnzip);
              ZipInputStream zipIn = new ZipInputStream(fis);
-             FileOutputStream fos = new FileOutputStream(destFile)) {
+             FileOutputStream fos = new FileOutputStream(workDir + destFile)) {
 
             ZipEntry zipEntry = zipIn.getNextEntry();
             byte[] bytes = new byte[ZIP_BUFFER];
@@ -164,12 +164,12 @@ public abstract class BaseExporter {
     }
     abstract String getNewRowSql();
 
-    protected void zipFile(String sourceFile, String destZip, File workDir) throws IOException, InterruptedException {
+    protected void zipFile(String sourceFile, String destZip, String workDir) throws IOException, InterruptedException {
         deleteZipParts(destZip);
 
         LOG.info("Zipping {} to {}...", sourceFile, destZip);
         String zipCmd = "zip -s 25m " + destZip + " " + sourceFile;
-        if (execCmd(zipCmd, workDir) != 0) {
+        if (execCmd(zipCmd, new File(workDir)) != 0) {
             LOG.error("Zip command failed!");
             System.exit(-1);
         }
