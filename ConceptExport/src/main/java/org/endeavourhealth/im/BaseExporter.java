@@ -165,7 +165,7 @@ public abstract class BaseExporter {
     abstract String getNewRowSql();
 
     protected void zipFile(String sourceFile, String destZip, String workDir) throws IOException, InterruptedException {
-        deleteZipParts(destZip);
+        deleteZipParts(workDir + destZip);
 
         LOG.info("Zipping {} to {}...", sourceFile, destZip);
         String zipCmd = "zip -s 25m " + destZip + " " + sourceFile;
@@ -174,7 +174,7 @@ public abstract class BaseExporter {
             System.exit(-1);
         }
 
-        File fileToZip = new File(sourceFile);
+        File fileToZip = new File(workDir + sourceFile);
         Files.delete(fileToZip.toPath());
     }
 
