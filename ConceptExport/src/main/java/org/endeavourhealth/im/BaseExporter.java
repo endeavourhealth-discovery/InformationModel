@@ -39,7 +39,7 @@ public abstract class BaseExporter {
                 LOG.info("{} new rows added", newRows);
             }
 
-            exportNewRows(conn, dataFile);
+            exportNewRows(conn, workDir + dataFile);
 
             if (zipFile != null)
                 zipFile(dataFile, zipFile, workDir);
