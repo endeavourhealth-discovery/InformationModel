@@ -29,6 +29,8 @@ public class ConceptExport {
         deltaRows += new NewConceptExporter().execute("concepts.txt", "concepts.zip", conceptDir + "IMv1/");
         deltaRows += new EmisMapExporter().execute("emis_codes.txt", "emis_codes.zip", conceptDir + "EMIS/");
         deltaRows += new EmisDrugExporter().execute("EMISDrugs.txt", "EMISDrugs.zip", conceptDir + "EMIS/");
+        deltaRows += new TPPConceptExporter().execute("tpp_ctv3_lookup_2.csv", "tpp_ctv3_lookup_2.zip", conceptDir + "TPP_Vision_Maps/");
+        deltaRows += new TPPMapExporter().execute("tpp_ctv3_to_snomed.csv", "tpp_ctv3_to_snomed.zip", conceptDir + "TPP_Vision_Maps/");
 
         if (deltaRows > 0) {
             LOG.info("Total {} new rows", deltaRows);
