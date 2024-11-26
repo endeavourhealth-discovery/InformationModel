@@ -66,3 +66,20 @@ FROM map_node_regex_meta m
          JOIN concept s ON s.dbid = v.code_scheme AND s.id = m.scheme
          JOIN concept c ON c.id = m.concept;
 
+--
+
+REPLACE INTO concept_property_object
+(dbid, property, value)
+SELECT DISTINCT l.dbid, p.dbid, c.dbid
+FROM map_legacy_core_meta m
+         JOIN concept l ON l.id = m.legacy
+         JOIN concept p ON p.id = 'is_equivalent_to'
+         JOIN concept c ON c.id = m.core;
+
+
+REPLACE INTO concept_map
+(legacy, core)
+SELECT DISTINCT l.dbid, c.dbid
+FROM map_legacy_core_meta m
+         JOIN concept l ON l.id = m.legacy
+         JOIN concept c ON c.id = m.core;

@@ -59,3 +59,14 @@ VALUES
     ('/NHS/NEMS/FHIR/PDS/STLLBRN_INDCTR', '2', 'FHIR_SBI', 'FHIR_SBI_2'),
     ('/NHS/NEMS/FHIR/PDS/STLLBRN_INDCTR', '3', 'FHIR_SBI', 'FHIR_SBI_3'),
     ('/NHS/NEMS/FHIR/PDS/STLLBRN_INDCTR', '4', 'FHIR_SBI', 'FHIR_SBI_4');
+
+
+-- Legacy Core Maps
+INSERT INTO map_legacy_core_meta
+(legacy, core)
+VALUES
+    ('FHIR_SBI_1', 'SN_281050002'),         -- Live Birth
+    ('FHIR_SBI_2', 'SN_713202001'),         -- Antepartum
+    ('FHIR_SBI_3', 'SN_921611000000101'),   -- Intrapartum
+    ('FHIR_SBI_4', 'SN_408796008');         -- Indeterminate
+

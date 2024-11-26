@@ -56,3 +56,11 @@ VALUES
     ('/NHS/NEMS/FHIR/PDS/SSPCTD_CNGNTL_ABNRMLTY', 'N', 'FHIR_SCAI', 'FHIR_SCAI_N'),
     ('/NHS/NEMS/FHIR/PDS/SSPCTD_CNGNTL_ABNRMLTY', 'U', 'FHIR_SCAI', 'FHIR_SCAI_U'),
     ('/NHS/NEMS/FHIR/PDS/SSPCTD_CNGNTL_ABNRMLTY', 'Y', 'FHIR_SCAI', 'FHIR_SCAI_Y');
+
+-- Legacy Core Maps
+INSERT INTO map_legacy_core_meta
+(legacy, core)
+VALUES
+--  ('FHIR_SCAI_N', ''),         -- None - No map
+    ('FHIR_SCAI_U', 'SN_444436002'),        -- Intrapartum
+    ('FHIR_SCAI_Y', 'SN_1097291000000101'); -- Indeterminate

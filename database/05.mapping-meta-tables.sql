@@ -44,3 +44,10 @@ CREATE TABLE map_function_value_meta (
     `function`  VARCHAR(200)
 ) ENGINE = Memory
   DEFAULT CHARSET = utf8;
+
+DROP TABLE IF EXISTS map_legacy_core_meta;
+CREATE TABLE map_legacy_core_meta (
+    legacy VARCHAR(150),
+    core VARCHAR(150)
+) ENGINE = Memory
+  DEFAULT CHARSET = utf8;

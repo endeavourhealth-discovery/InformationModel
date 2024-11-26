@@ -30,3 +30,10 @@ FROM map_node_regex_meta m
          LEFT JOIN concept c ON c.id = m.concept
 WHERE s.dbid IS NULL
    OR c.dbid IS NULL;
+
+SELECT DISTINCT m.legacy, m.core
+FROM map_legacy_core_meta m
+         LEFT JOIN concept l ON l.id = m.legacy
+         LEFT JOIN concept c ON c.id = m.core
+WHERE l.dbid IS NULL
+   OR c.dbid IS NULL;
